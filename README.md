@@ -4,6 +4,7 @@ Qubic Wallet Browser Extension
 ## Getting started
 - Install dependencies: `bun install`
 - Start dev server: `bun dev`
+- Extension live rebuild: `bun run dev:extension`
 - Build extension: `bun run build`
 
 ## Load in Chrome
@@ -12,6 +13,11 @@ Qubic Wallet Browser Extension
 3. Enable **Developer mode**
 4. Click **Load unpacked** and select the `dist` folder
 5. Click the extension icon to open the popup
+
+## Live rebuild workflow (no reloading the extension)
+1. Run `bun run dev:extension` (outputs to `dist-dev`)
+2. In Chrome, load `dist-dev` once via **Load unpacked**
+3. Keep the popup open or reopen it to see updates as files change
 
 ## Folder structure
 ```

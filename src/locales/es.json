@@ -5,13 +5,20 @@
     "language": "Idioma"
   },
   "nav": {
+    "welcome": "Bienvenida",
     "home": "Inicio",
+    "history": "Historial",
+    "accounts": "Cuentas",
     "settings": "Ajustes"
   },
   "home": {
     "headline": "Acceso rapido a tu cartera Qubic",
     "subhead": "Revisa saldos y actividad reciente sin salir de tu pestana.",
     "cta": "Ir a ajustes",
+    "actions": {
+      "history": "Historial",
+      "accounts": "Administrar cuentas"
+    },
     "cards": {
       "balance": "Resumen de saldo",
       "activity": "Actividad reciente",

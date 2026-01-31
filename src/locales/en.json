@@ -5,13 +5,20 @@
     "language": "Language"
   },
   "nav": {
+    "welcome": "Welcome",
     "home": "Home",
+    "history": "History",
+    "accounts": "Accounts",
     "settings": "Settings"
   },
   "home": {
     "headline": "Quick access to your Qubic wallet",
     "subhead": "Review balances and recent activity without leaving your tab.",
     "cta": "Go to settings",
+    "actions": {
+      "history": "History",
+      "accounts": "Manage accounts"
+    },
     "cards": {
       "balance": "Balance snapshot",
       "activity": "Recent activity",
