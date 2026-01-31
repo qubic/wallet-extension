@@ -1,19 +1,12 @@
 import type { PropsWithChildren } from 'react'
 import { useTranslation } from 'react-i18next'
 import { NavLink, useLocation } from 'react-router-dom'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { Label } from '@/components/ui/label'
+import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { motion } from 'framer-motion'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { HistoryIcon, HomeIcon, PanelRightOpenIcon, SettingsIcon, UsersIcon } from 'lucide-react'
+import { HistoryIcon, HomeIcon, SettingsIcon, UsersIcon } from 'lucide-react'
+import AppHeader from '@/components/app-header'
 import { setLanguage } from '../i18n'
 
 const AppShell = ({ children, showNav = true }: PropsWithChildren<{ showNav?: boolean }>) => {
@@ -92,42 +85,34 @@ const AppShell = ({ children, showNav = true }: PropsWithChildren<{ showNav?: bo
     },
   ]
 
+  const openTab = async () => {
+    const chromeApi = (
+      globalThis as typeof globalThis & {
+        chrome?: { tabs?: { create?: (options: { url: string }) => Promise<void> } }
+      }
+    ).chrome
+
+    if (!chromeApi?.tabs?.create) {
+      return
+    }
+
+    await chromeApi.tabs.create({ url: 'tab.html' })
+  }
+
   return (
     <div className="flex h-full w-full flex-col bg-[radial-gradient(circle_at_top,_#1f2e34_0%,_#0f1418_55%,_#0b0f12_100%)]">
       <div className="flex flex-1 flex-col gap-4 p-0">
-        <header className="flex items-center justify-between gap-4">
-          <div className="space-y-1">
-            <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-              {t('app.tagline')}
-            </p>
-            <h1 className="text-xl font-semibold">{t('app.title')}</h1>
-          </div>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Button
-              size="icon"
-              variant="secondary"
-              onClick={openSidePanel}
-              aria-label={t('app.sidepanel')}
-            >
-              <PanelRightOpenIcon className="size-4" />
-            </Button>
-            <div className="flex flex-col items-end gap-1">
-              <Label htmlFor="language">{t('app.language')}</Label>
-              <Select
-                value={i18n.language}
-                onValueChange={(value) => setLanguage(value as 'en' | 'es')}
-              >
-                <SelectTrigger id="language" className="h-8 w-[76px] text-xs">
-                  <SelectValue placeholder="EN" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="en">EN</SelectItem>
-                  <SelectItem value="es">ES</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </header>
+        <AppHeader
+          language={i18n.language}
+          onLanguageChange={(value) => setLanguage(value as 'en' | 'es')}
+          onOpenSidePanel={openSidePanel}
+          onOpenTab={openTab}
+          title={t('app.title')}
+          tagline={t('app.tagline')}
+          languageLabel={t('app.language')}
+          openSidePanelLabel={t('app.sidepanel')}
+          openTabLabel={t('app.opentab')}
+        />
 
         <Card className="flex min-h-0 flex-1 flex-col border-border/60 bg-card/80">
           <ScrollArea className="flex-1">

@@ -3,7 +3,8 @@
     "title": "Cartera Qubic",
     "tagline": "Ventana emergente",
     "language": "Idioma",
-    "sidepanel": "Abrir panel lateral"
+    "sidepanel": "Abrir panel lateral",
+    "opentab": "Abrir pestana"
   },
   "nav": {
     "welcome": "Bienvenida",

@@ -3,7 +3,8 @@
     "title": "Qubic Wallet",
     "tagline": "Extension popup",
     "language": "Language",
-    "sidepanel": "Open side panel"
+    "sidepanel": "Open side panel",
+    "opentab": "Open tab"
   },
   "nav": {
     "welcome": "Welcome",

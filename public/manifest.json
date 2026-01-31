@@ -7,7 +7,7 @@
     "default_title": "Qubic Wallet",
     "default_popup": "popup.html"
   },
-  "permissions": ["sidePanel", "windows"],
+  "permissions": ["sidePanel", "tabs", "windows"],
   "side_panel": {
     "default_path": "sidepanel.html"
   }
