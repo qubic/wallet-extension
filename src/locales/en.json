@@ -2,7 +2,8 @@
   "app": {
     "title": "Qubic Wallet",
     "tagline": "Extension popup",
-    "language": "Language"
+    "language": "Language",
+    "sidepanel": "Open side panel"
   },
   "nav": {
     "welcome": "Welcome",

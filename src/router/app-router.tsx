@@ -6,16 +6,36 @@ import ManageAccounts from '../pages/manage-accounts'
 import Settings from '../pages/settings'
 import Welcome from '../pages/welcome'
 
+const hasAccounts = () => {
+  try {
+    return localStorage.getItem('hasAccount') === 'true'
+  } catch {
+    return false
+  }
+}
+
 const AppRouter = () => {
+  const isOnboarded = hasAccounts()
+
+  if (!isOnboarded) {
+    return (
+      <AppShell showNav={false}>
+        <Routes>
+          <Route path="*" element={<Welcome />} />
+        </Routes>
+      </AppShell>
+    )
+  }
+
   return (
     <AppShell>
       <Routes>
-        <Route path="/" element={<Welcome />} />
+        <Route path="/" element={<Navigate to="/home" replace />} />
         <Route path="/home" element={<Home />} />
         <Route path="/history" element={<History />} />
         <Route path="/accounts" element={<ManageAccounts />} />
         <Route path="/settings" element={<Settings />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<Navigate to="/home" replace />} />
       </Routes>
     </AppShell>
   )

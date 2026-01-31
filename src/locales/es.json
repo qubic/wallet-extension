@@ -2,7 +2,8 @@
   "app": {
     "title": "Cartera Qubic",
     "tagline": "Ventana emergente",
-    "language": "Idioma"
+    "language": "Idioma",
+    "sidepanel": "Abrir panel lateral"
   },
   "nav": {
     "welcome": "Bienvenida",

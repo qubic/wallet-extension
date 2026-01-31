@@ -17,10 +17,12 @@ export default defineConfig(({ mode }) => {
     plugins: [react(), tailwindcss()],
     build: {
       outDir: isExtensionDev ? 'dist-dev' : 'dist',
+      chunkSizeWarningLimit: 1200,
       rollupOptions: {
         input: {
           index: resolve(__dirname, 'index.html'),
           popup: resolve(__dirname, 'popup.html'),
+          sidepanel: resolve(__dirname, 'sidepanel.html'),
         },
       },
     },
