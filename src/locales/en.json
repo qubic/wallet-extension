@@ -1,0 +1,40 @@
+{
+  "app": {
+    "title": "Qubic Wallet",
+    "tagline": "Extension popup",
+    "language": "Language",
+    "sidepanel": "Open side panel",
+    "opentab": "Open tab"
+  },
+  "nav": {
+    "welcome": "Welcome",
+    "home": "Home",
+    "history": "History",
+    "accounts": "Accounts",
+    "settings": "Settings"
+  },
+  "home": {
+    "headline": "Quick access to your Qubic wallet",
+    "subhead": "Review balances and recent activity without leaving your tab.",
+    "cta": "Go to settings",
+    "actions": {
+      "history": "History",
+      "accounts": "Manage accounts"
+    },
+    "cards": {
+      "balance": "Balance snapshot",
+      "activity": "Recent activity",
+      "security": "Security status",
+      "balanceValue": "52,140 QUBIC",
+      "activityValue": "3 new transactions",
+      "securityValue": "All checks passed"
+    }
+  },
+  "settings": {
+    "headline": "Extension preferences",
+    "subhead": "Control how the popup behaves.",
+    "appearance": "Compact layout",
+    "notifications": "Enable notifications",
+    "lock": "Auto-lock after inactivity"
+  }
+}

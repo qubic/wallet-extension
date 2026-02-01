@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "Qubic Wallet",
+  "description": "Qubic Wallet extension popup built with React and Vite.",
+  "version": "0.1.0",
+  "action": {
+    "default_title": "Qubic Wallet",
+    "default_popup": "popup.html"
+  },
+  "permissions": ["sidePanel", "tabs", "windows"],
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  }
+}
