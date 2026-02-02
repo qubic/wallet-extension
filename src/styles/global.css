@@ -4,15 +4,29 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
+  --font-geist-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+  --font-sans: var(--font-geist-mono);
+}
+
+@font-face {
+  font-family: "Geist Mono";
+  src: url("/fonts/GeistMono-VariableFont_wght.ttf") format("truetype-variations");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
   --radius: 0.75rem;
-  --background: oklch(0.145 0 0);
+  --background: rgb(17, 17, 17);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
+  --primary: #ccfcfb;
+  --primary-foreground: #0b0f12;
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);
@@ -36,6 +50,7 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+  font-family: var(--font-geist-mono);
 }
 
 @theme inline {
@@ -85,5 +100,10 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-geist-mono);
+  }
+
+  html {
+    font-family: var(--font-geist-mono);
   }
 }
