@@ -109,7 +109,7 @@ const AppShell = ({
   }
 
   return (
-    <div className="flex h-full w-full flex-col overflow-hidden bg-background">
+    <div className="relative flex h-full w-full flex-col bg-background">
       {showHeader && (
         <AppHeader
           onOpenSidePanel={openSidePanel}
@@ -119,17 +119,16 @@ const AppShell = ({
         />
       )}
 
-      {showHeader || showNav ? (
-        <div className="app-scrollbar flex-1 min-h-0 overflow-y-auto">
-          <div className="min-h-full">{children}</div>
-        </div>
-      ) : (
-        <div className="flex-1 min-h-0">{children}</div>
-      )}
+      <div
+        className="app-scrollbar flex-1 overflow-y-auto"
+        style={{ paddingBottom: showNav ? '56px' : '0' }}
+      >
+        {children}
+      </div>
 
       {showNav && (
         <nav
-          className={`z-20 grid h-[56px] shrink-0 items-center gap-1 rounded-none border-t border-border/60 bg-[rgb(17,17,17)] shadow-lg backdrop-blur ${
+          className={`fixed bottom-0 left-0 right-0 z-20 grid h-[56px] items-center gap-1 border-t border-border/60 bg-[rgb(17,17,17)] shadow-lg backdrop-blur ${
             isSidePanel ? 'grid-cols-5' : 'grid-cols-5'
           }`}
         >
