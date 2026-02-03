@@ -17,14 +17,7 @@ import {
   DrawerFooter,
 } from '@/components/ui/drawer'
 import { openBrowserVault } from '@/lib/vault'
-import { isValidIdentity, normalizeBalance, parseAmount } from '@/lib/utils'
-
-// Format balance for display
-const formatBalance = (value: bigint): string => {
-  return new Intl.NumberFormat('en', {
-    notation: 'standard',
-  }).format(Number(value))
-}
+import { isValidIdentity, normalizeBalance, parseAmount, formatBalance } from '@/lib/utils'
 
 type Step = 'form' | 'success'
 
