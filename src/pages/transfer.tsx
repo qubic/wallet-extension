@@ -103,6 +103,7 @@ const Transfer = () => {
     try {
       const vault = await openBrowserVault(passphrase, false)
       const seed = await vault.getSeed(currentAccountName)
+      setPassphrase('') 
 
       const parsedAmount = parseAmount(amount)
       if (!parsedAmount) {
@@ -152,6 +153,7 @@ const Transfer = () => {
       })
     } finally {
       setSending(false)
+      setPassphrase('') 
     }
   }
 
