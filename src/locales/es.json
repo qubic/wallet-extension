@@ -116,6 +116,7 @@
     "validation": {
       "recipientRequired": "La identidad del destinatario es requerida.",
       "recipientInvalid": "La identidad debe ser 60 letras mayusculas (A-Z).",
+      "recipientSameAsSender": "No puedes enviar a tu propia identidad.",
       "amountRequired": "El monto es requerido.",
       "amountInvalid": "El monto debe ser un numero positivo.",
       "amountExceedsBalance": "El monto excede el saldo disponible.",

@@ -58,6 +58,8 @@ const Transfer = () => {
       newErrors.recipient = t('transfer.validation.recipientRequired')
     } else if (!isValidIdentity(recipient.trim())) {
       newErrors.recipient = t('transfer.validation.recipientInvalid')
+    } else if (recipient.trim() === currentIdentity) {
+      newErrors.recipient = t('transfer.validation.recipientSameAsSender')
     }
 
     if (!amount.trim()) {
