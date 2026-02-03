@@ -90,7 +90,7 @@ const ImportVault = () => {
         return
       }
 
-      setOnboarded(entries[0].identity)
+      setOnboarded(entries[0].identity, entries[0].name)
       navigate('/home')
     } catch (error) {
       setStatus(error instanceof Error ? error.message : 'Failed to import vault.')

@@ -7,9 +7,12 @@ export const openBrowserVault = async (passphrase: string, create = false) => {
   return openSeedVaultBrowser({ store, passphrase, create })
 }
 
-export const setOnboarded = (identity: string) => {
+export const setOnboarded = (identity: string, name?: string) => {
   localStorage.setItem('hasAccount', 'true')
   localStorage.setItem('currentIdentity', identity)
+  if (name) {
+    localStorage.setItem('currentAccountName', name)
+  }
 }
 
 export const clearOnboarded = () => {

@@ -120,7 +120,7 @@ const CreateWallet = () => {
       const vault = await openBrowserVault(passphrase, true)
       const entry = await vault.addSeed({ name, seed, overwrite: true })
       await vault.save()
-      setOnboarded(entry.identity)
+      setOnboarded(entry.identity, name)
       navigate('/home')
     } catch (error) {
       setStatus(error instanceof Error ? error.message : 'Failed to create wallet.')

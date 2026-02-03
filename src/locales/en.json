@@ -9,6 +9,7 @@
   "nav": {
     "welcome": "Welcome",
     "home": "Home",
+    "transfer": "Transfer",
     "history": "History",
     "accounts": "Accounts",
     "settings": "Settings"
