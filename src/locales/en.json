@@ -97,5 +97,59 @@
     "outgoing": "Outgoing",
     "tick": "Tick",
     "type": "Type"
+  },
+  "transfer": {
+    "title": "Send QU",
+    "subtitle": "Transfer funds to another identity",
+    "balance": {
+      "label": "Available balance",
+      "loading": "Loading balance..."
+    },
+    "form": {
+      "recipient": "Recipient identity",
+      "recipientPlaceholder": "60-character identity (A-Z)",
+      "amount": "Amount (QU)",
+      "amountPlaceholder": "Enter amount",
+      "passphrase": "Vault passphrase",
+      "passphrasePlaceholder": "Enter passphrase to sign"
+    },
+    "validation": {
+      "recipientRequired": "Recipient identity is required.",
+      "recipientInvalid": "Identity must be 60 uppercase letters (A-Z).",
+      "amountRequired": "Amount is required.",
+      "amountInvalid": "Amount must be a positive number.",
+      "amountExceedsBalance": "Amount exceeds available balance.",
+      "passphraseRequired": "Passphrase is required to sign."
+    },
+    "confirm": {
+      "title": "Confirm transfer",
+      "description": "Review the details before sending.",
+      "to": "To",
+      "amount": "Amount",
+      "warning": "This action cannot be undone."
+    },
+    "actions": {
+      "continue": "Continue",
+      "confirm": "Confirm & send",
+      "sending": "Sending...",
+      "cancel": "Cancel",
+      "back": "Back"
+    },
+    "success": {
+      "title": "Transfer sent",
+      "description": "Transaction broadcast to the network.",
+      "txId": "Transaction ID",
+      "targetTick": "Target tick",
+      "peers": "Broadcast to {{count}} peers",
+      "viewHistory": "View history",
+      "sendAnother": "Send another"
+    },
+    "errors": {
+      "invalidPassphrase": "Invalid passphrase.",
+      "accountNotFound": "Account not found in vault.",
+      "networkError": "Network error. Please retry.",
+      "broadcastFailed": "Failed to broadcast transaction.",
+      "generic": "Transfer failed. Please retry."
+    }
   }
 }

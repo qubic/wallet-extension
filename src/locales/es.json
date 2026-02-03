@@ -97,5 +97,59 @@
     "outgoing": "Saliente",
     "tick": "Tick",
     "type": "Tipo"
+  },
+  "transfer": {
+    "title": "Enviar QU",
+    "subtitle": "Transferir fondos a otra identidad",
+    "balance": {
+      "label": "Saldo disponible",
+      "loading": "Cargando saldo..."
+    },
+    "form": {
+      "recipient": "Identidad del destinatario",
+      "recipientPlaceholder": "Identidad de 60 caracteres (A-Z)",
+      "amount": "Monto (QU)",
+      "amountPlaceholder": "Ingresa el monto",
+      "passphrase": "Contrasena del vault",
+      "passphrasePlaceholder": "Ingresa contrasena para firmar"
+    },
+    "validation": {
+      "recipientRequired": "La identidad del destinatario es requerida.",
+      "recipientInvalid": "La identidad debe ser 60 letras mayusculas (A-Z).",
+      "amountRequired": "El monto es requerido.",
+      "amountInvalid": "El monto debe ser un numero positivo.",
+      "amountExceedsBalance": "El monto excede el saldo disponible.",
+      "passphraseRequired": "Se requiere contrasena para firmar."
+    },
+    "confirm": {
+      "title": "Confirmar transferencia",
+      "description": "Revisa los detalles antes de enviar.",
+      "to": "Para",
+      "amount": "Monto",
+      "warning": "Esta accion no se puede deshacer."
+    },
+    "actions": {
+      "continue": "Continuar",
+      "confirm": "Confirmar y enviar",
+      "sending": "Enviando...",
+      "cancel": "Cancelar",
+      "back": "Atras"
+    },
+    "success": {
+      "title": "Transferencia enviada",
+      "description": "Transaccion transmitida a la red.",
+      "txId": "ID de transaccion",
+      "targetTick": "Tick objetivo",
+      "peers": "Transmitido a {{count}} pares",
+      "viewHistory": "Ver historial",
+      "sendAnother": "Enviar otra"
+    },
+    "errors": {
+      "invalidPassphrase": "Contrasena invalida.",
+      "accountNotFound": "Cuenta no encontrada en el vault.",
+      "networkError": "Error de red. Intenta de nuevo.",
+      "broadcastFailed": "Fallo al transmitir la transaccion.",
+      "generic": "Transferencia fallida. Intenta de nuevo."
+    }
   }
 }
