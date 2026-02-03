@@ -88,5 +88,14 @@
     "appearance": "Diseno compacto",
     "notifications": "Habilitar notificaciones",
     "lock": "Bloqueo automatico por inactividad"
+  },
+  "history": {
+    "title": "Historial",
+    "loading": "Cargando historial...",
+    "empty": "No hay transacciones.",
+    "incoming": "Entrante",
+    "outgoing": "Saliente",
+    "tick": "Tick",
+    "type": "Tipo"
   }
 }

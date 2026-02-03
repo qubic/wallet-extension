@@ -88,5 +88,14 @@
     "appearance": "Compact layout",
     "notifications": "Enable notifications",
     "lock": "Auto-lock after inactivity"
+  },
+  "history": {
+    "title": "History",
+    "loading": "Loading history...",
+    "empty": "No transactions found.",
+    "incoming": "Incoming",
+    "outgoing": "Outgoing",
+    "tick": "Tick",
+    "type": "Type"
   }
 }
