@@ -1,16 +1,18 @@
 import type { PropsWithChildren } from 'react'
 import { useTranslation } from 'react-i18next'
 import { NavLink, useLocation } from 'react-router-dom'
-import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { motion } from 'framer-motion'
 import { HistoryIcon, HomeIcon, SettingsIcon, UsersIcon } from 'lucide-react'
 import AppHeader from '@/components/app-header'
-import { setLanguage } from '../i18n'
 
-const AppShell = ({ children, showNav = true }: PropsWithChildren<{ showNav?: boolean }>) => {
-  const { t, i18n } = useTranslation()
+const AppShell = ({
+  children,
+  showNav = true,
+  showHeader = true,
+}: PropsWithChildren<{ showNav?: boolean; showHeader?: boolean }>) => {
+  const { t } = useTranslation()
   const { pathname } = useLocation()
   const isHome = pathname.startsWith('/home')
   const isHistory = pathname.startsWith('/history')
@@ -60,28 +62,28 @@ const AppShell = ({ children, showNav = true }: PropsWithChildren<{ showNav?: bo
       to: '/home',
       label: t('nav.home'),
       isActive: isHome,
-      icon: <HomeIcon className="size-5" />,
+      icon: <HomeIcon className="size-6" />,
     },
     {
       key: 'history',
       to: '/history',
       label: t('home.actions.history'),
       isActive: isHistory,
-      icon: <HistoryIcon className="size-5" />,
+      icon: <HistoryIcon className="size-6" />,
     },
     {
       key: 'accounts',
       to: '/accounts',
       label: t('nav.accounts'),
       isActive: isAccounts,
-      icon: <UsersIcon className="size-5" />,
+      icon: <UsersIcon className="size-6" />,
     },
     {
       key: 'settings',
       to: '/settings',
       label: t('nav.settings'),
       isActive: isSettings,
-      icon: <SettingsIcon className="size-5" />,
+      icon: <SettingsIcon className="size-6" />,
     },
   ]
 
@@ -100,30 +102,30 @@ const AppShell = ({ children, showNav = true }: PropsWithChildren<{ showNav?: bo
   }
 
   return (
-    <div className="flex h-full w-full flex-col bg-[radial-gradient(circle_at_top,_#1f2e34_0%,_#0f1418_55%,_#0b0f12_100%)]">
-      <div className="flex flex-1 flex-col gap-4 p-0">
-        <AppHeader
-          language={i18n.language}
-          onLanguageChange={(value) => setLanguage(value as 'en' | 'es')}
-          onOpenSidePanel={openSidePanel}
-          onOpenTab={openTab}
-          title={t('app.title')}
-          tagline={t('app.tagline')}
-          languageLabel={t('app.language')}
-          openSidePanelLabel={t('app.sidepanel')}
-          openTabLabel={t('app.opentab')}
-        />
+    <div className="flex h-full w-full flex-col bg-background">
+      <div className={`flex flex-1 flex-col p-0 ${showHeader ? 'gap-4' : ''}`}>
+        {showHeader && (
+          <AppHeader
+            onOpenSidePanel={openSidePanel}
+            onOpenTab={openTab}
+            title={t('app.title')}
+            openSidePanelLabel={t('app.sidepanel')}
+            openTabLabel={t('app.opentab')}
+          />
+        )}
 
-        <Card className="flex min-h-0 flex-1 flex-col border-border/60 bg-card/80">
-          <ScrollArea className="flex-1">
-            <CardContent className="flex min-h-0 flex-1 flex-col gap-4 p-0">{children}</CardContent>
+        {showHeader || showNav ? (
+          <ScrollArea className="flex-1 min-h-0">
+            <div className="h-full min-h-full">{children}</div>
           </ScrollArea>
-        </Card>
+        ) : (
+          <div className="flex-1">{children}</div>
+        )}
       </div>
 
       {showNav && (
         <nav
-          className={`fixed bottom-0 left-0 right-0 grid items-center gap-1 rounded-none border-t border-border/60 bg-card/90 p-1 shadow-lg backdrop-blur ${
+          className={`fixed bottom-0 left-0 right-0 grid h-[56px] items-center gap-1 rounded-none border-t border-border/60 bg-[rgb(17,17,17)] shadow-lg backdrop-blur ${
             isSidePanel ? 'grid-cols-4' : 'grid-cols-4'
           }`}
         >
@@ -133,28 +135,28 @@ const AppShell = ({ children, showNav = true }: PropsWithChildren<{ showNav?: bo
               asChild
               size="icon"
               variant="ghost"
-              className="h-11 w-full p-0"
+              className="h-full w-full p-0"
               aria-label={item.label}
             >
               <NavLink
                 to={item.to}
                 end={item.to === '/'}
-                className="relative flex h-10 w-full items-center justify-center rounded-full transition-colors hover:bg-muted/40"
+                className="relative flex h-full w-full items-center justify-center transition-colors hover:bg-muted/30"
               >
-                {item.isActive && (
-                  <motion.span
-                    layoutId="nav-indicator"
-                    className="absolute inset-1 rounded-full bg-[var(--accent)]/20"
-                    transition={{ type: 'spring', stiffness: 320, damping: 28 }}
-                  />
-                )}
+                {item.isActive && <span className="absolute inset-0 bg-[var(--accent)]/20" />}
                 <motion.span
                   initial={false}
                   animate={{
-                    scale: item.isActive ? 1.05 : 1,
-                    opacity: item.isActive ? 1 : 0.75,
+                    scale: item.isActive ? [1, 1.12, 1] : 1,
+                    rotate: item.isActive ? [0, 360] : 0,
+                    opacity: item.isActive ? 1 : 0.7,
                   }}
-                  transition={{ type: 'spring', stiffness: 320, damping: 22 }}
+                  transition={{
+                    type: 'spring',
+                    stiffness: 260,
+                    damping: 18,
+                    duration: item.isActive ? 0.6 : 0.2,
+                  }}
                   className="relative text-[var(--accent)]"
                 >
                   {item.icon}

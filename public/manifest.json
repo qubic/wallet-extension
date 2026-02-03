@@ -8,6 +8,9 @@
     "default_popup": "popup.html"
   },
   "permissions": ["sidePanel", "tabs", "windows"],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; font-src 'self' data:; style-src 'self' 'unsafe-inline'"
+  },
   "side_panel": {
     "default_path": "sidepanel.html"
   }
