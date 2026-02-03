@@ -3,6 +3,19 @@ import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 
+const extensionReloadPlugin = (enabled: boolean) => ({
+  name: 'extension-reload-stamp',
+  generateBundle() {
+    if (!enabled) return
+    const payload = JSON.stringify({ buildId: Date.now() })
+    this.emitFile({
+      type: 'asset',
+      fileName: 'reload.json',
+      source: payload,
+    })
+  },
+})
+
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   const isExtensionDev = mode === 'extension'
@@ -14,7 +27,7 @@ export default defineConfig(({ mode }) => {
         '@': resolve(__dirname, 'src'),
       },
     },
-    plugins: [react(), tailwindcss()],
+    plugins: [react(), tailwindcss(), extensionReloadPlugin(isExtensionDev)],
     build: {
       outDir: isExtensionDev ? 'dist-dev' : 'dist',
       chunkSizeWarningLimit: 1200,

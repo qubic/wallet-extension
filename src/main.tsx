@@ -41,6 +41,36 @@ const applyViewportSizing = () => {
 
 applyViewportSizing()
 
+const startExtensionReloadWatcher = () => {
+  if (import.meta.env.MODE !== 'extension') return
+
+  const chromeApi = (globalThis as typeof globalThis & { chrome?: { runtime?: { getURL?: (path: string) => string } } }).chrome
+  const getUrl = chromeApi?.runtime?.getURL
+  if (!getUrl) return
+
+  let lastBuildId: number | null = null
+  const reloadUrl = getUrl('reload.json')
+
+  const check = async () => {
+    try {
+      const response = await fetch(reloadUrl, { cache: 'no-store' })
+      if (!response.ok) return
+      const data = (await response.json()) as { buildId?: number }
+      if (data.buildId && lastBuildId && data.buildId !== lastBuildId) {
+        globalThis.location.reload()
+      }
+      lastBuildId = data.buildId ?? lastBuildId
+    } catch {
+      // ignore failed polls during rebuilds
+    }
+  }
+
+  void check()
+  setInterval(check, 1500)
+}
+
+startExtensionReloadWatcher()
+
 const rootElement = document.getElementById('root')
 
 if (rootElement) {
