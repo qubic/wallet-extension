@@ -1,9 +1,9 @@
 import { resolve } from 'node:path'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
-import { defineConfig } from 'vite'
+import { defineConfig, type Plugin } from 'vite'
 
-const extensionReloadPlugin = (enabled: boolean) => ({
+const extensionReloadPlugin = (enabled: boolean): Plugin => ({
   name: 'extension-reload-stamp',
   generateBundle() {
     if (!enabled) return
