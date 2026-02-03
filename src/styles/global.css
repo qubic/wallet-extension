@@ -4,8 +4,9 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --font-geist-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-    "Liberation Mono", "Courier New", monospace;
+  --font-geist-mono:
+    "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
   --font-sans: var(--font-geist-mono);
 }
 

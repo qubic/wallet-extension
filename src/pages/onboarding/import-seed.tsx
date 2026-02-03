@@ -81,7 +81,9 @@ const ImportSeed = () => {
         <div className="space-y-3 text-center">
           <div className="space-y-1">
             <h2 className="text-xl font-semibold">Import private seed</h2>
-            <p className="text-sm text-muted-foreground">Step {step} of {TOTAL_STEPS}</p>
+            <p className="text-sm text-muted-foreground">
+              Step {step} of {TOTAL_STEPS}
+            </p>
           </div>
           <Progress value={progressValue} />
         </div>

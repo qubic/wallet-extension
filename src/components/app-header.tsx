@@ -115,9 +115,7 @@ const AppHeader = ({
             </div>
             <div className="flex flex-col">
               <span className="text-sm font-semibold text-foreground">{accountName}</span>
-              <span className="text-xs text-muted-foreground">
-                {truncateIdentity(identity)}
-              </span>
+              <span className="text-xs text-muted-foreground">{truncateIdentity(identity)}</span>
             </div>
           </button>
         </PopoverTrigger>
@@ -152,9 +150,7 @@ const AppHeader = ({
               </div>
             )}
             {hasLoadedAccounts && accounts.length === 0 && (
-              <div className="text-xs text-muted-foreground">
-                No additional accounts found.
-              </div>
+              <div className="text-xs text-muted-foreground">No additional accounts found.</div>
             )}
             {hasLoadedAccounts && accounts.length > 0 && (
               <div className="space-y-1">

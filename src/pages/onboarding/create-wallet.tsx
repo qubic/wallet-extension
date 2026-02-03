@@ -134,7 +134,9 @@ const CreateWallet = () => {
         <div className="space-y-3 text-center">
           <div className="space-y-1">
             <h2 className="text-xl font-semibold">Create new wallet</h2>
-            <p className="text-sm text-muted-foreground">Step {step} of {TOTAL_STEPS}</p>
+            <p className="text-sm text-muted-foreground">
+              Step {step} of {TOTAL_STEPS}
+            </p>
           </div>
           <Progress value={progressValue} />
         </div>
@@ -145,8 +147,7 @@ const CreateWallet = () => {
               <div className="space-y-1">
                 <h3 className="text-sm font-semibold">Secure your seed</h3>
                 <p className="text-xs text-muted-foreground">
-                  Save this 55-letter seed in a safe place. You will need it to restore
-                  your wallet.
+                  Save this 55-letter seed in a safe place. You will need it to restore your wallet.
                 </p>
               </div>
               <div className="space-y-2">
@@ -220,8 +221,7 @@ const CreateWallet = () => {
                 </div>
               </div>
               <p className="text-xs text-muted-foreground">
-                Make sure you stored your seed. Anyone with this seed can access your
-                funds.
+                Make sure you stored your seed. Anyone with this seed can access your funds.
               </p>
             </div>
           )}

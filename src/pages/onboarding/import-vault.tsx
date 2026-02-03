@@ -104,7 +104,9 @@ const ImportVault = () => {
         <div className="space-y-3 text-center">
           <div className="space-y-1">
             <h2 className="text-xl font-semibold">Import vault file</h2>
-            <p className="text-sm text-muted-foreground">Step {step} of {TOTAL_STEPS}</p>
+            <p className="text-sm text-muted-foreground">
+              Step {step} of {TOTAL_STEPS}
+            </p>
           </div>
           <Progress value={progressValue} />
         </div>
@@ -138,9 +140,7 @@ const ImportVault = () => {
                     <UploadCloudIcon className="h-5 w-5" />
                     Drop your vault file
                   </div>
-                  <div className="text-xs text-muted-foreground">
-                    or click to browse (.json)
-                  </div>
+                  <div className="text-xs text-muted-foreground">or click to browse (.json)</div>
                   {file && (
                     <div className="flex items-center gap-2 rounded-lg border border-border/60 bg-background/60 px-3 py-2 text-xs text-foreground">
                       <FileJsonIcon className="h-4 w-4 text-primary" />
@@ -164,8 +164,7 @@ const ImportVault = () => {
               <div className="space-y-1">
                 <h3 className="text-sm font-semibold">Unlock and secure</h3>
                 <p className="text-xs text-muted-foreground">
-                  Provide a new passphrase for this device and, if needed, the source
-                  passphrase.
+                  Provide a new passphrase for this device and, if needed, the source passphrase.
                 </p>
               </div>
               <div className="space-y-2">

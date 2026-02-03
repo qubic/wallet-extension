@@ -44,7 +44,11 @@ applyViewportSizing()
 const startExtensionReloadWatcher = () => {
   if (import.meta.env.MODE !== 'extension') return
 
-  const chromeApi = (globalThis as typeof globalThis & { chrome?: { runtime?: { getURL?: (path: string) => string } } }).chrome
+  const chromeApi = (
+    globalThis as typeof globalThis & {
+      chrome?: { runtime?: { getURL?: (path: string) => string } }
+    }
+  ).chrome
   const getUrl = chromeApi?.runtime?.getURL
   if (!getUrl) return
 
