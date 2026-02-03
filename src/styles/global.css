@@ -9,6 +9,10 @@
   --font-sans: var(--font-geist-mono);
 }
 
+.font-geist-mono {
+  font-family: var(--font-geist-mono);
+}
+
 @font-face {
   font-family: "Geist Mono";
   src: url("/fonts/GeistMono-VariableFont_wght.ttf") format("truetype-variations");
@@ -105,5 +109,34 @@
 
   html {
     font-family: var(--font-geist-mono);
+  }
+}
+
+@layer utilities {
+  .app-scrollbar {
+    scrollbar-width: none;
+  }
+
+  .app-scrollbar::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
+
+  .app-scrollbar::-webkit-scrollbar-button {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
+  .app-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .app-scrollbar::-webkit-scrollbar-thumb {
+    background: transparent;
+  }
+
+  .app-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: transparent;
   }
 }
