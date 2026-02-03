@@ -14,6 +14,7 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer'
 import { useTranslation } from 'react-i18next'
+import { normalizeBalance } from '@/lib/utils'
 
 const formatQus = (value: bigint) => {
   const formatter = new Intl.NumberFormat('en', {
@@ -61,13 +62,6 @@ const fetchLatestStats = async (): Promise<LatestStatsResponse> => {
     throw new Error('Failed to load network stats.')
   }
   return response.json() as Promise<LatestStatsResponse>
-}
-
-const normalizeBalance = (value: bigint | number | string | undefined) => {
-  if (typeof value === 'bigint') return value
-  if (typeof value === 'number') return BigInt(Math.floor(value))
-  if (typeof value === 'string') return BigInt(value)
-  return 0n
 }
 
 const BalanceCard = ({ balance }: { balance: ReturnType<typeof useBalance> }) => {
