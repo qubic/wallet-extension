@@ -13,6 +13,7 @@ import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer'
+import { useTranslation } from 'react-i18next'
 
 const formatQus = (value: bigint) => {
   const formatter = new Intl.NumberFormat('en', {
@@ -70,8 +71,9 @@ const normalizeBalance = (value: bigint | number | string | undefined) => {
 }
 
 const BalanceCard = ({ balance }: { balance: ReturnType<typeof useBalance> }) => {
+  const { t } = useTranslation()
   if (balance.isLoading) {
-    return <div className="text-sm text-muted-foreground">Loading...</div>
+    return <div className="text-sm text-muted-foreground">{t('home.balance.loading')}</div>
   }
 
   if (balance.error) {
@@ -95,8 +97,9 @@ const TransactionsPreview = ({
   identity: string
   transactions: ReturnType<typeof useTransactions>
 }) => {
+  const { t } = useTranslation()
   if (transactions.isLoading) {
-    return <div className="text-xs text-muted-foreground">Loading recent activity...</div>
+    return <div className="text-xs text-muted-foreground">{t('home.recent.loading')}</div>
   }
 
   if (transactions.error) {
@@ -107,14 +110,14 @@ const TransactionsPreview = ({
   const recent = items.slice(0, 3)
 
   if (recent.length === 0) {
-    return <div className="text-xs text-muted-foreground">No recent transactions.</div>
+    return <div className="text-xs text-muted-foreground">{t('home.recent.empty')}</div>
   }
 
   return (
     <div className="w-full space-y-2 text-left">
       {recent.map((tx) => {
         const isIncoming = tx.destination === identity
-        const label = isIncoming ? 'Incoming' : 'Outgoing'
+        const label = isIncoming ? t('home.recent.incoming') : t('home.recent.outgoing')
         const counterparty = isIncoming ? tx.source : tx.destination
         const Icon = isIncoming ? ArrowDownLeftIcon : ArrowUpRightIcon
 
@@ -135,7 +138,9 @@ const TransactionsPreview = ({
                 <span className="text-xs text-muted-foreground">
                   {formatIdentity(counterparty)}
                 </span>
-                <span className="text-[11px] text-muted-foreground/70">Tick {tx.tickNumber}</span>
+                <span className="text-[11px] text-muted-foreground/70">
+                  {t('home.recent.tick', { tick: tx.tickNumber })}
+                </span>
               </div>
             </div>
             <span
@@ -152,6 +157,7 @@ const TransactionsPreview = ({
 }
 
 const Home = () => {
+  const { t } = useTranslation()
   const identity = localStorage.getItem('currentIdentity') ?? '...'
   const pathname = globalThis.location?.pathname ?? ''
   const isSidePanel = pathname.endsWith('sidepanel.html')
@@ -183,12 +189,12 @@ const Home = () => {
   const handleCopyIdentity = async () => {
     try {
       await navigator.clipboard.writeText(identity)
-      toast.success('Address copied', {
-        description: 'Your public identity is now in the clipboard.',
+      toast.success(t('home.toast.copySuccess'), {
+        description: t('home.toast.copySuccessDesc'),
       })
     } catch {
-      toast.error('Copy failed', {
-        description: 'Please try again or copy manually.',
+      toast.error(t('home.toast.copyFail'), {
+        description: t('home.toast.copyFailDesc'),
       })
     }
   }
@@ -222,7 +228,9 @@ const Home = () => {
     <section className="flex min-h-full w-full justify-center pb-6 pt-4">
       <div className="flex w-full max-w-sm flex-col gap-6 px-6">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-semibold uppercase text-muted-foreground">Balance</span>
+          <span className="text-xs font-semibold uppercase text-muted-foreground">
+            {t('home.balance.label')}
+          </span>
           <Button
             size="icon"
             variant="ghost"
@@ -249,7 +257,7 @@ const Home = () => {
             onClick={() => navigate('/transfer')}
           >
             <SendIcon className="h-6 w-6" />
-            Send
+            {t('home.actions.send')}
           </Button>
           <Button
             size="lg"
@@ -258,25 +266,25 @@ const Home = () => {
             onClick={() => setIsReceiveOpen(true)}
           >
             <ArrowDownLeftIcon className="h-6 w-6" />
-            Receive
+            {t('home.actions.receive')}
           </Button>
         </div>
 
         <div className="space-y-2">
           <div className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-            Recent activity
+            {t('home.recent.title')}
           </div>
           <TransactionsPreview identity={identity} transactions={transactions} />
         </div>
 
         <div className="space-y-2">
           <div className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-            Network
+            {t('home.network.title')}
           </div>
           <div className="grid grid-cols-2 gap-2 text-sm">
             <div className="bg-muted/10 px-3 py-2">
               <div className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
-                Tick
+                {t('home.network.tick')}
               </div>
               <div className="text-sm font-semibold text-foreground">
                 {latestStats.data?.data?.currentTick ?? '--'}
@@ -284,7 +292,7 @@ const Home = () => {
             </div>
             <div className="bg-muted/10 px-3 py-2">
               <div className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
-                Epoch
+                {t('home.network.epoch')}
               </div>
               <div className="text-sm font-semibold text-foreground">
                 {latestStats.data?.data?.epoch ?? '--'}
@@ -292,7 +300,7 @@ const Home = () => {
             </div>
             <div className="bg-muted/10 px-3 py-2">
               <div className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
-                Supply
+                {t('home.network.supply')}
               </div>
               <div className="text-sm font-semibold text-foreground">
                 {latestStats.data?.data?.circulatingSupply
@@ -302,7 +310,7 @@ const Home = () => {
             </div>
             <div className="bg-muted/10 px-3 py-2">
               <div className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
-                Active
+                {t('home.network.active')}
               </div>
               <div className="text-sm font-semibold text-foreground">
                 {latestStats.data?.data?.activeAddresses ?? '--'}
@@ -310,7 +318,7 @@ const Home = () => {
             </div>
             <div className="bg-muted/10 px-3 py-2">
               <div className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
-                Price / B
+                {t('home.network.pricePerB')}
               </div>
               <div className="text-sm font-semibold text-foreground">
                 {latestStats.data?.data?.price
@@ -320,7 +328,7 @@ const Home = () => {
             </div>
             <div className="bg-muted/10 px-3 py-2">
               <div className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
-                MCap
+                {t('home.network.marketCap')}
               </div>
               <div className="text-sm font-semibold text-foreground">
                 {latestStats.data?.data?.marketCap
@@ -336,7 +344,7 @@ const Home = () => {
 
         <div className="space-y-2">
           <div className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-            Assets
+            {t('home.assets.title')}
           </div>
           <div className="flex items-center justify-between bg-muted/20 px-3 py-2">
             <div className="flex flex-col">
@@ -347,7 +355,7 @@ const Home = () => {
               {balance.data?.balance ? formatQus(normalizeBalance(balance.data.balance)) : '--'}
             </div>
           </div>
-          <div className="text-xs text-muted-foreground">Other assets coming soon.</div>
+          <div className="text-xs text-muted-foreground">{t('home.assets.more')}</div>
         </div>
       </div>
 
@@ -358,17 +366,15 @@ const Home = () => {
           }`}
         >
           <DrawerHeader className="space-y-2 text-left">
-            <DrawerTitle>Receive Qubic</DrawerTitle>
-            <p className="text-sm text-muted-foreground">
-              Share this QR code or copy your public identity address.
-            </p>
+            <DrawerTitle>{t('home.receive.title')}</DrawerTitle>
+            <p className="text-sm text-muted-foreground">{t('home.receive.description')}</p>
           </DrawerHeader>
           <div className="mt-4 flex flex-col items-center gap-4 text-center">
             <div className="flex h-52 w-52 items-center justify-center bg-muted/20">
               {qrCode ? (
                 <img src={qrCode} alt="Public identity QR code" className="h-48 w-48" />
               ) : (
-                <div className="text-xs text-muted-foreground">Generating QR code...</div>
+                <div className="text-xs text-muted-foreground">{t('home.receive.generating')}</div>
               )}
             </div>
             <div className="w-full space-y-2">
@@ -377,7 +383,7 @@ const Home = () => {
               </div>
               <Button size="lg" className="w-full" onClick={handleCopyIdentity}>
                 <CopyIcon className="h-5 w-5" />
-                Copy address
+                {t('home.receive.copy')}
               </Button>
             </div>
           </div>

@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { openBrowserVault, setOnboarded } from '@/lib/vault'
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 type AppHeaderProps = {
   onOpenSidePanel: () => void
@@ -26,6 +27,7 @@ const AppHeader = ({
   openSidePanelLabel,
   openTabLabel,
 }: AppHeaderProps) => {
+  const { t } = useTranslation()
   const [accountName, setAccountName] = useState(
     localStorage.getItem('currentAccountName') ?? 'Main account',
   )
@@ -45,7 +47,7 @@ const AppHeader = ({
   const loadAccounts = async () => {
     if (hasLoadedAccounts || isLoadingAccounts) return
     if (!passphrase.trim()) {
-      setLoadError('enter your vault passphrase to view accounts.')
+      setLoadError(t('home.accounts.passphraseRequired'))
       return
     }
     setLoadError(null)
@@ -58,7 +60,7 @@ const AppHeader = ({
       }))
       setAccounts(entries)
     } catch {
-      setLoadError('unable to unlock vault. check your passphrase.')
+      setLoadError(t('home.accounts.unlockFailed'))
       setAccounts([])
     } finally {
       setHasLoadedAccounts(true)
@@ -90,12 +92,12 @@ const AppHeader = ({
     if (!identity) return
     try {
       await navigator.clipboard.writeText(identity)
-      toast.success('Address copied', {
-        description: 'Your public identity is now in the clipboard.',
+      toast.success(t('home.toast.copySuccess'), {
+        description: t('home.toast.copySuccessDesc'),
       })
     } catch {
-      toast.error('Copy failed', {
-        description: 'Please try again or copy manually.',
+      toast.error(t('home.toast.copyFail'), {
+        description: t('home.toast.copyFailDesc'),
       })
     }
   }
@@ -127,7 +129,7 @@ const AppHeader = ({
         >
           <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
             <UsersIcon className="h-4 w-4" />
-            Accounts
+            {t('home.accounts.title')}
           </div>
           <div className="mt-3 space-y-2">
             {!hasLoadedAccounts && (
@@ -136,7 +138,7 @@ const AppHeader = ({
                   type="password"
                   value={passphrase}
                   onChange={(event) => setPassphrase(event.target.value)}
-                  placeholder="vault passphrase"
+                  placeholder={t('home.accounts.passphrasePlaceholder')}
                 />
                 <Button
                   size="sm"
@@ -144,13 +146,13 @@ const AppHeader = ({
                   onClick={loadAccounts}
                   disabled={!passphrase || isLoadingAccounts}
                 >
-                  {isLoadingAccounts ? 'unlocking...' : 'unlock accounts'}
+                  {isLoadingAccounts ? t('home.accounts.unlocking') : t('home.accounts.unlock')}
                 </Button>
                 {loadError && <p className="text-xs text-destructive">{loadError}</p>}
               </div>
             )}
             {hasLoadedAccounts && accounts.length === 0 && (
-              <div className="text-xs text-muted-foreground">No additional accounts found.</div>
+              <div className="text-xs text-muted-foreground">{t('home.accounts.empty')}</div>
             )}
             {hasLoadedAccounts && accounts.length > 0 && (
               <div className="space-y-1">
@@ -180,13 +182,13 @@ const AppHeader = ({
                   className="mt-2 w-full justify-start gap-2 text-xs text-muted-foreground"
                   onClick={() => {
                     setIsMenuOpen(false)
-                    toast.info('create new account', {
-                      description: 'go to manage accounts to add another identity.',
+                    toast.info(t('home.accounts.createTitle'), {
+                      description: t('home.accounts.createDesc'),
                     })
                   }}
                 >
                   <UsersIcon className="h-4 w-4" />
-                  create a new account
+                  {t('home.accounts.create')}
                 </Button>
               </div>
             )}
