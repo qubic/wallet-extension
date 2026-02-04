@@ -30,7 +30,7 @@ type FormErrors = {
 type TxResult = {
   txId: string
   targetTick: string
-  peers: number
+  amount: bigint
 }
 
 const TransferSuccess = ({
@@ -85,9 +85,9 @@ const TransferSuccess = ({
 
             <div>
               <div className="text-xs font-semibold uppercase text-muted-foreground">
-                {t('transfer.success.peers', { count: txResult.peers })}
+                {t('transfer.success.amount')}
               </div>
-              <div className="mt-1 text-sm">{txResult.peers}</div>
+              <div className="mt-1 text-sm font-semibold">{formatBalance(txResult.amount)} QU</div>
             </div>
           </div>
         </div>
@@ -387,7 +387,7 @@ const Transfer = () => {
       setTxResult({
         txId: result.txId,
         targetTick: result.targetTick.toString(),
-        peers: result.broadcast.peersBroadcasted,
+        amount: parsedAmount,
       })
 
       setDrawerOpen(false)

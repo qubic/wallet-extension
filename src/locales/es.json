@@ -142,7 +142,7 @@
       "description": "Transaccion transmitida a la red.",
       "txId": "ID de transaccion",
       "targetTick": "Tick objetivo",
-      "peers": "Transmitido a {{count}} pares",
+      "amount": "Monto",
       "viewHistory": "Ver historial",
       "sendAnother": "Enviar otra"
     },

@@ -142,7 +142,7 @@
       "description": "Transaction broadcast to the network.",
       "txId": "Transaction ID",
       "targetTick": "Target tick",
-      "peers": "Broadcast to {{count}} peers",
+      "amount": "Amount",
       "viewHistory": "View history",
       "sendAnother": "Send another"
     },
