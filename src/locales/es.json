@@ -9,6 +9,7 @@
   "nav": {
     "welcome": "Bienvenida",
     "home": "Inicio",
+    "transfer": "Transferir",
     "history": "Historial",
     "accounts": "Cuentas",
     "settings": "Ajustes"
@@ -18,8 +19,59 @@
     "subhead": "Revisa saldos y actividad reciente sin salir de tu pestana.",
     "cta": "Ir a ajustes",
     "actions": {
+      "send": "Enviar",
+      "receive": "Recibir",
       "history": "Historial",
       "accounts": "Administrar cuentas"
+    },
+    "balance": {
+      "label": "Saldo",
+      "loading": "Cargando..."
+    },
+    "recent": {
+      "title": "Actividad reciente",
+      "loading": "Cargando actividad reciente...",
+      "empty": "Sin transacciones recientes.",
+      "incoming": "Entrante",
+      "outgoing": "Saliente",
+      "tick": "Tick {{tick}}"
+    },
+    "network": {
+      "title": "Red",
+      "tick": "Tick",
+      "epoch": "Epoca",
+      "supply": "Suministro",
+      "active": "Activas",
+      "pricePerB": "Precio / B",
+      "marketCap": "MCap"
+    },
+    "assets": {
+      "title": "Activos",
+      "more": "Otros activos pronto."
+    },
+    "receive": {
+      "title": "Recibir Qubic",
+      "description": "Comparte este codigo QR o copia tu identidad publica.",
+      "generating": "Generando codigo QR...",
+      "copy": "Copiar direccion"
+    },
+    "toast": {
+      "copySuccess": "Direccion copiada",
+      "copySuccessDesc": "Tu identidad publica esta en el portapapeles.",
+      "copyFail": "Fallo al copiar",
+      "copyFailDesc": "Intenta de nuevo o copia manualmente."
+    },
+    "accounts": {
+      "title": "Cuentas",
+      "passphrasePlaceholder": "Contrasena del vault",
+      "passphraseRequired": "Ingresa la contrasena del vault para ver cuentas.",
+      "unlock": "Desbloquear cuentas",
+      "unlocking": "Desbloqueando...",
+      "unlockFailed": "No se pudo desbloquear el vault. Verifica la contrasena.",
+      "empty": "No hay cuentas adicionales.",
+      "create": "Crear una nueva cuenta",
+      "createTitle": "Crear nueva cuenta",
+      "createDesc": "Ve a administrar cuentas para agregar otra identidad."
     },
     "cards": {
       "balance": "Resumen de saldo",

@@ -2,9 +2,8 @@ import type { PropsWithChildren } from 'react'
 import { useTranslation } from 'react-i18next'
 import { NavLink, useLocation } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import { motion } from 'framer-motion'
-import { HistoryIcon, HomeIcon, SettingsIcon, UsersIcon } from 'lucide-react'
+import { ArrowLeftRightIcon, HistoryIcon, HomeIcon, SettingsIcon, UsersIcon } from 'lucide-react'
 import AppHeader from '@/components/app-header'
 
 const AppShell = ({
@@ -15,6 +14,7 @@ const AppShell = ({
   const { t } = useTranslation()
   const { pathname } = useLocation()
   const isHome = pathname.startsWith('/home')
+  const isTransfer = pathname.startsWith('/transfer')
   const isHistory = pathname.startsWith('/history')
   const isAccounts = pathname.startsWith('/accounts')
   const isSettings = pathname.startsWith('/settings')
@@ -72,6 +72,13 @@ const AppShell = ({
       icon: <HistoryIcon className="size-6" />,
     },
     {
+      key: 'transfer',
+      to: '/transfer',
+      label: t('nav.transfer'),
+      isActive: isTransfer,
+      icon: <ArrowLeftRightIcon className="size-6" />,
+    },
+    {
       key: 'accounts',
       to: '/accounts',
       label: t('nav.accounts'),
@@ -102,31 +109,27 @@ const AppShell = ({
   }
 
   return (
-    <div className="flex h-full w-full flex-col bg-background">
-      <div className={`flex flex-1 flex-col p-0 ${showHeader ? 'gap-4' : ''}`}>
-        {showHeader && (
-          <AppHeader
-            onOpenSidePanel={openSidePanel}
-            onOpenTab={openTab}
-            title={t('app.title')}
-            openSidePanelLabel={t('app.sidepanel')}
-            openTabLabel={t('app.opentab')}
-          />
-        )}
+    <div className="relative flex h-full w-full flex-col bg-background">
+      {showHeader && (
+        <AppHeader
+          onOpenSidePanel={openSidePanel}
+          onOpenTab={openTab}
+          openSidePanelLabel={t('app.sidepanel')}
+          openTabLabel={t('app.opentab')}
+        />
+      )}
 
-        {showHeader || showNav ? (
-          <ScrollArea className="flex-1 min-h-0">
-            <div className="h-full min-h-full">{children}</div>
-          </ScrollArea>
-        ) : (
-          <div className="flex-1">{children}</div>
-        )}
+      <div
+        className="app-scrollbar flex-1 overflow-y-auto"
+        style={{ paddingBottom: showNav ? '56px' : '0' }}
+      >
+        {children}
       </div>
 
       {showNav && (
         <nav
-          className={`fixed bottom-0 left-0 right-0 grid h-[56px] items-center gap-1 rounded-none border-t border-border/60 bg-[rgb(17,17,17)] shadow-lg backdrop-blur ${
-            isSidePanel ? 'grid-cols-4' : 'grid-cols-4'
+          className={`fixed bottom-0 left-0 right-0 z-20 grid h-[56px] items-center gap-1 border-t border-border/60 bg-[rgb(17,17,17)] shadow-lg backdrop-blur ${
+            isSidePanel ? 'grid-cols-5' : 'grid-cols-5'
           }`}
         >
           {navItems.map((item) => (

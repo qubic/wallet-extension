@@ -7,6 +7,7 @@ import ManageAccounts from '../pages/manage-accounts'
 import CreateWallet from '../pages/onboarding/create-wallet'
 import ImportSeed from '../pages/onboarding/import-seed'
 import ImportVault from '../pages/onboarding/import-vault'
+import Transfer from '../pages/transfer'
 import Settings from '../pages/settings'
 import Welcome from '../pages/welcome'
 
@@ -121,6 +122,20 @@ const AppRouter = () => {
                 className="h-full"
               >
                 <History />
+              </motion.div>
+            }
+          />
+          <Route
+            path="/transfer"
+            element={
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.2, ease: 'easeOut' }}
+                className="h-full"
+              >
+                <Transfer />
               </motion.div>
             }
           />

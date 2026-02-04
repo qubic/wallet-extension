@@ -29,9 +29,16 @@ const Toaster = ({ ...props }: ToasterProps) => {
           '--normal-bg': 'var(--popover)',
           '--normal-text': 'var(--popover-foreground)',
           '--normal-border': 'var(--border)',
+          '--success-bg': 'var(--primary)',
+          '--success-text': 'var(--primary-foreground)',
+          '--success-border': 'color-mix(in oklab, var(--primary) 60%, transparent)',
           '--border-radius': 'var(--radius)',
         } as React.CSSProperties
       }
+      toastOptions={{
+        className: 'font-geist-mono',
+        descriptionClassName: 'font-geist-mono',
+      }}
       {...props}
     />
   )

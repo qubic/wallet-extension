@@ -53,8 +53,8 @@ const ManageAccounts = () => {
     }
   }
 
-  const setActive = (identity: string) => {
-    setOnboarded(identity)
+  const setActive = (identity: string, name: string) => {
+    setOnboarded(identity, name)
   }
 
   const removeAccount = async (identity: string) => {
@@ -75,7 +75,7 @@ const ManageAccounts = () => {
         clearOnboarded()
         navigate('/')
       } else if (identity === currentIdentity) {
-        setOnboarded(entries[0].identity)
+        setOnboarded(entries[0].identity, entries[0].name)
       }
     } catch (error) {
       setLoading(false)
@@ -118,7 +118,7 @@ const ManageAccounts = () => {
                 <Button
                   size="sm"
                   variant={account.identity === currentIdentity ? 'secondary' : 'outline'}
-                  onClick={() => setActive(account.identity)}
+                  onClick={() => setActive(account.identity, account.name)}
                 >
                   {account.identity === currentIdentity ? 'Active' : 'Select'}
                 </Button>

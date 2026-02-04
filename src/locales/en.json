@@ -9,6 +9,7 @@
   "nav": {
     "welcome": "Welcome",
     "home": "Home",
+    "transfer": "Transfer",
     "history": "History",
     "accounts": "Accounts",
     "settings": "Settings"
@@ -18,8 +19,59 @@
     "subhead": "Review balances and recent activity without leaving your tab.",
     "cta": "Go to settings",
     "actions": {
+      "send": "Send",
+      "receive": "Receive",
       "history": "History",
       "accounts": "Manage accounts"
+    },
+    "balance": {
+      "label": "Balance",
+      "loading": "Loading..."
+    },
+    "recent": {
+      "title": "Recent activity",
+      "loading": "Loading recent activity...",
+      "empty": "No recent transactions.",
+      "incoming": "Incoming",
+      "outgoing": "Outgoing",
+      "tick": "Tick {{tick}}"
+    },
+    "network": {
+      "title": "Network",
+      "tick": "Tick",
+      "epoch": "Epoch",
+      "supply": "Supply",
+      "active": "Active",
+      "pricePerB": "Price / B",
+      "marketCap": "MCap"
+    },
+    "assets": {
+      "title": "Assets",
+      "more": "Other assets coming soon."
+    },
+    "receive": {
+      "title": "Receive Qubic",
+      "description": "Share this QR code or copy your public identity address.",
+      "generating": "Generating QR code...",
+      "copy": "Copy address"
+    },
+    "toast": {
+      "copySuccess": "Address copied",
+      "copySuccessDesc": "Your public identity is now in the clipboard.",
+      "copyFail": "Copy failed",
+      "copyFailDesc": "Please try again or copy manually."
+    },
+    "accounts": {
+      "title": "Accounts",
+      "passphrasePlaceholder": "Vault passphrase",
+      "passphraseRequired": "Enter your vault passphrase to view accounts.",
+      "unlock": "Unlock accounts",
+      "unlocking": "Unlocking...",
+      "unlockFailed": "Unable to unlock vault. Check your passphrase.",
+      "empty": "No additional accounts found.",
+      "create": "Create a new account",
+      "createTitle": "Create new account",
+      "createDesc": "Go to manage accounts to add another identity."
     },
     "cards": {
       "balance": "Balance snapshot",

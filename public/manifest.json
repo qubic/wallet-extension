@@ -8,8 +8,9 @@
     "default_popup": "popup.html"
   },
   "permissions": ["sidePanel", "tabs", "windows"],
+  "host_permissions": ["https://rpc.qubic.org/*"],
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'; font-src 'self' data:; style-src 'self' 'unsafe-inline'"
+    "extension_pages": "script-src 'self'; object-src 'self'; font-src 'self' data:; style-src 'self' 'unsafe-inline'; connect-src 'self' https://rpc.qubic.org"
   },
   "side_panel": {
     "default_path": "sidepanel.html"
