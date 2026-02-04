@@ -45,12 +45,9 @@ type OwnedAssetsResponse = {
 }
 
 const fetchOwnedAssets = async (identity: string): Promise<OwnedAssetsResponse> => {
-  const response = await fetch(
-    `https://rpc.qubic.org/live/v1/assets/${identity}/owned`,
-    {
-      headers: { accept: 'application/json' },
-    },
-  )
+  const response = await fetch(`https://rpc.qubic.org/live/v1/assets/${identity}/owned`, {
+    headers: { accept: 'application/json' },
+  })
   if (!response.ok) {
     throw new Error('Failed to load assets.')
   }
@@ -401,16 +398,19 @@ const Home = () => {
           {ownedAssets.error && (
             <div className="text-xs text-destructive">{t('home.assets.error')}</div>
           )}
-          {ownedAssets.data?.ownedAssets?.map((asset, index) => {
+          {ownedAssets.data?.ownedAssets?.map((asset) => {
             const info = asset.data
             const issued = info?.issuedAsset
             const name = issued?.name ?? t('home.assets.unknown')
             const decimals = issued?.numberOfDecimalPlaces ?? 0
+            const key = [
+              issued?.issuerIdentity ?? 'unknown',
+              issued?.name ?? 'asset',
+              issued?.type ?? 0,
+              info?.numberOfUnits ?? '0',
+            ].join('-')
             return (
-              <div
-                key={`${name}-${index}`}
-                className="flex items-center justify-between bg-muted/20 px-3 py-2"
-              >
+              <div key={key} className="flex items-center justify-between bg-muted/20 px-3 py-2">
                 <div className="flex flex-col">
                   <span className="text-sm font-semibold text-foreground">{name}</span>
                   {issued?.issuerIdentity && (

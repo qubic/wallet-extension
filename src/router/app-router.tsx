@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import AppShell from '../components/app-shell'
 import History from '../pages/history'
 import Home from '../pages/home'
@@ -37,14 +37,14 @@ const AppRouter = () => {
   const lockTimeoutRef = useRef<number | null>(null)
   const hideChrome = location.pathname === '/unlock'
 
-  const clearLockTimeout = () => {
+  const clearLockTimeout = useCallback(() => {
     if (lockTimeoutRef.current) {
       window.clearTimeout(lockTimeoutRef.current)
       lockTimeoutRef.current = null
     }
-  }
+  }, [])
 
-  const scheduleLock = () => {
+  const scheduleLock = useCallback(() => {
     clearLockTimeout()
     const lastUnlockAt = getLastUnlockAt()
     if (!lastUnlockAt) {
@@ -63,14 +63,14 @@ const AppRouter = () => {
       lockWallet()
       setIsLocked(true)
     }, remaining)
-  }
+  }, [clearLockTimeout])
 
   useEffect(() => {
     if (!isOnboarded) return undefined
     ensureUnlockTimestamp()
     setIsLocked(isWalletLocked())
     return undefined
-  }, [isOnboarded, location.pathname])
+  }, [isOnboarded])
 
   useEffect(() => {
     if (!isOnboarded) return undefined
@@ -82,7 +82,7 @@ const AppRouter = () => {
     return () => {
       clearLockTimeout()
     }
-  }, [isLocked, isOnboarded])
+  }, [clearLockTimeout, isLocked, isOnboarded, scheduleLock])
 
   useEffect(() => {
     if (!isOnboarded) return undefined
@@ -109,7 +109,7 @@ const AppRouter = () => {
       window.removeEventListener('storage', handleStorage)
       window.removeEventListener('wallet-lock-updated', handleLockUpdate)
     }
-  }, [isOnboarded])
+  }, [isOnboarded, scheduleLock])
 
   if (!isOnboarded) {
     return (
