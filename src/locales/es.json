@@ -32,6 +32,7 @@
       "title": "Actividad reciente",
       "loading": "Cargando actividad reciente...",
       "empty": "Sin transacciones recientes.",
+      "emptyTitle": "Sin actividad aun",
       "incoming": "Entrante",
       "outgoing": "Saliente",
       "tick": "Tick {{tick}}"
@@ -47,7 +48,12 @@
     },
     "assets": {
       "title": "Activos",
-      "more": "Otros activos pronto."
+      "more": "Otros activos pronto.",
+      "loading": "Cargando activos...",
+      "empty": "No hay activos adicionales.",
+      "emptyTitle": "Sin activos aun",
+      "error": "No se pudieron cargar los activos.",
+      "unknown": "Activo desconocido"
     },
     "receive": {
       "title": "Recibir Qubic",
@@ -88,7 +94,12 @@
     "subhead": "Controla como se comporta la ventana emergente.",
     "appearance": "Diseno compacto",
     "notifications": "Habilitar notificaciones",
-    "lock": "Bloqueo automatico por inactividad"
+    "lock": "Bloqueo automatico por inactividad",
+    "lockNow": "Bloquear ahora",
+    "lockTimeout": {
+      "label": "Tiempo de bloqueo (minutos)",
+      "helper": "Bloquea la billetera despues del tiempo seleccionado."
+    }
   },
   "history": {
     "title": "Historial",
@@ -155,7 +166,9 @@
     "subtitle": "Ingresa tu contrasena del vault para continuar con esta accion.",
     "form": {
       "passphrase": "Contrasena del vault",
-      "passphrasePlaceholder": "Ingresa tu contrasena"
+      "passphrasePlaceholder": "Ingresa tu contrasena",
+      "showPassphrase": "Mostrar contrasena",
+      "hidePassphrase": "Ocultar contrasena"
     },
     "validation": {
       "required": "Se requiere contrasena."
@@ -172,5 +185,9 @@
       "accountNotFound": "Cuenta no encontrada en el vault.",
       "generic": "Autenticacion fallida. Intenta de nuevo."
     }
+  },
+  "unlock": {
+    "title": "Desbloquea tu billetera",
+    "subtitle": "Tu billetera esta bloqueada por seguridad. Ingresa tu contrasena para continuar."
   }
 }

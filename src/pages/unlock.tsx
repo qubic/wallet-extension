@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ArrowLeftIcon, EyeIcon, EyeOffIcon, LockIcon, ShieldCheckIcon } from 'lucide-react'
-import { VaultInvalidPassphraseError, VaultEntryNotFoundError } from '@qubic-labs/sdk'
+import { EyeIcon, EyeOffIcon, LockOpenIcon, ShieldCheckIcon } from 'lucide-react'
+import { VaultInvalidPassphraseError } from '@qubic-labs/sdk'
+import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import {
   InputGroup,
@@ -9,21 +10,12 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from '@/components/ui/input-group'
-import { Label } from '@/components/ui/label'
 import { setUnlocked } from '@/lib/lock'
 import { openBrowserVault } from '@/lib/vault'
 
-type PassphraseAuthProps = {
-  title?: string
-  subtitle?: string
-  onSuccess: (seed: string) => void
-  onCancel: () => void
-}
-
-const PassphraseAuth = ({ title, subtitle, onSuccess, onCancel }: PassphraseAuthProps) => {
+const Unlock = () => {
   const { t } = useTranslation()
-  const currentAccountName = localStorage.getItem('currentAccountName') ?? 'Main account'
-
+  const navigate = useNavigate()
   const [passphrase, setPassphrase] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -39,17 +31,13 @@ const PassphraseAuth = ({ title, subtitle, onSuccess, onCancel }: PassphraseAuth
     setError('')
 
     try {
-      const vault = await openBrowserVault(passphrase, false)
-      const seed = await vault.getSeed(currentAccountName)
-
+      await openBrowserVault(passphrase, false)
       setUnlocked()
       setPassphrase('')
-      onSuccess(seed)
+      navigate('/home')
     } catch (err) {
       if (err instanceof VaultInvalidPassphraseError) {
         setError(t('passphraseAuth.errors.invalidPassphrase'))
-      } else if (err instanceof VaultEntryNotFoundError) {
-        setError(t('passphraseAuth.errors.accountNotFound'))
       } else {
         setError(t('passphraseAuth.errors.generic'))
       }
@@ -74,15 +62,7 @@ const PassphraseAuth = ({ title, subtitle, onSuccess, onCancel }: PassphraseAuth
   return (
     <section className="flex min-h-full w-full justify-center">
       <div className="flex min-h-full w-full max-w-sm flex-col px-6 pb-6 pt-4">
-        <div className="flex items-center justify-between">
-          <button
-            type="button"
-            onClick={onCancel}
-            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
-          >
-            <ArrowLeftIcon className="h-4 w-4" />
-            {t('passphraseAuth.actions.back')}
-          </button>
+        <div className="flex items-center justify-end">
           <img
             src="/branding/Qubic-Logo-White.svg"
             alt="Qubic"
@@ -96,16 +76,13 @@ const PassphraseAuth = ({ title, subtitle, onSuccess, onCancel }: PassphraseAuth
           </div>
 
           <div>
-            <h1 className="text-2xl font-semibold">{title ?? t('passphraseAuth.title')}</h1>
-            <p className="mt-2 text-sm text-muted-foreground">
-              {subtitle ?? t('passphraseAuth.subtitle')}
-            </p>
+            <h1 className="text-2xl font-semibold">{t('unlock.title')}</h1>
+            <p className="mt-2 text-sm text-muted-foreground">{t('unlock.subtitle')}</p>
           </div>
 
           <div className="w-full space-y-4">
             <div className="space-y-2 text-left">
-              <Label htmlFor="passphrase">{t('passphraseAuth.form.passphrase')}</Label>
-              <InputGroup>
+              <InputGroup className="h-12 bg-muted/30 shadow-sm">
                 <InputGroupInput
                   id="passphrase"
                   type={showPassphrase ? 'text' : 'password'}
@@ -114,6 +91,7 @@ const PassphraseAuth = ({ title, subtitle, onSuccess, onCancel }: PassphraseAuth
                   onChange={(e) => handlePassphraseChange(e.target.value)}
                   onKeyDown={handleKeyDown}
                   aria-invalid={Boolean(error)}
+                  className="h-12 text-base"
                   autoFocus
                 />
                 <InputGroupAddon align="inline-end">
@@ -137,32 +115,17 @@ const PassphraseAuth = ({ title, subtitle, onSuccess, onCancel }: PassphraseAuth
               </InputGroup>
               {error && <p className="mt-1 text-xs text-destructive">{error}</p>}
             </div>
-
-            <div className="rounded-lg border border-border/60 bg-muted/20 p-3 text-left">
-              <div className="flex items-center gap-3">
-                <LockIcon className="mt-0.5 h-10 w-10 text-muted-foreground" />
-                <p className="text-xs text-muted-foreground">{t('passphraseAuth.securityNote')}</p>
-              </div>
-            </div>
           </div>
         </div>
 
-        <div className="mt-auto flex gap-3 pt-6">
-          <Button
-            onClick={onCancel}
-            variant="outline"
-            size="lg"
-            className="flex-1"
-            disabled={loading}
-          >
-            {t('passphraseAuth.actions.cancel')}
-          </Button>
+        <div className="mt-auto pt-6">
           <Button
             onClick={handleSubmit}
             size="lg"
-            className="flex-1"
+            className="w-full gap-2"
             disabled={loading || !passphrase.trim()}
           >
+            <LockOpenIcon className="h-4 w-4" />
             {loading ? t('passphraseAuth.actions.unlocking') : t('passphraseAuth.actions.unlock')}
           </Button>
         </div>
@@ -171,4 +134,4 @@ const PassphraseAuth = ({ title, subtitle, onSuccess, onCancel }: PassphraseAuth
   )
 }
 
-export default PassphraseAuth
+export default Unlock
