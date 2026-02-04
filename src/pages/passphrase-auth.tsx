@@ -83,11 +83,7 @@ const PassphraseAuth = ({ title, subtitle, onSuccess, onCancel }: PassphraseAuth
             <ArrowLeftIcon className="h-4 w-4" />
             {t('passphraseAuth.actions.back')}
           </button>
-          <img
-            src="/branding/Qubic-Logo-White.svg"
-            alt="Qubic"
-            className="h-5 opacity-80"
-          />
+          <img src="/branding/Qubic-Logo-White.svg" alt="Qubic" className="h-5 opacity-80" />
         </div>
 
         <div className="flex flex-1 flex-col items-center justify-center gap-4 text-center">

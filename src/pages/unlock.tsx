@@ -63,11 +63,7 @@ const Unlock = () => {
     <section className="flex min-h-full w-full justify-center">
       <div className="flex min-h-full w-full max-w-sm flex-col px-6 pb-6 pt-4">
         <div className="flex items-center justify-end">
-          <img
-            src="/branding/Qubic-Logo-White.svg"
-            alt="Qubic"
-            className="h-5 opacity-80"
-          />
+          <img src="/branding/Qubic-Logo-White.svg" alt="Qubic" className="h-5 opacity-80" />
         </div>
 
         <div className="flex flex-1 flex-col items-center justify-center gap-4 text-center">
