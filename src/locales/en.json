@@ -63,6 +63,7 @@
     },
     "accounts": {
       "title": "Accounts",
+      "selectLabel": "Select account",
       "passphrasePlaceholder": "Vault passphrase",
       "passphraseRequired": "Enter your vault passphrase to view accounts.",
       "unlock": "Unlock accounts",

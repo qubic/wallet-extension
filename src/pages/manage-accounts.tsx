@@ -3,19 +3,13 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { truncateIdentity } from '@/lib/utils'
 import { clearOnboarded, openBrowserVault, setOnboarded } from '@/lib/vault'
 import { useNavigate } from 'react-router-dom'
 
 type AccountEntry = {
   name: string
   identity: string
-}
-
-const truncateIdentity = (identity: string) => {
-  if (identity.length <= 12) {
-    return identity
-  }
-  return `${identity.slice(0, 5)}…${identity.slice(-5)}`
 }
 
 const ManageAccounts = () => {
@@ -111,7 +105,7 @@ const ManageAccounts = () => {
               <div className="text-sm">
                 <p className="font-semibold">{account.name}</p>
                 <p className="text-xs text-muted-foreground">
-                  {truncateIdentity(account.identity)}
+                  {truncateIdentity(account.identity, { leading: 5, trailing: 5 })}
                 </p>
               </div>
               <div className="flex items-center gap-2">

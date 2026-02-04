@@ -1,6 +1,7 @@
 import { useTransactions } from '@qubic-labs/react'
 import { ArrowDownLeftIcon, ArrowUpRightIcon, HashIcon, RefreshCwIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { buildExplorerObjectUrl, truncateIdentity } from '@/lib/utils'
 import { useTranslation } from 'react-i18next'
 
 const formatQus = (value: bigint) => {
@@ -9,11 +10,6 @@ const formatQus = (value: bigint) => {
     maximumFractionDigits: 2,
   })
   return formatter.format(Number(value))
-}
-
-const formatIdentity = (identity: string) => {
-  if (identity.length <= 12) return identity
-  return `${identity.slice(0, 6)}…${identity.slice(-6)}`
 }
 
 const formatHash = (hash: string) => {
@@ -90,7 +86,7 @@ const History = () => {
                     <div className="flex flex-col">
                       <span className="text-xs font-semibold text-foreground">{label}</span>
                       <span className="text-xs text-muted-foreground">
-                        {formatIdentity(counterparty)}
+                        {truncateIdentity(counterparty)}
                       </span>
                     </div>
                   </div>
@@ -108,7 +104,7 @@ const History = () => {
                   <div className="flex items-center gap-2">
                     <HashIcon className="h-3.5 w-3.5" />
                     <a
-                      href={`https://explorer.qubic.org/network/tx/${tx.hash}`}
+                      href={buildExplorerObjectUrl('tx', tx.hash)}
                       className="text-primary hover:underline"
                       target="_blank"
                       rel="noreferrer"

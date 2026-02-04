@@ -10,6 +10,7 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { truncateIdentity } from '@/lib/utils'
 import { openBrowserVault, setOnboarded } from '@/lib/vault'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -38,11 +39,6 @@ const AppHeader = ({
   const [passphrase, setPassphrase] = useState('')
   const [isLoadingAccounts, setIsLoadingAccounts] = useState(false)
   const [loadError, setLoadError] = useState<string | null>(null)
-  const truncateIdentity = (value: string) => {
-    if (!value) return 'No identity'
-    if (value.length <= 12) return value
-    return `${value.slice(0, 6)}…${value.slice(-6)}`
-  }
 
   const loadAccounts = async () => {
     if (hasLoadedAccounts || isLoadingAccounts) return
@@ -109,7 +105,7 @@ const AppHeader = ({
           <button
             type="button"
             className="flex items-center gap-3 text-left"
-            aria-label="Select account"
+            aria-label={t('home.accounts.selectLabel')}
             onMouseEnter={() => setIsMenuOpen(true)}
           >
             <div className="flex h-10 w-10 items-center justify-center border border-border/60 bg-muted/20">
