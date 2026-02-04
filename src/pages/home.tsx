@@ -70,7 +70,9 @@ const BalanceCard = ({ balance }: { balance: ReturnType<typeof useBalance> }) =>
 
   return (
     <div className="text-center">
-      <div className="text-4xl font-semibold text-foreground">{formatBalanceCompact(normalized)}</div>
+      <div className="text-4xl font-semibold text-foreground">
+        {formatBalanceCompact(normalized)}
+      </div>
       <div className="mt-2 text-sm text-muted-foreground">{formatUsd(normalized)}</div>
     </div>
   )
@@ -338,7 +340,9 @@ const Home = () => {
               <span className="text-xs text-muted-foreground">QUS</span>
             </div>
             <div className="text-sm font-semibold text-foreground">
-              {balance.data?.balance ? formatBalanceCompact(normalizeBalance(balance.data.balance)) : '--'}
+              {balance.data?.balance
+                ? formatBalanceCompact(normalizeBalance(balance.data.balance))
+                : '--'}
             </div>
           </div>
           <div className="text-xs text-muted-foreground">{t('home.assets.more')}</div>

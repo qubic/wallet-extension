@@ -188,9 +188,7 @@ const BalanceDisplay = ({ balance }: { balance: ReturnType<typeof useBalance> })
       </div>
       <div className="mt-2 text-2xl font-semibold">
         {balance.isLoading ? (
-          <span className="text-sm text-muted-foreground">
-            {t('transfer.balance.loading')}
-          </span>
+          <span className="text-sm text-muted-foreground">{t('transfer.balance.loading')}</span>
         ) : balance.error ? (
           <span className="text-sm text-destructive">{balance.error.message}</span>
         ) : (
