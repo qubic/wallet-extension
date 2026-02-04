@@ -109,9 +109,7 @@
       "recipient": "Recipient identity",
       "recipientPlaceholder": "60-character identity (A-Z)",
       "amount": "Amount (QU)",
-      "amountPlaceholder": "Enter amount",
-      "passphrase": "Vault passphrase",
-      "passphrasePlaceholder": "Enter passphrase to sign"
+      "amountPlaceholder": "Enter amount"
     },
     "validation": {
       "recipientRequired": "Recipient identity is required.",
@@ -120,8 +118,7 @@
       "amountRequired": "Amount is required.",
       "amountInvalid": "Amount must be a positive number.",
       "amountExceedsBalance": "Amount exceeds available balance.",
-      "balanceLoading": "Please wait for balance to load.",
-      "passphraseRequired": "Passphrase is required to sign."
+      "balanceLoading": "Please wait for balance to load."
     },
     "confirm": {
       "title": "Confirm transfer",
@@ -147,11 +144,32 @@
       "sendAnother": "Send another"
     },
     "errors": {
-      "invalidPassphrase": "Invalid passphrase.",
-      "accountNotFound": "Account not found in vault.",
       "networkError": "Network error. Please retry.",
       "broadcastFailed": "Failed to broadcast transaction.",
       "generic": "Transfer failed. Please retry."
+    }
+  },
+  "passphraseAuth": {
+    "title": "Authentication Required",
+    "subtitle": "Enter your vault passphrase to continue with this action.",
+    "form": {
+      "passphrase": "Vault passphrase",
+      "passphrasePlaceholder": "Enter your passphrase"
+    },
+    "validation": {
+      "required": "Passphrase is required."
+    },
+    "securityNote": "Your passphrase is used locally to decrypt your vault and sign transactions. It is never transmitted over the network.",
+    "actions": {
+      "back": "Back",
+      "cancel": "Cancel",
+      "unlock": "Unlock",
+      "unlocking": "Unlocking..."
+    },
+    "errors": {
+      "invalidPassphrase": "Invalid passphrase. Please try again.",
+      "accountNotFound": "Account not found in vault.",
+      "generic": "Authentication failed. Please try again."
     }
   }
 }

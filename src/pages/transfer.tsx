@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { ArrowLeftIcon, CheckCircleIcon, SendIcon } from 'lucide-react'
 import { useBalance, useSend } from '@qubic-labs/react'
-import { VaultInvalidPassphraseError, VaultEntryNotFoundError } from '@qubic-labs/sdk'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -16,15 +15,14 @@ import {
   DrawerDescription,
   DrawerFooter,
 } from '@/components/ui/drawer'
-import { openBrowserVault } from '@/lib/vault'
 import { isValidIdentity, normalizeBalance, parseAmount, formatBalance } from '@/lib/utils'
+import PassphraseAuth from '@/pages/passphrase-auth'
 
-type Step = 'form' | 'success'
+type Step = 'form' | 'auth' | 'success'
 
 type FormErrors = {
   recipient?: string
   amount?: string
-  passphrase?: string
 }
 
 type TxResult = {
@@ -202,24 +200,20 @@ const BalanceDisplay = ({ balance }: { balance: ReturnType<typeof useBalance> })
 const TransferForm = ({
   recipient,
   amount,
-  passphrase,
   errors,
   errorMessage,
   balance,
   onRecipientChange,
   onAmountChange,
-  onPassphraseChange,
   onContinue,
 }: {
   recipient: string
   amount: string
-  passphrase: string
   errors: FormErrors
   errorMessage: string
   balance: ReturnType<typeof useBalance>
   onRecipientChange: (value: string) => void
   onAmountChange: (value: string) => void
-  onPassphraseChange: (value: string) => void
   onContinue: () => void
 }) => {
   const { t } = useTranslation()
@@ -264,21 +258,6 @@ const TransferForm = ({
             />
             {errors.amount && <p className="mt-1 text-xs text-destructive">{errors.amount}</p>}
           </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="passphrase">{t('transfer.form.passphrase')}</Label>
-            <Input
-              id="passphrase"
-              type="password"
-              placeholder={t('transfer.form.passphrasePlaceholder')}
-              value={passphrase}
-              onChange={(e) => onPassphraseChange(e.target.value)}
-              className={errors.passphrase ? 'border-destructive' : ''}
-            />
-            {errors.passphrase && (
-              <p className="mt-1 text-xs text-destructive">{errors.passphrase}</p>
-            )}
-          </div>
         </div>
 
         {errorMessage && (
@@ -301,7 +280,6 @@ const Transfer = () => {
   const navigate = useNavigate()
 
   const currentIdentity = localStorage.getItem('currentIdentity') ?? ''
-  const currentAccountName = localStorage.getItem('currentAccountName') ?? 'Main account'
 
   const balance = useBalance(currentIdentity)
   const sendMutation = useSend()
@@ -309,7 +287,6 @@ const Transfer = () => {
   const [step, setStep] = useState<Step>('form')
   const [recipient, setRecipient] = useState('')
   const [amount, setAmount] = useState('')
-  const [passphrase, setPassphrase] = useState('')
   const [errors, setErrors] = useState<FormErrors>({})
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [sending, setSending] = useState(false)
@@ -343,34 +320,23 @@ const Transfer = () => {
       }
     }
 
-    if (!passphrase.trim()) {
-      newErrors.passphrase = t('transfer.validation.passphraseRequired')
-    }
-
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
 
   const handleContinue = () => {
     if (validateForm()) {
-      setDrawerOpen(true)
+      setStep('auth')
       setErrorMessage('')
     }
   }
 
-  const handleConfirmSend = async () => {
-    if (!validateForm()) {
-      setDrawerOpen(false)
-      return
-    }
-
+  const handleAuthSuccess = async (seed: string) => {
     setSending(true)
     setErrorMessage('')
+    setDrawerOpen(true)
 
     try {
-      const vault = await openBrowserVault(passphrase, false)
-      const seed = await vault.getSeed(currentAccountName)
-
       const parsedAmount = parseAmount(amount)
       if (!parsedAmount) {
         throw new Error(t('transfer.validation.amountInvalid'))
@@ -399,11 +365,7 @@ const Transfer = () => {
     } catch (error) {
       let message = t('transfer.errors.generic')
 
-      if (error instanceof VaultInvalidPassphraseError) {
-        message = t('transfer.errors.invalidPassphrase')
-      } else if (error instanceof VaultEntryNotFoundError) {
-        message = t('transfer.errors.accountNotFound')
-      } else if (error instanceof Error) {
+      if (error instanceof Error) {
         if (error.message.includes('network') || error.message.includes('fetch')) {
           message = t('transfer.errors.networkError')
         } else if (error.message.includes('broadcast')) {
@@ -414,20 +376,24 @@ const Transfer = () => {
       }
 
       setErrorMessage(message)
+      setStep('form')
       toast.error(t('transfer.errors.generic'), {
         description: message,
       })
     } finally {
       setSending(false)
-      setPassphrase('')
+      setDrawerOpen(false)
     }
+  }
+
+  const handleAuthCancel = () => {
+    setStep('form')
   }
 
   const handleSendAnother = () => {
     setStep('form')
     setRecipient('')
     setAmount('')
-    setPassphrase('')
     setErrors({})
     setErrorMessage('')
     setTxResult(null)
@@ -451,11 +417,13 @@ const Transfer = () => {
     }
   }
 
-  const handlePassphraseChange = (value: string) => {
-    setPassphrase(value)
-    if (errors.passphrase) {
-      setErrors({ ...errors, passphrase: undefined })
-    }
+  if (step === 'auth') {
+    return (
+      <PassphraseAuth
+        onSuccess={handleAuthSuccess}
+        onCancel={handleAuthCancel}
+      />
+    )
   }
 
   if (step === 'success' && txResult) {
@@ -473,13 +441,11 @@ const Transfer = () => {
       <TransferForm
         recipient={recipient}
         amount={amount}
-        passphrase={passphrase}
         errors={errors}
         errorMessage={errorMessage}
         balance={balance}
         onRecipientChange={handleRecipientChange}
         onAmountChange={handleAmountChange}
-        onPassphraseChange={handlePassphraseChange}
         onContinue={handleContinue}
       />
 
@@ -490,7 +456,7 @@ const Transfer = () => {
         amount={amount}
         sending={sending}
         onCancel={() => setDrawerOpen(false)}
-        onConfirm={handleConfirmSend}
+        onConfirm={() => {}}
       />
     </>
   )

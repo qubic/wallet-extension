@@ -109,9 +109,7 @@
       "recipient": "Identidad del destinatario",
       "recipientPlaceholder": "Identidad de 60 caracteres (A-Z)",
       "amount": "Monto (QU)",
-      "amountPlaceholder": "Ingresa el monto",
-      "passphrase": "Contrasena del vault",
-      "passphrasePlaceholder": "Ingresa contrasena para firmar"
+      "amountPlaceholder": "Ingresa el monto"
     },
     "validation": {
       "recipientRequired": "La identidad del destinatario es requerida.",
@@ -120,8 +118,7 @@
       "amountRequired": "El monto es requerido.",
       "amountInvalid": "El monto debe ser un numero positivo.",
       "amountExceedsBalance": "El monto excede el saldo disponible.",
-      "balanceLoading": "Espera a que se cargue el saldo.",
-      "passphraseRequired": "Se requiere contrasena para firmar."
+      "balanceLoading": "Espera a que se cargue el saldo."
     },
     "confirm": {
       "title": "Confirmar transferencia",
@@ -147,11 +144,32 @@
       "sendAnother": "Enviar otra"
     },
     "errors": {
-      "invalidPassphrase": "Contrasena invalida.",
-      "accountNotFound": "Cuenta no encontrada en el vault.",
       "networkError": "Error de red. Intenta de nuevo.",
       "broadcastFailed": "Fallo al transmitir la transaccion.",
       "generic": "Transferencia fallida. Intenta de nuevo."
+    }
+  },
+  "passphraseAuth": {
+    "title": "Autenticacion Requerida",
+    "subtitle": "Ingresa tu contrasena del vault para continuar con esta accion.",
+    "form": {
+      "passphrase": "Contrasena del vault",
+      "passphrasePlaceholder": "Ingresa tu contrasena"
+    },
+    "validation": {
+      "required": "Se requiere contrasena."
+    },
+    "securityNote": "Tu contrasena se usa localmente para descifrar tu vault y firmar transacciones. Nunca se transmite por la red.",
+    "actions": {
+      "back": "Atras",
+      "cancel": "Cancelar",
+      "unlock": "Desbloquear",
+      "unlocking": "Desbloqueando..."
+    },
+    "errors": {
+      "invalidPassphrase": "Contrasena invalida. Intenta de nuevo.",
+      "accountNotFound": "Cuenta no encontrada en el vault.",
+      "generic": "Autenticacion fallida. Intenta de nuevo."
     }
   }
 }
