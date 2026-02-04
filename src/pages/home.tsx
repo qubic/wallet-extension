@@ -4,6 +4,8 @@ import {
   ArrowDownLeftIcon,
   ArrowUpRightIcon,
   CopyIcon,
+  InboxIcon,
+  PackageIcon,
   RefreshCwIcon,
   SendIcon,
 } from 'lucide-react'
@@ -13,9 +15,8 @@ import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer'
-import { truncateString } from '@/lib/utils'
 import { useTranslation } from 'react-i18next'
-import { normalizeBalance, formatBalanceCompact } from '@/lib/utils'
+import { normalizeBalance, formatBalanceCompact, truncateString } from '@/lib/utils'
 
 const formatUsd = (value: bigint) => {
   const usdPerBillion = 435
@@ -26,6 +27,43 @@ const formatUsd = (value: bigint) => {
     currency: 'USD',
     maximumFractionDigits: 2,
   }).format(usdValue)
+}
+
+type OwnedAssetsResponse = {
+  ownedAssets?: Array<{
+    data?: {
+      numberOfUnits?: string
+      issuedAsset?: {
+        name?: string
+        numberOfDecimalPlaces?: number
+        unitOfMeasurement?: number[]
+        type?: number
+        issuerIdentity?: string
+      }
+    }
+  }>
+}
+
+const fetchOwnedAssets = async (identity: string): Promise<OwnedAssetsResponse> => {
+  const response = await fetch(
+    `https://rpc.qubic.org/live/v1/assets/${identity}/owned`,
+    {
+      headers: { accept: 'application/json' },
+    },
+  )
+  if (!response.ok) {
+    throw new Error('Failed to load assets.')
+  }
+  return response.json() as Promise<OwnedAssetsResponse>
+}
+
+const formatAssetUnits = (units: string | undefined, decimals = 0) => {
+  if (!units) return '--'
+  if (decimals <= 0) return Number(units).toLocaleString()
+  const padded = units.padStart(decimals + 1, '0')
+  const whole = padded.slice(0, -decimals)
+  const fraction = padded.slice(-decimals).replace(/0+$/, '')
+  return `${Number(whole).toLocaleString()}${fraction ? `.${fraction}` : ''}`
 }
 
 type LatestStatsResponse = {
@@ -94,7 +132,17 @@ const TransactionsPreview = ({
   const recent = items.slice(0, 3)
 
   if (recent.length === 0) {
-    return <div className="text-xs text-muted-foreground">{t('home.recent.empty')}</div>
+    return (
+      <div className="flex items-center gap-3 rounded-lg border border-dashed border-border/60 bg-muted/20 px-3 py-3 text-xs text-muted-foreground">
+        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted/40 text-muted-foreground">
+          <InboxIcon className="h-4 w-4" />
+        </div>
+        <div>
+          <div className="text-sm font-semibold text-foreground">{t('home.recent.emptyTitle')}</div>
+          <div className="text-xs text-muted-foreground">{t('home.recent.empty')}</div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -142,7 +190,7 @@ const TransactionsPreview = ({
 
 const Home = () => {
   const { t } = useTranslation()
-  const identity = localStorage.getItem('currentIdentity') ?? '...'
+  const [identity, setIdentity] = useState(localStorage.getItem('currentIdentity') ?? '')
   const pathname = globalThis.location?.pathname ?? ''
   const isSidePanel = pathname.endsWith('sidepanel.html')
   const isPopup = pathname.endsWith('popup.html')
@@ -153,6 +201,13 @@ const Home = () => {
     queryFn: fetchLatestStats,
     staleTime: 120_000,
     gcTime: 120_000,
+  })
+  const ownedAssets = useQuery({
+    queryKey: ['qubic', 'owned-assets', identity],
+    queryFn: () => fetchOwnedAssets(identity),
+    enabled: Boolean(identity),
+    staleTime: 60_000,
+    gcTime: 60_000,
   })
   const transactions = useTransactions(
     {
@@ -182,6 +237,16 @@ const Home = () => {
       })
     }
   }
+
+  useEffect(() => {
+    const refreshIdentity = () => {
+      setIdentity(localStorage.getItem('currentIdentity') ?? '')
+    }
+
+    refreshIdentity()
+    window.addEventListener('storage', refreshIdentity)
+    return () => window.removeEventListener('storage', refreshIdentity)
+  }, [])
 
   useEffect(() => {
     let isActive = true
@@ -330,18 +395,50 @@ const Home = () => {
           <div className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
             {t('home.assets.title')}
           </div>
-          <div className="flex items-center justify-between bg-muted/20 px-3 py-2">
-            <div className="flex flex-col">
-              <span className="text-sm font-semibold text-foreground">QUBIC</span>
-              <span className="text-xs text-muted-foreground">QUS</span>
-            </div>
-            <div className="text-sm font-semibold text-foreground">
-              {balance.data?.balance
-                ? formatBalanceCompact(normalizeBalance(balance.data.balance))
-                : '--'}
-            </div>
-          </div>
-          <div className="text-xs text-muted-foreground">{t('home.assets.more')}</div>
+          {ownedAssets.isLoading && (
+            <div className="text-xs text-muted-foreground">{t('home.assets.loading')}</div>
+          )}
+          {ownedAssets.error && (
+            <div className="text-xs text-destructive">{t('home.assets.error')}</div>
+          )}
+          {ownedAssets.data?.ownedAssets?.map((asset, index) => {
+            const info = asset.data
+            const issued = info?.issuedAsset
+            const name = issued?.name ?? t('home.assets.unknown')
+            const decimals = issued?.numberOfDecimalPlaces ?? 0
+            return (
+              <div
+                key={`${name}-${index}`}
+                className="flex items-center justify-between bg-muted/20 px-3 py-2"
+              >
+                <div className="flex flex-col">
+                  <span className="text-sm font-semibold text-foreground">{name}</span>
+                  {issued?.issuerIdentity && (
+                    <span className="text-xs text-muted-foreground">
+                      {truncateString(issued.issuerIdentity)}
+                    </span>
+                  )}
+                </div>
+                <div className="text-sm font-semibold text-foreground">
+                  {formatAssetUnits(info?.numberOfUnits, decimals)}
+                </div>
+              </div>
+            )
+          })}
+          {ownedAssets.isSuccess &&
+            (!ownedAssets.data?.ownedAssets || ownedAssets.data.ownedAssets.length === 0) && (
+              <div className="flex items-center gap-3 rounded-lg border border-dashed border-border/60 bg-muted/20 px-3 py-3 text-xs text-muted-foreground">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted/40 text-muted-foreground">
+                  <PackageIcon className="h-4 w-4" />
+                </div>
+                <div>
+                  <div className="text-sm font-semibold text-foreground">
+                    {t('home.assets.emptyTitle')}
+                  </div>
+                  <div className="text-xs text-muted-foreground">{t('home.assets.empty')}</div>
+                </div>
+              </div>
+            )}
         </div>
       </div>
 
