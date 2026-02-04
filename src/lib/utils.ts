@@ -62,12 +62,7 @@ type TruncateIdentityOptions = {
 }
 
 export function truncateIdentity(value: string, options: TruncateIdentityOptions = {}) {
-  const {
-    leading = 6,
-    trailing = 6,
-    minLength = 12,
-    emptyLabel = 'No identity',
-  } = options
+  const { leading = 6, trailing = 6, minLength = 12, emptyLabel = 'No identity' } = options
 
   if (!value) return emptyLabel
   if (value.length <= minLength) return value
