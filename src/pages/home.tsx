@@ -14,14 +14,7 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer'
 import { useTranslation } from 'react-i18next'
-
-const formatQus = (value: bigint) => {
-  const formatter = new Intl.NumberFormat('en', {
-    notation: 'compact',
-    maximumFractionDigits: 2,
-  })
-  return formatter.format(Number(value))
-}
+import { normalizeBalance, formatBalanceCompact } from '@/lib/utils'
 
 const formatUsd = (value: bigint) => {
   const usdPerBillion = 435
@@ -63,13 +56,6 @@ const fetchLatestStats = async (): Promise<LatestStatsResponse> => {
   return response.json() as Promise<LatestStatsResponse>
 }
 
-const normalizeBalance = (value: bigint | number | string | undefined) => {
-  if (typeof value === 'bigint') return value
-  if (typeof value === 'number') return BigInt(Math.floor(value))
-  if (typeof value === 'string') return BigInt(value)
-  return 0n
-}
-
 const BalanceCard = ({ balance }: { balance: ReturnType<typeof useBalance> }) => {
   const { t } = useTranslation()
   if (balance.isLoading) {
@@ -84,7 +70,9 @@ const BalanceCard = ({ balance }: { balance: ReturnType<typeof useBalance> }) =>
 
   return (
     <div className="text-center">
-      <div className="text-4xl font-semibold text-foreground">{formatQus(normalized)}</div>
+      <div className="text-4xl font-semibold text-foreground">
+        {formatBalanceCompact(normalized)}
+      </div>
       <div className="mt-2 text-sm text-muted-foreground">{formatUsd(normalized)}</div>
     </div>
   )
@@ -147,7 +135,7 @@ const TransactionsPreview = ({
               className={`text-sm font-medium ${isIncoming ? 'text-primary' : 'text-[#ff6b6b]'}`}
             >
               {isIncoming ? '+' : '-'}
-              {formatQus(tx.amount)}
+              {formatBalanceCompact(tx.amount)}
             </span>
           </div>
         )
@@ -304,7 +292,7 @@ const Home = () => {
               </div>
               <div className="text-sm font-semibold text-foreground">
                 {latestStats.data?.data?.circulatingSupply
-                  ? formatQus(BigInt(latestStats.data.data.circulatingSupply))
+                  ? formatBalanceCompact(BigInt(latestStats.data.data.circulatingSupply))
                   : '--'}
               </div>
             </div>
@@ -352,7 +340,9 @@ const Home = () => {
               <span className="text-xs text-muted-foreground">QUS</span>
             </div>
             <div className="text-sm font-semibold text-foreground">
-              {balance.data?.balance ? formatQus(normalizeBalance(balance.data.balance)) : '--'}
+              {balance.data?.balance
+                ? formatBalanceCompact(normalizeBalance(balance.data.balance))
+                : '--'}
             </div>
           </div>
           <div className="text-xs text-muted-foreground">{t('home.assets.more')}</div>
