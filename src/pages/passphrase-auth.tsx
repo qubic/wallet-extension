@@ -81,9 +81,7 @@ const PassphraseAuth = ({ title, subtitle, onSuccess, onCancel }: PassphraseAuth
           </div>
 
           <div>
-            <h1 className="text-2xl font-semibold">
-              {title ?? t('passphraseAuth.title')}
-            </h1>
+            <h1 className="text-2xl font-semibold">{title ?? t('passphraseAuth.title')}</h1>
             <p className="mt-2 text-sm text-muted-foreground">
               {subtitle ?? t('passphraseAuth.subtitle')}
             </p>
@@ -109,9 +107,7 @@ const PassphraseAuth = ({ title, subtitle, onSuccess, onCancel }: PassphraseAuth
           <div className="rounded-lg border border-border/60 bg-muted/20 p-3">
             <div className="flex items-center gap-3">
               <LockIcon className="mt-0.5 h-10 w-10 text-muted-foreground" />
-              <p className="text-xs text-muted-foreground">
-                {t('passphraseAuth.securityNote')}
-              </p>
+              <p className="text-xs text-muted-foreground">{t('passphraseAuth.securityNote')}</p>
             </div>
           </div>
         </div>

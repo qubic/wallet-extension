@@ -418,12 +418,7 @@ const Transfer = () => {
   }
 
   if (step === 'auth') {
-    return (
-      <PassphraseAuth
-        onSuccess={handleAuthSuccess}
-        onCancel={handleAuthCancel}
-      />
-    )
+    return <PassphraseAuth onSuccess={handleAuthSuccess} onCancel={handleAuthCancel} />
   }
 
   if (step === 'success' && txResult) {
