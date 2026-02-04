@@ -120,6 +120,7 @@
       "amountRequired": "El monto es requerido.",
       "amountInvalid": "El monto debe ser un numero positivo.",
       "amountExceedsBalance": "El monto excede el saldo disponible.",
+      "balanceLoading": "Espera a que se cargue el saldo.",
       "passphraseRequired": "Se requiere contrasena para firmar."
     },
     "confirm": {

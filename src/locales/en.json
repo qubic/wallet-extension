@@ -120,6 +120,7 @@
       "amountRequired": "Amount is required.",
       "amountInvalid": "Amount must be a positive number.",
       "amountExceedsBalance": "Amount exceeds available balance.",
+      "balanceLoading": "Please wait for balance to load.",
       "passphraseRequired": "Passphrase is required to sign."
     },
     "confirm": {

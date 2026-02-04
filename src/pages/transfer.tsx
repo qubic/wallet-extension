@@ -68,6 +68,8 @@ const Transfer = () => {
       const parsedAmount = parseAmount(amount)
       if (!parsedAmount || parsedAmount <= 0n) {
         newErrors.amount = t('transfer.validation.amountInvalid')
+      } else if (balance.isLoading) {
+        newErrors.amount = t('transfer.validation.balanceLoading')
       } else {
         const currentBalance = normalizeBalance(balance.data?.balance)
         if (parsedAmount > currentBalance) {
