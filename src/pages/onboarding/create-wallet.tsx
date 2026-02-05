@@ -14,11 +14,23 @@ import { Label } from '@/components/ui/label'
 import { Progress } from '@/components/ui/progress'
 import { Textarea } from '@/components/ui/textarea'
 import { generateSeed, isSeedLike } from '@/lib/seed'
+import { VaultEntryNotFoundError, VaultInvalidPassphraseError } from '@qubic-labs/sdk'
 import { openBrowserVault, setOnboarded } from '@/lib/vault'
+import { getCachedAccounts, getWatchOnlyAccounts, saveCachedAccounts } from '@/lib/accounts'
 
 const TOTAL_STEPS = 3
 
-const CreateWallet = () => {
+type CreateWalletProps = {
+  onCancelPath?: string
+  onCompletePath?: string
+  variant?: 'onboarding' | 'add-address'
+}
+
+const CreateWallet = ({
+  onCancelPath = '/',
+  onCompletePath = '/home',
+  variant = 'onboarding',
+}: CreateWalletProps) => {
   const navigate = useNavigate()
   const [step, setStep] = useState(1)
   const [seed, setSeed] = useState(() => generateSeed())
@@ -70,7 +82,7 @@ const CreateWallet = () => {
     }
   }
 
-  const handleNext = () => {
+  const handleNext = async () => {
     setStatus(null)
 
     if (step === 1 && !isSeedLike(seed)) {
@@ -83,9 +95,46 @@ const CreateWallet = () => {
       return
     }
 
+    if (step === 1 && variant === 'add-address') {
+      const cachedAccounts = getCachedAccounts()
+      if (cachedAccounts.some((entry) => entry.identity === identity)) {
+        setStatus('This address already exists.')
+        return
+      }
+    }
+
     if (step === 2 && !passphrase.trim()) {
       setStatus('Passphrase is required.')
       return
+    }
+    if (step === 2 && variant === 'add-address') {
+      const existingNames = [
+        ...getCachedAccounts().map((entry) => entry.name.toLowerCase()),
+        ...getWatchOnlyAccounts().map((entry) => entry.name.toLowerCase()),
+      ]
+      if (existingNames.includes(name.trim().toLowerCase())) {
+        setStatus('Wallet name already exists.')
+        return
+      }
+      try {
+        const vault = await openBrowserVault(passphrase.trim(), false)
+        const cached = getCachedAccounts()
+        const currentIdentity = localStorage.getItem('currentIdentity')
+        const expectedIdentity = currentIdentity ?? cached[0]?.identity
+        if (expectedIdentity) {
+          await vault.getSeed(expectedIdentity)
+        }
+      } catch (error) {
+        if (
+          error instanceof VaultInvalidPassphraseError ||
+          error instanceof VaultEntryNotFoundError
+        ) {
+          setStatus('Invalid vault passphrase.')
+          return
+        }
+        setStatus('Failed to validate vault passphrase.')
+        return
+      }
     }
 
     setStep((current) => Math.min(current + 1, TOTAL_STEPS))
@@ -94,7 +143,7 @@ const CreateWallet = () => {
   const handleBack = () => {
     setStatus(null)
     if (step === 1) {
-      navigate('/')
+      navigate(onCancelPath)
       return
     }
     setStep((current) => Math.max(current - 1, 1))
@@ -115,13 +164,53 @@ const CreateWallet = () => {
       return
     }
 
+    const cachedAccounts = getCachedAccounts()
+    const existingNames = [
+      ...cachedAccounts.map((entry) => entry.name.toLowerCase()),
+      ...getWatchOnlyAccounts().map((entry) => entry.name.toLowerCase()),
+    ]
+    if (existingNames.includes(name.trim().toLowerCase())) {
+      setStatus('Wallet name already exists.')
+      setStep(2)
+      return
+    }
+    if (cachedAccounts.some((entry) => entry.identity === identity)) {
+      setStatus('This address already exists.')
+      setStep(1)
+      return
+    }
+
     try {
       setIsSaving(true)
-      const vault = await openBrowserVault(passphrase, true)
+      const vault = await openBrowserVault(passphrase, variant !== 'add-address')
+      if (variant === 'add-address') {
+        const cached = getCachedAccounts()
+        const currentIdentity = localStorage.getItem('currentIdentity')
+        const expectedIdentity = currentIdentity ?? cached[0]?.identity
+        if (expectedIdentity) {
+          try {
+            await vault.getSeed(expectedIdentity)
+          } catch (error) {
+            if (
+              error instanceof VaultInvalidPassphraseError ||
+              error instanceof VaultEntryNotFoundError
+            ) {
+              setStatus('Invalid vault passphrase.')
+              setIsSaving(false)
+              return
+            }
+            throw error
+          }
+        }
+      }
       const entry = await vault.addSeed({ name, seed, overwrite: true })
       await vault.save()
-      setOnboarded(entry.identity, name)
-      navigate('/home')
+      const existing = getCachedAccounts().filter((item) => item.identity !== entry.identity)
+      saveCachedAccounts([...existing, { name: entry.name, identity: entry.identity }])
+      if (variant !== 'add-address') {
+        setOnboarded(entry.identity, name)
+      }
+      navigate(onCompletePath)
     } catch (error) {
       setStatus(error instanceof Error ? error.message : 'Failed to create wallet.')
       setIsSaving(false)
@@ -133,7 +222,9 @@ const CreateWallet = () => {
       <div className="flex w-full max-w-sm flex-col justify-between gap-6">
         <div className="space-y-3 text-center">
           <div className="space-y-1">
-            <h2 className="text-xl font-semibold">Create new wallet</h2>
+            <h2 className="text-xl font-semibold">
+              {variant === 'add-address' ? 'Add new address' : 'Create new wallet'}
+            </h2>
             <p className="text-sm text-muted-foreground">
               Step {step} of {TOTAL_STEPS}
             </p>
@@ -147,7 +238,9 @@ const CreateWallet = () => {
               <div className="space-y-1">
                 <h3 className="text-sm font-semibold">Secure your seed</h3>
                 <p className="text-xs text-muted-foreground">
-                  Save this 55-letter seed in a safe place. You will need it to restore your wallet.
+                  {variant === 'add-address'
+                    ? 'Save this 55-letter seed in a safe place. You will need it to restore this address.'
+                    : 'Save this 55-letter seed in a safe place. You will need it to restore your wallet.'}
                 </p>
               </div>
               <div className="space-y-2">
@@ -182,7 +275,9 @@ const CreateWallet = () => {
                 </p>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="wallet-name">Wallet name</Label>
+                <Label htmlFor="wallet-name">
+                  {variant === 'add-address' ? 'Address label' : 'Wallet name'}
+                </Label>
                 <Input
                   id="wallet-name"
                   value={name}
@@ -190,7 +285,9 @@ const CreateWallet = () => {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="passphrase">Vault passphrase</Label>
+                <Label htmlFor="passphrase">
+                  {variant === 'add-address' ? 'Current vault passphrase' : 'Vault passphrase'}
+                </Label>
                 <Input
                   id="passphrase"
                   type="password"
@@ -211,7 +308,7 @@ const CreateWallet = () => {
               </div>
               <div className="space-y-2 text-sm">
                 <div className="flex items-center justify-between text-xs text-muted-foreground">
-                  <span>Wallet name</span>
+                  <span>{variant === 'add-address' ? 'Address label' : 'Wallet name'}</span>
                   <span className="text-foreground">{name || 'main'}</span>
                 </div>
                 <div className="text-xs text-muted-foreground">Seed length: {seed.length}</div>
@@ -242,7 +339,13 @@ const CreateWallet = () => {
           ) : (
             <Button size="lg" onClick={handleCreate} className="flex-1" disabled={isSaving}>
               <CheckCircleIcon className="h-5 w-5" />
-              {isSaving ? 'Creating...' : 'Create wallet'}
+              {variant === 'add-address'
+                ? isSaving
+                  ? 'Adding...'
+                  : 'Add address'
+                : isSaving
+                  ? 'Creating...'
+                  : 'Create wallet'}
             </Button>
           )}
         </div>
