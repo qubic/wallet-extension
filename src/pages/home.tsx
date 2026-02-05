@@ -13,6 +13,7 @@ import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer'
+import { truncateString } from '@/lib/utils'
 import { useTranslation } from 'react-i18next'
 import { normalizeBalance, formatBalanceCompact } from '@/lib/utils'
 
@@ -25,11 +26,6 @@ const formatUsd = (value: bigint) => {
     currency: 'USD',
     maximumFractionDigits: 2,
   }).format(usdValue)
-}
-
-const formatIdentity = (identity: string) => {
-  if (identity.length <= 12) return identity
-  return `${identity.slice(0, 6)}…${identity.slice(-6)}`
 }
 
 type LatestStatsResponse = {
@@ -124,7 +120,7 @@ const TransactionsPreview = ({
               <div className="flex flex-col">
                 <span className="text-xs font-semibold text-foreground">{label}</span>
                 <span className="text-xs text-muted-foreground">
-                  {formatIdentity(counterparty)}
+                  {truncateString(counterparty)}
                 </span>
                 <span className="text-[11px] text-muted-foreground/70">
                   {t('home.recent.tick', { tick: tx.tickNumber })}

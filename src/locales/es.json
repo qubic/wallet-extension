@@ -63,6 +63,7 @@
     },
     "accounts": {
       "title": "Cuentas",
+      "selectLabel": "Seleccionar cuenta",
       "passphrasePlaceholder": "Contrasena del vault",
       "passphraseRequired": "Ingresa la contrasena del vault para ver cuentas.",
       "unlock": "Desbloquear cuentas",

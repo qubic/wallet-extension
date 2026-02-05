@@ -53,3 +53,30 @@ export const formatBalanceCompact = (value: bigint): string => {
     maximumFractionDigits: 2,
   }).format(Number(value))
 }
+
+type TruncateStringOptions = {
+  leading?: number
+  trailing?: number
+  minLength?: number
+  emptyLabel?: string
+}
+
+export function truncateString(value: string, options: TruncateStringOptions = {}) {
+  const { leading = 6, trailing = 6, minLength = 12, emptyLabel = 'No identity' } = options
+
+  if (!value) return emptyLabel
+  if (value.length <= minLength) return value
+  return `${value.slice(0, leading)}…${value.slice(-trailing)}`
+}
+
+export const EXPLORER_BASE_URL = 'https://explorer.qubic.org'
+
+export type ExplorerObject = 'tx'
+
+export function buildExplorerObjectUrl(object: ExplorerObject, id: string) {
+  const pathMap: Record<ExplorerObject, string> = {
+    tx: 'network/tx',
+  }
+
+  return `${EXPLORER_BASE_URL}/${pathMap[object]}/${id}`
+}
