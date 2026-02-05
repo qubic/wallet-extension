@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useQueries } from '@tanstack/react-query'
 import { useSdk } from '@qubic-labs/react'
 import { VaultInvalidPassphraseError, VaultEntryNotFoundError } from '@qubic-labs/sdk'
@@ -60,7 +60,6 @@ const ManageAccounts = () => {
   const { t } = useTranslation()
   const sdk = useSdk()
   const navigate = useNavigate()
-  const location = useLocation()
   const [accounts, setAccounts] = useState<AccountEntry[]>(() => {
     const cached = getCachedAccounts().map((entry) => ({
       name: entry.name,
@@ -105,7 +104,7 @@ const ManageAccounts = () => {
     return [...ordered, ...remaining]
   }, [accounts])
 
-  const refreshFromCache = () => {
+  const refreshFromCache = useCallback(() => {
     const cached = getCachedAccounts().map((entry) => ({
       name: entry.name,
       identity: entry.identity,
@@ -116,17 +115,17 @@ const ManageAccounts = () => {
       watchOnly: true,
     }))
     setAccounts([...cached, ...watchOnly])
-  }
+  }, [])
 
   useEffect(() => {
     refreshFromCache()
-  }, [location.key])
+  }, [refreshFromCache])
 
   useEffect(() => {
     const handleStorage = () => refreshFromCache()
     window.addEventListener('storage', handleStorage)
     return () => window.removeEventListener('storage', handleStorage)
-  }, [])
+  }, [refreshFromCache])
 
   const balanceQueries = useQueries({
     queries: orderedAccounts.map((account) => ({
@@ -389,6 +388,16 @@ const ManageAccounts = () => {
                 onDragOver={handleDragOver(account.identity)}
                 onDrop={handleDrop(account.identity)}
                 onDragEnd={handleDragEnd}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault()
+                    setRenameTarget(account)
+                    setRenameValue(account.name)
+                  }
+                }}
+                aria-label={`${t('accounts.manage.menu')} ${account.name}`}
                 className={`flex items-center justify-between gap-2 rounded-lg border border-border/60 bg-card/80 px-3 py-2 ${
                   isOver ? 'ring-2 ring-primary/40' : ''
                 } ${isDragging ? 'opacity-60' : ''}`}
