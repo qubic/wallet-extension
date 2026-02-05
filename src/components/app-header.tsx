@@ -12,8 +12,11 @@ import { Input } from '@/components/ui/input'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { truncateString } from '@/lib/utils'
 import { openBrowserVault, setOnboarded } from '@/lib/vault'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useQueries } from '@tanstack/react-query'
+import { useSdk } from '@qubic-labs/react'
+import { formatBalanceCompact } from '@/lib/utils'
 
 type AppHeaderProps = {
   onOpenSidePanel: () => void
@@ -29,6 +32,7 @@ const AppHeader = ({
   openTabLabel,
 }: AppHeaderProps) => {
   const { t } = useTranslation()
+  const sdk = useSdk()
   const [accountName, setAccountName] = useState(
     localStorage.getItem('currentAccountName') ?? 'Main account',
   )
@@ -39,6 +43,26 @@ const AppHeader = ({
   const [passphrase, setPassphrase] = useState('')
   const [isLoadingAccounts, setIsLoadingAccounts] = useState(false)
   const [loadError, setLoadError] = useState<string | null>(null)
+
+  const balanceQueries = useQueries({
+    queries: accounts.map((account) => ({
+      queryKey: ['qubic', 'balance', account.identity],
+      queryFn: () => sdk.rpc.live.balance(account.identity),
+      enabled: hasLoadedAccounts && accounts.length > 0,
+      refetchInterval: 20_000,
+    })),
+  })
+
+  const balanceByIdentity = useMemo(() => {
+    const map = new Map<string, bigint>()
+    accounts.forEach((account, index) => {
+      const data = balanceQueries[index]?.data
+      if (data?.balance !== undefined) {
+        map.set(account.identity, data.balance)
+      }
+    })
+    return map
+  }, [accounts, balanceQueries])
 
   const loadAccounts = async () => {
     if (hasLoadedAccounts || isLoadingAccounts) return
@@ -166,6 +190,11 @@ const AppHeader = ({
                       <span className="text-xs text-muted-foreground">
                         {truncateString(account.identity)}
                       </span>
+                    </div>
+                    <div className="text-right text-xs font-semibold text-foreground">
+                      {balanceByIdentity.has(account.identity)
+                        ? formatBalanceCompact(balanceByIdentity.get(account.identity) ?? 0n)
+                        : '--'}
                     </div>
                     {account.identity === identity && (
                       <span className="text-[11px] text-primary">Active</span>
