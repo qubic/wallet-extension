@@ -1,7 +1,7 @@
 import { useTransactions } from '@qubic-labs/react'
 import { ArrowDownLeftIcon, ArrowUpRightIcon, HashIcon, RefreshCwIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { buildExplorerObjectUrl, truncateIdentity } from '@/lib/utils'
+import { buildExplorerObjectUrl, truncateString } from '@/lib/utils'
 import { useTranslation } from 'react-i18next'
 
 const formatQus = (value: bigint) => {
@@ -81,7 +81,7 @@ const History = () => {
                     <div className="flex flex-col">
                       <span className="text-xs font-semibold text-foreground">{label}</span>
                       <span className="text-xs text-muted-foreground">
-                        {truncateIdentity(counterparty)}
+                        {truncateString(counterparty)}
                       </span>
                     </div>
                   </div>
@@ -104,7 +104,7 @@ const History = () => {
                       target="_blank"
                       rel="noreferrer"
                     >
-                      {truncateIdentity(tx.hash, {
+                      {truncateString(tx.hash, {
                         leading: 6,
                         trailing: 6,
                         minLength: 12,

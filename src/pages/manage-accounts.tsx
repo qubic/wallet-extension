@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { truncateIdentity } from '@/lib/utils'
+import { truncateString } from '@/lib/utils'
 import { clearOnboarded, openBrowserVault, setOnboarded } from '@/lib/vault'
 import { useNavigate } from 'react-router-dom'
 
@@ -105,7 +105,7 @@ const ManageAccounts = () => {
               <div className="text-sm">
                 <p className="font-semibold">{account.name}</p>
                 <p className="text-xs text-muted-foreground">
-                  {truncateIdentity(account.identity, { leading: 5, trailing: 5 })}
+                  {truncateString(account.identity, { leading: 5, trailing: 5 })}
                 </p>
               </div>
               <div className="flex items-center gap-2">

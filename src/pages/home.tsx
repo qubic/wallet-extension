@@ -13,7 +13,7 @@ import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer'
-import { truncateIdentity } from '@/lib/utils'
+import { truncateString } from '@/lib/utils'
 import { useTranslation } from 'react-i18next'
 import { normalizeBalance, formatBalanceCompact } from '@/lib/utils'
 
@@ -120,7 +120,7 @@ const TransactionsPreview = ({
               <div className="flex flex-col">
                 <span className="text-xs font-semibold text-foreground">{label}</span>
                 <span className="text-xs text-muted-foreground">
-                  {truncateIdentity(counterparty)}
+                  {truncateString(counterparty)}
                 </span>
                 <span className="text-[11px] text-muted-foreground/70">
                   {t('home.recent.tick', { tick: tx.tickNumber })}

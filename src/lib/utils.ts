@@ -54,14 +54,14 @@ export const formatBalanceCompact = (value: bigint): string => {
   }).format(Number(value))
 }
 
-type TruncateIdentityOptions = {
+type TruncateStringOptions = {
   leading?: number
   trailing?: number
   minLength?: number
   emptyLabel?: string
 }
 
-export function truncateIdentity(value: string, options: TruncateIdentityOptions = {}) {
+export function truncateString(value: string, options: TruncateStringOptions = {}) {
   const { leading = 6, trailing = 6, minLength = 12, emptyLabel = 'No identity' } = options
 
   if (!value) return emptyLabel

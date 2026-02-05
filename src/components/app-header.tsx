@@ -10,7 +10,7 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { truncateIdentity } from '@/lib/utils'
+import { truncateString } from '@/lib/utils'
 import { openBrowserVault, setOnboarded } from '@/lib/vault'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -113,7 +113,7 @@ const AppHeader = ({
             </div>
             <div className="flex flex-col">
               <span className="text-sm font-semibold text-foreground">{accountName}</span>
-              <span className="text-xs text-muted-foreground">{truncateIdentity(identity)}</span>
+              <span className="text-xs text-muted-foreground">{truncateString(identity)}</span>
             </div>
           </button>
         </PopoverTrigger>
@@ -164,7 +164,7 @@ const AppHeader = ({
                     <div className="flex flex-col">
                       <span className="font-medium text-foreground">{account.name}</span>
                       <span className="text-xs text-muted-foreground">
-                        {truncateIdentity(account.identity)}
+                        {truncateString(account.identity)}
                       </span>
                     </div>
                     {account.identity === identity && (
