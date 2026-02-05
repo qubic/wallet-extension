@@ -381,15 +381,14 @@ const ManageAccounts = () => {
             const isDragging = draggedId === account.identity
             const isOver = dragOverId === account.identity
             return (
-              <div
+              <button
                 key={account.identity}
+                type="button"
                 draggable
                 onDragStart={handleDragStart(account.identity)}
                 onDragOver={handleDragOver(account.identity)}
                 onDrop={handleDrop(account.identity)}
                 onDragEnd={handleDragEnd}
-                role="button"
-                tabIndex={0}
                 onKeyDown={(event) => {
                   if (event.key === 'Enter' || event.key === ' ') {
                     event.preventDefault()
@@ -483,7 +482,7 @@ const ManageAccounts = () => {
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
-              </div>
+              </button>
             )
           })}
           {orderedAccounts.length === 0 && (
