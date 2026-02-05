@@ -15,6 +15,7 @@ import { Progress } from '@/components/ui/progress'
 import { Textarea } from '@/components/ui/textarea'
 import { generateSeed, isSeedLike } from '@/lib/seed'
 import { VaultEntryNotFoundError, VaultInvalidPassphraseError } from '@qubic-labs/sdk'
+import { setUnlocked } from '@/lib/lock'
 import { openBrowserVault, setOnboarded } from '@/lib/vault'
 import { getCachedAccounts, getWatchOnlyAccounts, saveCachedAccounts } from '@/lib/accounts'
 
@@ -209,6 +210,7 @@ const CreateWallet = ({
       saveCachedAccounts([...existing, { name: entry.name, identity: entry.identity }])
       if (variant !== 'add-address') {
         setOnboarded(entry.identity, name)
+        setUnlocked()
       }
       navigate(onCompletePath)
     } catch (error) {

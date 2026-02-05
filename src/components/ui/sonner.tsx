@@ -36,8 +36,8 @@ const Toaster = ({ ...props }: ToasterProps) => {
         } as React.CSSProperties
       }
       toastOptions={{
-        className: 'font-geist-mono',
-        descriptionClassName: 'font-geist-mono',
+        className: 'font-sans',
+        descriptionClassName: 'font-sans',
       }}
       {...props}
     />

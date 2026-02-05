@@ -366,7 +366,7 @@ const ManageAccounts = () => {
 
   return (
     <section className="flex min-h-full w-full justify-center pb-6 pt-4">
-      <div className="flex w-full max-w-sm flex-col gap-4 px-4">
+      <div className="flex w-full flex-col gap-4 px-4">
         <div className="flex items-center justify-between gap-2">
           <div>
             <h2 className="text-base font-semibold">{t('accounts.manage.title')}</h2>
@@ -397,7 +397,7 @@ const ManageAccounts = () => {
                   }
                 }}
                 aria-label={`${t('accounts.manage.menu')} ${account.name}`}
-                className={`flex items-center justify-between gap-2 rounded-lg border border-border/60 bg-card/80 px-3 py-2 ${
+                className={`flex w-full items-center justify-between gap-2 rounded-lg border border-border/60 bg-card/80 px-3 py-2 ${
                   isOver ? 'ring-2 ring-primary/40' : ''
                 } ${isDragging ? 'opacity-60' : ''}`}
               >

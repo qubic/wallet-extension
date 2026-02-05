@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { VaultEntryNotFoundError, VaultInvalidPassphraseError } from '@qubic-labs/sdk'
 import { isSeedLike } from '@/lib/seed'
 import { getCachedAccounts, getWatchOnlyAccounts, saveCachedAccounts } from '@/lib/accounts'
+import { setUnlocked } from '@/lib/lock'
 import { openBrowserVault, setOnboarded } from '@/lib/vault'
 
 const TOTAL_STEPS = 3
@@ -172,6 +173,7 @@ const ImportSeed = ({
       saveCachedAccounts([...existing, { name: entry.name, identity: entry.identity }])
       if (variant !== 'add-address') {
         setOnboarded(entry.identity, name)
+        setUnlocked()
       }
       navigate(onCompletePath)
     } catch (error) {
