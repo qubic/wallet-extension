@@ -12,11 +12,6 @@ const formatQus = (value: bigint) => {
   return formatter.format(Number(value))
 }
 
-const formatHash = (hash: string) => {
-  if (hash.length <= 12) return hash
-  return `${hash.slice(0, 6)}…${hash.slice(-6)}`
-}
-
 const History = () => {
   const { t } = useTranslation()
   const identity = localStorage.getItem('currentIdentity') ?? '...'
@@ -109,7 +104,12 @@ const History = () => {
                       target="_blank"
                       rel="noreferrer"
                     >
-                      {formatHash(tx.hash)}
+                      {truncateIdentity(tx.hash, {
+                        leading: 6,
+                        trailing: 6,
+                        minLength: 12,
+                        emptyLabel: '',
+                      })}
                     </a>
                   </div>
                   <div className="flex items-center gap-2">
