@@ -128,6 +128,8 @@ const AppShell = ({
           msOverflowStyle: 'none',
           paddingRight: '12px',
           marginRight: '-12px',
+          paddingBottom: showNav ? 'calc(56px + env(safe-area-inset-bottom))' : '0',
+          scrollPaddingBottom: showNav ? '72px' : '0',
         }}
       >
         {children}
