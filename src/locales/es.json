@@ -86,6 +86,11 @@
   "settings": {
     "headline": "Preferencias de la extension",
     "subhead": "Controla como se comporta la ventana emergente.",
+    "language": "Idioma",
+    "theme": "Tema",
+    "themeDark": "Oscuro",
+    "themeLight": "Claro",
+    "themeSystem": "Sistema",
     "appearance": "Diseno compacto",
     "notifications": "Habilitar notificaciones",
     "lock": "Bloqueo automatico por inactividad"
