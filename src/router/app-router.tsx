@@ -178,7 +178,7 @@ const AppRouter = () => {
     )
   }
 
-  if (isOnboarded && isLocked && location.pathname !== '/unlock') {
+  if (isLocked && location.pathname !== '/unlock') {
     return <Navigate to="/unlock" replace />
   }
 
