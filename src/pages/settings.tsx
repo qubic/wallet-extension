@@ -22,7 +22,10 @@ const Settings = () => {
           <Label htmlFor="language" className="text-sm text-muted-foreground">
             {t('settings.language')}
           </Label>
-          <Select value={i18n.language} onValueChange={(value) => setLanguage(value as 'en' | 'es')}>
+          <Select
+            value={i18n.language}
+            onValueChange={(value) => setLanguage(value as 'en' | 'es')}
+          >
             <SelectTrigger id="language" className="h-9 w-[120px] text-sm">
               <SelectValue placeholder="EN" />
             </SelectTrigger>

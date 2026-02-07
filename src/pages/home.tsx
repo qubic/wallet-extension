@@ -106,7 +106,10 @@ const TransactionsPreview = ({
         const Icon = isIncoming ? ArrowDownLeftIcon : ArrowUpRightIcon
 
         return (
-          <div key={tx.hash} className="flex items-center justify-between rounded-lg bg-card px-3 py-2">
+          <div
+            key={tx.hash}
+            className="flex items-center justify-between rounded-lg bg-card px-3 py-2"
+          >
             <div className="flex items-center gap-3">
               <div
                 className={`flex h-9 w-9 items-center justify-center rounded-full border ${

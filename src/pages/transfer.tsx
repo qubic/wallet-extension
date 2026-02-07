@@ -148,9 +148,7 @@ const ConfirmationDrawer = ({
           </div>
 
           <div className="rounded-lg border border-warning/20 bg-warning/10 p-3">
-            <p className="text-sm text-warning-foreground">
-              {t('transfer.confirm.warning')}
-            </p>
+            <p className="text-sm text-warning-foreground">{t('transfer.confirm.warning')}</p>
           </div>
         </div>
 

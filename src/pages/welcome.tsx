@@ -47,7 +47,11 @@ const Welcome = () => {
     <section className="flex h-full flex-col items-center justify-center gap-6 px-6 text-center">
       <div className="flex flex-col items-center gap-3">
         <img
-          src={resolvedTheme === 'light' ? '/branding/Qubic-Logo-Dark.svg' : '/branding/Qubic-Logo-White.svg'}
+          src={
+            resolvedTheme === 'light'
+              ? '/branding/Qubic-Logo-Dark.svg'
+              : '/branding/Qubic-Logo-White.svg'
+          }
           alt="Qubic"
           className="h-9"
         />
