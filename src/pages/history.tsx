@@ -66,7 +66,7 @@ const History = () => {
             const Icon = isIncoming ? ArrowDownLeftIcon : ArrowUpRightIcon
 
             return (
-              <div key={tx.hash} className="space-y-3 rounded-lg border border-border/50 bg-card px-3 py-3">
+              <div key={tx.hash} className="space-y-3 rounded-lg bg-card px-3 py-3">
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
                     <div

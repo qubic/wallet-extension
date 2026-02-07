@@ -66,7 +66,7 @@ const TransferSuccess = ({
             </p>
           </div>
 
-          <div className="w-full space-y-3 rounded-lg border border-border/50 bg-card p-4 text-left">
+          <div className="w-full space-y-3 rounded-lg bg-card p-4 text-left">
             <div>
               <div className="text-xs font-semibold uppercase text-muted-foreground">
                 {t('transfer.success.txId')}
@@ -180,7 +180,7 @@ const BalanceDisplay = ({ balance }: { balance: ReturnType<typeof useBalance> })
   const currentBalance = normalizeBalance(balance.data?.balance)
 
   return (
-    <div className="rounded-lg border border-border/50 bg-card p-4">
+    <div className="rounded-lg bg-card p-4">
       <div className="text-xs font-semibold uppercase text-muted-foreground">
         {t('transfer.balance.label')}
       </div>

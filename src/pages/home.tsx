@@ -106,7 +106,7 @@ const TransactionsPreview = ({
         const Icon = isIncoming ? ArrowDownLeftIcon : ArrowUpRightIcon
 
         return (
-          <div key={tx.hash} className="flex items-center justify-between rounded-lg border border-border/50 bg-card px-3 py-2">
+          <div key={tx.hash} className="flex items-center justify-between rounded-lg bg-card px-3 py-2">
             <div className="flex items-center gap-3">
               <div
                 className={`flex h-9 w-9 items-center justify-center rounded-full border ${
@@ -230,7 +230,7 @@ const Home = () => {
             />
           </Button>
         </div>
-        <div className="bg-muted/10 p-4 text-center">
+        <div className="rounded-lg bg-card p-4 text-center">
           <BalanceCard balance={balance} />
         </div>
 
@@ -246,7 +246,7 @@ const Home = () => {
           <Button
             size="lg"
             variant="secondary"
-            className="aspect-square w-full flex-row gap-2 rounded-md bg-muted/20 hover:bg-muted/30"
+            className="aspect-square w-full flex-row gap-2 rounded-md bg-card hover:bg-muted"
             onClick={() => setIsReceiveOpen(true)}
           >
             <ArrowDownLeftIcon className="h-6 w-6" />
@@ -266,7 +266,7 @@ const Home = () => {
             {t('home.network.title')}
           </div>
           <div className="grid grid-cols-2 gap-2 text-sm">
-            <div className="bg-muted/10 px-3 py-2">
+            <div className="rounded-lg bg-card px-3 py-2">
               <div className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
                 {t('home.network.tick')}
               </div>
@@ -274,7 +274,7 @@ const Home = () => {
                 {latestStats.data?.data?.currentTick ?? '--'}
               </div>
             </div>
-            <div className="bg-muted/10 px-3 py-2">
+            <div className="rounded-lg bg-card px-3 py-2">
               <div className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
                 {t('home.network.epoch')}
               </div>
@@ -282,7 +282,7 @@ const Home = () => {
                 {latestStats.data?.data?.epoch ?? '--'}
               </div>
             </div>
-            <div className="bg-muted/10 px-3 py-2">
+            <div className="rounded-lg bg-card px-3 py-2">
               <div className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
                 {t('home.network.supply')}
               </div>
@@ -292,7 +292,7 @@ const Home = () => {
                   : '--'}
               </div>
             </div>
-            <div className="bg-muted/10 px-3 py-2">
+            <div className="rounded-lg bg-card px-3 py-2">
               <div className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
                 {t('home.network.active')}
               </div>
@@ -300,7 +300,7 @@ const Home = () => {
                 {latestStats.data?.data?.activeAddresses ?? '--'}
               </div>
             </div>
-            <div className="bg-muted/10 px-3 py-2">
+            <div className="rounded-lg bg-card px-3 py-2">
               <div className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
                 {t('home.network.pricePerB')}
               </div>
@@ -310,7 +310,7 @@ const Home = () => {
                   : '--'}
               </div>
             </div>
-            <div className="bg-muted/10 px-3 py-2">
+            <div className="rounded-lg bg-card px-3 py-2">
               <div className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
                 {t('home.network.marketCap')}
               </div>
@@ -330,7 +330,7 @@ const Home = () => {
           <div className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
             {t('home.assets.title')}
           </div>
-          <div className="flex items-center justify-between rounded-lg border border-border/50 bg-card px-3 py-2">
+          <div className="flex items-center justify-between rounded-lg bg-card px-3 py-2">
             <div className="flex flex-col">
               <span className="text-sm font-semibold text-foreground">QUBIC</span>
               <span className="text-xs text-muted-foreground">QUS</span>
@@ -356,7 +356,7 @@ const Home = () => {
             <p className="text-sm text-muted-foreground">{t('home.receive.description')}</p>
           </DrawerHeader>
           <div className="mt-4 flex flex-col items-center gap-4 text-center">
-            <div className="flex h-52 w-52 items-center justify-center rounded-lg border border-border/50 bg-card">
+            <div className="flex h-52 w-52 items-center justify-center rounded-lg bg-card">
               {qrCode ? (
                 <img src={qrCode} alt="Public identity QR code" className="h-48 w-48" />
               ) : (
@@ -364,7 +364,7 @@ const Home = () => {
               )}
             </div>
             <div className="w-full space-y-2">
-              <div className="break-all rounded-md border border-border/50 bg-card p-3 text-xs text-foreground">
+              <div className="break-all rounded-md bg-card p-3 text-xs text-foreground">
                 {identity}
               </div>
               <Button size="lg" className="w-full" onClick={handleCopyIdentity}>
