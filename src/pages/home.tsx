@@ -106,13 +106,13 @@ const TransactionsPreview = ({
         const Icon = isIncoming ? ArrowDownLeftIcon : ArrowUpRightIcon
 
         return (
-          <div key={tx.hash} className="flex items-center justify-between bg-muted/20 px-3 py-2">
+          <div key={tx.hash} className="flex items-center justify-between rounded-lg border border-border/50 bg-card px-3 py-2">
             <div className="flex items-center gap-3">
               <div
                 className={`flex h-9 w-9 items-center justify-center rounded-full border ${
                   isIncoming
                     ? 'border-primary/40 bg-primary/10 text-primary'
-                    : 'border-[#ff6b6b]/40 bg-[#ff6b6b]/10 text-[#ff6b6b]'
+                    : 'border-[var(--destructive)]/40 bg-[var(--destructive)]/10 text-[var(--destructive)]'
                 }`}
               >
                 <Icon className="h-4 w-4" />
@@ -128,7 +128,7 @@ const TransactionsPreview = ({
               </div>
             </div>
             <span
-              className={`text-sm font-medium ${isIncoming ? 'text-primary' : 'text-[#ff6b6b]'}`}
+              className={`text-sm font-medium ${isIncoming ? 'text-primary' : 'text-[var(--destructive)]'}`}
             >
               {isIncoming ? '+' : '-'}
               {formatBalanceCompact(tx.amount)}
@@ -330,7 +330,7 @@ const Home = () => {
           <div className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
             {t('home.assets.title')}
           </div>
-          <div className="flex items-center justify-between bg-muted/20 px-3 py-2">
+          <div className="flex items-center justify-between rounded-lg border border-border/50 bg-card px-3 py-2">
             <div className="flex flex-col">
               <span className="text-sm font-semibold text-foreground">QUBIC</span>
               <span className="text-xs text-muted-foreground">QUS</span>
@@ -356,7 +356,7 @@ const Home = () => {
             <p className="text-sm text-muted-foreground">{t('home.receive.description')}</p>
           </DrawerHeader>
           <div className="mt-4 flex flex-col items-center gap-4 text-center">
-            <div className="flex h-52 w-52 items-center justify-center bg-muted/20">
+            <div className="flex h-52 w-52 items-center justify-center rounded-lg border border-border/50 bg-card">
               {qrCode ? (
                 <img src={qrCode} alt="Public identity QR code" className="h-48 w-48" />
               ) : (
@@ -364,7 +364,7 @@ const Home = () => {
               )}
             </div>
             <div className="w-full space-y-2">
-              <div className="break-all rounded-md bg-muted/20 p-3 text-xs text-foreground">
+              <div className="break-all rounded-md border border-border/50 bg-card p-3 text-xs text-foreground">
                 {identity}
               </div>
               <Button size="lg" className="w-full" onClick={handleCopyIdentity}>

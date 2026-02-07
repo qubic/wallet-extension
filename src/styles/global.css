@@ -74,7 +74,7 @@
   --secondary: #e0e0e0;
   --secondary-foreground: var(--card-foreground);
 
-  --muted: #f2f2f2;
+  --muted: #e8e8e8;
   --muted-foreground: #0000008a;
 
   --accent: var(--primary);

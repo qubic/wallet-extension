@@ -104,7 +104,7 @@ const PassphraseAuth = ({ title, subtitle, onSuccess, onCancel }: PassphraseAuth
             {error && <p className="mt-1 text-xs text-destructive">{error}</p>}
           </div>
 
-          <div className="rounded-lg border border-border/60 bg-muted/20 p-3">
+          <div className="rounded-lg border border-border/60 bg-card p-3">
             <div className="flex items-center gap-3">
               <LockIcon className="mt-0.5 h-10 w-10 text-muted-foreground" />
               <p className="text-xs text-muted-foreground">{t('passphraseAuth.securityNote')}</p>
