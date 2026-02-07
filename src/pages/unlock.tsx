@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { EyeIcon, EyeOffIcon, LockOpenIcon, ShieldCheckIcon } from 'lucide-react'
-import { VaultInvalidPassphraseError } from '@qubic-labs/sdk'
+import { VaultEntryNotFoundError, VaultInvalidPassphraseError } from '@qubic-labs/sdk'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import {
@@ -31,13 +31,25 @@ const Unlock = () => {
     setError('')
 
     try {
-      await openBrowserVault(passphrase, false)
+      const vault = await openBrowserVault(passphrase, false)
+      const currentIdentity = localStorage.getItem('currentIdentity') ?? ''
+      const fallbackIdentity = vault.list()[0]?.identity
+      const identityToValidate = currentIdentity || fallbackIdentity
+
+      if (!identityToValidate) {
+        setError(t('passphraseAuth.errors.accountNotFound'))
+        return
+      }
+
+      await vault.getSeed(identityToValidate)
       setUnlocked()
       setPassphrase('')
       navigate('/home')
     } catch (err) {
       if (err instanceof VaultInvalidPassphraseError) {
         setError(t('passphraseAuth.errors.invalidPassphrase'))
+      } else if (err instanceof VaultEntryNotFoundError) {
+        setError(t('passphraseAuth.errors.accountNotFound'))
       } else {
         setError(t('passphraseAuth.errors.generic'))
       }
