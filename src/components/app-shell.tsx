@@ -122,8 +122,8 @@ const AppShell = ({
       <div
         className="app-scrollbar flex-1 overflow-y-auto"
         style={{
-          paddingBottom: showNav ? 'calc(56px + env(safe-area-inset-bottom))' : '0',
-          scrollPaddingBottom: showNav ? '72px' : '0',
+          paddingBottom: '0',
+          scrollPaddingBottom: showNav ? '12px' : '0',
         }}
       >
         {children}
@@ -131,7 +131,7 @@ const AppShell = ({
 
       {showNav && (
         <nav
-          className={`fixed bottom-0 left-0 right-0 z-20 grid h-[56px] items-center gap-1 border-t border-border/60 bg-[rgb(17,17,17)] shadow-lg backdrop-blur ${
+          className={`z-20 grid h-[calc(56px+env(safe-area-inset-bottom))] items-center gap-1 border-t border-border/60 bg-[rgb(17,17,17)] pb-[env(safe-area-inset-bottom)] shadow-lg backdrop-blur ${
             isSidePanel ? 'grid-cols-5' : 'grid-cols-5'
           }`}
         >

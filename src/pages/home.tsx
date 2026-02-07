@@ -191,6 +191,7 @@ const Home = () => {
   const pathname = globalThis.location?.pathname ?? ''
   const isSidePanel = pathname.endsWith('sidepanel.html')
   const isPopup = pathname.endsWith('popup.html')
+  const assetsListMaxHeightClass = isPopup ? 'max-h-36' : isSidePanel ? 'max-h-44' : 'max-h-52'
   const navigate = useNavigate()
   const balance = useBalance(identity, { refetchInterval: 10_000 })
   const latestStats = useQuery({
@@ -399,7 +400,9 @@ const Home = () => {
             <div className="text-xs text-destructive">{t('home.assets.error')}</div>
           )}
           {ownedAssets.data?.ownedAssets && ownedAssets.data.ownedAssets.length > 0 && (
-            <div className="app-scrollbar max-h-52 space-y-2 overflow-y-auto pr-1">
+            <div
+              className={`app-scrollbar ${assetsListMaxHeightClass} space-y-2 overflow-y-auto pr-1`}
+            >
               {ownedAssets.data.ownedAssets.map((asset) => {
                 const info = asset.data
                 const issued = info?.issuedAsset
@@ -416,15 +419,15 @@ const Home = () => {
                     key={key}
                     className="flex items-center justify-between bg-muted/20 px-3 py-2"
                   >
-                    <div className="flex flex-col">
-                      <span className="text-sm font-semibold text-foreground">{name}</span>
+                    <div className="min-w-0 flex flex-col">
+                      <span className="truncate text-sm font-semibold text-foreground">{name}</span>
                       {issued?.issuerIdentity && (
-                        <span className="text-xs text-muted-foreground">
+                        <span className="truncate text-xs text-muted-foreground">
                           {truncateString(issued.issuerIdentity)}
                         </span>
                       )}
                     </div>
-                    <div className="text-sm font-semibold text-foreground">
+                    <div className="ml-3 shrink-0 text-sm font-semibold text-foreground">
                       {formatAssetUnits(info?.numberOfUnits, decimals)}
                     </div>
                   </div>
