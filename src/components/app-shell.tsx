@@ -121,7 +121,10 @@ const AppShell = ({
 
       <div
         className="app-scrollbar flex-1 overflow-y-auto"
-        style={{ paddingBottom: showNav ? '56px' : '0' }}
+        style={{
+          paddingBottom: showNav ? 'calc(56px + env(safe-area-inset-bottom))' : '0',
+          scrollPaddingBottom: showNav ? '72px' : '0',
+        }}
       >
         {children}
       </div>

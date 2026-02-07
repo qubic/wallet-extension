@@ -271,7 +271,7 @@ const Home = () => {
   }, [identity, isReceiveOpen])
 
   return (
-    <section className="flex min-h-full w-full justify-center pb-6 pt-4">
+    <section className="flex min-h-full w-full justify-start pb-6 pt-4">
       <div className="flex w-full max-w-sm flex-col gap-6 px-6">
         <div className="flex items-center justify-between">
           <span className="text-xs font-semibold uppercase text-muted-foreground">
@@ -398,33 +398,40 @@ const Home = () => {
           {ownedAssets.error && (
             <div className="text-xs text-destructive">{t('home.assets.error')}</div>
           )}
-          {ownedAssets.data?.ownedAssets?.map((asset) => {
-            const info = asset.data
-            const issued = info?.issuedAsset
-            const name = issued?.name ?? t('home.assets.unknown')
-            const decimals = issued?.numberOfDecimalPlaces ?? 0
-            const key = [
-              issued?.issuerIdentity ?? 'unknown',
-              issued?.name ?? 'asset',
-              issued?.type ?? 0,
-              info?.numberOfUnits ?? '0',
-            ].join('-')
-            return (
-              <div key={key} className="flex items-center justify-between bg-muted/20 px-3 py-2">
-                <div className="flex flex-col">
-                  <span className="text-sm font-semibold text-foreground">{name}</span>
-                  {issued?.issuerIdentity && (
-                    <span className="text-xs text-muted-foreground">
-                      {truncateString(issued.issuerIdentity)}
-                    </span>
-                  )}
-                </div>
-                <div className="text-sm font-semibold text-foreground">
-                  {formatAssetUnits(info?.numberOfUnits, decimals)}
-                </div>
-              </div>
-            )
-          })}
+          {ownedAssets.data?.ownedAssets && ownedAssets.data.ownedAssets.length > 0 && (
+            <div className="app-scrollbar max-h-52 space-y-2 overflow-y-auto pr-1">
+              {ownedAssets.data.ownedAssets.map((asset) => {
+                const info = asset.data
+                const issued = info?.issuedAsset
+                const name = issued?.name ?? t('home.assets.unknown')
+                const decimals = issued?.numberOfDecimalPlaces ?? 0
+                const key = [
+                  issued?.issuerIdentity ?? 'unknown',
+                  issued?.name ?? 'asset',
+                  issued?.type ?? 0,
+                  info?.numberOfUnits ?? '0',
+                ].join('-')
+                return (
+                  <div
+                    key={key}
+                    className="flex items-center justify-between bg-muted/20 px-3 py-2"
+                  >
+                    <div className="flex flex-col">
+                      <span className="text-sm font-semibold text-foreground">{name}</span>
+                      {issued?.issuerIdentity && (
+                        <span className="text-xs text-muted-foreground">
+                          {truncateString(issued.issuerIdentity)}
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-sm font-semibold text-foreground">
+                      {formatAssetUnits(info?.numberOfUnits, decimals)}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
           {ownedAssets.isSuccess &&
             (!ownedAssets.data?.ownedAssets || ownedAssets.data.ownedAssets.length === 0) && (
               <div className="flex items-center gap-3 rounded-lg border border-dashed border-border/60 bg-muted/20 px-3 py-3 text-xs text-muted-foreground">
