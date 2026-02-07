@@ -4,8 +4,8 @@ import {
   ArrowDownLeftIcon,
   ArrowUpRightIcon,
   CopyIcon,
+  DownloadIcon,
   RefreshCwIcon,
-  SendIcon,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import QRCode from 'qrcode'
@@ -240,7 +240,7 @@ const Home = () => {
             className="aspect-square w-full flex-row gap-2 rounded-md bg-primary/10 text-primary hover:bg-primary/20"
             onClick={() => navigate('/transfer')}
           >
-            <SendIcon className="h-6 w-6" />
+            <ArrowUpRightIcon className="h-6 w-6" />
             {t('home.actions.send')}
           </Button>
           <Button
@@ -249,7 +249,7 @@ const Home = () => {
             className="aspect-square w-full flex-row gap-2 rounded-md bg-card hover:bg-muted"
             onClick={() => setIsReceiveOpen(true)}
           >
-            <ArrowDownLeftIcon className="h-6 w-6" />
+            <DownloadIcon className="h-6 w-6" />
             {t('home.actions.receive')}
           </Button>
         </div>
