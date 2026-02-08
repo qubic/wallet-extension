@@ -128,7 +128,7 @@ const AppShell = ({
 
       {showNav && (
         <nav
-          className={`fixed bottom-0 left-0 right-0 z-20 grid h-[56px] items-center gap-1 border-t border-border/60 bg-[rgb(17,17,17)] shadow-lg backdrop-blur ${
+          className={`fixed bottom-0 left-0 right-0 z-20 grid h-[56px] items-center gap-1 border-t border-border/60 bg-card shadow-lg backdrop-blur ${
             isSidePanel ? 'grid-cols-5' : 'grid-cols-5'
           }`}
         >

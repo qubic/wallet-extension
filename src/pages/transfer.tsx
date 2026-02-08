@@ -55,8 +55,8 @@ const TransferSuccess = ({
         </button>
 
         <div className="flex flex-col items-center gap-4 py-8 text-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-500/10">
-            <CheckCircleIcon className="h-8 w-8 text-green-500" />
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-success/10">
+            <CheckCircleIcon className="h-8 w-8 text-success" />
           </div>
 
           <div>
@@ -66,7 +66,7 @@ const TransferSuccess = ({
             </p>
           </div>
 
-          <div className="w-full space-y-3 rounded-lg bg-muted/20 p-4 text-left">
+          <div className="w-full space-y-3 rounded-lg bg-card p-4 text-left">
             <div>
               <div className="text-xs font-semibold uppercase text-muted-foreground">
                 {t('transfer.success.txId')}
@@ -147,10 +147,8 @@ const ConfirmationDrawer = ({
             </div>
           </div>
 
-          <div className="rounded-lg border border-yellow-500/20 bg-yellow-500/10 p-3">
-            <p className="text-sm text-yellow-700 dark:text-yellow-400">
-              {t('transfer.confirm.warning')}
-            </p>
+          <div className="rounded-lg border border-warning/20 bg-warning/10 p-3">
+            <p className="text-sm text-warning-foreground">{t('transfer.confirm.warning')}</p>
           </div>
         </div>
 
@@ -180,7 +178,7 @@ const BalanceDisplay = ({ balance }: { balance: ReturnType<typeof useBalance> })
   const currentBalance = normalizeBalance(balance.data?.balance)
 
   return (
-    <div className="rounded-lg bg-muted/20 p-4">
+    <div className="rounded-lg bg-card p-4">
       <div className="text-xs font-semibold uppercase text-muted-foreground">
         {t('transfer.balance.label')}
       </div>

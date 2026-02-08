@@ -66,14 +66,14 @@ const History = () => {
             const Icon = isIncoming ? ArrowDownLeftIcon : ArrowUpRightIcon
 
             return (
-              <div key={tx.hash} className="space-y-3 bg-muted/20 px-3 py-3">
+              <div key={tx.hash} className="space-y-3 rounded-lg bg-card px-3 py-3">
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
                     <div
                       className={`flex h-9 w-9 items-center justify-center rounded-full border ${
                         isIncoming
                           ? 'border-primary/40 bg-primary/10 text-primary'
-                          : 'border-[#ff6b6b]/40 bg-[#ff6b6b]/10 text-[#ff6b6b]'
+                          : 'border-[var(--destructive)]/40 bg-[var(--destructive)]/10 text-[var(--destructive)]'
                       }`}
                     >
                       <Icon className="h-4 w-4" />
@@ -87,7 +87,7 @@ const History = () => {
                   </div>
                   <span
                     className={`text-sm font-medium ${
-                      isIncoming ? 'text-primary' : 'text-[#ff6b6b]'
+                      isIncoming ? 'text-primary' : 'text-[var(--destructive)]'
                     }`}
                   >
                     {isIncoming ? '+' : '-'}

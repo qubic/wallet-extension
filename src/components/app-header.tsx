@@ -108,7 +108,7 @@ const AppHeader = ({
             aria-label={t('home.accounts.selectLabel')}
             onMouseEnter={() => setIsMenuOpen(true)}
           >
-            <div className="flex h-10 w-10 items-center justify-center border border-border/60 bg-muted/20">
+            <div className="flex h-10 w-10 items-center justify-center rounded-md border border-border/60 bg-card">
               <WalletIcon className="h-5 w-5 text-primary" />
             </div>
             <div className="flex flex-col">

@@ -1,9 +1,11 @@
 import { KeyRoundIcon, PanelRightOpenIcon, PlusCircleIcon, UploadIcon } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { useTheme } from 'next-themes'
 import { Button } from '@/components/ui/button'
 
 const Welcome = () => {
   const navigate = useNavigate()
+  const { resolvedTheme } = useTheme()
 
   const openSidePanel = async () => {
     const chromeApi = (
@@ -44,7 +46,15 @@ const Welcome = () => {
   return (
     <section className="flex h-full flex-col items-center justify-center gap-6 px-6 text-center">
       <div className="flex flex-col items-center gap-3">
-        <img src="/branding/Qubic-Logo-White.svg" alt="Qubic" className="h-9" />
+        <img
+          src={
+            resolvedTheme === 'light'
+              ? '/branding/Qubic-Logo-Dark.svg'
+              : '/branding/Qubic-Logo-White.svg'
+          }
+          alt="Qubic"
+          className="h-9"
+        />
         <p className="text-sm text-muted-foreground">Welcome to Qubic Wallet</p>
       </div>
 
