@@ -194,6 +194,7 @@ const Home = () => {
   const pathname = globalThis.location?.pathname ?? ''
   const isSidePanel = pathname.endsWith('sidepanel.html')
   const isPopup = pathname.endsWith('popup.html')
+  const isConstrainedLayout = isPopup || isSidePanel
   const assetsListMaxHeightClass = isPopup ? 'max-h-36' : isSidePanel ? 'max-h-44' : 'max-h-52'
   const navigate = useNavigate()
   const balance = useBalance(identity, { refetchInterval: 10_000 })
@@ -275,7 +276,9 @@ const Home = () => {
   }, [identity, isReceiveOpen])
 
   return (
-    <section className="flex min-h-full w-full justify-start pb-6 pt-4">
+    <section
+      className={`flex min-h-full w-full pb-6 pt-4 ${isConstrainedLayout ? 'justify-start' : 'justify-center'}`}
+    >
       <div className="flex w-full max-w-sm flex-col gap-6 px-6">
         <div className="flex items-center justify-between">
           <span className="text-xs font-semibold uppercase text-muted-foreground">
