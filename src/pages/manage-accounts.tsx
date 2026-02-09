@@ -79,6 +79,7 @@ const ManageAccounts = () => {
   const [dragOverId, setDragOverId] = useState<string | null>(null)
   const [renameTarget, setRenameTarget] = useState<AccountEntry | null>(null)
   const [renameValue, setRenameValue] = useState('')
+  const [renameError, setRenameError] = useState('')
   const [seedTarget, setSeedTarget] = useState<AccountEntry | null>(null)
   const [revealedSeed, setRevealedSeed] = useState('')
   const [removeTarget, setRemoveTarget] = useState<AccountEntry | null>(null)
@@ -283,6 +284,7 @@ const ManageAccounts = () => {
       setAccounts(updated)
       setRenameTarget(null)
       setRenameValue('')
+      setRenameError('')
     } catch (error) {
       setStatus(error instanceof Error ? error.message : t('accounts.manage.errors.rename'))
     } finally {
@@ -394,6 +396,7 @@ const ManageAccounts = () => {
                     event.preventDefault()
                     setRenameTarget(account)
                     setRenameValue(account.name)
+                    setRenameError('')
                   }
                 }}
                 aria-label={`${t('accounts.manage.menu')} ${account.name}`}
@@ -450,6 +453,7 @@ const ManageAccounts = () => {
                         onClick={() => {
                           setRenameTarget(account)
                           setRenameValue(account.name)
+                          setRenameError('')
                         }}
                       >
                         <PencilIcon className="h-4 w-4" />
@@ -557,7 +561,15 @@ const ManageAccounts = () => {
         </DrawerContent>
       </Drawer>
 
-      <Drawer open={Boolean(renameTarget)} onOpenChange={() => setRenameTarget(null)}>
+      <Drawer
+        open={Boolean(renameTarget)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setRenameTarget(null)
+            setRenameError('')
+          }
+        }}
+      >
         <DrawerContent>
           <DrawerHeader>
             <DrawerTitle>{t('accounts.manage.renameTitle')}</DrawerTitle>
@@ -567,8 +579,14 @@ const ManageAccounts = () => {
             <Input
               id="rename-input"
               value={renameValue}
-              onChange={(event) => setRenameValue(event.target.value)}
+              onChange={(event) => {
+                setRenameValue(event.target.value)
+                if (renameError) {
+                  setRenameError('')
+                }
+              }}
             />
+            {renameError && <p className="text-xs text-destructive">{renameError}</p>}
           </div>
           <DrawerFooter>
             <Button
@@ -581,9 +599,10 @@ const ManageAccounts = () => {
                     entry.name.toLowerCase() === name.toLowerCase(),
                 )
                 if (hasNameConflict) {
-                  setStatus(t('accounts.manage.errors.nameDuplicate'))
+                  setRenameError(t('accounts.manage.errors.nameDuplicate'))
                   return
                 }
+                setRenameError('')
                 if (renameTarget.watchOnly) {
                   handleRename(renameTarget, name, '')
                   return
