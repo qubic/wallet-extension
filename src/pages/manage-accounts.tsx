@@ -283,7 +283,7 @@ const ManageAccounts = () => {
       } else {
         const vault = await openBrowserVault(passphrase, false)
         const seed = await vault.getSeed(account.identity)
-        await vault.remove(account.identity)
+        // Write first with overwrite to avoid losing the existing entry if an intermediate step fails.
         await vault.addSeed({ name: name.trim(), seed, overwrite: true })
         await vault.save()
         if (account.identity === currentIdentity) {
