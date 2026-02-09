@@ -86,7 +86,6 @@ const ManageAccounts = () => {
   const [revealedSeed, setRevealedSeed] = useState('')
   const [removeTarget, setRemoveTarget] = useState<AccountEntry | null>(null)
   const [addOpen, setAddOpen] = useState(false)
-  const [vaultPassphrase, setVaultPassphrase] = useState('')
   const [passphrasePromptOpen, setPassphrasePromptOpen] = useState(false)
   const [passphraseInput, setPassphraseInput] = useState('')
   const [passphraseError, setPassphraseError] = useState('')
@@ -346,7 +345,6 @@ const ManageAccounts = () => {
       if (expectedIdentity) {
         await vault.getSeed(expectedIdentity)
       }
-      setVaultPassphrase(passphrase)
       setPassphrasePromptOpen(false)
       setPassphraseInput('')
       setPassphraseError('')
@@ -476,11 +474,7 @@ const ManageAccounts = () => {
                       {!account.watchOnly && (
                         <DropdownMenuItem
                           onClick={() => {
-                            if (!vaultPassphrase) {
-                              handleRequestPassphrase({ type: 'reveal', account })
-                              return
-                            }
-                            handleRevealSeed(account, vaultPassphrase)
+                            handleRequestPassphrase({ type: 'reveal', account })
                           }}
                         >
                           <ShieldCheckIcon className="h-4 w-4" />
@@ -619,12 +613,8 @@ const ManageAccounts = () => {
                   handleRename(renameTarget, name, '')
                   return
                 }
-                if (!vaultPassphrase) {
-                  setRenameTarget(null)
-                  handleRequestPassphrase({ type: 'rename', account: renameTarget, name })
-                  return
-                }
-                handleRename(renameTarget, name, vaultPassphrase)
+                setRenameTarget(null)
+                handleRequestPassphrase({ type: 'rename', account: renameTarget, name })
               }}
               disabled={!renameValue.trim() || loading}
             >
@@ -686,12 +676,7 @@ const ManageAccounts = () => {
                     setRemoveTarget(null)
                     return
                   }
-                  if (!vaultPassphrase) {
-                    handleRequestPassphrase({ type: 'remove', account: removeTarget })
-                    setRemoveTarget(null)
-                    return
-                  }
-                  handleRemove(removeTarget, vaultPassphrase)
+                  handleRequestPassphrase({ type: 'remove', account: removeTarget })
                   setRemoveTarget(null)
                 }
               }}
@@ -703,7 +688,17 @@ const ManageAccounts = () => {
         </DrawerContent>
       </Drawer>
 
-      <Drawer open={passphrasePromptOpen} onOpenChange={setPassphrasePromptOpen}>
+      <Drawer
+        open={passphrasePromptOpen}
+        onOpenChange={(open) => {
+          setPassphrasePromptOpen(open)
+          if (!open) {
+            setPassphraseInput('')
+            setPassphraseError('')
+            setPendingAction(null)
+          }
+        }}
+      >
         <DrawerContent>
           <DrawerHeader>
             <DrawerTitle>{t('accounts.manage.passphraseTitle')}</DrawerTitle>
