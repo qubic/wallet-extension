@@ -137,7 +137,7 @@ const AppShell = ({
 
       {showNav && (
         <nav
-          className={`z-20 grid h-[56px] shrink-0 items-center gap-1 border-t border-border/60 bg-[rgb(17,17,17)] shadow-lg backdrop-blur ${
+          className={`z-20 grid h-[56px] shrink-0 items-center gap-1 border-t border-border/60 bg-background/95 shadow-lg backdrop-blur supports-[backdrop-filter]:bg-background/80 ${
             isSidePanel ? 'grid-cols-5' : 'grid-cols-5'
           }`}
         >
