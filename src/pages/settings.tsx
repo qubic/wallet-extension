@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useTheme } from 'next-themes'
+import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -12,10 +14,10 @@ import {
 } from '@/components/ui/select'
 import { setLanguage } from '@/i18n'
 import { getLockTimeoutMinutes, lockWallet, setLockTimeoutMinutes } from '@/lib/lock'
-import { useNavigate } from 'react-router-dom'
 
 const Settings = () => {
   const { t, i18n } = useTranslation()
+  const { theme, setTheme } = useTheme()
   const navigate = useNavigate()
   const [lockMinutes, setLockMinutes] = useState(() => getLockTimeoutMinutes())
 
@@ -45,7 +47,7 @@ const Settings = () => {
       <div className="flex w-full max-w-sm flex-col gap-6 px-6">
         <div className="space-y-3">
           <Label htmlFor="language" className="text-sm text-muted-foreground">
-            {t('app.language')}
+            {t('settings.language')}
           </Label>
           <Select
             value={i18n.language}
@@ -57,6 +59,22 @@ const Settings = () => {
             <SelectContent>
               <SelectItem value="en">EN</SelectItem>
               <SelectItem value="es">ES</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-3">
+          <Label htmlFor="theme" className="text-sm text-muted-foreground">
+            {t('settings.theme')}
+          </Label>
+          <Select value={theme} onValueChange={setTheme}>
+            <SelectTrigger id="theme" className="h-9 w-full text-sm">
+              <SelectValue placeholder={t('settings.themeDark')} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="dark">{t('settings.themeDark')}</SelectItem>
+              <SelectItem value="light">{t('settings.themeLight')}</SelectItem>
+              <SelectItem value="system">{t('settings.themeSystem')}</SelectItem>
             </SelectContent>
           </Select>
         </div>

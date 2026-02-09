@@ -92,6 +92,11 @@
   "settings": {
     "headline": "Extension preferences",
     "subhead": "Control how the popup behaves.",
+    "language": "Language",
+    "theme": "Theme",
+    "themeDark": "Dark",
+    "themeLight": "Light",
+    "themeSystem": "System",
     "appearance": "Compact layout",
     "notifications": "Enable notifications",
     "lock": "Auto-lock after inactivity",

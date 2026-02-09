@@ -156,7 +156,7 @@ const CreateWallet = () => {
               </div>
               <div className="space-y-2">
                 <Label>Public identity</Label>
-                <div className="rounded-md border border-border/60 bg-muted/20 px-3 py-2 text-sm text-foreground break-all">
+                <div className="rounded-md border border-border/60 bg-card px-3 py-2 text-sm text-foreground break-all">
                   {identity || 'Deriving...'}
                 </div>
               </div>
