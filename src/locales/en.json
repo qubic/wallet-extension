@@ -223,6 +223,7 @@
     "errors": {
       "networkError": "Network error. Please retry.",
       "broadcastFailed": "Failed to broadcast transaction.",
+      "watchOnly": "Watch-only accounts cannot send transfers.",
       "generic": "Transfer failed. Please retry."
     }
   },

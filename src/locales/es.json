@@ -223,6 +223,7 @@
     "errors": {
       "networkError": "Error de red. Intenta de nuevo.",
       "broadcastFailed": "Fallo al transmitir la transaccion.",
+      "watchOnly": "Las cuentas de solo lectura no pueden enviar transferencias.",
       "generic": "Transferencia fallida. Intenta de nuevo."
     }
   },

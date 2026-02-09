@@ -473,22 +473,20 @@ const ManageAccounts = () => {
                         <PencilIcon className="h-4 w-4" />
                         {t('accounts.manage.rename')}
                       </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => {
-                          if (account.watchOnly) {
-                            handleRevealSeed(account, '')
-                            return
-                          }
-                          if (!vaultPassphrase) {
-                            handleRequestPassphrase({ type: 'reveal', account })
-                            return
-                          }
-                          handleRevealSeed(account, vaultPassphrase)
-                        }}
-                      >
-                        <ShieldCheckIcon className="h-4 w-4" />
-                        {t('accounts.manage.reveal')}
-                      </DropdownMenuItem>
+                      {!account.watchOnly && (
+                        <DropdownMenuItem
+                          onClick={() => {
+                            if (!vaultPassphrase) {
+                              handleRequestPassphrase({ type: 'reveal', account })
+                              return
+                            }
+                            handleRevealSeed(account, vaultPassphrase)
+                          }}
+                        >
+                          <ShieldCheckIcon className="h-4 w-4" />
+                          {t('accounts.manage.reveal')}
+                        </DropdownMenuItem>
+                      )}
                       <DropdownMenuSeparator />
                       <DropdownMenuItem
                         variant="destructive"
