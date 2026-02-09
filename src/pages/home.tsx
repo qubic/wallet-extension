@@ -112,9 +112,11 @@ const BalanceCard = ({ balance }: { balance: ReturnType<typeof useBalance> }) =>
 const TransactionsPreview = ({
   identity,
   transactions,
+  onViewMore,
 }: {
   identity: string
   transactions: ReturnType<typeof useTransactions>
+  onViewMore: () => void
 }) => {
   const { t } = useTranslation()
   if (transactions.isLoading) {
@@ -184,6 +186,14 @@ const TransactionsPreview = ({
           </div>
         )
       })}
+      <button
+        type="button"
+        className="w-full cursor-pointer pt-1 text-center text-xs text-muted-foreground transition-colors hover:text-foreground"
+        onClick={onViewMore}
+        aria-label={t('home.actions.history')}
+      >
+        View all
+      </button>
     </div>
   )
 }
@@ -327,7 +337,11 @@ const Home = () => {
           <div className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
             {t('home.recent.title')}
           </div>
-          <TransactionsPreview identity={identity} transactions={transactions} />
+          <TransactionsPreview
+            identity={identity}
+            transactions={transactions}
+            onViewMore={() => navigate('/history')}
+          />
         </div>
 
         <div className="space-y-2">
