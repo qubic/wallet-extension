@@ -282,7 +282,11 @@ const AppRouter = () => {
                 transition={{ duration: 0.2, ease: 'easeOut' }}
                 className="h-full"
               >
-                <CreateWallet />
+                <CreateWallet
+                  variant="add-address"
+                  onCancelPath="/accounts"
+                  onCompletePath="/accounts"
+                />
               </motion.div>
             }
           />
