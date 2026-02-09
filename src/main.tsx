@@ -12,31 +12,32 @@ const applyViewportSizing = () => {
 
   if (isPopup) {
     html.style.width = '360px'
-    html.style.height = '600px'
+    html.style.height = '520px'
     html.style.minWidth = '360px'
-    html.style.minHeight = '600px'
+    html.style.minHeight = '520px'
     html.style.overflow = 'hidden'
 
     body.style.width = '100%'
     body.style.height = '100%'
     body.style.minWidth = '360px'
-    body.style.minHeight = '600px'
+    body.style.minHeight = '520px'
     body.style.margin = '0'
     body.style.overflow = 'hidden'
-  } else {
-    html.style.width = '100%'
-    html.style.height = '100%'
-    html.style.minWidth = '100%'
-    html.style.minHeight = '100%'
-    html.style.overflow = 'hidden'
-
-    body.style.width = '100%'
-    body.style.height = '100%'
-    body.style.minWidth = '100%'
-    body.style.minHeight = '100%'
-    body.style.margin = '0'
-    body.style.overflow = 'hidden'
+    return
   }
+
+  html.style.width = '100%'
+  html.style.height = '100%'
+  html.style.minWidth = '100%'
+  html.style.minHeight = '100%'
+  html.style.overflow = 'hidden'
+
+  body.style.width = '100%'
+  body.style.height = '100%'
+  body.style.minWidth = '100%'
+  body.style.minHeight = '100%'
+  body.style.margin = '0'
+  body.style.overflow = 'hidden'
 }
 
 applyViewportSizing()
