@@ -4,6 +4,8 @@ import {
   ArrowDownLeftIcon,
   ArrowUpRightIcon,
   CopyIcon,
+  InboxIcon,
+  PackageIcon,
   DownloadIcon,
   RefreshCwIcon,
 } from 'lucide-react'
@@ -13,9 +15,8 @@ import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer'
-import { truncateString } from '@/lib/utils'
 import { useTranslation } from 'react-i18next'
-import { normalizeBalance, formatBalanceCompact } from '@/lib/utils'
+import { normalizeBalance, formatBalanceCompact, truncateString } from '@/lib/utils'
 
 const formatUsd = (value: bigint) => {
   const usdPerBillion = 435
@@ -26,6 +27,40 @@ const formatUsd = (value: bigint) => {
     currency: 'USD',
     maximumFractionDigits: 2,
   }).format(usdValue)
+}
+
+type OwnedAssetsResponse = {
+  ownedAssets?: Array<{
+    data?: {
+      numberOfUnits?: string
+      issuedAsset?: {
+        name?: string
+        numberOfDecimalPlaces?: number
+        unitOfMeasurement?: number[]
+        type?: number
+        issuerIdentity?: string
+      }
+    }
+  }>
+}
+
+const fetchOwnedAssets = async (identity: string): Promise<OwnedAssetsResponse> => {
+  const response = await fetch(`https://rpc.qubic.org/live/v1/assets/${identity}/owned`, {
+    headers: { accept: 'application/json' },
+  })
+  if (!response.ok) {
+    throw new Error('Failed to load assets.')
+  }
+  return response.json() as Promise<OwnedAssetsResponse>
+}
+
+const formatAssetUnits = (units: string | undefined, decimals = 0) => {
+  if (!units) return '--'
+  if (decimals <= 0) return Number(units).toLocaleString()
+  const padded = units.padStart(decimals + 1, '0')
+  const whole = padded.slice(0, -decimals)
+  const fraction = padded.slice(-decimals).replace(/0+$/, '')
+  return `${Number(whole).toLocaleString()}${fraction ? `.${fraction}` : ''}`
 }
 
 type LatestStatsResponse = {
@@ -77,9 +112,11 @@ const BalanceCard = ({ balance }: { balance: ReturnType<typeof useBalance> }) =>
 const TransactionsPreview = ({
   identity,
   transactions,
+  onViewMore,
 }: {
   identity: string
   transactions: ReturnType<typeof useTransactions>
+  onViewMore: () => void
 }) => {
   const { t } = useTranslation()
   if (transactions.isLoading) {
@@ -94,7 +131,17 @@ const TransactionsPreview = ({
   const recent = items.slice(0, 3)
 
   if (recent.length === 0) {
-    return <div className="text-xs text-muted-foreground">{t('home.recent.empty')}</div>
+    return (
+      <div className="flex items-center gap-3 rounded-lg border border-dashed border-border/60 bg-muted/20 px-3 py-3 text-xs text-muted-foreground">
+        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted/40 text-muted-foreground">
+          <InboxIcon className="h-4 w-4" />
+        </div>
+        <div>
+          <div className="text-sm font-semibold text-foreground">{t('home.recent.emptyTitle')}</div>
+          <div className="text-xs text-muted-foreground">{t('home.recent.empty')}</div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -139,16 +186,26 @@ const TransactionsPreview = ({
           </div>
         )
       })}
+      <button
+        type="button"
+        className="w-full cursor-pointer pt-1 text-center text-xs text-muted-foreground transition-colors hover:text-foreground"
+        onClick={onViewMore}
+        aria-label={t('home.actions.history')}
+      >
+        View all
+      </button>
     </div>
   )
 }
 
 const Home = () => {
   const { t } = useTranslation()
-  const identity = localStorage.getItem('currentIdentity') ?? '...'
+  const [identity, setIdentity] = useState(localStorage.getItem('currentIdentity') ?? '')
   const pathname = globalThis.location?.pathname ?? ''
   const isSidePanel = pathname.endsWith('sidepanel.html')
   const isPopup = pathname.endsWith('popup.html')
+  const isConstrainedLayout = isPopup || isSidePanel
+  const assetsListMaxHeightClass = isPopup ? 'max-h-36' : isSidePanel ? 'max-h-44' : 'max-h-52'
   const navigate = useNavigate()
   const balance = useBalance(identity, { refetchInterval: 10_000 })
   const latestStats = useQuery({
@@ -156,6 +213,13 @@ const Home = () => {
     queryFn: fetchLatestStats,
     staleTime: 120_000,
     gcTime: 120_000,
+  })
+  const ownedAssets = useQuery({
+    queryKey: ['qubic', 'owned-assets', identity],
+    queryFn: () => fetchOwnedAssets(identity),
+    enabled: Boolean(identity),
+    staleTime: 60_000,
+    gcTime: 60_000,
   })
   const transactions = useTransactions(
     {
@@ -187,6 +251,16 @@ const Home = () => {
   }
 
   useEffect(() => {
+    const refreshIdentity = () => {
+      setIdentity(localStorage.getItem('currentIdentity') ?? '')
+    }
+
+    refreshIdentity()
+    window.addEventListener('storage', refreshIdentity)
+    return () => window.removeEventListener('storage', refreshIdentity)
+  }, [])
+
+  useEffect(() => {
     let isActive = true
 
     if (!isReceiveOpen || !identity) {
@@ -212,7 +286,9 @@ const Home = () => {
   }, [identity, isReceiveOpen])
 
   return (
-    <section className="flex min-h-full w-full justify-center pb-6 pt-4">
+    <section
+      className={`flex w-full pt-4 ${isConstrainedLayout ? 'justify-start' : 'justify-center'}`}
+    >
       <div className="flex w-full max-w-sm flex-col gap-6 px-6">
         <div className="flex items-center justify-between">
           <span className="text-xs font-semibold uppercase text-muted-foreground">
@@ -261,7 +337,11 @@ const Home = () => {
           <div className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
             {t('home.recent.title')}
           </div>
-          <TransactionsPreview identity={identity} transactions={transactions} />
+          <TransactionsPreview
+            identity={identity}
+            transactions={transactions}
+            onViewMore={() => navigate('/history')}
+          />
         </div>
 
         <div className="space-y-2">
@@ -333,18 +413,62 @@ const Home = () => {
           <div className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
             {t('home.assets.title')}
           </div>
-          <div className="flex items-center justify-between rounded-lg bg-card px-3 py-2">
-            <div className="flex flex-col">
-              <span className="text-sm font-semibold text-foreground">QUBIC</span>
-              <span className="text-xs text-muted-foreground">QUS</span>
+          {ownedAssets.isLoading && (
+            <div className="text-xs text-muted-foreground">{t('home.assets.loading')}</div>
+          )}
+          {ownedAssets.error && (
+            <div className="text-xs text-destructive">{t('home.assets.error')}</div>
+          )}
+          {ownedAssets.data?.ownedAssets && ownedAssets.data.ownedAssets.length > 0 && (
+            <div
+              className={`app-scrollbar ${assetsListMaxHeightClass} space-y-2 overflow-y-auto pr-1`}
+            >
+              {ownedAssets.data.ownedAssets.map((asset) => {
+                const info = asset.data
+                const issued = info?.issuedAsset
+                const name = issued?.name ?? t('home.assets.unknown')
+                const decimals = issued?.numberOfDecimalPlaces ?? 0
+                const key = [
+                  issued?.issuerIdentity ?? 'unknown',
+                  issued?.name ?? 'asset',
+                  issued?.type ?? 0,
+                  info?.numberOfUnits ?? '0',
+                ].join('-')
+                return (
+                  <div
+                    key={key}
+                    className="flex items-center justify-between bg-muted/20 px-3 py-2"
+                  >
+                    <div className="min-w-0 flex flex-col">
+                      <span className="truncate text-sm font-semibold text-foreground">{name}</span>
+                      {issued?.issuerIdentity && (
+                        <span className="truncate text-xs text-muted-foreground">
+                          {truncateString(issued.issuerIdentity)}
+                        </span>
+                      )}
+                    </div>
+                    <div className="ml-3 shrink-0 text-sm font-semibold text-foreground">
+                      {formatAssetUnits(info?.numberOfUnits, decimals)}
+                    </div>
+                  </div>
+                )
+              })}
             </div>
-            <div className="text-sm font-semibold text-foreground">
-              {balance.data?.balance
-                ? formatBalanceCompact(normalizeBalance(balance.data.balance))
-                : '--'}
-            </div>
-          </div>
-          <div className="text-xs text-muted-foreground">{t('home.assets.more')}</div>
+          )}
+          {ownedAssets.isSuccess &&
+            (!ownedAssets.data?.ownedAssets || ownedAssets.data.ownedAssets.length === 0) && (
+              <div className="flex items-center gap-3 rounded-lg border border-dashed border-border/60 bg-muted/20 px-3 py-3 text-xs text-muted-foreground">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted/40 text-muted-foreground">
+                  <PackageIcon className="h-4 w-4" />
+                </div>
+                <div>
+                  <div className="text-sm font-semibold text-foreground">
+                    {t('home.assets.emptyTitle')}
+                  </div>
+                  <div className="text-xs text-muted-foreground">{t('home.assets.empty')}</div>
+                </div>
+              </div>
+            )}
         </div>
       </div>
 

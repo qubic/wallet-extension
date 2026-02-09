@@ -28,7 +28,7 @@ const History = () => {
   const sorted = [...items].sort((a, b) => Number(b.tickNumber) - Number(a.tickNumber))
 
   return (
-    <section className="flex min-h-full w-full justify-center pb-6 pt-4">
+    <section className="flex w-full justify-center pt-4">
       <div className="flex w-full max-w-sm flex-col gap-4 px-6">
         <div className="flex items-center justify-between">
           <span className="text-xs font-semibold uppercase text-muted-foreground">

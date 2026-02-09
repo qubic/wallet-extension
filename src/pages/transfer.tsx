@@ -43,7 +43,7 @@ const TransferSuccess = ({
   const { t } = useTranslation()
 
   return (
-    <section className="flex min-h-full w-full justify-center pb-6 pt-4">
+    <section className="flex w-full justify-center pt-4">
       <div className="flex w-full max-w-sm flex-col gap-6 px-6">
         <button
           type="button"
@@ -217,7 +217,7 @@ const TransferForm = ({
   const { t } = useTranslation()
 
   return (
-    <section className="flex min-h-full w-full justify-center pb-6 pt-4">
+    <section className="flex w-full justify-center pt-4">
       <div className="flex w-full max-w-sm flex-col gap-6 px-6">
         <div>
           <h1 className="text-2xl font-semibold">{t('transfer.title')}</h1>

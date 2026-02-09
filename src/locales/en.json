@@ -32,6 +32,7 @@
       "title": "Recent activity",
       "loading": "Loading recent activity...",
       "empty": "No recent transactions.",
+      "emptyTitle": "No activity yet",
       "incoming": "Incoming",
       "outgoing": "Outgoing",
       "tick": "Tick {{tick}}"
@@ -47,7 +48,12 @@
     },
     "assets": {
       "title": "Assets",
-      "more": "Other assets coming soon."
+      "more": "Other assets coming soon.",
+      "loading": "Loading assets...",
+      "empty": "No additional assets found.",
+      "emptyTitle": "No assets yet",
+      "error": "Unable to load assets.",
+      "unknown": "Unknown asset"
     },
     "receive": {
       "title": "Receive Qubic",
@@ -93,7 +99,12 @@
     "themeSystem": "System",
     "appearance": "Compact layout",
     "notifications": "Enable notifications",
-    "lock": "Auto-lock after inactivity"
+    "lock": "Auto-lock after inactivity",
+    "lockNow": "Lock now",
+    "lockTimeout": {
+      "label": "Auto-lock timeout (minutes)",
+      "helper": "Locks the wallet after the selected duration."
+    }
   },
   "history": {
     "title": "History",
@@ -160,7 +171,9 @@
     "subtitle": "Enter your vault passphrase to continue with this action.",
     "form": {
       "passphrase": "Vault passphrase",
-      "passphrasePlaceholder": "Enter your passphrase"
+      "passphrasePlaceholder": "Enter your passphrase",
+      "showPassphrase": "Show passphrase",
+      "hidePassphrase": "Hide passphrase"
     },
     "validation": {
       "required": "Passphrase is required."
@@ -177,5 +190,9 @@
       "accountNotFound": "Account not found in vault.",
       "generic": "Authentication failed. Please try again."
     }
+  },
+  "unlock": {
+    "title": "Unlock Your Wallet",
+    "subtitle": "Your wallet is locked for safety. Enter your passphrase to proceed."
   }
 }

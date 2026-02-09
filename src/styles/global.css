@@ -156,19 +156,43 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html,
+  body,
+  #root {
+    height: 100%;
+    max-height: 100%;
+    overflow: hidden;
+  }
   html {
     font-family: var(--font-mono);
   }
   body {
     @apply bg-background text-foreground;
+    margin: 0;
   }
 }
 
 @layer utilities {
   .app-scrollbar {
     scrollbar-width: none;
-    &::-webkit-scrollbar {
-      display: none;
-    }
+    scrollbar-color: transparent transparent;
+    -ms-overflow-style: none;
+  }
+
+  .app-scrollbar::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+    background: transparent;
+  }
+
+  .app-scrollbar::-webkit-scrollbar-track {
+    display: none;
+    background: transparent;
+  }
+
+  .app-scrollbar::-webkit-scrollbar-thumb {
+    display: none;
+    background: transparent;
   }
 }
