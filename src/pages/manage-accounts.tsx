@@ -47,7 +47,7 @@ import {
   saveCachedAccounts,
   saveWatchOnlyAccounts,
 } from '@/lib/accounts'
-import { formatBalanceCompact, truncateIdentity } from '@/lib/utils'
+import { formatBalanceCompact, truncateString } from '@/lib/utils'
 import { clearOnboarded, openBrowserVault, setOnboarded } from '@/lib/vault'
 
 type AccountEntry = {
@@ -423,7 +423,7 @@ const ManageAccounts = () => {
                     </div>
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <span className="truncate">
-                        {truncateIdentity(account.identity, { leading: 5, trailing: 5 })}
+                        {truncateString(account.identity, { leading: 5, trailing: 5 })}
                       </span>
                       <span className="text-[11px] font-semibold text-foreground">
                         {balance ? formatBalanceCompact(balance) : '--'}
