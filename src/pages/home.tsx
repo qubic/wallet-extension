@@ -287,7 +287,7 @@ const Home = () => {
 
   return (
     <section
-      className={`flex min-h-full w-full pb-6 pt-4 ${isConstrainedLayout ? 'justify-start' : 'justify-center'}`}
+      className={`flex w-full pt-4 ${isConstrainedLayout ? 'justify-start' : 'justify-center'}`}
     >
       <div className="flex w-full max-w-sm flex-col gap-6 px-6">
         <div className="flex items-center justify-between">

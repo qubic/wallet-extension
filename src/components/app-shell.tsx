@@ -109,21 +109,25 @@ const AppShell = ({
   }
 
   return (
-    <div className="relative flex h-full w-full flex-col bg-background">
+    <div className="relative flex h-full max-h-full w-full flex-col overflow-hidden bg-background">
       {showHeader && (
-        <AppHeader
-          onOpenSidePanel={openSidePanel}
-          onOpenTab={openTab}
-          openSidePanelLabel={t('app.sidepanel')}
-          openTabLabel={t('app.opentab')}
-        />
+        <div>
+          <AppHeader
+            onOpenSidePanel={openSidePanel}
+            onOpenTab={openTab}
+            openSidePanelLabel={t('app.sidepanel')}
+            openTabLabel={t('app.opentab')}
+          />
+        </div>
       )}
 
       <div
-        className="app-scrollbar flex-1 overflow-y-auto"
+        className="app-scrollbar min-h-0 flex-1 overflow-y-auto overscroll-contain"
         style={{
-          paddingBottom: '0',
-          scrollPaddingBottom: showNav ? '12px' : '0',
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
+          paddingRight: '12px',
+          marginRight: '-12px',
         }}
       >
         {children}
@@ -131,7 +135,7 @@ const AppShell = ({
 
       {showNav && (
         <nav
-          className={`z-20 grid h-[calc(56px+env(safe-area-inset-bottom))] items-center gap-1 border-t border-border/60 bg-[rgb(17,17,17)] pb-[env(safe-area-inset-bottom)] shadow-lg backdrop-blur ${
+          className={`z-20 grid h-[56px] shrink-0 items-center gap-1 border-t border-border/60 bg-[rgb(17,17,17)] shadow-lg backdrop-blur ${
             isSidePanel ? 'grid-cols-5' : 'grid-cols-5'
           }`}
         >

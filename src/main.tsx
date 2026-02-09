@@ -7,22 +7,33 @@ import App from './app/app'
 const applyViewportSizing = () => {
   const html = document.documentElement
   const body = document.body
+  const root = document.getElementById('root')
   const pathname = window.location.pathname
   const isPopup = pathname.endsWith('popup.html')
 
   if (isPopup) {
     html.style.width = '360px'
-    html.style.height = '520px'
+    html.style.height = '600px'
+    html.style.maxHeight = '600px'
     html.style.minWidth = '360px'
-    html.style.minHeight = '520px'
+    html.style.minHeight = '600px'
     html.style.overflow = 'hidden'
 
-    body.style.width = '100%'
-    body.style.height = '100%'
+    body.style.width = '360px'
+    body.style.height = '600px'
+    body.style.maxHeight = '600px'
     body.style.minWidth = '360px'
-    body.style.minHeight = '520px'
+    body.style.minHeight = '600px'
     body.style.margin = '0'
     body.style.overflow = 'hidden'
+
+    if (root) {
+      root.style.width = '360px'
+      root.style.height = '600px'
+      root.style.maxHeight = '600px'
+      root.style.minHeight = '600px'
+      root.style.overflow = 'hidden'
+    }
     return
   }
 
@@ -38,6 +49,14 @@ const applyViewportSizing = () => {
   body.style.minHeight = '100%'
   body.style.margin = '0'
   body.style.overflow = 'hidden'
+
+  if (root) {
+    root.style.width = '100%'
+    root.style.height = '100%'
+    root.style.maxHeight = '100%'
+    root.style.minHeight = '100%'
+    root.style.overflow = 'hidden'
+  }
 }
 
 applyViewportSizing()
