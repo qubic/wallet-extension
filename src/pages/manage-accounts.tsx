@@ -74,7 +74,9 @@ const ManageAccounts = () => {
   })
   const [status, setStatus] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
-  const currentIdentity = localStorage.getItem('currentIdentity')
+  const [currentIdentity, setCurrentIdentity] = useState(
+    localStorage.getItem('currentIdentity') ?? '',
+  )
   const [draggedId, setDraggedId] = useState<string | null>(null)
   const [dragOverId, setDragOverId] = useState<string | null>(null)
   const [renameTarget, setRenameTarget] = useState<AccountEntry | null>(null)
@@ -121,6 +123,18 @@ const ManageAccounts = () => {
   useEffect(() => {
     refreshFromCache()
   }, [refreshFromCache])
+
+  useEffect(() => {
+    const refreshCurrentIdentity = () => {
+      setCurrentIdentity(localStorage.getItem('currentIdentity') ?? '')
+    }
+    window.addEventListener('storage', refreshCurrentIdentity)
+    window.addEventListener('wallet-account-updated', refreshCurrentIdentity)
+    return () => {
+      window.removeEventListener('storage', refreshCurrentIdentity)
+      window.removeEventListener('wallet-account-updated', refreshCurrentIdentity)
+    }
+  }, [])
 
   useEffect(() => {
     const handleStorage = () => refreshFromCache()

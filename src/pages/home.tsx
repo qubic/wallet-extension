@@ -257,7 +257,11 @@ const Home = () => {
 
     refreshIdentity()
     window.addEventListener('storage', refreshIdentity)
-    return () => window.removeEventListener('storage', refreshIdentity)
+    window.addEventListener('wallet-account-updated', refreshIdentity)
+    return () => {
+      window.removeEventListener('storage', refreshIdentity)
+      window.removeEventListener('wallet-account-updated', refreshIdentity)
+    }
   }, [])
 
   useEffect(() => {
