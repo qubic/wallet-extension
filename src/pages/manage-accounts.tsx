@@ -256,6 +256,7 @@ const ManageAccounts = () => {
       saveCachedAccounts(remaining.filter((entry) => !entry.watchOnly))
       setLoading(false)
       if (remaining.length === 0) {
+        saveAccountOrder([])
         clearOnboarded()
         navigate('/')
       } else if (account.identity === currentIdentity) {
