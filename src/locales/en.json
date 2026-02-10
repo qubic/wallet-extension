@@ -1,9 +1,13 @@
 {
   "app": {
+    "title": "Qubic Wallet",
+    "tagline": "Extension popup",
+    "language": "Language",
     "sidepanel": "Open side panel",
     "opentab": "Open tab"
   },
   "nav": {
+    "welcome": "Welcome",
     "home": "Home",
     "transfer": "Transfer",
     "history": "History",
@@ -11,10 +15,14 @@
     "settings": "Settings"
   },
   "home": {
+    "headline": "Quick access to your Qubic wallet",
+    "subhead": "Review balances and recent activity without leaving your tab.",
+    "cta": "Go to settings",
     "actions": {
       "send": "Send",
       "receive": "Receive",
-      "history": "History"
+      "history": "History",
+      "accounts": "Manage accounts"
     },
     "balance": {
       "label": "Balance",
@@ -68,33 +76,34 @@
       "unlocking": "Unlocking...",
       "unlockFailed": "Unable to unlock vault. Check your passphrase.",
       "empty": "No additional accounts found.",
-      "create": "Create a new account"
+      "create": "Create a new account",
+      "createTitle": "Create new account",
+      "createDesc": "Go to manage accounts to add another identity."
+    },
+    "cards": {
+      "balance": "Balance snapshot",
+      "activity": "Recent activity",
+      "security": "Security status",
+      "balanceValue": "52,140 QUBIC",
+      "activityValue": "3 new transactions",
+      "securityValue": "All checks passed"
     }
   },
   "settings": {
+    "headline": "Extension preferences",
+    "subhead": "Control how the popup behaves.",
     "language": "Language",
     "theme": "Theme",
     "themeDark": "Dark",
     "themeLight": "Light",
     "themeSystem": "System",
+    "appearance": "Compact layout",
+    "notifications": "Enable notifications",
     "lock": "Auto-lock after inactivity",
     "lockNow": "Lock now",
     "lockTimeout": {
       "label": "Auto-lock timeout (minutes)",
       "helper": "Locks the wallet after the selected duration."
-    },
-    "exportVault": {
-      "button": "Export vault",
-      "drawerTitle": "Export vault file",
-      "drawerDescription": "Download your vault in a format compatible with the Qubic web wallet.",
-      "passphrase": "Vault passphrase",
-      "confirm": "Export vault",
-      "exporting": "Exporting...",
-      "errors": {
-        "passphraseRequired": "Passphrase is required.",
-        "invalidPassphrase": "Invalid passphrase.",
-        "exportFailed": "Failed to export vault."
-      }
     }
   },
   "accounts": {
@@ -131,6 +140,7 @@
       "copySeed": "Copy seed",
       "done": "Done",
       "addTitle": "Add account",
+      "addNewTitle": "Create or import",
       "addNewDesc": "Add another address to this wallet.",
       "addCreate": "Add new address",
       "addImport": "Import seed",
@@ -245,48 +255,5 @@
   "unlock": {
     "title": "Unlock Your Wallet",
     "subtitle": "Your wallet is locked for safety. Enter your passphrase to proceed."
-  },
-  "onboarding": {
-    "importVault": {
-      "title": "Import vault file",
-      "step": "Step {{current}} of {{total}}",
-      "selectVault": {
-        "title": "Select your vault",
-        "subtitle": "Upload a vault file exported from this extension or the Qubic web wallet.",
-        "label": "Vault file",
-        "dropText": "Drop your vault file",
-        "browseText": "or click to browse (.json, .qubic-vault)"
-      },
-      "unlockSecure": {
-        "title": "Unlock and secure",
-        "subtitle": "Provide a new passphrase for this device and, if needed, the source passphrase.",
-        "newPassphrase": "New vault passphrase",
-        "sourcePassphrase": "Source vault passphrase"
-      },
-      "review": {
-        "title": "Review import",
-        "subtitle": "Confirm the file and passphrase details before importing.",
-        "vaultFile": "Vault file",
-        "notSelected": "Not selected",
-        "sourcePassphraseProvided": "Provided",
-        "sourcePassphraseSame": "Same as new",
-        "sourcePassphraseLabel": "Source passphrase",
-        "addMoreLater": "You can add more accounts later in Manage Accounts."
-      },
-      "actions": {
-        "back": "Back",
-        "previous": "Previous",
-        "continue": "Continue",
-        "import": "Import vault",
-        "importing": "Importing..."
-      },
-      "errors": {
-        "selectFile": "Select a vault file.",
-        "passphraseRequired": "Passphrase is required.",
-        "importFailed": "Failed to import web wallet vault.",
-        "noEntries": "Vault imported but no entries were found.",
-        "generic": "Failed to import vault."
-      }
-    }
   }
 }

@@ -1,9 +1,13 @@
 {
   "app": {
+    "title": "Cartera Qubic",
+    "tagline": "Ventana emergente",
+    "language": "Idioma",
     "sidepanel": "Abrir panel lateral",
     "opentab": "Abrir pestana"
   },
   "nav": {
+    "welcome": "Bienvenida",
     "home": "Inicio",
     "transfer": "Transferir",
     "history": "Historial",
@@ -11,10 +15,14 @@
     "settings": "Ajustes"
   },
   "home": {
+    "headline": "Acceso rapido a tu cartera Qubic",
+    "subhead": "Revisa saldos y actividad reciente sin salir de tu pestana.",
+    "cta": "Ir a ajustes",
     "actions": {
       "send": "Enviar",
       "receive": "Recibir",
-      "history": "Historial"
+      "history": "Historial",
+      "accounts": "Administrar cuentas"
     },
     "balance": {
       "label": "Saldo",
@@ -68,33 +76,34 @@
       "unlocking": "Desbloqueando...",
       "unlockFailed": "No se pudo desbloquear el vault. Verifica la contrasena.",
       "empty": "No hay cuentas adicionales.",
-      "create": "Crear una nueva cuenta"
+      "create": "Crear una nueva cuenta",
+      "createTitle": "Crear nueva cuenta",
+      "createDesc": "Ve a administrar cuentas para agregar otra identidad."
+    },
+    "cards": {
+      "balance": "Resumen de saldo",
+      "activity": "Actividad reciente",
+      "security": "Estado de seguridad",
+      "balanceValue": "52.140 QUBIC",
+      "activityValue": "3 transacciones nuevas",
+      "securityValue": "Todas las revisiones listas"
     }
   },
   "settings": {
+    "headline": "Preferencias de la extension",
+    "subhead": "Controla como se comporta la ventana emergente.",
     "language": "Idioma",
     "theme": "Tema",
     "themeDark": "Oscuro",
     "themeLight": "Claro",
     "themeSystem": "Sistema",
+    "appearance": "Diseno compacto",
+    "notifications": "Habilitar notificaciones",
     "lock": "Bloqueo automatico por inactividad",
     "lockNow": "Bloquear ahora",
     "lockTimeout": {
       "label": "Tiempo de bloqueo (minutos)",
       "helper": "Bloquea la billetera despues del tiempo seleccionado."
-    },
-    "exportVault": {
-      "button": "Exportar vault",
-      "drawerTitle": "Exportar archivo vault",
-      "drawerDescription": "Descarga tu vault en un formato compatible con la billetera web de Qubic.",
-      "passphrase": "Contrasena del vault",
-      "confirm": "Exportar vault",
-      "exporting": "Exportando...",
-      "errors": {
-        "passphraseRequired": "Se requiere contrasena.",
-        "invalidPassphrase": "Contrasena invalida.",
-        "exportFailed": "No se pudo exportar el vault."
-      }
     }
   },
   "accounts": {
@@ -131,6 +140,7 @@
       "copySeed": "Copiar semilla",
       "done": "Listo",
       "addTitle": "Agregar cuenta",
+      "addNewTitle": "Crear o importar",
       "addNewDesc": "Agrega otra direccion a esta billetera.",
       "addCreate": "Agregar nueva direccion",
       "addImport": "Importar semilla",
@@ -245,48 +255,5 @@
   "unlock": {
     "title": "Desbloquea tu billetera",
     "subtitle": "Tu billetera esta bloqueada por seguridad. Ingresa tu contrasena para continuar."
-  },
-  "onboarding": {
-    "importVault": {
-      "title": "Importar archivo vault",
-      "step": "Paso {{current}} de {{total}}",
-      "selectVault": {
-        "title": "Selecciona tu vault",
-        "subtitle": "Sube un archivo vault exportado desde esta extension o la billetera web de Qubic.",
-        "label": "Archivo vault",
-        "dropText": "Suelta tu archivo vault",
-        "browseText": "o haz clic para buscar (.json, .qubic-vault)"
-      },
-      "unlockSecure": {
-        "title": "Desbloquear y asegurar",
-        "subtitle": "Proporciona una nueva contrasena para este dispositivo y, si es necesario, la contrasena de origen.",
-        "newPassphrase": "Nueva contrasena del vault",
-        "sourcePassphrase": "Contrasena del vault de origen"
-      },
-      "review": {
-        "title": "Revisar importacion",
-        "subtitle": "Confirma los detalles del archivo y la contrasena antes de importar.",
-        "vaultFile": "Archivo vault",
-        "notSelected": "No seleccionado",
-        "sourcePassphraseProvided": "Proporcionada",
-        "sourcePassphraseSame": "Igual que la nueva",
-        "sourcePassphraseLabel": "Contrasena de origen",
-        "addMoreLater": "Puedes agregar mas cuentas mas tarde en Administrar Cuentas."
-      },
-      "actions": {
-        "back": "Atras",
-        "previous": "Anterior",
-        "continue": "Continuar",
-        "import": "Importar vault",
-        "importing": "Importando..."
-      },
-      "errors": {
-        "selectFile": "Selecciona un archivo vault.",
-        "passphraseRequired": "Se requiere contrasena.",
-        "importFailed": "No se pudo importar el vault de la billetera web.",
-        "noEntries": "Vault importado pero no se encontraron entradas.",
-        "generic": "No se pudo importar el vault."
-      }
-    }
   }
 }

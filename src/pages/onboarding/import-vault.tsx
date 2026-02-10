@@ -1,22 +1,17 @@
 import { useMemo, useState } from 'react'
 import { ArrowLeftIcon, ArrowRightIcon, FileJsonIcon, UploadCloudIcon } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Progress } from '@/components/ui/progress'
 import { setUnlocked } from '@/lib/lock'
 import { openBrowserVault, setOnboarded } from '@/lib/vault'
-// @ts-ignore - No type definitions available for this library
-import { QubicVault } from '@qubic-lib/qubic-ts-vault-library/dist/vault.js'
-import { getWatchOnlyAccounts, saveWatchOnlyAccounts } from '@/lib/accounts'
 
 const TOTAL_STEPS = 3
 
 const ImportVault = () => {
   const navigate = useNavigate()
-  const { t } = useTranslation()
   const [step, setStep] = useState(1)
   const [file, setFile] = useState<File | null>(null)
   const [passphrase, setPassphrase] = useState('')
@@ -31,12 +26,12 @@ const ImportVault = () => {
     setStatus(null)
 
     if (step === 1 && !file) {
-      setStatus(t('onboarding.importVault.errors.selectFile'))
+      setStatus('Select a vault file.')
       return
     }
 
     if (step === 2 && !passphrase.trim()) {
-      setStatus(t('onboarding.importVault.errors.passphraseRequired'))
+      setStatus('Passphrase is required.')
       return
     }
 
@@ -68,93 +63,39 @@ const ImportVault = () => {
     setStatus(null)
 
     if (!file) {
-      setStatus(t('onboarding.importVault.errors.selectFile'))
+      setStatus('Select a vault file.')
       setStep(1)
       return
     }
 
     if (!passphrase.trim()) {
-      setStatus(t('onboarding.importVault.errors.passphraseRequired'))
+      setStatus('Passphrase is required.')
       setStep(2)
       return
     }
 
     try {
       setIsSaving(true)
+      const vault = await openBrowserVault(passphrase, true)
+      const fileContents = await file.text()
+      await vault.importEncrypted(fileContents, {
+        mode: 'merge',
+        sourcePassphrase: sourcePassphrase.trim() ? sourcePassphrase : passphrase,
+      })
+      await vault.save()
 
-      const fileText = await file.text()
-      let isWebWalletVault = false
-      try {
-        const data = JSON.parse(fileText)
-        isWebWalletVault = !!(data.salt && data.iv && data.cipher)
-      } catch {
-        // Not valid JSON — treat as SDK format
+      const entries = vault.list()
+      if (entries.length === 0) {
+        setStatus('Vault imported but no entries were found.')
+        setIsSaving(false)
+        return
       }
 
-      if (isWebWalletVault) {
-        const qubicVault = new QubicVault()
-        const importPassphrase = sourcePassphrase.trim() || passphrase.trim()
-
-        const success = await qubicVault.importAndUnlock(true, importPassphrase, null, file, false)
-        if (!success) {
-          setStatus(t('onboarding.importVault.errors.importFailed'))
-          setIsSaving(false)
-          return
-        }
-
-        const seeds = qubicVault.getSeeds()
-        if (seeds.length === 0) {
-          setStatus(t('onboarding.importVault.errors.noEntries'))
-          setIsSaving(false)
-          return
-        }
-
-        const vault = await openBrowserVault(passphrase.trim(), true)
-        const watchOnlyAccounts = getWatchOnlyAccounts()
-
-        for (const seed of seeds) {
-          if (seed.isOnlyWatch) {
-            if (!watchOnlyAccounts.find((acc: any) => acc.identity === seed.publicId)) {
-              watchOnlyAccounts.push({ identity: seed.publicId, name: seed.alias, watchOnly: true })
-            }
-          } else {
-            const decryptedSeed = await qubicVault.revealSeed(seed.publicId)
-            await vault.addSeed({ name: seed.alias, seed: decryptedSeed, overwrite: true })
-          }
-        }
-
-        saveWatchOnlyAccounts(watchOnlyAccounts)
-        await vault.save()
-
-        const firstEntry = vault.list()[0]
-        const firstWatchOnly = seeds.find((s: any) => s.isOnlyWatch)
-        setOnboarded(
-          firstEntry?.identity ?? firstWatchOnly?.publicId,
-          firstEntry?.name ?? firstWatchOnly?.alias
-        )
-        setUnlocked()
-        navigate('/home')
-      } else {
-        const vault = await openBrowserVault(passphrase.trim(), true)
-        await vault.importEncrypted(fileText, {
-          mode: 'merge',
-          sourcePassphrase: sourcePassphrase.trim() || passphrase.trim(),
-        })
-        await vault.save()
-
-        const entries = vault.list()
-        if (entries.length === 0) {
-          setStatus(t('onboarding.importVault.errors.noEntries'))
-          setIsSaving(false)
-          return
-        }
-
-        setOnboarded(entries[0].identity, entries[0].name)
-        setUnlocked()
-        navigate('/home')
-      }
+      setOnboarded(entries[0].identity, entries[0].name)
+      setUnlocked()
+      navigate('/home')
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : t('onboarding.importVault.errors.generic'))
+      setStatus(error instanceof Error ? error.message : 'Failed to import vault.')
       setIsSaving(false)
     }
   }
@@ -164,9 +105,9 @@ const ImportVault = () => {
       <div className="flex w-full max-w-sm flex-col justify-between gap-6">
         <div className="space-y-3 text-center">
           <div className="space-y-1">
-            <h2 className="text-xl font-semibold">{t('onboarding.importVault.title')}</h2>
+            <h2 className="text-xl font-semibold">Import vault file</h2>
             <p className="text-sm text-muted-foreground">
-              {t('onboarding.importVault.step', { current: step, total: TOTAL_STEPS })}
+              Step {step} of {TOTAL_STEPS}
             </p>
           </div>
           <Progress value={progressValue} />
@@ -176,13 +117,13 @@ const ImportVault = () => {
           {step === 1 && (
             <div className="space-y-4">
               <div className="space-y-1">
-                <h3 className="text-sm font-semibold">{t('onboarding.importVault.selectVault.title')}</h3>
+                <h3 className="text-sm font-semibold">Select your vault</h3>
                 <p className="text-xs text-muted-foreground">
-                  {t('onboarding.importVault.selectVault.subtitle')}
+                  Upload the JSON vault file you exported previously.
                 </p>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="vault-file">{t('onboarding.importVault.selectVault.label')}</Label>
+                <Label htmlFor="vault-file">Vault file</Label>
                 <label
                   htmlFor="vault-file"
                   onDragOver={(event) => {
@@ -199,9 +140,9 @@ const ImportVault = () => {
                 >
                   <div className="flex items-center gap-2 text-sm font-medium text-foreground">
                     <UploadCloudIcon className="h-5 w-5" />
-                    {t('onboarding.importVault.selectVault.dropText')}
+                    Drop your vault file
                   </div>
-                  <div className="text-xs text-muted-foreground">{t('onboarding.importVault.selectVault.browseText')}</div>
+                  <div className="text-xs text-muted-foreground">or click to browse (.json)</div>
                   {file && (
                     <div className="flex items-center gap-2 rounded-lg border border-border/60 bg-background/60 px-3 py-2 text-xs text-foreground">
                       <FileJsonIcon className="h-4 w-4 text-primary" />
@@ -212,7 +153,7 @@ const ImportVault = () => {
                 <Input
                   id="vault-file"
                   type="file"
-                  accept="*/*,.json,.qubic-vault"
+                  accept="application/json"
                   onChange={(event) => handleFileSelect(event.target.files?.[0] ?? null)}
                   className="hidden"
                 />
@@ -223,13 +164,13 @@ const ImportVault = () => {
           {step === 2 && (
             <div className="space-y-4">
               <div className="space-y-1">
-                <h3 className="text-sm font-semibold">{t('onboarding.importVault.unlockSecure.title')}</h3>
+                <h3 className="text-sm font-semibold">Unlock and secure</h3>
                 <p className="text-xs text-muted-foreground">
-                  {t('onboarding.importVault.unlockSecure.subtitle')}
+                  Provide a new passphrase for this device and, if needed, the source passphrase.
                 </p>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="passphrase">{t('onboarding.importVault.unlockSecure.newPassphrase')}</Label>
+                <Label htmlFor="passphrase">New vault passphrase</Label>
                 <Input
                   id="passphrase"
                   type="password"
@@ -238,7 +179,7 @@ const ImportVault = () => {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="source-passphrase">{t('onboarding.importVault.unlockSecure.sourcePassphrase')}</Label>
+                <Label htmlFor="source-passphrase">Source vault passphrase</Label>
                 <Input
                   id="source-passphrase"
                   type="password"
@@ -252,22 +193,22 @@ const ImportVault = () => {
           {step === 3 && (
             <div className="space-y-4">
               <div className="space-y-1">
-                <h3 className="text-sm font-semibold">{t('onboarding.importVault.review.title')}</h3>
+                <h3 className="text-sm font-semibold">Review import</h3>
                 <p className="text-xs text-muted-foreground">
-                  {t('onboarding.importVault.review.subtitle')}
+                  Confirm the file and passphrase details before importing.
                 </p>
               </div>
               <div className="space-y-2 text-sm">
                 <div className="flex items-center justify-between text-xs text-muted-foreground">
-                  <span>{t('onboarding.importVault.review.vaultFile')}</span>
-                  <span className="text-foreground">{file?.name ?? t('onboarding.importVault.review.notSelected')}</span>
+                  <span>Vault file</span>
+                  <span className="text-foreground">{file?.name ?? 'Not selected'}</span>
                 </div>
                 <div className="text-xs text-muted-foreground">
-                  {t('onboarding.importVault.review.sourcePassphraseLabel')}: {sourcePassphrase.trim() ? t('onboarding.importVault.review.sourcePassphraseProvided') : t('onboarding.importVault.review.sourcePassphraseSame')}
+                  Source passphrase: {sourcePassphrase.trim() ? 'Provided' : 'Same as new'}
                 </div>
               </div>
               <p className="text-xs text-muted-foreground">
-                {t('onboarding.importVault.review.addMoreLater')}
+                You can add more accounts later in Manage Accounts.
               </p>
             </div>
           )}
@@ -278,17 +219,17 @@ const ImportVault = () => {
         <div className="flex w-full gap-3">
           <Button size="lg" variant="ghost" onClick={handleBack} className="flex-1">
             <ArrowLeftIcon className="h-5 w-5" />
-            {step === 1 ? t('onboarding.importVault.actions.back') : t('onboarding.importVault.actions.previous')}
+            {step === 1 ? 'Back' : 'Previous'}
           </Button>
           {step < TOTAL_STEPS ? (
             <Button size="lg" onClick={handleNext} className="flex-1">
-              {t('onboarding.importVault.actions.continue')}
+              Continue
               <ArrowRightIcon className="h-5 w-5" />
             </Button>
           ) : (
             <Button size="lg" onClick={handleImport} className="flex-1" disabled={isSaving}>
               <UploadCloudIcon className="h-5 w-5" />
-              {isSaving ? t('onboarding.importVault.actions.importing') : t('onboarding.importVault.actions.import')}
+              {isSaving ? 'Importing...' : 'Import vault'}
             </Button>
           )}
         </div>
