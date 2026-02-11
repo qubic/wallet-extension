@@ -22,6 +22,12 @@ const ImportVault = () => {
 
   const progressValue = useMemo(() => (step / TOTAL_STEPS) * 100, [step])
 
+  const clearSensitiveState = () => {
+    setPassphrase('')
+    setSourcePassphrase('')
+    setFile(null)
+  }
+
   const handleNext = () => {
     setStatus(null)
 
@@ -53,6 +59,7 @@ const ImportVault = () => {
   const handleBack = () => {
     setStatus(null)
     if (step === 1) {
+      clearSensitiveState()
       navigate('/')
       return
     }
@@ -93,6 +100,7 @@ const ImportVault = () => {
 
       setOnboarded(entries[0].identity, entries[0].name)
       setUnlocked()
+      clearSensitiveState()
       navigate('/home')
     } catch (error) {
       setStatus(error instanceof Error ? error.message : 'Failed to import vault.')

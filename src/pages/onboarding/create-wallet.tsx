@@ -44,6 +44,12 @@ const CreateWallet = ({
 
   const progressValue = useMemo(() => (step / TOTAL_STEPS) * 100, [step])
 
+  const clearSensitiveState = () => {
+    setSeed('')
+    setPassphrase('')
+    setHasCopiedSeed(false)
+  }
+
   useEffect(() => {
     let isActive = true
 
@@ -144,6 +150,7 @@ const CreateWallet = ({
   const handleBack = () => {
     setStatus(null)
     if (step === 1) {
+      clearSensitiveState()
       navigate(onCancelPath)
       return
     }
@@ -212,6 +219,7 @@ const CreateWallet = ({
       if (variant !== 'add-address') {
         setUnlocked()
       }
+      clearSensitiveState()
       navigate(onCompletePath)
     } catch (error) {
       setStatus(error instanceof Error ? error.message : 'Failed to create wallet.')
