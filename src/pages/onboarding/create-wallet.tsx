@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Progress } from '@/components/ui/progress'
@@ -36,18 +37,22 @@ const CreateWallet = ({
   const [step, setStep] = useState(1)
   const [seed, setSeed] = useState(() => generateSeed())
   const [passphrase, setPassphrase] = useState('')
+  const [confirmPassphrase, setConfirmPassphrase] = useState('')
   const [name, setName] = useState('main')
   const [status, setStatus] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [identity, setIdentity] = useState<string>('')
   const [hasCopiedSeed, setHasCopiedSeed] = useState(false)
+  const [hasConfirmedSeedBackup, setHasConfirmedSeedBackup] = useState(false)
 
   const progressValue = useMemo(() => (step / TOTAL_STEPS) * 100, [step])
 
   const clearSensitiveState = () => {
     setSeed('')
     setPassphrase('')
+    setConfirmPassphrase('')
     setHasCopiedSeed(false)
+    setHasConfirmedSeedBackup(false)
   }
 
   useEffect(() => {
@@ -77,6 +82,7 @@ const CreateWallet = ({
     setSeed(generateSeed())
     setStatus(null)
     setHasCopiedSeed(false)
+    setHasConfirmedSeedBackup(false)
   }
 
   const handleCopySeed = async () => {
@@ -97,8 +103,8 @@ const CreateWallet = ({
       return
     }
 
-    if (step === 1 && !hasCopiedSeed) {
-      setStatus('Copy your seed before continuing.')
+    if (step === 1 && variant !== 'add-address' && !hasConfirmedSeedBackup) {
+      setStatus('Please confirm you saved your seed securely.')
       return
     }
 
@@ -113,6 +119,20 @@ const CreateWallet = ({
     if (step === 2 && !passphrase.trim()) {
       setStatus('Passphrase is required.')
       return
+    }
+    if (step === 2 && variant !== 'add-address') {
+      if (passphrase.length < 12) {
+        setStatus('Passphrase must be at least 12 characters.')
+        return
+      }
+      if (!confirmPassphrase.trim()) {
+        setStatus('Please re-enter your passphrase.')
+        return
+      }
+      if (passphrase !== confirmPassphrase) {
+        setStatus('Passphrases do not match.')
+        return
+      }
     }
     if (step === 2 && variant === 'add-address') {
       const existingNames = [
@@ -170,6 +190,18 @@ const CreateWallet = ({
       setStatus('Passphrase is required.')
       setStep(2)
       return
+    }
+    if (variant !== 'add-address') {
+      if (passphrase.length < 12) {
+        setStatus('Passphrase must be at least 12 characters.')
+        setStep(2)
+        return
+      }
+      if (passphrase !== confirmPassphrase) {
+        setStatus('Passphrases do not match.')
+        setStep(2)
+        return
+      }
     }
 
     const cachedAccounts = getCachedAccounts()
@@ -253,6 +285,9 @@ const CreateWallet = ({
                     : 'Save this 55-letter seed in a safe place. You will need it to restore your wallet.'}
                 </p>
               </div>
+              <div className="rounded-lg border border-warning/30 bg-warning/10 p-3 text-xs text-warning-foreground">
+                Save this seed securely.
+              </div>
               <div className="space-y-2">
                 <Label htmlFor="seed">Seed</Label>
                 <Textarea id="seed" rows={3} value={seed} readOnly className="resize-none" />
@@ -273,6 +308,18 @@ const CreateWallet = ({
                   {hasCopiedSeed ? 'Seed copied' : 'Copy seed'}
                 </Button>
               </div>
+              {variant !== 'add-address' && (
+                <div className="flex items-start gap-2 rounded-lg border border-border/60 bg-muted/20 p-3">
+                  <Checkbox
+                    id="seed-confirmation"
+                    checked={hasConfirmedSeedBackup}
+                    onCheckedChange={(checked) => setHasConfirmedSeedBackup(checked === true)}
+                  />
+                  <Label htmlFor="seed-confirmation" className="text-xs text-muted-foreground">
+                    I saved this seed securely and understand it is required to recover this wallet.
+                  </Label>
+                </div>
+              )}
             </div>
           )}
 
@@ -281,7 +328,9 @@ const CreateWallet = ({
               <div className="space-y-1">
                 <h3 className="text-sm font-semibold">Name and protect it</h3>
                 <p className="text-xs text-muted-foreground">
-                  Give this wallet a label and set a vault passphrase.
+                  {variant === 'add-address'
+                    ? 'Give this wallet a label and enter the current vault passphrase.'
+                    : 'Give this wallet a label and set a vault passphrase.'}
                 </p>
               </div>
               <div className="space-y-2">
@@ -304,7 +353,21 @@ const CreateWallet = ({
                   value={passphrase}
                   onChange={(event) => setPassphrase(event.target.value)}
                 />
+                {variant !== 'add-address' && (
+                  <p className="text-xs text-muted-foreground">Minimum 12 characters.</p>
+                )}
               </div>
+              {variant !== 'add-address' && (
+                <div className="space-y-2">
+                  <Label htmlFor="confirm-passphrase">Re-enter vault passphrase</Label>
+                  <Input
+                    id="confirm-passphrase"
+                    type="password"
+                    value={confirmPassphrase}
+                    onChange={(event) => setConfirmPassphrase(event.target.value)}
+                  />
+                </div>
+              )}
             </div>
           )}
 
