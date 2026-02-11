@@ -1,24 +1,16 @@
 import { useEffect, useMemo, useState } from 'react'
 import { identityFromSeed } from '@qubic-labs/core'
-import {
-  ArrowLeftIcon,
-  ArrowRightIcon,
-  CheckCircleIcon,
-  CopyIcon,
-  RefreshCwIcon,
-} from 'lucide-react'
+import { ArrowLeftIcon, ArrowRightIcon, CheckCircleIcon } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Progress } from '@/components/ui/progress'
-import { Textarea } from '@/components/ui/textarea'
 import { generateSeed, isSeedLike } from '@/lib/seed'
 import { VaultEntryNotFoundError, VaultInvalidPassphraseError } from '@qubic-labs/sdk'
 import { setUnlocked } from '@/lib/lock'
 import { openBrowserVault, setOnboarded } from '@/lib/vault'
 import { getCachedAccounts, getWatchOnlyAccounts, saveCachedAccounts } from '@/lib/accounts'
+import SeedSecurityStep from '@/components/onboarding/seed-security-step'
+import PassphraseStep from '@/components/onboarding/passphrase-step'
 
 const TOTAL_STEPS = 3
 
@@ -103,7 +95,7 @@ const CreateWallet = ({
       return
     }
 
-    if (step === 1 && variant !== 'add-address' && !hasConfirmedSeedBackup) {
+    if (step === 1 && !hasConfirmedSeedBackup) {
       setStatus('Please confirm you saved your seed securely.')
       return
     }
@@ -120,17 +112,17 @@ const CreateWallet = ({
       setStatus('Passphrase is required.')
       return
     }
+    if (step === 2 && !confirmPassphrase.trim()) {
+      setStatus('Please re-enter your passphrase.')
+      return
+    }
+    if (step === 2 && passphrase !== confirmPassphrase) {
+      setStatus('Passphrases do not match.')
+      return
+    }
     if (step === 2 && variant !== 'add-address') {
       if (passphrase.length < 12) {
         setStatus('Passphrase must be at least 12 characters.')
-        return
-      }
-      if (!confirmPassphrase.trim()) {
-        setStatus('Please re-enter your passphrase.')
-        return
-      }
-      if (passphrase !== confirmPassphrase) {
-        setStatus('Passphrases do not match.')
         return
       }
     }
@@ -191,14 +183,19 @@ const CreateWallet = ({
       setStep(2)
       return
     }
+    if (!confirmPassphrase.trim()) {
+      setStatus('Please re-enter your passphrase.')
+      setStep(2)
+      return
+    }
+    if (passphrase !== confirmPassphrase) {
+      setStatus('Passphrases do not match.')
+      setStep(2)
+      return
+    }
     if (variant !== 'add-address') {
       if (passphrase.length < 12) {
         setStatus('Passphrase must be at least 12 characters.')
-        setStep(2)
-        return
-      }
-      if (passphrase !== confirmPassphrase) {
-        setStatus('Passphrases do not match.')
         setStep(2)
         return
       }
@@ -276,99 +273,28 @@ const CreateWallet = ({
 
         <div className="flex-1 space-y-4">
           {step === 1 && (
-            <div className="space-y-4">
-              <div className="space-y-1">
-                <h3 className="text-sm font-semibold">Secure your seed</h3>
-                <p className="text-xs text-muted-foreground">
-                  {variant === 'add-address'
-                    ? 'Save this 55-letter seed in a safe place. You will need it to restore this address.'
-                    : 'Save this 55-letter seed in a safe place. You will need it to restore your wallet.'}
-                </p>
-              </div>
-              <div className="rounded-lg border border-warning/30 bg-warning/10 p-3 text-xs text-warning-foreground">
-                Save this seed securely.
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="seed">Seed</Label>
-                <Textarea id="seed" rows={3} value={seed} readOnly className="resize-none" />
-              </div>
-              <div className="space-y-2">
-                <Label>Public identity</Label>
-                <div className="rounded-md border border-border/60 bg-card px-3 py-2 text-sm text-foreground break-all">
-                  {identity || 'Deriving...'}
-                </div>
-              </div>
-              <div className="grid gap-3">
-                <Button size="lg" variant="secondary" className="w-full" onClick={regenerate}>
-                  <RefreshCwIcon className="h-5 w-5" />
-                  Generate new seed
-                </Button>
-                <Button size="lg" variant="outline" className="w-full" onClick={handleCopySeed}>
-                  <CopyIcon className="h-5 w-5" />
-                  {hasCopiedSeed ? 'Seed copied' : 'Copy seed'}
-                </Button>
-              </div>
-              {variant !== 'add-address' && (
-                <div className="flex items-start gap-2 rounded-lg border border-border/60 bg-muted/20 p-3">
-                  <Checkbox
-                    id="seed-confirmation"
-                    checked={hasConfirmedSeedBackup}
-                    onCheckedChange={(checked) => setHasConfirmedSeedBackup(checked === true)}
-                  />
-                  <Label htmlFor="seed-confirmation" className="text-xs text-muted-foreground">
-                    I saved this seed securely and understand it is required to recover this wallet.
-                  </Label>
-                </div>
-              )}
-            </div>
+            <SeedSecurityStep
+              variant={variant}
+              seed={seed}
+              identity={identity}
+              hasCopiedSeed={hasCopiedSeed}
+              hasConfirmedSeedBackup={hasConfirmedSeedBackup}
+              onGenerate={regenerate}
+              onCopy={handleCopySeed}
+              onConfirmChange={setHasConfirmedSeedBackup}
+            />
           )}
 
           {step === 2 && (
-            <div className="space-y-4">
-              <div className="space-y-1">
-                <h3 className="text-sm font-semibold">Name and protect it</h3>
-                <p className="text-xs text-muted-foreground">
-                  {variant === 'add-address'
-                    ? 'Give this wallet a label and enter the current vault passphrase.'
-                    : 'Give this wallet a label and set a vault passphrase.'}
-                </p>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="wallet-name">
-                  {variant === 'add-address' ? 'Address label' : 'Wallet name'}
-                </Label>
-                <Input
-                  id="wallet-name"
-                  value={name}
-                  onChange={(event) => setName(event.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="passphrase">
-                  {variant === 'add-address' ? 'Current vault passphrase' : 'Vault passphrase'}
-                </Label>
-                <Input
-                  id="passphrase"
-                  type="password"
-                  value={passphrase}
-                  onChange={(event) => setPassphrase(event.target.value)}
-                />
-                {variant !== 'add-address' && (
-                  <p className="text-xs text-muted-foreground">Minimum 12 characters.</p>
-                )}
-              </div>
-              {variant !== 'add-address' && (
-                <div className="space-y-2">
-                  <Label htmlFor="confirm-passphrase">Re-enter vault passphrase</Label>
-                  <Input
-                    id="confirm-passphrase"
-                    type="password"
-                    value={confirmPassphrase}
-                    onChange={(event) => setConfirmPassphrase(event.target.value)}
-                  />
-                </div>
-              )}
-            </div>
+            <PassphraseStep
+              variant={variant}
+              name={name}
+              passphrase={passphrase}
+              confirmPassphrase={confirmPassphrase}
+              onNameChange={setName}
+              onPassphraseChange={setPassphrase}
+              onConfirmPassphraseChange={setConfirmPassphrase}
+            />
           )}
 
           {step === 3 && (
