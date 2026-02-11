@@ -138,7 +138,11 @@ const ManageAccounts = () => {
   useEffect(() => {
     const handleStorage = () => refreshFromCache()
     window.addEventListener('storage', handleStorage)
-    return () => window.removeEventListener('storage', handleStorage)
+    window.addEventListener('wallet-account-updated', handleStorage)
+    return () => {
+      window.removeEventListener('storage', handleStorage)
+      window.removeEventListener('wallet-account-updated', handleStorage)
+    }
   }, [refreshFromCache])
 
   const balanceQueries = useQueries({
