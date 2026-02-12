@@ -344,9 +344,7 @@ const ManageAccounts = () => {
     const passphrase = passphraseInput.trim()
     try {
       const vault = await openBrowserVault(passphrase, false)
-      const cached = getCachedAccounts()
-      const currentIdentity = localStorage.getItem('currentIdentity')
-      const expectedIdentity = currentIdentity ?? cached[0]?.identity
+      const expectedIdentity = vault.list()[0]?.identity
       if (expectedIdentity) {
         await vault.getSeed(expectedIdentity)
       }
