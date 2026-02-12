@@ -3,6 +3,7 @@ import { ArrowDownLeftIcon, ArrowUpRightIcon, HashIcon, RefreshCwIcon } from 'lu
 import { Button } from '@/components/ui/button'
 import { buildExplorerObjectUrl, truncateString } from '@/lib/utils'
 import { useTranslation } from 'react-i18next'
+import { useEffect, useState } from 'react'
 
 const formatQus = (value: bigint) => {
   const formatter = new Intl.NumberFormat('en', {
@@ -14,7 +15,7 @@ const formatQus = (value: bigint) => {
 
 const History = () => {
   const { t } = useTranslation()
-  const identity = localStorage.getItem('currentIdentity') ?? '...'
+  const [identity, setIdentity] = useState(localStorage.getItem('currentIdentity') ?? '')
   const transactions = useTransactions(
     {
       identity,
@@ -23,6 +24,20 @@ const History = () => {
     },
     { refetchInterval: 15_000 },
   )
+
+  useEffect(() => {
+    const refreshIdentity = () => {
+      setIdentity(localStorage.getItem('currentIdentity') ?? '')
+    }
+
+    refreshIdentity()
+    window.addEventListener('storage', refreshIdentity)
+    window.addEventListener('wallet-account-updated', refreshIdentity)
+    return () => {
+      window.removeEventListener('storage', refreshIdentity)
+      window.removeEventListener('wallet-account-updated', refreshIdentity)
+    }
+  }, [])
 
   const items = transactions.data?.pages.flatMap((page) => page.transactions) ?? []
   const sorted = [...items].sort((a, b) => Number(b.tickNumber) - Number(a.tickNumber))

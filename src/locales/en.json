@@ -106,6 +106,66 @@
       "helper": "Locks the wallet after the selected duration."
     }
   },
+  "accounts": {
+    "watchOnly": {
+      "title": "Add watch-only address",
+      "subtitle": "Track a public identity without importing its seed.",
+      "submit": "Add watch-only"
+    },
+    "manage": {
+      "title": "Manage accounts",
+      "subtitle": "View, reorder, and manage your identities.",
+      "passphrase": "Vault passphrase",
+      "passphraseTitle": "Unlock vault",
+      "load": "Load accounts",
+      "unlock": "Unlock vault",
+      "loading": "Loading...",
+      "empty": "No accounts loaded yet.",
+      "active": "Active",
+      "select": "Select",
+      "balance": "Balance",
+      "menu": "Account options",
+      "drag": "Reorder account",
+      "rename": "Rename",
+      "renameTitle": "Rename account",
+      "renameLabel": "Account name",
+      "save": "Save",
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "remove": "Remove",
+      "removeTitle": "Remove account",
+      "removeDesc": "This action removes the account from this device. This cannot be undone.",
+      "reveal": "Reveal seed",
+      "revealTitle": "Seed phrase",
+      "copySeed": "Copy seed",
+      "done": "Done",
+      "addTitle": "Add account",
+      "addNewTitle": "Create or import",
+      "addNewDesc": "Add another address to this wallet.",
+      "addCreate": "Add new address",
+      "addImport": "Import seed",
+      "watchOnlyTitle": "Watch-only account",
+      "watchOnlyName": "Account name",
+      "watchOnlyIdentity": "Public identity",
+      "watchOnlyAdd": "Add watch-only",
+      "watchOnly": "Watch-only",
+      "close": "Close",
+      "errors": {
+        "load": "Failed to open vault.",
+        "remove": "Failed to remove account.",
+        "rename": "Unable to rename account.",
+        "reveal": "Unable to reveal seed.",
+        "nameRequired": "Account name is required.",
+        "passphraseRequired": "Passphrase is required.",
+        "invalidPassphrase": "Invalid passphrase.",
+        "nameDuplicate": "An account with this name already exists.",
+        "watchOnlySeed": "Watch-only accounts do not have a seed.",
+        "watchOnlyRequired": "Name and identity are required.",
+        "watchOnlyInvalid": "Identity format is invalid.",
+        "watchOnlyDuplicate": "This identity is already added."
+      }
+    }
+  },
   "history": {
     "title": "History",
     "loading": "Loading history...",
@@ -163,6 +223,7 @@
     "errors": {
       "networkError": "Network error. Please retry.",
       "broadcastFailed": "Failed to broadcast transaction.",
+      "watchOnly": "Watch-only accounts cannot send transfers.",
       "generic": "Transfer failed. Please retry."
     }
   },

@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button'
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer'
 import { useTranslation } from 'react-i18next'
 import { normalizeBalance, formatBalanceCompact, truncateString } from '@/lib/utils'
+import { getWatchOnlyAccounts } from '@/lib/accounts'
 
 const formatUsd = (value: bigint) => {
   const usdPerBillion = 435
@@ -201,6 +202,11 @@ const TransactionsPreview = ({
 const Home = () => {
   const { t } = useTranslation()
   const [identity, setIdentity] = useState(localStorage.getItem('currentIdentity') ?? '')
+  const [isWatchOnly, setIsWatchOnly] = useState(() =>
+    getWatchOnlyAccounts().some(
+      (entry) => entry.identity === (localStorage.getItem('currentIdentity') ?? ''),
+    ),
+  )
   const pathname = globalThis.location?.pathname ?? ''
   const isSidePanel = pathname.endsWith('sidepanel.html')
   const isPopup = pathname.endsWith('popup.html')
@@ -252,12 +258,18 @@ const Home = () => {
 
   useEffect(() => {
     const refreshIdentity = () => {
-      setIdentity(localStorage.getItem('currentIdentity') ?? '')
+      const nextIdentity = localStorage.getItem('currentIdentity') ?? ''
+      setIdentity(nextIdentity)
+      setIsWatchOnly(getWatchOnlyAccounts().some((entry) => entry.identity === nextIdentity))
     }
 
     refreshIdentity()
     window.addEventListener('storage', refreshIdentity)
-    return () => window.removeEventListener('storage', refreshIdentity)
+    window.addEventListener('wallet-account-updated', refreshIdentity)
+    return () => {
+      window.removeEventListener('storage', refreshIdentity)
+      window.removeEventListener('wallet-account-updated', refreshIdentity)
+    }
   }, [])
 
   useEffect(() => {
@@ -318,6 +330,8 @@ const Home = () => {
             size="lg"
             className="aspect-square w-full flex-row gap-2 rounded-md bg-primary/10 text-primary hover:bg-primary/20"
             onClick={() => navigate('/transfer')}
+            disabled={isWatchOnly}
+            title={isWatchOnly ? t('transfer.errors.watchOnly') : undefined}
           >
             <ArrowUpRightIcon className="h-6 w-6" />
             {t('home.actions.send')}

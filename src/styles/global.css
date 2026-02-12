@@ -4,17 +4,17 @@
 @custom-variant dark (&:is(.dark *));
 
 @font-face {
-  font-family: "Geist Mono";
-  src: url("/fonts/GeistMono-VariableFont_wght.ttf") format("truetype-variations");
+  font-family: "Space Grotesk";
+  src: url("/fonts/SpaceGrotesk-VariableFont_wght.ttf") format("truetype");
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
 }
 
 :root {
-  --font-mono:
-    "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
-    "Courier New", monospace;
+  --font-sans:
+    "Space Grotesk", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
   --radius: 0.75rem;
 
   /* Dark theme (default) */
@@ -164,10 +164,12 @@
     overflow: hidden;
   }
   html {
-    font-family: var(--font-mono);
+    font-family: var(--font-sans);
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-sans);
+    letter-spacing: 0.015em;
     margin: 0;
   }
 }

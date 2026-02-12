@@ -12,6 +12,7 @@ import Transfer from '../pages/transfer'
 import Settings from '../pages/settings'
 import Unlock from '../pages/unlock'
 import Welcome from '../pages/welcome'
+import ImportWatchOnly from '../pages/accounts/import-watch-only'
 import {
   ensureUnlockTimestamp,
   getLockTimeoutMs,
@@ -268,6 +269,88 @@ const AppRouter = () => {
                 className="h-full"
               >
                 <Settings />
+              </motion.div>
+            }
+          />
+          <Route
+            path="/onboarding/create"
+            element={
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.2, ease: 'easeOut' }}
+                className="h-full"
+              >
+                <CreateWallet
+                  variant="add-address"
+                  onCancelPath="/accounts"
+                  onCompletePath="/accounts"
+                />
+              </motion.div>
+            }
+          />
+          <Route
+            path="/onboarding/import-seed"
+            element={
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.2, ease: 'easeOut' }}
+                className="h-full"
+              >
+                <ImportSeed />
+              </motion.div>
+            }
+          />
+          <Route
+            path="/accounts/create"
+            element={
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.2, ease: 'easeOut' }}
+                className="h-full"
+              >
+                <CreateWallet
+                  variant="add-address"
+                  onCancelPath="/accounts"
+                  onCompletePath="/accounts"
+                />
+              </motion.div>
+            }
+          />
+          <Route
+            path="/accounts/import-seed"
+            element={
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.2, ease: 'easeOut' }}
+                className="h-full"
+              >
+                <ImportSeed
+                  variant="add-address"
+                  onCancelPath="/accounts"
+                  onCompletePath="/accounts"
+                />
+              </motion.div>
+            }
+          />
+          <Route
+            path="/accounts/watch-only"
+            element={
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.2, ease: 'easeOut' }}
+                className="h-full"
+              >
+                <ImportWatchOnly />
               </motion.div>
             }
           />

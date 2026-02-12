@@ -17,6 +17,8 @@ import {
 } from '@/components/ui/drawer'
 import { isValidIdentity, normalizeBalance, parseAmount, formatBalance } from '@/lib/utils'
 import PassphraseAuth from '@/pages/passphrase-auth'
+import { getWatchOnlyAccounts } from '@/lib/accounts'
+import { useEffect } from 'react'
 
 type Step = 'form' | 'auth' | 'success'
 
@@ -201,6 +203,7 @@ const TransferForm = ({
   errors,
   errorMessage,
   balance,
+  isWatchOnly,
   onRecipientChange,
   onAmountChange,
   onContinue,
@@ -210,6 +213,7 @@ const TransferForm = ({
   errors: FormErrors
   errorMessage: string
   balance: ReturnType<typeof useBalance>
+  isWatchOnly: boolean
   onRecipientChange: (value: string) => void
   onAmountChange: (value: string) => void
   onContinue: () => void
@@ -235,6 +239,7 @@ const TransferForm = ({
               value={recipient}
               onChange={(e) => onRecipientChange(e.target.value.toUpperCase())}
               className={errors.recipient ? 'border-destructive' : ''}
+              disabled={isWatchOnly}
             />
             {errors.recipient && (
               <p className="mt-1 text-xs text-destructive">{errors.recipient}</p>
@@ -253,6 +258,7 @@ const TransferForm = ({
                 onAmountChange(value)
               }}
               className={errors.amount ? 'border-destructive' : ''}
+              disabled={isWatchOnly}
             />
             {errors.amount && <p className="mt-1 text-xs text-destructive">{errors.amount}</p>}
           </div>
@@ -264,7 +270,7 @@ const TransferForm = ({
           </div>
         )}
 
-        <Button onClick={onContinue} size="lg" className="w-full">
+        <Button onClick={onContinue} size="lg" className="w-full" disabled={isWatchOnly}>
           <SendIcon className="mr-2 h-4 w-4" />
           {t('transfer.actions.continue')}
         </Button>
@@ -276,8 +282,14 @@ const TransferForm = ({
 const Transfer = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
-
-  const currentIdentity = localStorage.getItem('currentIdentity') ?? ''
+  const [currentIdentity, setCurrentIdentity] = useState(
+    localStorage.getItem('currentIdentity') ?? '',
+  )
+  const [isWatchOnly, setIsWatchOnly] = useState(() =>
+    getWatchOnlyAccounts().some(
+      (entry) => entry.identity === (localStorage.getItem('currentIdentity') ?? ''),
+    ),
+  )
 
   const balance = useBalance(currentIdentity)
   const sendMutation = useSend()
@@ -290,6 +302,22 @@ const Transfer = () => {
   const [sending, setSending] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
   const [txResult, setTxResult] = useState<TxResult | null>(null)
+
+  useEffect(() => {
+    const refreshAccount = () => {
+      const nextIdentity = localStorage.getItem('currentIdentity') ?? ''
+      setCurrentIdentity(nextIdentity)
+      setIsWatchOnly(getWatchOnlyAccounts().some((entry) => entry.identity === nextIdentity))
+    }
+
+    refreshAccount()
+    window.addEventListener('storage', refreshAccount)
+    window.addEventListener('wallet-account-updated', refreshAccount)
+    return () => {
+      window.removeEventListener('storage', refreshAccount)
+      window.removeEventListener('wallet-account-updated', refreshAccount)
+    }
+  }, [])
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {}
@@ -323,6 +351,10 @@ const Transfer = () => {
   }
 
   const handleContinue = () => {
+    if (isWatchOnly) {
+      setErrorMessage(t('transfer.errors.watchOnly'))
+      return
+    }
     if (validateForm()) {
       setStep('auth')
       setErrorMessage('')
@@ -437,6 +469,7 @@ const Transfer = () => {
         errors={errors}
         errorMessage={errorMessage}
         balance={balance}
+        isWatchOnly={isWatchOnly}
         onRecipientChange={handleRecipientChange}
         onAmountChange={handleAmountChange}
         onContinue={handleContinue}
