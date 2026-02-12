@@ -29,7 +29,7 @@ function arrayBufferToBase64(buffer: ArrayBuffer): string {
 
 export async function exportVaultToWebWalletFormat(
   vault: SeedVault,
-  password: string
+  password: string,
 ): Promise<{ salt: string; iv: string; cipher: string }> {
   // Generate RSA key pair
   const keyPair = await crypto.subtle.generateKey(RSA_ALG, true, ['encrypt', 'decrypt'])
@@ -37,7 +37,7 @@ export async function exportVaultToWebWalletFormat(
 
   // Build seeds array by encrypting each seed with the RSA public key
   const entries = vault.list()
-  const watchOnlyIds = new Set(getWatchOnlyAccounts().map(acc => acc.identity))
+  const watchOnlyIds = new Set(getWatchOnlyAccounts().map((acc) => acc.identity))
   const seeds = []
 
   for (const entry of entries) {
@@ -54,7 +54,7 @@ export async function exportVaultToWebWalletFormat(
       const encryptedSeed = await crypto.subtle.encrypt(
         { name: 'RSA-OAEP' },
         keyPair.publicKey,
-        new TextEncoder().encode(seedStr)
+        new TextEncoder().encode(seedStr),
       )
       seeds.push({
         encryptedSeed: btoa(String.fromCharCode(...new Uint8Array(encryptedSeed))),
@@ -71,14 +71,14 @@ export async function exportVaultToWebWalletFormat(
     new TextEncoder().encode(password),
     { name: 'PBKDF2' },
     false,
-    ['deriveBits', 'deriveKey']
+    ['deriveBits', 'deriveKey'],
   )
   const wrapKey = await crypto.subtle.deriveKey(
     { name: 'PBKDF2', salt: new Uint8Array(16).fill(0), iterations: 100000, hash: 'SHA-256' },
     pwKeyMaterial,
     AES_ALG,
     true,
-    ['wrapKey', 'unwrapKey']
+    ['wrapKey', 'unwrapKey'],
   )
   const wrappedPrivateKey = await crypto.subtle.wrapKey('jwk', keyPair.privateKey, wrapKey, AES_ALG)
 
@@ -96,19 +96,19 @@ export async function exportVaultToWebWalletFormat(
     new TextEncoder().encode(password),
     { name: 'PBKDF2' },
     false,
-    ['deriveKey']
+    ['deriveKey'],
   )
   const vaultKey = await crypto.subtle.deriveKey(
     { name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' },
     vaultKeyMaterial,
     { name: 'AES-GCM', length: 256 },
     false,
-    ['encrypt', 'decrypt']
+    ['encrypt', 'decrypt'],
   )
   const cipherBuf = await crypto.subtle.encrypt(
     { name: 'AES-GCM', iv },
     vaultKey,
-    new TextEncoder().encode(JSON.stringify(vaultFile))
+    new TextEncoder().encode(JSON.stringify(vaultFile)),
   )
 
   return {
