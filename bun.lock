@@ -12,6 +12,7 @@
         "@hookform/resolvers": "^5.2.2",
         "@qubic-labs/react": "^1.1.1",
         "@qubic-labs/sdk": "^2.0.1",
+        "@qubic-lib/qubic-ts-vault-library": "^1.0.2",
         "@radix-ui/react-accordion": "^1.2.12",
         "@radix-ui/react-alert-dialog": "^1.1.15",
         "@radix-ui/react-aspect-ratio": "^1.1.8",
@@ -263,6 +264,8 @@
     "@qubic-labs/schnorrq": ["@qubic-labs/schnorrq@1.0.2", "", { "dependencies": { "@noble/hashes": "^1.8.0" }, "peerDependencies": { "typescript": "^5" } }, "sha512-5siomdXGgycQAGJXYIaKqS5EvbEKYYf6hfEShGBfaHw2R3hFxLCwZa8eF5EBHGlR4e8oMb1fkJVL6Eb1uZb86g=="],
 
     "@qubic-labs/sdk": ["@qubic-labs/sdk@2.0.1", "", { "dependencies": { "@qubic-labs/core": "^1.0.3" }, "peerDependencies": { "typescript": "^5" }, "bin": { "qubic-vault": "dist/src/vault-cli.js" } }, "sha512-ija289W31WzAEDMqLz23iLO0J4fmWCBu0nkbgmNLD9MPmsWLZr0Rwgkgz41HyhJGtxY0eqHaq/vWXOxb2QHY+A=="],
+
+    "@qubic-lib/qubic-ts-vault-library": ["@qubic-lib/qubic-ts-vault-library@1.0.2", "", {}, "sha512-sgaMOVUcakLT7sCTTMIn5k2mrToZhVHmlqGKgamDA7McRvg0i1e5L5SHjNQ4jOc9koyJ48f1qZRHAfeCG6LyzQ=="],
 
     "@radix-ui/number": ["@radix-ui/number@1.1.1", "", {}, "sha512-MkKCwxlXTgz6CFoJx3pCwn07GKp36+aZyu/u2Ln2VrA5DcdyCZkASEDBTd8x5whTQQL5CiYf4prXKLcgQdv29g=="],
 
