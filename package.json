@@ -19,6 +19,7 @@
     "@hookform/resolvers": "^5.2.2",
     "@qubic-labs/react": "^1.1.1",
     "@qubic-labs/sdk": "^2.0.1",
+    "@qubic-lib/qubic-ts-vault-library": "^1.0.2",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",
     "@radix-ui/react-aspect-ratio": "^1.1.8",
