@@ -72,15 +72,12 @@ const Settings = () => {
       const vault = await openBrowserVault(exportPassphrase.trim(), false)
 
       // Export to web wallet format using WalletService
-      const encryptedVault = await exportVaultToWebWalletFormat(
-        vault,
-        exportPassphrase.trim()
-      )
+      const encryptedVault = await exportVaultToWebWalletFormat(vault, exportPassphrase.trim())
 
       // Convert to JSON and download
       const json = JSON.stringify(encryptedVault, null, 2)
       const blob = new Blob([new TextEncoder().encode(json)], {
-        type: 'application/octet-stream'
+        type: 'application/octet-stream',
       })
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
@@ -210,9 +207,7 @@ const Settings = () => {
           <DrawerFooter>
             <Button onClick={handleExportVault} disabled={exporting || !exportPassphrase.trim()}>
               <CheckIcon className="h-4 w-4" />
-              {exporting
-                ? t('settings.exportVault.exporting')
-                : t('settings.exportVault.confirm')}
+              {exporting ? t('settings.exportVault.exporting') : t('settings.exportVault.confirm')}
             </Button>
           </DrawerFooter>
         </DrawerContent>

@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Progress } from '@/components/ui/progress'
 import { setUnlocked } from '@/lib/lock'
 import { openBrowserVault, setOnboarded } from '@/lib/vault'
-// @ts-ignore - No type definitions available for this library
+// @ts-expect-error - No type definitions available for this library
 import { QubicVault } from '@qubic-lib/qubic-ts-vault-library/dist/vault.js'
 import { getWatchOnlyAccounts, saveWatchOnlyAccounts } from '@/lib/accounts'
 
@@ -102,7 +102,13 @@ const ImportVault = () => {
           return
         }
 
-        const seeds = qubicVault.getSeeds()
+        type QubicSeed = {
+          encryptedSeed: string
+          alias: string
+          publicId: string
+          isOnlyWatch: boolean
+        }
+        const seeds = qubicVault.getSeeds() as QubicSeed[]
         if (seeds.length === 0) {
           setStatus(t('onboarding.importVault.errors.noEntries'))
           setIsSaving(false)
@@ -114,7 +120,8 @@ const ImportVault = () => {
 
         for (const seed of seeds) {
           if (seed.isOnlyWatch) {
-            if (!watchOnlyAccounts.find((acc: any) => acc.identity === seed.publicId)) {
+            const existingAccount = watchOnlyAccounts.find((acc) => acc.identity === seed.publicId)
+            if (!existingAccount) {
               watchOnlyAccounts.push({ identity: seed.publicId, name: seed.alias, watchOnly: true })
             }
           } else {
@@ -127,10 +134,10 @@ const ImportVault = () => {
         await vault.save()
 
         const firstEntry = vault.list()[0]
-        const firstWatchOnly = seeds.find((s: any) => s.isOnlyWatch)
+        const firstWatchOnly = seeds.find((s) => s.isOnlyWatch)
         setOnboarded(
           firstEntry?.identity ?? firstWatchOnly?.publicId,
-          firstEntry?.name ?? firstWatchOnly?.alias
+          firstEntry?.name ?? firstWatchOnly?.alias,
         )
         setUnlocked()
         navigate('/home')
@@ -176,7 +183,9 @@ const ImportVault = () => {
           {step === 1 && (
             <div className="space-y-4">
               <div className="space-y-1">
-                <h3 className="text-sm font-semibold">{t('onboarding.importVault.selectVault.title')}</h3>
+                <h3 className="text-sm font-semibold">
+                  {t('onboarding.importVault.selectVault.title')}
+                </h3>
                 <p className="text-xs text-muted-foreground">
                   {t('onboarding.importVault.selectVault.subtitle')}
                 </p>
@@ -201,7 +210,9 @@ const ImportVault = () => {
                     <UploadCloudIcon className="h-5 w-5" />
                     {t('onboarding.importVault.selectVault.dropText')}
                   </div>
-                  <div className="text-xs text-muted-foreground">{t('onboarding.importVault.selectVault.browseText')}</div>
+                  <div className="text-xs text-muted-foreground">
+                    {t('onboarding.importVault.selectVault.browseText')}
+                  </div>
                   {file && (
                     <div className="flex items-center gap-2 rounded-lg border border-border/60 bg-background/60 px-3 py-2 text-xs text-foreground">
                       <FileJsonIcon className="h-4 w-4 text-primary" />
@@ -223,13 +234,17 @@ const ImportVault = () => {
           {step === 2 && (
             <div className="space-y-4">
               <div className="space-y-1">
-                <h3 className="text-sm font-semibold">{t('onboarding.importVault.unlockSecure.title')}</h3>
+                <h3 className="text-sm font-semibold">
+                  {t('onboarding.importVault.unlockSecure.title')}
+                </h3>
                 <p className="text-xs text-muted-foreground">
                   {t('onboarding.importVault.unlockSecure.subtitle')}
                 </p>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="passphrase">{t('onboarding.importVault.unlockSecure.newPassphrase')}</Label>
+                <Label htmlFor="passphrase">
+                  {t('onboarding.importVault.unlockSecure.newPassphrase')}
+                </Label>
                 <Input
                   id="passphrase"
                   type="password"
@@ -238,7 +253,9 @@ const ImportVault = () => {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="source-passphrase">{t('onboarding.importVault.unlockSecure.sourcePassphrase')}</Label>
+                <Label htmlFor="source-passphrase">
+                  {t('onboarding.importVault.unlockSecure.sourcePassphrase')}
+                </Label>
                 <Input
                   id="source-passphrase"
                   type="password"
@@ -252,7 +269,9 @@ const ImportVault = () => {
           {step === 3 && (
             <div className="space-y-4">
               <div className="space-y-1">
-                <h3 className="text-sm font-semibold">{t('onboarding.importVault.review.title')}</h3>
+                <h3 className="text-sm font-semibold">
+                  {t('onboarding.importVault.review.title')}
+                </h3>
                 <p className="text-xs text-muted-foreground">
                   {t('onboarding.importVault.review.subtitle')}
                 </p>
@@ -260,10 +279,15 @@ const ImportVault = () => {
               <div className="space-y-2 text-sm">
                 <div className="flex items-center justify-between text-xs text-muted-foreground">
                   <span>{t('onboarding.importVault.review.vaultFile')}</span>
-                  <span className="text-foreground">{file?.name ?? t('onboarding.importVault.review.notSelected')}</span>
+                  <span className="text-foreground">
+                    {file?.name ?? t('onboarding.importVault.review.notSelected')}
+                  </span>
                 </div>
                 <div className="text-xs text-muted-foreground">
-                  {t('onboarding.importVault.review.sourcePassphraseLabel')}: {sourcePassphrase.trim() ? t('onboarding.importVault.review.sourcePassphraseProvided') : t('onboarding.importVault.review.sourcePassphraseSame')}
+                  {t('onboarding.importVault.review.sourcePassphraseLabel')}:{' '}
+                  {sourcePassphrase.trim()
+                    ? t('onboarding.importVault.review.sourcePassphraseProvided')
+                    : t('onboarding.importVault.review.sourcePassphraseSame')}
                 </div>
               </div>
               <p className="text-xs text-muted-foreground">
@@ -278,7 +302,9 @@ const ImportVault = () => {
         <div className="flex w-full gap-3">
           <Button size="lg" variant="ghost" onClick={handleBack} className="flex-1">
             <ArrowLeftIcon className="h-5 w-5" />
-            {step === 1 ? t('onboarding.importVault.actions.back') : t('onboarding.importVault.actions.previous')}
+            {step === 1
+              ? t('onboarding.importVault.actions.back')
+              : t('onboarding.importVault.actions.previous')}
           </Button>
           {step < TOTAL_STEPS ? (
             <Button size="lg" onClick={handleNext} className="flex-1">
@@ -288,7 +314,9 @@ const ImportVault = () => {
           ) : (
             <Button size="lg" onClick={handleImport} className="flex-1" disabled={isSaving}>
               <UploadCloudIcon className="h-5 w-5" />
-              {isSaving ? t('onboarding.importVault.actions.importing') : t('onboarding.importVault.actions.import')}
+              {isSaving
+                ? t('onboarding.importVault.actions.importing')
+                : t('onboarding.importVault.actions.import')}
             </Button>
           )}
         </div>
