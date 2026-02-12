@@ -10,6 +10,7 @@ import ImportSeed from '../pages/onboarding/import-seed'
 import ImportVault from '../pages/onboarding/import-vault'
 import Transfer from '../pages/transfer'
 import Settings from '../pages/settings'
+import Security from '../pages/settings/security'
 import Unlock from '../pages/unlock'
 import Welcome from '../pages/welcome'
 import ImportWatchOnly from '../pages/accounts/import-watch-only'
@@ -269,6 +270,20 @@ const AppRouter = () => {
                 className="h-full"
               >
                 <Settings />
+              </motion.div>
+            }
+          />
+          <Route
+            path="/settings/security"
+            element={
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.2, ease: 'easeOut' }}
+                className="h-full"
+              >
+                <Security />
               </motion.div>
             }
           />
