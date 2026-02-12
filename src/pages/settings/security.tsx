@@ -111,7 +111,7 @@ const Security = () => {
 
   const handleResetApp = () => {
     localStorage.clear()
-    navigate('/')
+    window.location.replace('/')
   }
 
   return (
