@@ -176,7 +176,7 @@ const AppShell = ({
                     {isActive && (
                       <motion.span
                         layoutId="app-nav-active-pill"
-                        className="absolute inset-0 rounded-lg border border-primary/35 bg-primary/15 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
+                        className="absolute inset-0 rounded-lg border border-primary/35 bg-primary/15"
                         transition={{ type: 'spring', stiffness: 320, damping: 30, mass: 0.8 }}
                       />
                     )}
@@ -192,7 +192,7 @@ const AppShell = ({
                         damping: 16,
                         duration: isActive ? 0.48 : 0.18,
                       }}
-                      className={`relative transition-colors ${isActive ? 'text-primary' : 'text-white/80 group-hover:text-white'}`}
+                      className={`relative transition-colors ${isActive ? 'text-primary' : 'dark:text-white/80 dark:group-hover:text-white'}`}
                     >
                       {item.icon}
                     </motion.span>
