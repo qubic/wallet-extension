@@ -37,6 +37,12 @@ const ImportSeed = ({
 
   const progressValue = useMemo(() => (step / TOTAL_STEPS) * 100, [step])
 
+  const clearSensitiveState = () => {
+    setSeed('')
+    setPassphrase('')
+    setDerivedIdentity(null)
+  }
+
   const handleNext = async () => {
     setStatus(null)
 
@@ -100,6 +106,7 @@ const ImportSeed = ({
   const handleBack = () => {
     setStatus(null)
     if (step === 1) {
+      clearSensitiveState()
       navigate(onCancelPath)
       return
     }
@@ -175,6 +182,7 @@ const ImportSeed = ({
         setOnboarded(entry.identity, name)
         setUnlocked()
       }
+      clearSensitiveState()
       navigate(onCompletePath)
     } catch (error) {
       setStatus(error instanceof Error ? error.message : 'Failed to import seed.')
