@@ -10,6 +10,7 @@ import {
   InputGroupInput,
 } from '@/components/ui/input-group'
 import { Label } from '@/components/ui/label'
+import { getCachedAccounts } from '@/lib/accounts'
 import { setUnlocked } from '@/lib/lock'
 import { openBrowserVault } from '@/lib/vault'
 
@@ -22,7 +23,8 @@ type PassphraseAuthProps = {
 
 const PassphraseAuth = ({ title, subtitle, onSuccess, onCancel }: PassphraseAuthProps) => {
   const { t } = useTranslation()
-  const currentAccountName = localStorage.getItem('currentAccountName') ?? 'Main account'
+  const storedIdentity = localStorage.getItem('currentIdentity')
+  const currentIdentity = storedIdentity ?? getCachedAccounts()[0]?.identity ?? ''
 
   const [passphrase, setPassphrase] = useState('')
   const [error, setError] = useState('')
@@ -40,7 +42,7 @@ const PassphraseAuth = ({ title, subtitle, onSuccess, onCancel }: PassphraseAuth
 
     try {
       const vault = await openBrowserVault(passphrase, false)
-      const seed = await vault.getSeed(currentAccountName)
+      const seed = await vault.getSeed(currentIdentity)
 
       setUnlocked()
       setPassphrase('')
@@ -71,13 +73,19 @@ const PassphraseAuth = ({ title, subtitle, onSuccess, onCancel }: PassphraseAuth
     }
   }
 
+  const handleCancel = () => {
+    setPassphrase('')
+    setError('')
+    onCancel()
+  }
+
   return (
     <section className="flex min-h-full w-full justify-center">
       <div className="flex min-h-full w-full max-w-sm flex-col px-6 pb-6 pt-4">
         <div className="flex items-center justify-between">
           <button
             type="button"
-            onClick={onCancel}
+            onClick={handleCancel}
             className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
           >
             <ArrowLeftIcon className="h-4 w-4" />
@@ -145,7 +153,7 @@ const PassphraseAuth = ({ title, subtitle, onSuccess, onCancel }: PassphraseAuth
 
         <div className="mt-auto flex gap-3 pt-6">
           <Button
-            onClick={onCancel}
+            onClick={handleCancel}
             variant="outline"
             size="lg"
             className="flex-1"

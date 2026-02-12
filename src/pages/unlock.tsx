@@ -32,9 +32,7 @@ const Unlock = () => {
 
     try {
       const vault = await openBrowserVault(passphrase, false)
-      const currentIdentity = localStorage.getItem('currentIdentity') ?? ''
-      const fallbackIdentity = vault.list()[0]?.identity
-      const identityToValidate = currentIdentity || fallbackIdentity
+      const identityToValidate = vault.list()[0]?.identity
 
       if (!identityToValidate) {
         setError(t('passphraseAuth.errors.accountNotFound'))

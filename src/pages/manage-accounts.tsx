@@ -138,7 +138,11 @@ const ManageAccounts = () => {
   useEffect(() => {
     const handleStorage = () => refreshFromCache()
     window.addEventListener('storage', handleStorage)
-    return () => window.removeEventListener('storage', handleStorage)
+    window.addEventListener('wallet-account-updated', handleStorage)
+    return () => {
+      window.removeEventListener('storage', handleStorage)
+      window.removeEventListener('wallet-account-updated', handleStorage)
+    }
   }, [refreshFromCache])
 
   const balanceQueries = useQueries({
@@ -340,9 +344,7 @@ const ManageAccounts = () => {
     const passphrase = passphraseInput.trim()
     try {
       const vault = await openBrowserVault(passphrase, false)
-      const cached = getCachedAccounts()
-      const currentIdentity = localStorage.getItem('currentIdentity')
-      const expectedIdentity = currentIdentity ?? cached[0]?.identity
+      const expectedIdentity = vault.list()[0]?.identity
       if (expectedIdentity) {
         await vault.getSeed(expectedIdentity)
       }

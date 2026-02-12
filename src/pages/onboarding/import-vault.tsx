@@ -27,6 +27,12 @@ const ImportVault = () => {
 
   const progressValue = useMemo(() => (step / TOTAL_STEPS) * 100, [step])
 
+  const clearSensitiveState = () => {
+    setPassphrase('')
+    setSourcePassphrase('')
+    setFile(null)
+  }
+
   const handleNext = () => {
     setStatus(null)
 
@@ -58,6 +64,7 @@ const ImportVault = () => {
   const handleBack = () => {
     setStatus(null)
     if (step === 1) {
+      clearSensitiveState()
       navigate('/')
       return
     }
@@ -140,6 +147,7 @@ const ImportVault = () => {
           firstEntry?.name ?? firstWatchOnly?.alias,
         )
         setUnlocked()
+        clearSensitiveState()
         navigate('/home')
       } else {
         const vault = await openBrowserVault(passphrase.trim(), true)
@@ -158,6 +166,7 @@ const ImportVault = () => {
 
         setOnboarded(entries[0].identity, entries[0].name)
         setUnlocked()
+        clearSensitiveState()
         navigate('/home')
       }
     } catch (error) {

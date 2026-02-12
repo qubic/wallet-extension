@@ -12,6 +12,13 @@ export type CachedAccount = {
 const WATCH_ONLY_KEY = 'watchOnlyAccounts'
 const ACCOUNT_ORDER_KEY = 'accountOrder'
 const ACCOUNT_CACHE_KEY = 'accountCache'
+export const ACCOUNT_UPDATED_EVENT = 'wallet-account-updated'
+
+export const emitAccountUpdated = () => {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event(ACCOUNT_UPDATED_EVENT))
+  }
+}
 
 export const getWatchOnlyAccounts = (): WatchOnlyAccount[] => {
   try {
@@ -34,6 +41,7 @@ export const getWatchOnlyAccounts = (): WatchOnlyAccount[] => {
 export const saveWatchOnlyAccounts = (accounts: WatchOnlyAccount[]) => {
   try {
     localStorage.setItem(WATCH_ONLY_KEY, JSON.stringify(accounts))
+    emitAccountUpdated()
   } catch {
     // Ignore storage failures.
   }
@@ -56,6 +64,7 @@ export const getCachedAccounts = (): CachedAccount[] => {
 export const saveCachedAccounts = (accounts: CachedAccount[]) => {
   try {
     localStorage.setItem(ACCOUNT_CACHE_KEY, JSON.stringify(accounts))
+    emitAccountUpdated()
   } catch {
     // Ignore storage failures.
   }
@@ -75,6 +84,7 @@ export const getAccountOrder = () => {
 export const saveAccountOrder = (identities: string[]) => {
   try {
     localStorage.setItem(ACCOUNT_ORDER_KEY, JSON.stringify(identities))
+    emitAccountUpdated()
   } catch {
     // Ignore storage failures.
   }

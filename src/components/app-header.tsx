@@ -18,6 +18,7 @@ import { useSdk } from '@qubic-labs/react'
 import { formatBalanceCompact } from '@/lib/utils'
 import { getAccountOrder, getCachedAccounts, getWatchOnlyAccounts } from '@/lib/accounts'
 import { useNavigate } from 'react-router-dom'
+import { useCallback } from 'react'
 
 type AppHeaderProps = {
   onOpenSidePanel: () => void
@@ -41,6 +42,37 @@ const AppHeader = ({
   const [identity, setIdentity] = useState(localStorage.getItem('currentIdentity') ?? '')
   const [accounts, setAccounts] = useState<Array<{ name: string; identity: string }>>([])
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+
+  const refreshAccounts = useCallback(() => {
+    const nextAccountName = localStorage.getItem('currentAccountName') ?? 'Main account'
+    const nextIdentity = localStorage.getItem('currentIdentity') ?? ''
+    setAccountName(nextAccountName)
+    setIdentity(nextIdentity)
+
+    const cached = getCachedAccounts()
+    const watchOnly = getWatchOnlyAccounts().map((entry) => ({
+      name: entry.name,
+      identity: entry.identity,
+    }))
+    const combined = [...cached, ...watchOnly]
+    const unique = new Map(combined.map((entry) => [entry.identity, entry]))
+
+    if (nextIdentity && !unique.has(nextIdentity)) {
+      unique.set(nextIdentity, {
+        name: nextAccountName,
+        identity: nextIdentity,
+      })
+    }
+
+    const entries = Array.from(unique.values())
+    const order = getAccountOrder()
+    const byIdentity = new Map(entries.map((entry) => [entry.identity, entry]))
+    const ordered = order
+      .map((accountIdentity) => byIdentity.get(accountIdentity))
+      .filter(Boolean) as Array<{ name: string; identity: string }>
+    const remaining = entries.filter((entry) => !order.includes(entry.identity))
+    setAccounts([...ordered, ...remaining])
+  }, [])
 
   const balanceQueries = useQueries({
     queries: accounts.map((account) => ({
@@ -70,45 +102,14 @@ const AppHeader = ({
   }
 
   useEffect(() => {
-    const refresh = () => {
-      const nextAccountName = localStorage.getItem('currentAccountName') ?? 'Main account'
-      const nextIdentity = localStorage.getItem('currentIdentity') ?? ''
-      setAccountName(nextAccountName)
-      setIdentity(nextIdentity)
-
-      const cached = getCachedAccounts()
-      const watchOnly = getWatchOnlyAccounts().map((entry) => ({
-        name: entry.name,
-        identity: entry.identity,
-      }))
-      const combined = [...cached, ...watchOnly]
-      const unique = new Map(combined.map((entry) => [entry.identity, entry]))
-
-      if (nextIdentity && !unique.has(nextIdentity)) {
-        unique.set(nextIdentity, {
-          name: nextAccountName,
-          identity: nextIdentity,
-        })
-      }
-
-      const entries = Array.from(unique.values())
-      const order = getAccountOrder()
-      const byIdentity = new Map(entries.map((entry) => [entry.identity, entry]))
-      const ordered = order
-        .map((accountIdentity) => byIdentity.get(accountIdentity))
-        .filter(Boolean) as Array<{ name: string; identity: string }>
-      const remaining = entries.filter((entry) => !order.includes(entry.identity))
-      setAccounts([...ordered, ...remaining])
-    }
-
-    refresh()
-    window.addEventListener('storage', refresh)
-    window.addEventListener('wallet-account-updated', refresh)
+    refreshAccounts()
+    window.addEventListener('storage', refreshAccounts)
+    window.addEventListener('wallet-account-updated', refreshAccounts)
     return () => {
-      window.removeEventListener('storage', refresh)
-      window.removeEventListener('wallet-account-updated', refresh)
+      window.removeEventListener('storage', refreshAccounts)
+      window.removeEventListener('wallet-account-updated', refreshAccounts)
     }
-  }, [])
+  }, [refreshAccounts])
 
   const handleCopy = async () => {
     if (!identity) return
@@ -126,7 +127,15 @@ const AppHeader = ({
 
   return (
     <header className="z-20 flex items-center justify-between gap-4 border-b border-border/60 bg-background px-4 py-4">
-      <Popover open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+      <Popover
+        open={isMenuOpen}
+        onOpenChange={(open) => {
+          setIsMenuOpen(open)
+          if (open) {
+            refreshAccounts()
+          }
+        }}
+      >
         <PopoverTrigger asChild>
           <button
             type="button"
@@ -164,24 +173,26 @@ const AppHeader = ({
                     key={account.identity}
                     type="button"
                     onClick={() => handleSelectAccount(account)}
-                    className={`flex w-full items-center justify-between rounded-md px-2 py-2 text-left text-sm transition hover:bg-muted/30 ${
+                    className={`flex w-full items-center rounded-md px-2 py-2 text-left text-sm transition hover:bg-muted/30 ${
                       account.identity === identity ? 'bg-muted/20' : ''
                     }`}
                   >
-                    <div className="flex flex-col">
-                      <span className="font-medium text-foreground">{account.name}</span>
-                      <span className="text-xs text-muted-foreground">
-                        {truncateString(account.identity)}
-                      </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="truncate font-medium text-foreground">{account.name}</span>
+                        {account.identity === identity && (
+                          <span className="shrink-0 text-[11px] text-primary">Active</span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <span className="truncate">{truncateString(account.identity)}</span>
+                        <span className="shrink-0 text-[11px] font-semibold text-foreground">
+                          {balanceByIdentity.has(account.identity)
+                            ? formatBalanceCompact(balanceByIdentity.get(account.identity) ?? 0n)
+                            : '--'}
+                        </span>
+                      </div>
                     </div>
-                    <div className="text-right text-xs font-semibold text-foreground">
-                      {balanceByIdentity.has(account.identity)
-                        ? formatBalanceCompact(balanceByIdentity.get(account.identity) ?? 0n)
-                        : '--'}
-                    </div>
-                    {account.identity === identity && (
-                      <span className="text-[11px] text-primary">Active</span>
-                    )}
                   </button>
                 ))}
                 <Button
