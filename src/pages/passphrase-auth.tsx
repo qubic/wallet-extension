@@ -10,6 +10,7 @@ import {
   InputGroupInput,
 } from '@/components/ui/input-group'
 import { Label } from '@/components/ui/label'
+import { getCachedAccounts } from '@/lib/accounts'
 import { setUnlocked } from '@/lib/lock'
 import { openBrowserVault } from '@/lib/vault'
 
@@ -22,7 +23,8 @@ type PassphraseAuthProps = {
 
 const PassphraseAuth = ({ title, subtitle, onSuccess, onCancel }: PassphraseAuthProps) => {
   const { t } = useTranslation()
-  const currentAccountName = localStorage.getItem('currentAccountName') ?? 'Main account'
+  const storedIdentity = localStorage.getItem('currentIdentity')
+  const currentIdentity = storedIdentity ?? getCachedAccounts()[0]?.identity ?? ''
 
   const [passphrase, setPassphrase] = useState('')
   const [error, setError] = useState('')
@@ -40,7 +42,7 @@ const PassphraseAuth = ({ title, subtitle, onSuccess, onCancel }: PassphraseAuth
 
     try {
       const vault = await openBrowserVault(passphrase, false)
-      const seed = await vault.getSeed(currentAccountName)
+      const seed = await vault.getSeed(currentIdentity)
 
       setUnlocked()
       setPassphrase('')
