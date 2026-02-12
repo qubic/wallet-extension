@@ -30,10 +30,7 @@ export const validateVaultPassphrase = async (
     }
     return { valid: true }
   } catch (error) {
-    if (
-      error instanceof VaultInvalidPassphraseError ||
-      error instanceof VaultEntryNotFoundError
-    ) {
+    if (error instanceof VaultInvalidPassphraseError || error instanceof VaultEntryNotFoundError) {
       return { valid: false, reason: 'invalid' }
     }
     return { valid: false, reason: 'error' }
