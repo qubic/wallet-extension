@@ -122,10 +122,10 @@
       "save": "Save new password",
       "saving": "Saving...",
       "cancel": "Cancel",
-      "resetApp": "Reset app",
-      "resetAppTitle": "Reset app?",
+      "resetApp": "Delete wallet",
+      "resetAppTitle": "Delete wallet?",
       "resetAppDesc": "This will erase all data including your vault, accounts, and settings. This action cannot be undone. Make sure you have backed up your seeds.",
-      "resetAppConfirm": "Reset everything",
+      "resetAppConfirm": "Delete wallet",
       "errors": {
         "currentRequired": "Current passphrase is required.",
         "newRequired": "New passphrase is required.",

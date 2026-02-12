@@ -122,10 +122,10 @@
       "save": "Guardar nueva contrasena",
       "saving": "Guardando...",
       "cancel": "Cancelar",
-      "resetApp": "Restablecer aplicacion",
-      "resetAppTitle": "Restablecer aplicacion?",
+      "resetApp": "Eliminar billetera",
+      "resetAppTitle": "Eliminar billetera?",
       "resetAppDesc": "Esto borrara todos los datos incluyendo tu vault, cuentas y ajustes. Esta accion no se puede deshacer. Asegurate de haber respaldado tus semillas.",
-      "resetAppConfirm": "Restablecer todo",
+      "resetAppConfirm": "Eliminar billetera",
       "errors": {
         "currentRequired": "Se requiere contrasena actual.",
         "newRequired": "Se requiere nueva contrasena.",
