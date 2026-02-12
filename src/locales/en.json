@@ -78,7 +78,7 @@
     "themeLight": "Light",
     "themeSystem": "System",
     "lock": "Auto-lock after inactivity",
-    "lockNow": "Lock now",
+    "lockNow": "Lock wallet",
     "lockTimeout": {
       "label": "Auto-lock timeout (minutes)",
       "helper": "Locks the wallet after the selected duration."
@@ -95,6 +95,59 @@
         "invalidPassphrase": "Invalid passphrase.",
         "exportFailed": "Failed to export vault."
       }
+    },
+    "categories": {
+      "security": "Security",
+      "securityDesc": "Password, auto-lock, and app reset",
+      "backup": "Backup",
+      "backupDesc": "Export your vault file",
+      "accounts": "Manage Accounts",
+      "accountsDesc": "View, reorder, and manage identities",
+      "support": "Support",
+      "supportDesc": "Get help and report issues",
+      "about": "About",
+      "aboutDesc": "App version and info"
+    },
+    "security": {
+      "title": "Security",
+      "back": "Settings",
+      "changePassword": "Change password",
+      "changePasswordDesc": "Update your vault passphrase",
+      "changePasswordDrawerTitle": "Change password",
+      "changePasswordDrawerDesc": "Enter your current passphrase and choose a new one.",
+      "currentPassphrase": "Current passphrase",
+      "newPassphrase": "New passphrase",
+      "confirmPassphrase": "Confirm new passphrase",
+      "minChars": "Minimum 12 characters.",
+      "save": "Save new password",
+      "saving": "Saving...",
+      "cancel": "Cancel",
+      "resetApp": "Reset app",
+      "resetAppTitle": "Reset app?",
+      "resetAppDesc": "This will erase all data including your vault, accounts, and settings. This action cannot be undone. Make sure you have backed up your seeds.",
+      "resetAppConfirm": "Reset everything",
+      "errors": {
+        "currentRequired": "Current passphrase is required.",
+        "newRequired": "New passphrase is required.",
+        "confirmRequired": "Please confirm your new passphrase.",
+        "tooShort": "Passphrase must be at least 12 characters.",
+        "mismatch": "Passphrases do not match.",
+        "invalidCurrent": "Current passphrase is incorrect.",
+        "changeFailed": "Failed to change password. Please try again."
+      }
+    },
+    "support": {
+      "title": "Support",
+      "warningTitle": "Beware of scammers",
+      "warningDescription": "Qubic team members will never ask for your seed or passphrase. Never share your private keys with anyone.",
+      "discord": "Discord community",
+      "github": "Report an issue on GitHub"
+    },
+    "about": {
+      "title": "About",
+      "appVersion": "App version",
+      "extensionName": "Extension",
+      "versionLabel": "v{{version}}"
     }
   },
   "accounts": {
