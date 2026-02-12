@@ -93,7 +93,7 @@ const Security = () => {
     setChangePasswordError('')
 
     try {
-      await changeVaultPassphrase(currentPassphrase.trim(), newPassphrase.trim())
+      await changeVaultPassphrase(currentPassphrase, newPassphrase)
       setChangePasswordOpen(false)
       resetChangePasswordForm()
       lockWallet()
