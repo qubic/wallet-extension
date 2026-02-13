@@ -218,15 +218,9 @@ const AppRouter = () => {
           <Route
             path="/settings/security"
             element={
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.2, ease: 'easeOut' }}
-                className="h-full"
-              >
+              <AnimatedRoute>
                 <Security />
-              </motion.div>
+              </AnimatedRoute>
             }
           />
           <Route
