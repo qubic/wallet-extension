@@ -18,7 +18,7 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/u
 import { useTranslation } from 'react-i18next'
 import { normalizeBalance, formatBalanceCompact, truncateString } from '@/lib/utils'
 import { getWatchOnlyAccounts } from '@/lib/accounts'
-import { formatAssetUnits, useOwnedAssets } from '@/lib/assets'
+import { aggregateAssets, formatAssetUnits, useOwnedAssets } from '@/lib/assets'
 
 const formatUsd = (value: bigint) => {
   const usdPerBillion = 435
@@ -394,44 +394,34 @@ const Home = () => {
           {ownedAssets.error && (
             <div className="text-xs text-destructive">{t('home.assets.error')}</div>
           )}
-          {ownedAssets.data?.ownedAssets && ownedAssets.data.ownedAssets.length > 0 && (
+          {ownedAssets.data && aggregateAssets(ownedAssets.data).length > 0 && (
             <div
               className={`app-scrollbar ${assetsListMaxHeightClass} space-y-2 overflow-y-auto pr-1`}
             >
-              {ownedAssets.data.ownedAssets.map((asset) => {
-                const info = asset.data
-                const issued = info?.issuedAsset
-                const name = issued?.name ?? t('home.assets.unknown')
-                const decimals = issued?.numberOfDecimalPlaces ?? 0
-                const key = [
-                  issued?.issuerIdentity ?? 'unknown',
-                  issued?.name ?? 'asset',
-                  issued?.type ?? 0,
-                  info?.numberOfUnits ?? '0',
-                ].join('-')
-                return (
-                  <div
-                    key={key}
-                    className="flex items-center justify-between bg-muted/20 px-3 py-2"
-                  >
-                    <div className="min-w-0 flex flex-col">
-                      <span className="truncate text-sm font-semibold text-foreground">{name}</span>
-                      {issued?.issuerIdentity && (
-                        <span className="truncate text-xs text-muted-foreground">
-                          {truncateString(issued.issuerIdentity)}
-                        </span>
-                      )}
-                    </div>
-                    <div className="ml-3 shrink-0 text-sm font-semibold text-foreground">
-                      {formatAssetUnits(info?.numberOfUnits, decimals)}
-                    </div>
+              {aggregateAssets(ownedAssets.data).map((asset) => (
+                <div
+                  key={`${asset.issuerIdentity}-${asset.name}`}
+                  className="flex items-center justify-between bg-muted/20 px-3 py-2"
+                >
+                  <div className="min-w-0 flex flex-col">
+                    <span className="truncate text-sm font-semibold text-foreground">
+                      {asset.name}
+                    </span>
+                    {asset.issuerIdentity && (
+                      <span className="truncate text-xs text-muted-foreground">
+                        {truncateString(asset.issuerIdentity)}
+                      </span>
+                    )}
                   </div>
-                )
-              })}
+                  <div className="ml-3 shrink-0 text-sm font-semibold text-foreground">
+                    {formatAssetUnits(asset.numberOfUnits, asset.decimals)}
+                  </div>
+                </div>
+              ))}
             </div>
           )}
           {ownedAssets.isSuccess &&
-            (!ownedAssets.data?.ownedAssets || ownedAssets.data.ownedAssets.length === 0) && (
+            (!ownedAssets.data || aggregateAssets(ownedAssets.data).length === 0) && (
               <div className="flex items-center gap-3 rounded-lg border border-dashed border-border/60 bg-muted/20 px-3 py-3 text-xs text-muted-foreground">
                 <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted/40 text-muted-foreground">
                   <PackageIcon className="h-4 w-4" />
