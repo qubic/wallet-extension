@@ -156,6 +156,7 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   html,
   body,
   #root {
@@ -163,9 +164,11 @@
     max-height: 100%;
     overflow: hidden;
   }
+
   html {
     font-family: var(--font-sans);
   }
+
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-sans);

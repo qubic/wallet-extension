@@ -14,6 +14,13 @@ import { setUnlocked } from '@/lib/lock'
 import { openBrowserVault, setOnboarded } from '@/lib/vault'
 
 const TOTAL_STEPS = 3
+const SEED_LENGTH = 55
+
+const normalizeSeedInput = (value: string) =>
+  value
+    .toLowerCase()
+    .replace(/[^a-z]/g, '')
+    .slice(0, SEED_LENGTH)
 
 type ImportSeedProps = {
   onCancelPath?: string
@@ -36,11 +43,23 @@ const ImportSeed = ({
   const [derivedIdentity, setDerivedIdentity] = useState<string | null>(null)
 
   const progressValue = useMemo(() => (step / TOTAL_STEPS) * 100, [step])
+  const seedLength = seed.length
+  const isSeedValid = isSeedLike(seed)
+  const seedValidationMessage = isSeedValid
+    ? 'Valid seed format.'
+    : `Seed must be 55 lowercase letters (${seedLength}/${SEED_LENGTH}).`
 
   const clearSensitiveState = () => {
     setSeed('')
     setPassphrase('')
     setDerivedIdentity(null)
+  }
+
+  const handleSeedChange = (value: string) => {
+    setSeed(normalizeSeedInput(value))
+    if (status === 'Seed must be 55 lowercase letters.') {
+      setStatus(null)
+    }
   }
 
   const handleNext = async () => {
@@ -220,8 +239,12 @@ const ImportSeed = ({
                   id="seed"
                   rows={3}
                   value={seed}
-                  onChange={(event) => setSeed(event.target.value)}
+                  onChange={(event) => handleSeedChange(event.target.value)}
+                  aria-invalid={!isSeedValid}
                 />
+                <p className={`text-xs ${isSeedValid ? 'text-success' : 'text-muted-foreground'}`}>
+                  {seedValidationMessage}
+                </p>
               </div>
             </div>
           )}
@@ -290,7 +313,12 @@ const ImportSeed = ({
             {step === 1 ? 'Back' : 'Previous'}
           </Button>
           {step < TOTAL_STEPS ? (
-            <Button size="lg" onClick={handleNext} className="flex-1">
+            <Button
+              size="lg"
+              onClick={handleNext}
+              className="flex-1"
+              disabled={step === 1 && !isSeedValid}
+            >
               Continue
               <ArrowRightIcon className="h-5 w-5" />
             </Button>

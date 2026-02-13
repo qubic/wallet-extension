@@ -35,7 +35,7 @@ const SeedSecurityStep = ({
             : 'Save this 55-letter seed in a safe place. You will need it to restore your wallet.'}
         </p>
       </div>
-      <div className="rounded-lg border border-warning/30 bg-warning/10 p-3 text-xs text-warning-foreground">
+      <div className="rounded-lg border border-warning/30 bg-warning/10 p-3 text-xs text-warning-foreground dark:text-white">
         Save this seed securely.
       </div>
       <div className="space-y-2">
