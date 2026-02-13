@@ -11,12 +11,12 @@ const AnimatedRoute = ({ children }: AnimatedRouteProps) => {
   const shouldReduceMotion = useReducedMotion()
 
   if (shouldReduceMotion) {
-    return <div className="h-full">{children}</div>
+    return <div className="h-full min-h-full">{children}</div>
   }
 
   return (
     <motion.div
-      className="h-full"
+      className="h-full min-h-full"
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}

@@ -138,7 +138,7 @@ const AppShell = ({
         }}
       >
         <div
-          className={showNav ? 'min-h-full pb-10' : 'min-h-full'}
+          className={showNav ? 'h-full pb-10' : 'h-full'}
           style={{
             paddingBottom: showNav ? 'calc(24px + env(safe-area-inset-bottom))' : '0',
             scrollPaddingBottom: showNav ? '96px' : '0',
