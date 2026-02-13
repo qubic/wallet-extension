@@ -1,6 +1,7 @@
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence } from 'framer-motion'
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import AnimatedRoute from '../components/animated-route'
 import AppShell from '../components/app-shell'
 import History from '../pages/history'
 import Home from '../pages/home'
@@ -10,6 +11,7 @@ import ImportSeed from '../pages/onboarding/import-seed'
 import ImportVault from '../pages/onboarding/import-vault'
 import Transfer from '../pages/transfer'
 import Settings from '../pages/settings'
+import Security from '../pages/settings/security'
 import Unlock from '../pages/unlock'
 import Welcome from '../pages/welcome'
 import ImportWatchOnly from '../pages/accounts/import-watch-only'
@@ -37,6 +39,7 @@ const AppRouter = () => {
   const [isLocked, setIsLocked] = useState(() => isWalletLocked())
   const lockTimeoutRef = useRef<number | null>(null)
   const hideChrome = location.pathname === '/unlock'
+  const routeKey = `${location.pathname}${location.search}`
 
   const clearLockTimeout = useCallback(() => {
     if (lockTimeoutRef.current) {
@@ -116,61 +119,37 @@ const AppRouter = () => {
     return (
       <AppShell showNav={false} showHeader={false}>
         <AnimatePresence mode="wait">
-          <Routes location={location} key={location.pathname}>
+          <Routes location={location} key={routeKey}>
             <Route
               path="/onboarding/create"
               element={
-                <motion.div
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  transition={{ duration: 0.2, ease: 'easeOut' }}
-                  className="h-full"
-                >
+                <AnimatedRoute>
                   <CreateWallet />
-                </motion.div>
+                </AnimatedRoute>
               }
             />
             <Route
               path="/onboarding/import-seed"
               element={
-                <motion.div
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  transition={{ duration: 0.2, ease: 'easeOut' }}
-                  className="h-full"
-                >
+                <AnimatedRoute>
                   <ImportSeed />
-                </motion.div>
+                </AnimatedRoute>
               }
             />
             <Route
               path="/onboarding/import-vault"
               element={
-                <motion.div
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  transition={{ duration: 0.2, ease: 'easeOut' }}
-                  className="h-full"
-                >
+                <AnimatedRoute>
                   <ImportVault />
-                </motion.div>
+                </AnimatedRoute>
               }
             />
             <Route
               path="*"
               element={
-                <motion.div
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  transition={{ duration: 0.2, ease: 'easeOut' }}
-                  className="h-full"
-                >
+                <AnimatedRoute>
                   <Welcome />
-                </motion.div>
+                </AnimatedRoute>
               }
             />
           </Routes>
@@ -186,172 +165,114 @@ const AppRouter = () => {
   return (
     <AppShell showNav={!hideChrome} showHeader={!hideChrome}>
       <AnimatePresence mode="wait">
-        <Routes location={location} key={location.pathname}>
+        <Routes location={location} key={routeKey}>
           <Route path="/" element={<Navigate to="/home" replace />} />
           <Route
             path="/unlock"
             element={
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.2, ease: 'easeOut' }}
-                className="h-full"
-              >
+              <AnimatedRoute>
                 <Unlock />
-              </motion.div>
+              </AnimatedRoute>
             }
           />
           <Route
             path="/home"
             element={
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.2, ease: 'easeOut' }}
-                className="h-full"
-              >
+              <AnimatedRoute>
                 <Home />
-              </motion.div>
+              </AnimatedRoute>
             }
           />
           <Route
             path="/history"
             element={
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.2, ease: 'easeOut' }}
-                className="h-full"
-              >
+              <AnimatedRoute>
                 <History />
-              </motion.div>
+              </AnimatedRoute>
             }
           />
           <Route
             path="/transfer"
             element={
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.2, ease: 'easeOut' }}
-                className="h-full"
-              >
+              <AnimatedRoute>
                 <Transfer />
-              </motion.div>
+              </AnimatedRoute>
             }
           />
           <Route
             path="/accounts"
             element={
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.2, ease: 'easeOut' }}
-                className="h-full"
-              >
+              <AnimatedRoute>
                 <ManageAccounts />
-              </motion.div>
+              </AnimatedRoute>
             }
           />
           <Route
             path="/settings"
             element={
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.2, ease: 'easeOut' }}
-                className="h-full"
-              >
+              <AnimatedRoute>
                 <Settings />
-              </motion.div>
+              </AnimatedRoute>
+            }
+          />
+          <Route
+            path="/settings/security"
+            element={
+              <AnimatedRoute>
+                <Security />
+              </AnimatedRoute>
             }
           />
           <Route
             path="/onboarding/create"
             element={
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.2, ease: 'easeOut' }}
-                className="h-full"
-              >
+              <AnimatedRoute>
                 <CreateWallet
                   variant="add-address"
                   onCancelPath="/accounts"
                   onCompletePath="/accounts"
                 />
-              </motion.div>
+              </AnimatedRoute>
             }
           />
           <Route
             path="/onboarding/import-seed"
             element={
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.2, ease: 'easeOut' }}
-                className="h-full"
-              >
+              <AnimatedRoute>
                 <ImportSeed />
-              </motion.div>
+              </AnimatedRoute>
             }
           />
           <Route
             path="/accounts/create"
             element={
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.2, ease: 'easeOut' }}
-                className="h-full"
-              >
+              <AnimatedRoute>
                 <CreateWallet
                   variant="add-address"
                   onCancelPath="/accounts"
                   onCompletePath="/accounts"
                 />
-              </motion.div>
+              </AnimatedRoute>
             }
           />
           <Route
             path="/accounts/import-seed"
             element={
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.2, ease: 'easeOut' }}
-                className="h-full"
-              >
+              <AnimatedRoute>
                 <ImportSeed
                   variant="add-address"
                   onCancelPath="/accounts"
                   onCompletePath="/accounts"
                 />
-              </motion.div>
+              </AnimatedRoute>
             }
           />
           <Route
             path="/accounts/watch-only"
             element={
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.2, ease: 'easeOut' }}
-                className="h-full"
-              >
+              <AnimatedRoute>
                 <ImportWatchOnly />
-              </motion.div>
+              </AnimatedRoute>
             }
           />
           <Route path="*" element={<Navigate to="/home" replace />} />

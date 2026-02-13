@@ -1,9 +1,20 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useTheme } from 'next-themes'
 import { useNavigate } from 'react-router-dom'
 import { VaultInvalidPassphraseError } from '@qubic-labs/sdk'
-import { CheckIcon, DownloadIcon } from 'lucide-react'
+import {
+  AlertTriangleIcon,
+  CheckIcon,
+  ChevronRightIcon,
+  DownloadIcon,
+  ExternalLinkIcon,
+  InfoIcon,
+  LifeBuoyIcon,
+  LockIcon,
+  ShieldIcon,
+  UsersIcon,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Drawer,
@@ -22,40 +33,32 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Separator } from '@/components/ui/separator'
 import { setLanguage } from '@/i18n'
-import { getLockTimeoutMinutes, lockWallet, setLockTimeoutMinutes } from '@/lib/lock'
+import { lockWallet } from '@/lib/lock'
 import { openBrowserVault } from '@/lib/vault'
 import { exportVaultToWebWalletFormat } from '@/lib/vault-export'
+
+declare const __APP_VERSION__: string
+
+const appVersion = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '0.0.0'
 
 const Settings = () => {
   const { t, i18n } = useTranslation()
   const { theme, setTheme } = useTheme()
   const navigate = useNavigate()
-  const [lockMinutes, setLockMinutes] = useState(() => getLockTimeoutMinutes())
+
   const [exportDrawerOpen, setExportDrawerOpen] = useState(false)
   const [exportPassphrase, setExportPassphrase] = useState('')
   const [exportError, setExportError] = useState('')
   const [exporting, setExporting] = useState(false)
 
-  useEffect(() => {
-    setLockMinutes(getLockTimeoutMinutes())
-  }, [])
+  const [supportDrawerOpen, setSupportDrawerOpen] = useState(false)
+  const [aboutDrawerOpen, setAboutDrawerOpen] = useState(false)
 
   const handleLockNow = () => {
     lockWallet()
     navigate('/unlock')
-  }
-
-  const handleTimeoutChange = (value: string) => {
-    const parsed = Number(value)
-    if (!Number.isFinite(parsed)) {
-      setLockMinutes(0)
-      return
-    }
-    setLockMinutes(parsed)
-    if (parsed > 0) {
-      setLockTimeoutMinutes(parsed)
-    }
   }
 
   const handleExportVault = async () => {
@@ -68,13 +71,9 @@ const Settings = () => {
     setExportError('')
 
     try {
-      // Open SDK vault
       const vault = await openBrowserVault(exportPassphrase.trim(), false)
-
-      // Export to web wallet format using WalletService
       const encryptedVault = await exportVaultToWebWalletFormat(vault, exportPassphrase.trim())
 
-      // Convert to JSON and download
       const json = JSON.stringify(encryptedVault, null, 2)
       const blob = new Blob([new TextEncoder().encode(json)], {
         type: 'application/octet-stream',
@@ -101,6 +100,44 @@ const Settings = () => {
       setExporting(false)
     }
   }
+
+  const categories = [
+    {
+      key: 'security',
+      icon: ShieldIcon,
+      label: t('settings.categories.security'),
+      description: t('settings.categories.securityDesc'),
+      action: () => navigate('/settings/security'),
+    },
+    {
+      key: 'backup',
+      icon: DownloadIcon,
+      label: t('settings.categories.backup'),
+      description: t('settings.categories.backupDesc'),
+      action: () => setExportDrawerOpen(true),
+    },
+    {
+      key: 'accounts',
+      icon: UsersIcon,
+      label: t('settings.categories.accounts'),
+      description: t('settings.categories.accountsDesc'),
+      action: () => navigate('/accounts'),
+    },
+    {
+      key: 'support',
+      icon: LifeBuoyIcon,
+      label: t('settings.categories.support'),
+      description: t('settings.categories.supportDesc'),
+      action: () => setSupportDrawerOpen(true),
+    },
+    {
+      key: 'about',
+      icon: InfoIcon,
+      label: t('settings.categories.about'),
+      description: t('settings.categories.aboutDesc'),
+      action: () => setAboutDrawerOpen(true),
+    },
+  ]
 
   return (
     <>
@@ -140,37 +177,42 @@ const Settings = () => {
             </Select>
           </div>
 
-          <div className="space-y-3">
-            <Label htmlFor="lock-timeout" className="text-sm text-muted-foreground">
-              {t('settings.lockTimeout.label')}
-            </Label>
-            <Input
-              id="lock-timeout"
-              type="number"
-              min={1}
-              max={120}
-              value={Number.isFinite(lockMinutes) ? lockMinutes : ''}
-              onChange={(event) => handleTimeoutChange(event.target.value)}
-              onBlur={() => {
-                if (lockMinutes <= 0) {
-                  setLockMinutes(getLockTimeoutMinutes())
-                }
-              }}
-            />
-            <p className="text-xs text-muted-foreground">{t('settings.lockTimeout.helper')}</p>
+          <Separator />
+
+          <div className="space-y-2">
+            {categories.map((cat) => (
+              <button
+                key={cat.key}
+                type="button"
+                onClick={cat.action}
+                className="flex w-full items-center gap-3 rounded-lg border border-border/60 bg-card/80 px-3 py-3 text-left transition hover:bg-muted/20"
+              >
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted/30">
+                  <cat.icon className="h-4 w-4 text-muted-foreground" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <span className="text-sm font-semibold text-foreground">{cat.label}</span>
+                  <span className="block text-xs text-muted-foreground">{cat.description}</span>
+                </div>
+                <ChevronRightIcon className="h-4 w-4 text-muted-foreground" />
+              </button>
+            ))}
           </div>
 
+          <Separator />
+
           <Button variant="outline" onClick={handleLockNow}>
+            <LockIcon className="h-4 w-4" />
             {t('settings.lockNow')}
           </Button>
 
-          <Button variant="outline" onClick={() => setExportDrawerOpen(true)}>
-            <DownloadIcon className="h-4 w-4" />
-            {t('settings.exportVault.button')}
-          </Button>
+          <p className="pb-4 text-center text-xs text-muted-foreground">
+            {t('settings.about.versionLabel', { version: appVersion })}
+          </p>
         </div>
       </section>
 
+      {/* Export Vault Drawer */}
       <Drawer
         open={exportDrawerOpen}
         onOpenChange={(open) => {
@@ -210,6 +252,69 @@ const Settings = () => {
               {exporting ? t('settings.exportVault.exporting') : t('settings.exportVault.confirm')}
             </Button>
           </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
+
+      {/* Support Drawer */}
+      <Drawer open={supportDrawerOpen} onOpenChange={setSupportDrawerOpen}>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>{t('settings.support.title')}</DrawerTitle>
+          </DrawerHeader>
+          <div className="space-y-4 px-4 pb-4">
+            <div className="rounded-lg border border-yellow-500/40 bg-yellow-500/10 p-3">
+              <div className="flex items-center gap-2">
+                <AlertTriangleIcon className="h-5 w-5 shrink-0 text-yellow-500" />
+                <span className="text-sm font-semibold text-yellow-500">
+                  {t('settings.support.warningTitle')}
+                </span>
+              </div>
+              <p className="mt-2 text-xs text-muted-foreground">
+                {t('settings.support.warningDescription')}
+              </p>
+            </div>
+
+            <a
+              href="https://discord.com/channels/768887649540243497/1029858434117550170"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 rounded-lg border border-border/60 px-3 py-3 transition hover:bg-muted/20"
+            >
+              <span className="text-sm flex-1">{t('settings.support.discord')}</span>
+              <ExternalLinkIcon className="h-4 w-4 text-muted-foreground" />
+            </a>
+
+            <a
+              href="https://github.com/qubic/wallet-extension/issues/new"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 rounded-lg border border-border/60 px-3 py-3 transition hover:bg-muted/20"
+            >
+              <span className="text-sm flex-1">{t('settings.support.github')}</span>
+              <ExternalLinkIcon className="h-4 w-4 text-muted-foreground" />
+            </a>
+          </div>
+        </DrawerContent>
+      </Drawer>
+
+      {/* About Drawer */}
+      <Drawer open={aboutDrawerOpen} onOpenChange={setAboutDrawerOpen}>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>{t('settings.about.title')}</DrawerTitle>
+          </DrawerHeader>
+          <div className="space-y-3 px-4 pb-4">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-muted-foreground">{t('settings.about.extensionName')}</span>
+              <span className="font-medium">Qubic Wallet</span>
+            </div>
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-muted-foreground">{t('settings.about.appVersion')}</span>
+              <span className="font-medium">
+                {t('settings.about.versionLabel', { version: appVersion })}
+              </span>
+            </div>
+          </div>
         </DrawerContent>
       </Drawer>
     </>
