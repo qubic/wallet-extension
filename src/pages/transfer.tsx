@@ -31,7 +31,7 @@ import {
 import { isValidIdentity, normalizeBalance, parseAmount, formatBalance } from '@/lib/utils'
 import PassphraseAuth from '@/pages/passphrase-auth'
 import { getWatchOnlyAccounts } from '@/lib/accounts'
-import { formatAssetUnits, useOwnedAssets } from '@/lib/assets'
+import { type AggregatedAsset, aggregateAssets, formatAssetUnits, useOwnedAssets } from '@/lib/assets'
 import {
   QX_ADDRESS,
   QX_TRANSFER_ASSET_FEE,
@@ -213,7 +213,7 @@ const BalanceDisplay = ({
   selectedAsset,
 }: {
   balance: ReturnType<typeof useBalance>
-  selectedAsset: AssetOption | null
+  selectedAsset: AggregatedAsset | null
 }) => {
   const { t } = useTranslation()
 
@@ -250,13 +250,6 @@ const BalanceDisplay = ({
   )
 }
 
-type AssetOption = {
-  name: string
-  issuerIdentity: string
-  numberOfUnits: string
-  decimals: number
-}
-
 const TransferForm = ({
   recipient,
   amount,
@@ -282,9 +275,9 @@ const TransferForm = ({
   balance: ReturnType<typeof useBalance>
   isWatchOnly: boolean
   hasMultipleTokens: boolean
-  assets: AssetOption[]
+  assets: AggregatedAsset[]
   selectedToken: string
-  selectedAsset: AssetOption | null
+  selectedAsset: AggregatedAsset | null
   onTokenChange: (value: string) => void
   onRecipientChange: (value: string) => void
   onAmountChange: (value: string) => void
@@ -430,14 +423,7 @@ const Transfer = () => {
   const [txResult, setTxResult] = useState<TxResult | null>(null)
   const seedRef = useRef<string | null>(null)
 
-  const parsedAssets = (ownedAssets.data?.ownedAssets ?? [])
-    .filter((a) => a.data?.issuedAsset?.name && Number(a.data?.numberOfUnits ?? '0') > 0)
-    .map((a) => ({
-      name: a.data!.issuedAsset!.name!,
-      issuerIdentity: a.data!.issuedAsset!.issuerIdentity ?? '',
-      numberOfUnits: a.data!.numberOfUnits ?? '0',
-      decimals: a.data!.issuedAsset!.numberOfDecimalPlaces ?? 0,
-    }))
+  const parsedAssets = aggregateAssets(ownedAssets.data ?? {})
 
   const hasMultipleTokens = parsedAssets.length > 0
   const selectedAsset =
