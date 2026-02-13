@@ -1,12 +1,25 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { ArrowLeftIcon, CheckCircleIcon, SendIcon } from 'lucide-react'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { useBalance, useSend } from '@qubic-labs/react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from '@/components/ui/input-group'
 import {
   Drawer,
   DrawerContent,
@@ -18,6 +31,7 @@ import {
 import { isValidIdentity, normalizeBalance, parseAmount, formatBalance } from '@/lib/utils'
 import PassphraseAuth from '@/pages/passphrase-auth'
 import { getWatchOnlyAccounts } from '@/lib/accounts'
+import { formatAssetUnits, useOwnedAssets } from '@/lib/assets'
 import { useEffect } from 'react'
 
 type Step = 'form' | 'auth' | 'success'
@@ -64,7 +78,7 @@ const TransferSuccess = ({
           <div>
             <h2 className="text-2xl font-semibold">{t('transfer.success.title')}</h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              {t('transfer.success.description')}
+              {t('transfer.success.description', { targetTick: txResult.targetTick })}
             </p>
           </div>
 
@@ -197,6 +211,13 @@ const BalanceDisplay = ({ balance }: { balance: ReturnType<typeof useBalance> })
   )
 }
 
+type AssetOption = {
+  name: string
+  issuerIdentity: string
+  numberOfUnits: string
+  decimals: number
+}
+
 const TransferForm = ({
   recipient,
   amount,
@@ -204,8 +225,11 @@ const TransferForm = ({
   errorMessage,
   balance,
   isWatchOnly,
+  hasMultipleTokens,
+  assets,
   onRecipientChange,
   onAmountChange,
+  onMaxAmount,
   onContinue,
 }: {
   recipient: string
@@ -214,8 +238,11 @@ const TransferForm = ({
   errorMessage: string
   balance: ReturnType<typeof useBalance>
   isWatchOnly: boolean
+  hasMultipleTokens: boolean
+  assets: AssetOption[]
   onRecipientChange: (value: string) => void
   onAmountChange: (value: string) => void
+  onMaxAmount: () => void
   onContinue: () => void
 }) => {
   const { t } = useTranslation()
@@ -231,6 +258,30 @@ const TransferForm = ({
         <BalanceDisplay balance={balance} />
 
         <div className="space-y-4">
+          {hasMultipleTokens && (
+            <div className="space-y-2">
+              <Label>{t('transfer.form.token')}</Label>
+              <Select defaultValue="qu">
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="qu">QU — {t('transfer.selectToken.native')}</SelectItem>
+                  {assets.map((asset) => (
+                    <SelectItem
+                      key={`${asset.issuerIdentity}-${asset.name}`}
+                      value={`${asset.issuerIdentity}-${asset.name}`}
+                      disabled
+                    >
+                      {asset.name} ({formatAssetUnits(asset.numberOfUnits, asset.decimals)}) —{' '}
+                    {t('transfer.selectToken.comingSoon')}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
           <div className="space-y-2">
             <Label htmlFor="recipient">{t('transfer.form.recipient')}</Label>
             <Input
@@ -248,18 +299,29 @@ const TransferForm = ({
 
           <div className="space-y-2">
             <Label htmlFor="amount">{t('transfer.form.amount')}</Label>
-            <Input
-              id="amount"
-              type="text"
-              placeholder={t('transfer.form.amountPlaceholder')}
-              value={amount}
-              onChange={(e) => {
-                const value = e.target.value.replace(/[^\d,]/g, '')
-                onAmountChange(value)
-              }}
-              className={errors.amount ? 'border-destructive' : ''}
-              disabled={isWatchOnly}
-            />
+            <InputGroup className={errors.amount ? 'border-destructive' : ''}>
+              <InputGroupInput
+                id="amount"
+                type="text"
+                placeholder={t('transfer.form.amountPlaceholder')}
+                value={amount}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/[^\d,]/g, '')
+                  onAmountChange(value)
+                }}
+                disabled={isWatchOnly}
+              />
+              <InputGroupAddon align="inline-end">
+                <InputGroupButton
+                  variant="ghost"
+                  size="xs"
+                  onClick={onMaxAmount}
+                  disabled={isWatchOnly}
+                >
+                  {t('transfer.form.max')}
+                </InputGroupButton>
+              </InputGroupAddon>
+            </InputGroup>
             {errors.amount && <p className="mt-1 text-xs text-destructive">{errors.amount}</p>}
           </div>
         </div>
@@ -292,6 +354,7 @@ const Transfer = () => {
   )
 
   const balance = useBalance(currentIdentity)
+  const ownedAssets = useOwnedAssets(currentIdentity)
   const sendMutation = useSend()
 
   const [step, setStep] = useState<Step>('form')
@@ -302,6 +365,18 @@ const Transfer = () => {
   const [sending, setSending] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
   const [txResult, setTxResult] = useState<TxResult | null>(null)
+  const seedRef = useRef<string | null>(null)
+
+  const parsedAssets = (ownedAssets.data?.ownedAssets ?? [])
+    .filter((a) => a.data?.issuedAsset?.name && Number(a.data?.numberOfUnits ?? '0') > 0)
+    .map((a) => ({
+      name: a.data!.issuedAsset!.name!,
+      issuerIdentity: a.data!.issuedAsset!.issuerIdentity ?? '',
+      numberOfUnits: a.data!.numberOfUnits ?? '0',
+      decimals: a.data!.issuedAsset!.numberOfDecimalPlaces ?? 0,
+    }))
+
+  const hasMultipleTokens = parsedAssets.length > 0
 
   useEffect(() => {
     const refreshAccount = () => {
@@ -361,10 +436,19 @@ const Transfer = () => {
     }
   }
 
-  const handleAuthSuccess = async (seed: string) => {
+  const handleAuthSuccess = (seed: string) => {
+    seedRef.current = seed
+    setErrorMessage('')
+    setStep('form')
+    setDrawerOpen(true)
+  }
+
+  const handleConfirmSend = async () => {
+    const seed = seedRef.current
+    if (!seed) return
+
     setSending(true)
     setErrorMessage('')
-    setDrawerOpen(true)
 
     try {
       const parsedAmount = parseAmount(amount)
@@ -378,6 +462,8 @@ const Transfer = () => {
         fromSeed: seed,
       })
 
+      seedRef.current = null
+
       setTxResult({
         txId: result.txId,
         targetTick: result.targetTick.toString(),
@@ -388,7 +474,9 @@ const Transfer = () => {
       setStep('success')
 
       toast.success(t('transfer.success.title'), {
-        description: t('transfer.success.description'),
+        description: t('transfer.success.description', {
+          targetTick: result.targetTick.toString(),
+        }),
       })
 
       balance.refetch()
@@ -405,18 +493,20 @@ const Transfer = () => {
         }
       }
 
+      seedRef.current = null
       setErrorMessage(message)
+      setDrawerOpen(false)
       setStep('form')
       toast.error(t('transfer.errors.generic'), {
         description: message,
       })
     } finally {
       setSending(false)
-      setDrawerOpen(false)
     }
   }
 
   const handleAuthCancel = () => {
+    seedRef.current = null
     setStep('form')
   }
 
@@ -447,6 +537,16 @@ const Transfer = () => {
     }
   }
 
+  const handleMaxAmount = () => {
+    const currentBalance = normalizeBalance(balance.data?.balance)
+    if (currentBalance > 0n) {
+      setAmount(currentBalance.toString())
+      if (errors.amount) {
+        setErrors({ ...errors, amount: undefined })
+      }
+    }
+  }
+
   if (step === 'auth') {
     return <PassphraseAuth onSuccess={handleAuthSuccess} onCancel={handleAuthCancel} />
   }
@@ -470,19 +570,30 @@ const Transfer = () => {
         errorMessage={errorMessage}
         balance={balance}
         isWatchOnly={isWatchOnly}
+        hasMultipleTokens={hasMultipleTokens}
+        assets={parsedAssets}
         onRecipientChange={handleRecipientChange}
         onAmountChange={handleAmountChange}
+        onMaxAmount={handleMaxAmount}
         onContinue={handleContinue}
       />
 
       <ConfirmationDrawer
         open={drawerOpen}
-        onOpenChange={setDrawerOpen}
+        onOpenChange={(open) => {
+          setDrawerOpen(open)
+          if (!open) {
+            seedRef.current = null
+          }
+        }}
         recipient={recipient}
         amount={amount}
         sending={sending}
-        onCancel={() => setDrawerOpen(false)}
-        onConfirm={() => {}}
+        onCancel={() => {
+          setDrawerOpen(false)
+          seedRef.current = null
+        }}
+        onConfirm={handleConfirmSend}
       />
     </>
   )

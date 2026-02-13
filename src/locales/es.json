@@ -168,15 +168,23 @@
   "transfer": {
     "title": "Enviar QU",
     "subtitle": "Transferir fondos a otra identidad",
+    "selectToken": {
+      "subtitle": "Selecciona el token que deseas enviar",
+      "label": "Tokens disponibles",
+      "native": "Token nativo",
+      "comingSoon": "Proximamente"
+    },
     "balance": {
       "label": "Saldo disponible",
       "loading": "Cargando saldo..."
     },
     "form": {
+      "token": "Token",
       "recipient": "Identidad del destinatario",
       "recipientPlaceholder": "Identidad de 60 caracteres (A-Z)",
       "amount": "Monto (QU)",
-      "amountPlaceholder": "Ingresa el monto"
+      "amountPlaceholder": "Ingresa el monto",
+      "max": "MAX"
     },
     "validation": {
       "recipientRequired": "La identidad del destinatario es requerida.",
@@ -203,7 +211,7 @@
     },
     "success": {
       "title": "Transferencia enviada",
-      "description": "Transaccion transmitida a la red.",
+      "description": "Tu transaccion ha sido transmitida y esta programada para el tick {{targetTick}}.",
       "txId": "ID de transaccion",
       "targetTick": "Tick objetivo",
       "amount": "Monto",

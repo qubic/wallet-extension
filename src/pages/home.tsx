@@ -18,6 +18,7 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/u
 import { useTranslation } from 'react-i18next'
 import { normalizeBalance, formatBalanceCompact, truncateString } from '@/lib/utils'
 import { getWatchOnlyAccounts } from '@/lib/accounts'
+import { formatAssetUnits, useOwnedAssets } from '@/lib/assets'
 
 const formatUsd = (value: bigint) => {
   const usdPerBillion = 435
@@ -28,40 +29,6 @@ const formatUsd = (value: bigint) => {
     currency: 'USD',
     maximumFractionDigits: 2,
   }).format(usdValue)
-}
-
-type OwnedAssetsResponse = {
-  ownedAssets?: Array<{
-    data?: {
-      numberOfUnits?: string
-      issuedAsset?: {
-        name?: string
-        numberOfDecimalPlaces?: number
-        unitOfMeasurement?: number[]
-        type?: number
-        issuerIdentity?: string
-      }
-    }
-  }>
-}
-
-const fetchOwnedAssets = async (identity: string): Promise<OwnedAssetsResponse> => {
-  const response = await fetch(`https://rpc.qubic.org/live/v1/assets/${identity}/owned`, {
-    headers: { accept: 'application/json' },
-  })
-  if (!response.ok) {
-    throw new Error('Failed to load assets.')
-  }
-  return response.json() as Promise<OwnedAssetsResponse>
-}
-
-const formatAssetUnits = (units: string | undefined, decimals = 0) => {
-  if (!units) return '--'
-  if (decimals <= 0) return Number(units).toLocaleString()
-  const padded = units.padStart(decimals + 1, '0')
-  const whole = padded.slice(0, -decimals)
-  const fraction = padded.slice(-decimals).replace(/0+$/, '')
-  return `${Number(whole).toLocaleString()}${fraction ? `.${fraction}` : ''}`
 }
 
 type LatestStatsResponse = {
@@ -220,13 +187,7 @@ const Home = () => {
     staleTime: 120_000,
     gcTime: 120_000,
   })
-  const ownedAssets = useQuery({
-    queryKey: ['qubic', 'owned-assets', identity],
-    queryFn: () => fetchOwnedAssets(identity),
-    enabled: Boolean(identity),
-    staleTime: 60_000,
-    gcTime: 60_000,
-  })
+  const ownedAssets = useOwnedAssets(identity)
   const transactions = useTransactions(
     {
       identity,

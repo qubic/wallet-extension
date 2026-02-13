@@ -168,15 +168,23 @@
   "transfer": {
     "title": "Send QU",
     "subtitle": "Transfer funds to another identity",
+    "selectToken": {
+      "subtitle": "Select the token you want to send",
+      "label": "Available tokens",
+      "native": "Native token",
+      "comingSoon": "Coming soon"
+    },
     "balance": {
       "label": "Available balance",
       "loading": "Loading balance..."
     },
     "form": {
+      "token": "Token",
       "recipient": "Recipient identity",
       "recipientPlaceholder": "60-character identity (A-Z)",
       "amount": "Amount (QU)",
-      "amountPlaceholder": "Enter amount"
+      "amountPlaceholder": "Enter amount",
+      "max": "MAX"
     },
     "validation": {
       "recipientRequired": "Recipient identity is required.",
@@ -203,7 +211,7 @@
     },
     "success": {
       "title": "Transfer sent",
-      "description": "Transaction broadcast to the network.",
+      "description": "Your transaction has been broadcast and is scheduled for tick {{targetTick}}.",
       "txId": "Transaction ID",
       "targetTick": "Target tick",
       "amount": "Amount",
