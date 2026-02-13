@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { useBalance, useSend } from '@qubic-labs/react'
+import { useBalance, useSdk, useSend } from '@qubic-labs/react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -32,6 +32,12 @@ import { isValidIdentity, normalizeBalance, parseAmount, formatBalance } from '@
 import PassphraseAuth from '@/pages/passphrase-auth'
 import { getWatchOnlyAccounts } from '@/lib/accounts'
 import { formatAssetUnits, useOwnedAssets } from '@/lib/assets'
+import {
+  QX_ADDRESS,
+  QX_TRANSFER_ASSET_FEE,
+  QX_TRANSFER_ASSET_INPUT_TYPE,
+  buildAssetTransferPayload,
+} from '@/lib/qx'
 import { useEffect } from 'react'
 
 type Step = 'form' | 'auth' | 'success'
@@ -45,6 +51,7 @@ type TxResult = {
   txId: string
   targetTick: string
   amount: bigint
+  tokenName: string
 }
 
 const TransferSuccess = ({
@@ -101,7 +108,9 @@ const TransferSuccess = ({
               <div className="text-xs font-semibold uppercase text-muted-foreground">
                 {t('transfer.success.amount')}
               </div>
-              <div className="mt-1 text-sm font-semibold">{formatBalance(txResult.amount)} QU</div>
+              <div className="mt-1 text-sm font-semibold">
+                {formatBalance(txResult.amount)} {txResult.tokenName}
+              </div>
             </div>
           </div>
         </div>
@@ -124,6 +133,7 @@ const ConfirmationDrawer = ({
   onOpenChange,
   recipient,
   amount,
+  tokenName,
   sending,
   onCancel,
   onConfirm,
@@ -132,6 +142,7 @@ const ConfirmationDrawer = ({
   onOpenChange: (open: boolean) => void
   recipient: string
   amount: string
+  tokenName: string
   sending: boolean
   onCancel: () => void
   onConfirm: () => void
@@ -159,9 +170,17 @@ const ConfirmationDrawer = ({
               {t('transfer.confirm.amount')}
             </div>
             <div className="mt-1 text-xl font-semibold">
-              {formatBalance(parseAmount(amount) || 0n)} QU
+              {formatBalance(parseAmount(amount) || 0n)} {tokenName}
             </div>
           </div>
+
+          {tokenName !== 'QU' && (
+            <div>
+              <div className="text-xs font-semibold uppercase text-muted-foreground">
+                {t('transfer.confirm.fee', { fee: '100' })}
+              </div>
+            </div>
+          )}
 
           <div className="rounded-lg border border-warning/20 bg-warning/10 p-3">
             <p className="text-sm text-warning-foreground">{t('transfer.confirm.warning')}</p>
@@ -189,10 +208,30 @@ const ConfirmationDrawer = ({
   )
 }
 
-const BalanceDisplay = ({ balance }: { balance: ReturnType<typeof useBalance> }) => {
+const BalanceDisplay = ({
+  balance,
+  selectedAsset,
+}: {
+  balance: ReturnType<typeof useBalance>
+  selectedAsset: AssetOption | null
+}) => {
   const { t } = useTranslation()
-  const currentBalance = normalizeBalance(balance.data?.balance)
 
+  if (selectedAsset) {
+    return (
+      <div className="rounded-lg bg-card p-4">
+        <div className="text-xs font-semibold uppercase text-muted-foreground">
+          {t('transfer.balance.label')}
+        </div>
+        <div className="mt-2 text-2xl font-semibold">
+          {formatAssetUnits(selectedAsset.numberOfUnits, selectedAsset.decimals)}{' '}
+          {selectedAsset.name}
+        </div>
+      </div>
+    )
+  }
+
+  const currentBalance = normalizeBalance(balance.data?.balance)
   return (
     <div className="rounded-lg bg-card p-4">
       <div className="text-xs font-semibold uppercase text-muted-foreground">
@@ -227,6 +266,10 @@ const TransferForm = ({
   isWatchOnly,
   hasMultipleTokens,
   assets,
+  selectedToken,
+  selectedAsset,
+  quBalance,
+  onTokenChange,
   onRecipientChange,
   onAmountChange,
   onMaxAmount,
@@ -240,8 +283,12 @@ const TransferForm = ({
   isWatchOnly: boolean
   hasMultipleTokens: boolean
   assets: AssetOption[]
+  selectedToken: string
+  selectedAsset: AssetOption | null
+  onTokenChange: (value: string) => void
   onRecipientChange: (value: string) => void
   onAmountChange: (value: string) => void
+  quBalance: bigint
   onMaxAmount: () => void
   onContinue: () => void
 }) => {
@@ -255,13 +302,13 @@ const TransferForm = ({
           <p className="mt-1 text-sm text-muted-foreground">{t('transfer.subtitle')}</p>
         </div>
 
-        <BalanceDisplay balance={balance} />
+        <BalanceDisplay balance={balance} selectedAsset={selectedAsset} />
 
         <div className="space-y-4">
           {hasMultipleTokens && (
             <div className="space-y-2">
               <Label>{t('transfer.form.token')}</Label>
-              <Select defaultValue="qu">
+              <Select value={selectedToken} onValueChange={onTokenChange}>
                 <SelectTrigger className="w-full">
                   <SelectValue />
                 </SelectTrigger>
@@ -271,10 +318,8 @@ const TransferForm = ({
                     <SelectItem
                       key={`${asset.issuerIdentity}-${asset.name}`}
                       value={`${asset.issuerIdentity}-${asset.name}`}
-                      disabled
                     >
-                      {asset.name} ({formatAssetUnits(asset.numberOfUnits, asset.decimals)}) —{' '}
-                    {t('transfer.selectToken.comingSoon')}
+                      {asset.name} ({formatAssetUnits(asset.numberOfUnits, asset.decimals)})
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -298,7 +343,9 @@ const TransferForm = ({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="amount">{t('transfer.form.amount')}</Label>
+            <Label htmlFor="amount">
+              {t('transfer.form.amount', { token: selectedAsset?.name ?? 'QU' })}
+            </Label>
             <InputGroup className={errors.amount ? 'border-destructive' : ''}>
               <InputGroupInput
                 id="amount"
@@ -324,6 +371,20 @@ const TransferForm = ({
             </InputGroup>
             {errors.amount && <p className="mt-1 text-xs text-destructive">{errors.amount}</p>}
           </div>
+
+          {selectedAsset && (
+            <div className="space-y-2">
+              <Label>{t('transfer.form.fee')}</Label>
+              <Input
+                readOnly
+                value={t('transfer.form.feeValue', { fee: '100' })}
+                className="text-center"
+              />
+              <p className="text-xs text-muted-foreground">
+                {t('transfer.form.quBalance', { balance: formatBalance(quBalance) })}
+              </p>
+            </div>
+          )}
         </div>
 
         {errorMessage && (
@@ -353,11 +414,13 @@ const Transfer = () => {
     ),
   )
 
+  const sdk = useSdk()
   const balance = useBalance(currentIdentity)
   const ownedAssets = useOwnedAssets(currentIdentity)
   const sendMutation = useSend()
 
   const [step, setStep] = useState<Step>('form')
+  const [selectedToken, setSelectedToken] = useState('qu')
   const [recipient, setRecipient] = useState('')
   const [amount, setAmount] = useState('')
   const [errors, setErrors] = useState<FormErrors>({})
@@ -377,6 +440,16 @@ const Transfer = () => {
     }))
 
   const hasMultipleTokens = parsedAssets.length > 0
+  const selectedAsset =
+    selectedToken === 'qu'
+      ? null
+      : (parsedAssets.find((a) => `${a.issuerIdentity}-${a.name}` === selectedToken) ?? null)
+
+  const handleTokenChange = (value: string) => {
+    setSelectedToken(value)
+    setAmount('')
+    setErrors({})
+  }
 
   useEffect(() => {
     const refreshAccount = () => {
@@ -411,6 +484,15 @@ const Transfer = () => {
       const parsedAmount = parseAmount(amount)
       if (!parsedAmount || parsedAmount <= 0n) {
         newErrors.amount = t('transfer.validation.amountInvalid')
+      } else if (selectedAsset) {
+        const assetBalance = BigInt(selectedAsset.numberOfUnits)
+        if (parsedAmount > assetBalance) {
+          newErrors.amount = t('transfer.validation.amountExceedsBalance')
+        }
+        const currentQu = normalizeBalance(balance.data?.balance)
+        if (currentQu < QX_TRANSFER_ASSET_FEE) {
+          newErrors.amount = t('transfer.validation.insufficientQuForFee', { fee: '100' })
+        }
       } else if (balance.isLoading) {
         newErrors.amount = t('transfer.validation.balanceLoading')
       } else {
@@ -456,18 +538,39 @@ const Transfer = () => {
         throw new Error(t('transfer.validation.amountInvalid'))
       }
 
-      const result = await sendMutation.mutateAsync({
-        toIdentity: recipient.trim(),
-        amount: parsedAmount,
-        fromSeed: seed,
-      })
+      let result: { txId: string; targetTick: bigint }
+
+      if (selectedAsset) {
+        const payload = buildAssetTransferPayload(
+          selectedAsset.issuerIdentity,
+          recipient.trim(),
+          selectedAsset.name,
+          parsedAmount,
+        )
+        result = await sdk.transactions.send({
+          fromSeed: seed,
+          toIdentity: QX_ADDRESS,
+          amount: QX_TRANSFER_ASSET_FEE,
+          inputType: QX_TRANSFER_ASSET_INPUT_TYPE,
+          inputBytes: payload,
+        })
+      } else {
+        result = await sendMutation.mutateAsync({
+          toIdentity: recipient.trim(),
+          amount: parsedAmount,
+          fromSeed: seed,
+        })
+      }
 
       seedRef.current = null
+
+      const tokenName = selectedAsset?.name ?? 'QU'
 
       setTxResult({
         txId: result.txId,
         targetTick: result.targetTick.toString(),
         amount: parsedAmount,
+        tokenName,
       })
 
       setDrawerOpen(false)
@@ -512,6 +615,7 @@ const Transfer = () => {
 
   const handleSendAnother = () => {
     setStep('form')
+    setSelectedToken('qu')
     setRecipient('')
     setAmount('')
     setErrors({})
@@ -538,9 +642,14 @@ const Transfer = () => {
   }
 
   const handleMaxAmount = () => {
-    const currentBalance = normalizeBalance(balance.data?.balance)
-    if (currentBalance > 0n) {
-      setAmount(currentBalance.toString())
+    let maxAmount: bigint
+    if (selectedAsset) {
+      maxAmount = BigInt(selectedAsset.numberOfUnits)
+    } else {
+      maxAmount = normalizeBalance(balance.data?.balance)
+    }
+    if (maxAmount > 0n) {
+      setAmount(maxAmount.toString())
       if (errors.amount) {
         setErrors({ ...errors, amount: undefined })
       }
@@ -572,8 +681,12 @@ const Transfer = () => {
         isWatchOnly={isWatchOnly}
         hasMultipleTokens={hasMultipleTokens}
         assets={parsedAssets}
+        selectedToken={selectedToken}
+        selectedAsset={selectedAsset}
+        onTokenChange={handleTokenChange}
         onRecipientChange={handleRecipientChange}
         onAmountChange={handleAmountChange}
+        quBalance={normalizeBalance(balance.data?.balance)}
         onMaxAmount={handleMaxAmount}
         onContinue={handleContinue}
       />
@@ -588,6 +701,7 @@ const Transfer = () => {
         }}
         recipient={recipient}
         amount={amount}
+        tokenName={selectedAsset?.name ?? 'QU'}
         sending={sending}
         onCancel={() => {
           setDrawerOpen(false)
