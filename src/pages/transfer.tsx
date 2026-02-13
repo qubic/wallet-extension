@@ -31,7 +31,12 @@ import {
 import { isValidIdentity, normalizeBalance, parseAmount, formatBalance } from '@/lib/utils'
 import PassphraseAuth from '@/pages/passphrase-auth'
 import { getWatchOnlyAccounts } from '@/lib/accounts'
-import { type AggregatedAsset, aggregateAssets, formatAssetUnits, useOwnedAssets } from '@/lib/assets'
+import {
+  type AggregatedAsset,
+  aggregateAssets,
+  formatAssetUnits,
+  useOwnedAssets,
+} from '@/lib/assets'
 import {
   QX_ADDRESS,
   QX_TRANSFER_ASSET_FEE,
