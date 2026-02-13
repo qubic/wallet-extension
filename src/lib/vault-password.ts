@@ -1,6 +1,5 @@
 import { openBrowserVault } from '@/lib/vault'
 
-
 export const changeVaultPassphrase = async (
   currentPassphrase: string,
   newPassphrase: string,
