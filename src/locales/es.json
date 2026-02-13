@@ -78,7 +78,7 @@
     "themeLight": "Claro",
     "themeSystem": "Sistema",
     "lock": "Bloqueo automatico por inactividad",
-    "lockNow": "Bloquear ahora",
+    "lockNow": "Bloquear billetera",
     "lockTimeout": {
       "label": "Tiempo de bloqueo (minutos)",
       "helper": "Bloquea la billetera despues del tiempo seleccionado."
@@ -95,6 +95,59 @@
         "invalidPassphrase": "Contrasena invalida.",
         "exportFailed": "No se pudo exportar el vault."
       }
+    },
+    "categories": {
+      "security": "Seguridad",
+      "securityDesc": "Contrasena, bloqueo automatico y restablecer",
+      "backup": "Respaldo",
+      "backupDesc": "Exportar tu archivo vault",
+      "accounts": "Administrar cuentas",
+      "accountsDesc": "Ver, ordenar y gestionar identidades",
+      "support": "Soporte",
+      "supportDesc": "Obtener ayuda y reportar problemas",
+      "about": "Acerca de",
+      "aboutDesc": "Version de la aplicacion e informacion"
+    },
+    "security": {
+      "title": "Seguridad",
+      "back": "Ajustes",
+      "changePassword": "Cambiar contrasena",
+      "changePasswordDesc": "Actualizar la contrasena de tu vault",
+      "changePasswordDrawerTitle": "Cambiar contrasena",
+      "changePasswordDrawerDesc": "Ingresa tu contrasena actual y elige una nueva.",
+      "currentPassphrase": "Contrasena actual",
+      "newPassphrase": "Nueva contrasena",
+      "confirmPassphrase": "Confirmar nueva contrasena",
+      "minChars": "Minimo 12 caracteres.",
+      "save": "Guardar nueva contrasena",
+      "saving": "Guardando...",
+      "cancel": "Cancelar",
+      "resetApp": "Eliminar billetera",
+      "resetAppTitle": "Eliminar billetera?",
+      "resetAppDesc": "Esto borrara todos los datos incluyendo tu vault, cuentas y ajustes. Esta accion no se puede deshacer. Asegurate de haber respaldado tus semillas.",
+      "resetAppConfirm": "Eliminar billetera",
+      "errors": {
+        "currentRequired": "Se requiere contrasena actual.",
+        "newRequired": "Se requiere nueva contrasena.",
+        "confirmRequired": "Confirma tu nueva contrasena.",
+        "tooShort": "La contrasena debe tener al menos 12 caracteres.",
+        "mismatch": "Las contrasenas no coinciden.",
+        "invalidCurrent": "La contrasena actual es incorrecta.",
+        "changeFailed": "No se pudo cambiar la contrasena. Intenta de nuevo."
+      }
+    },
+    "support": {
+      "title": "Soporte",
+      "warningTitle": "Cuidado con los estafadores",
+      "warningDescription": "Los miembros del equipo de Qubic nunca te pediran tu semilla o contrasena. Nunca compartas tus claves privadas con nadie.",
+      "discord": "Comunidad de Discord",
+      "github": "Reportar un problema en GitHub"
+    },
+    "about": {
+      "title": "Acerca de",
+      "appVersion": "Version de la aplicacion",
+      "extensionName": "Extension",
+      "versionLabel": "v{{version}}"
     }
   },
   "accounts": {
