@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/input-group'
 import { setUnlocked } from '@/lib/lock'
 import { openBrowserVault } from '@/lib/vault'
+import { truncateString } from '@/lib/utils'
 
 const Unlock = () => {
   const { t } = useTranslation()
@@ -20,6 +21,7 @@ const Unlock = () => {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [showPassphrase, setShowPassphrase] = useState(false)
+  const currentIdentity = localStorage.getItem('currentIdentity') ?? ''
 
   const handleSubmit = async () => {
     if (!passphrase.trim()) {
@@ -73,10 +75,14 @@ const Unlock = () => {
     <section className="flex min-h-full w-full justify-center">
       <div className="flex min-h-full w-full max-w-sm flex-col px-4 pb-6 pt-4">
         <div className="flex items-center justify-end">
-          <img src="/branding/Qubic-Logo-White.svg" alt="Qubic" className="h-5 opacity-80" />
+          {currentIdentity && (
+            <span className="font-mono text-[11px] text-muted-foreground">
+              {truncateString(currentIdentity)}
+            </span>
+          )}
         </div>
 
-        <div className="flex flex-1 flex-col items-center justify-center gap-4 text-center">
+        <div className="mt-8 flex flex-col items-center gap-4 text-center">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
             <ShieldCheckIcon className="h-8 w-8 text-primary" />
           </div>
@@ -85,43 +91,42 @@ const Unlock = () => {
             <h1 className="text-2xl font-semibold">{t('unlock.title')}</h1>
             <p className="mt-2 text-sm text-muted-foreground">{t('unlock.subtitle')}</p>
           </div>
+        </div>
 
-          <div className="w-full space-y-4">
-            <div className="space-y-2 text-left">
-              <InputGroup className="h-12 bg-muted/30 shadow-sm">
-                <InputGroupInput
-                  id="passphrase"
-                  type={showPassphrase ? 'text' : 'password'}
-                  placeholder={t('passphraseAuth.form.passphrasePlaceholder')}
-                  value={passphrase}
-                  onChange={(e) => handlePassphraseChange(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  aria-invalid={Boolean(error)}
-                  className="h-12 text-base"
-                  autoFocus
-                />
-                <InputGroupAddon align="inline-end">
-                  <InputGroupButton
-                    type="button"
-                    variant="ghost"
-                    aria-label={
-                      showPassphrase
-                        ? t('passphraseAuth.form.hidePassphrase')
-                        : t('passphraseAuth.form.showPassphrase')
-                    }
-                    onClick={() => setShowPassphrase((current) => !current)}
-                  >
-                    {showPassphrase ? (
-                      <EyeOffIcon className="h-4 w-4" />
-                    ) : (
-                      <EyeIcon className="h-4 w-4" />
-                    )}
-                  </InputGroupButton>
-                </InputGroupAddon>
-              </InputGroup>
-              {error && <p className="mt-1 text-xs text-destructive">{error}</p>}
-            </div>
-          </div>
+        <div className="mt-6 w-full space-y-3">
+          <InputGroup className="h-12">
+            <InputGroupInput
+              id="passphrase"
+              type={showPassphrase ? 'text' : 'password'}
+              placeholder={t('passphraseAuth.form.passphrasePlaceholder')}
+              value={passphrase}
+              onChange={(e) => handlePassphraseChange(e.target.value)}
+              onKeyDown={handleKeyDown}
+              aria-invalid={Boolean(error)}
+              className="h-12 text-base"
+              autoFocus
+            />
+            <InputGroupAddon align="inline-end">
+              <InputGroupButton
+                type="button"
+                variant="ghost"
+                aria-label={
+                  showPassphrase
+                    ? t('passphraseAuth.form.hidePassphrase')
+                    : t('passphraseAuth.form.showPassphrase')
+                }
+                onClick={() => setShowPassphrase((current) => !current)}
+              >
+                {showPassphrase ? (
+                  <EyeOffIcon className="h-4 w-4" />
+                ) : (
+                  <EyeIcon className="h-4 w-4" />
+                )}
+              </InputGroupButton>
+            </InputGroupAddon>
+          </InputGroup>
+          {error && <p className="text-xs text-destructive">{error}</p>}
+          <p className="text-xs text-muted-foreground">{t('passphraseAuth.securityNote')}</p>
         </div>
 
         <div className="mt-auto pt-6">
