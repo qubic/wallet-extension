@@ -1,4 +1,5 @@
 import { useTransactions } from '@qubic-labs/react'
+import { useQuery } from '@tanstack/react-query'
 import {
   ArrowDownLeftIcon,
   ArrowUpRightIcon,
@@ -12,6 +13,13 @@ import { useTranslation } from 'react-i18next'
 import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
+import {
+  getPendingTransactionsForIdentity,
+  PENDING_SETTLED_EVENT,
+  isTransactionPending,
+  resolvePendingTransactions,
+  usePendingTransactionsVersion,
+} from '@/lib/pending-transactions'
 
 const formatQus = (value: bigint) => {
   const formatter = new Intl.NumberFormat('en', {
@@ -21,9 +29,24 @@ const formatQus = (value: bigint) => {
   return formatter.format(Number(value))
 }
 
+type LatestStatsResponse = {
+  data?: {
+    currentTick?: number
+  }
+}
+
+const fetchLatestStats = async (): Promise<LatestStatsResponse> => {
+  const response = await fetch('https://rpc.qubic.org/v1/latest-stats')
+  if (!response.ok) {
+    throw new Error('Failed to load network stats.')
+  }
+  return response.json() as Promise<LatestStatsResponse>
+}
+
 const History = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  usePendingTransactionsVersion()
   const [identity, setIdentity] = useState(localStorage.getItem('currentIdentity') ?? '')
   const transactions = useTransactions(
     {
@@ -33,6 +56,13 @@ const History = () => {
     },
     { refetchInterval: 15_000 },
   )
+  const latestStats = useQuery({
+    queryKey: ['qubic', 'latest-stats', 'history'],
+    queryFn: fetchLatestStats,
+    refetchInterval: 15_000,
+    staleTime: 3_000,
+    gcTime: 120_000,
+  })
 
   useEffect(() => {
     const refreshIdentity = () => {
@@ -48,8 +78,22 @@ const History = () => {
     }
   }, [])
 
+  const currentTick = latestStats.data?.data?.currentTick
   const items = transactions.data?.pages.flatMap((page) => page.transactions) ?? []
-  const sorted = [...items].sort((a, b) => Number(b.tickNumber) - Number(a.tickNumber))
+  const pending = getPendingTransactionsForIdentity(identity, currentTick)
+  const pendingHashes = new Set(pending.map((tx) => tx.hash.toLowerCase()))
+  const pendingItems = pending.map((tx) => ({
+    hash: tx.hash,
+    source: tx.sourceIdentity,
+    destination: tx.destinationIdentity ?? '',
+    amount: tx.amount ?? 0n,
+    tickNumber: tx.targetTick,
+    inputType: tx.inputType ?? 0,
+  }))
+  const sorted = [
+    ...pendingItems,
+    ...items.filter((tx) => !pendingHashes.has(tx.hash.toLowerCase())),
+  ].sort((a, b) => Number(b.tickNumber) - Number(a.tickNumber))
   const listMotion = {
     hidden: { opacity: 0, y: 10 },
     show: {
@@ -62,6 +106,20 @@ const History = () => {
     hidden: { opacity: 0, y: 8 },
     show: { opacity: 1, y: 0, transition: { duration: 0.2 } },
   }
+
+  useEffect(() => {
+    resolvePendingTransactions(sorted, currentTick)
+  }, [sorted, currentTick])
+
+  useEffect(() => {
+    const handlePendingSettled = () => {
+      void transactions.refetch()
+    }
+    window.addEventListener(PENDING_SETTLED_EVENT, handlePendingSettled)
+    return () => {
+      window.removeEventListener(PENDING_SETTLED_EVENT, handlePendingSettled)
+    }
+  }, [transactions])
 
   return (
     <section className="flex w-full justify-center pt-4">
@@ -124,12 +182,17 @@ const History = () => {
               const label = isIncoming ? t('history.incoming') : t('history.outgoing')
               const counterparty = isIncoming ? tx.source : tx.destination
               const Icon = isIncoming ? ArrowDownLeftIcon : ArrowUpRightIcon
+              const isPending = isTransactionPending(tx.hash, currentTick)
 
               return (
                 <motion.button
                   type="button"
                   key={tx.hash}
-                  className="w-full cursor-pointer space-y-3 rounded-xl border border-border/40 bg-background/40 px-3 py-3 text-left transition-colors hover:border-primary/30 hover:bg-background/60"
+                  className={`w-full cursor-pointer space-y-3 rounded-xl border px-3 py-3 text-left transition-colors ${
+                    isPending
+                      ? 'animate-pulse border-amber-500/50 bg-amber-500/10'
+                      : 'border-border/40 bg-background/40 hover:border-primary/30 hover:bg-background/60'
+                  }`}
                   onClick={() => navigate(`/tx/${tx.hash}`)}
                   variants={itemMotion}
                 >
@@ -137,9 +200,11 @@ const History = () => {
                     <div className="flex items-center gap-3">
                       <div
                         className={`flex h-9 w-9 items-center justify-center rounded-full border ${
-                          isIncoming
-                            ? 'border-primary/40 bg-primary/10 text-primary'
-                            : 'border-[var(--destructive)]/40 bg-[var(--destructive)]/10 text-[var(--destructive)]'
+                          isPending
+                            ? 'border-amber-500/40 bg-amber-500/15 text-amber-700 dark:text-amber-300'
+                            : isIncoming
+                              ? 'border-primary/40 bg-primary/10 text-primary'
+                              : 'border-[var(--destructive)]/40 bg-[var(--destructive)]/10 text-[var(--destructive)]'
                         }`}
                       >
                         <Icon className="h-4 w-4" />
@@ -153,9 +218,11 @@ const History = () => {
                     </div>
                     <span
                       className={`rounded-md px-2 py-0.5 text-sm font-semibold ${
-                        isIncoming
-                          ? 'bg-primary/10 text-primary'
-                          : 'bg-[var(--destructive)]/10 text-[var(--destructive)]'
+                        isPending
+                          ? 'bg-amber-500/15 text-amber-700 dark:text-amber-300'
+                          : isIncoming
+                            ? 'bg-primary/10 text-primary'
+                            : 'bg-[var(--destructive)]/10 text-[var(--destructive)]'
                       }`}
                     >
                       {isIncoming ? '+' : '-'}

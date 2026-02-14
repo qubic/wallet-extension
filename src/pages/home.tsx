@@ -11,7 +11,7 @@ import {
   DownloadIcon,
   RefreshCwIcon,
 } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import QRCode from 'qrcode'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
@@ -22,6 +22,14 @@ import { useTranslation } from 'react-i18next'
 import { normalizeBalance, formatBalanceCompact, truncateString } from '@/lib/utils'
 import { getWatchOnlyAccounts } from '@/lib/accounts'
 import { aggregateAssets, formatAssetUnits, useOwnedAssets } from '@/lib/assets'
+import {
+  getPendingOutgoingDebit,
+  PENDING_SETTLED_EVENT,
+  getPendingTransactionsForIdentity,
+  isTransactionPending,
+  resolvePendingTransactions,
+  usePendingTransactionsVersion,
+} from '@/lib/pending-transactions'
 
 const formatUsdFromNumber = (value: number) => {
   const usdPerBillion = 435
@@ -102,10 +110,12 @@ const sectionMotion = {
 const BalanceCard = ({
   balance,
   identity,
+  pendingDebit,
   networkMeta,
 }: {
   balance: ReturnType<typeof useBalance>
   identity: string
+  pendingDebit: bigint
   networkMeta: {
     tick: string | number
     epoch: string | number
@@ -163,19 +173,28 @@ const BalanceCard = ({
     return <div className="text-sm text-destructive">{balance.error.message}</div>
   }
 
+  const effectiveBalance = normalized > pendingDebit ? normalized - pendingDebit : 0n
+  const pendingActive = pendingDebit > 0n
   const displayBigInt = BigInt(Math.max(0, Math.floor(displayBalance)))
+  const displayValue =
+    pendingActive && displayBigInt > pendingDebit ? displayBigInt - pendingDebit : effectiveBalance
 
   return (
     <div className="space-y-3 text-center">
       <div className="text-5xl font-semibold leading-none tracking-tight text-foreground">
-        {formatBalanceCompact(displayBigInt)}
+        {formatBalanceCompact(displayValue)}
       </div>
       <div className="inline-flex items-center rounded-full border border-primary/25 bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary">
-        {formatUsdFromNumber(displayBalance)}
+        {`≈ ${formatUsdFromNumber(Number(displayValue))}`}
       </div>
       <div className="text-[11px] text-muted-foreground">
         {networkMeta.price} / {networkMeta.tick} / {networkMeta.epoch}
       </div>
+      {pendingActive && (
+        <div className="text-[11px] text-amber-700 dark:text-amber-300">
+          -{formatBalanceCompact(pendingDebit)} {t('home.status.pending').toLowerCase()}
+        </div>
+      )}
     </div>
   )
 }
@@ -183,15 +202,18 @@ const BalanceCard = ({
 const TransactionsPreview = ({
   identity,
   transactions,
+  currentTick,
   onViewMore,
   onOpenTx,
 }: {
   identity: string
   transactions: ReturnType<typeof useTransactions>
+  currentTick?: number
   onViewMore: () => void
   onOpenTx: (hash: string) => void
 }) => {
   const { t } = useTranslation()
+  usePendingTransactionsVersion()
   if (transactions.isLoading) {
     return (
       <div className="space-y-2">
@@ -207,7 +229,21 @@ const TransactionsPreview = ({
   }
 
   const items = transactions.data?.pages.flatMap((page) => page.transactions) ?? []
-  const recent = items.slice(0, 3)
+  const pending = getPendingTransactionsForIdentity(identity, currentTick)
+  const pendingHashes = new Set(pending.map((tx) => tx.hash.toLowerCase()))
+  const pendingItems = pending.map((tx) => ({
+    hash: tx.hash,
+    source: tx.sourceIdentity,
+    destination: tx.destinationIdentity ?? '',
+    amount: tx.amount ?? 0n,
+    tickNumber: tx.targetTick,
+    inputType: tx.inputType ?? 0,
+  }))
+  const merged = [
+    ...pendingItems,
+    ...items.filter((tx) => !pendingHashes.has(tx.hash.toLowerCase())),
+  ]
+  const recent = merged.slice(0, 3)
 
   if (recent.length === 0) {
     return (
@@ -230,20 +266,27 @@ const TransactionsPreview = ({
         const label = isIncoming ? t('home.recent.incoming') : t('home.recent.outgoing')
         const counterparty = isIncoming ? tx.source : tx.destination
         const Icon = isIncoming ? ArrowDownLeftIcon : ArrowUpRightIcon
+        const isPending = isTransactionPending(tx.hash, currentTick)
 
         return (
           <motion.button
             type="button"
             key={tx.hash}
-            className="group flex w-full cursor-pointer items-center justify-between rounded-xl border border-border/40 bg-background/40 px-3 py-2 text-left transition-colors hover:border-primary/30 hover:bg-background/60"
+            className={`group flex w-full cursor-pointer items-center justify-between rounded-xl border px-3 py-2 text-left transition-colors ${
+              isPending
+                ? 'animate-pulse border-amber-500/50 bg-amber-500/10 text-amber-800 dark:text-amber-200'
+                : 'border-border/40 bg-background/40 hover:border-primary/30 hover:bg-background/60'
+            }`}
             onClick={() => onOpenTx(tx.hash)}
           >
             <div className="flex items-center gap-3">
               <div
                 className={`flex h-9 w-9 items-center justify-center rounded-full border ${
-                  isIncoming
-                    ? 'border-primary/40 bg-primary/10 text-primary'
-                    : 'border-[var(--destructive)]/40 bg-[var(--destructive)]/10 text-[var(--destructive)]'
+                  isPending
+                    ? 'border-amber-500/40 bg-amber-500/15 text-amber-700 dark:text-amber-300'
+                    : isIncoming
+                      ? 'border-primary/40 bg-primary/10 text-primary'
+                      : 'border-[var(--destructive)]/40 bg-[var(--destructive)]/10 text-[var(--destructive)]'
                 }`}
               >
                 <Icon className="h-4 w-4" />
@@ -259,7 +302,13 @@ const TransactionsPreview = ({
               </div>
             </div>
             <span
-              className={`rounded-md px-2 py-0.5 text-sm font-semibold ${isIncoming ? 'bg-primary/10 text-primary' : 'bg-[var(--destructive)]/10 text-[var(--destructive)]'}`}
+              className={`rounded-md px-2 py-0.5 text-sm font-semibold ${
+                isPending
+                  ? 'bg-amber-500/15 text-amber-700 dark:text-amber-300'
+                  : isIncoming
+                    ? 'bg-primary/10 text-primary'
+                    : 'bg-[var(--destructive)]/10 text-[var(--destructive)]'
+              }`}
             >
               {isIncoming ? '+' : '-'}
               {formatBalanceCompact(tx.amount)}
@@ -281,6 +330,7 @@ const TransactionsPreview = ({
 
 const Home = () => {
   const { t } = useTranslation()
+  usePendingTransactionsVersion()
   const [identity, setIdentity] = useState(localStorage.getItem('currentIdentity') ?? '')
   const [isWatchOnly, setIsWatchOnly] = useState(() =>
     getWatchOnlyAccounts().some(
@@ -317,6 +367,9 @@ const Home = () => {
   const currentTickFromRpc = latestStats.data?.data?.currentTick
   const hasVirtualTick = virtualTick !== null
   const tickValue = virtualTick ?? currentTickFromRpc ?? '--'
+  const currentTick = typeof tickValue === 'number' ? tickValue : undefined
+  const pendingOutgoingDebit = getPendingOutgoingDebit(identity, currentTick)
+  const hasPendingOutgoing = getPendingTransactionsForIdentity(identity, currentTick).length > 0
   const epochValue = latestStats.data?.data?.epoch ?? '--'
   const pricePerBValue = latestStats.data?.data?.price
     ? `$${(latestStats.data.data.price * 1_000_000_000).toFixed(2)}`
@@ -325,6 +378,10 @@ const Home = () => {
     void balance.refetch()
     void transactions.refetch()
   }
+  const transactionItems = useMemo(
+    () => transactions.data?.pages.flatMap((page) => page.transactions) ?? [],
+    [transactions.data],
+  )
 
   const handleCopyIdentity = async () => {
     try {
@@ -354,6 +411,22 @@ const Home = () => {
       window.removeEventListener('wallet-account-updated', refreshIdentity)
     }
   }, [])
+
+  useEffect(() => {
+    resolvePendingTransactions(transactionItems, currentTick)
+  }, [transactionItems, currentTick])
+
+  useEffect(() => {
+    const handlePendingSettled = () => {
+      void balance.refetch()
+      void transactions.refetch()
+      void ownedAssets.refetch()
+    }
+    window.addEventListener(PENDING_SETTLED_EVENT, handlePendingSettled)
+    return () => {
+      window.removeEventListener(PENDING_SETTLED_EVENT, handlePendingSettled)
+    }
+  }, [balance, ownedAssets, transactions])
 
   useEffect(() => {
     let isActive = true
@@ -450,6 +523,7 @@ const Home = () => {
               <BalanceCard
                 balance={balance}
                 identity={identity}
+                pendingDebit={pendingOutgoingDebit}
                 networkMeta={{ tick: tickValue, epoch: epochValue, price: pricePerBValue }}
               />
             </div>
@@ -468,8 +542,14 @@ const Home = () => {
               size="sm"
               className="h-12 w-full gap-2 rounded-md bg-primary/10 text-primary hover:bg-primary/20"
               onClick={() => navigate('/transfer')}
-              disabled={isWatchOnly}
-              title={isWatchOnly ? t('transfer.errors.watchOnly') : undefined}
+              disabled={isWatchOnly || hasPendingOutgoing}
+              title={
+                isWatchOnly
+                  ? t('transfer.errors.watchOnly')
+                  : hasPendingOutgoing
+                    ? t('transfer.errors.pendingOutgoing')
+                    : undefined
+              }
             >
               <ArrowUpRightIcon className="h-4 w-4" />
               {t('home.actions.send')}
@@ -497,6 +577,7 @@ const Home = () => {
             <TransactionsPreview
               identity={identity}
               transactions={transactions}
+              currentTick={currentTick}
               onViewMore={() => navigate('/history')}
               onOpenTx={(hash) => navigate(`/tx/${hash}`)}
             />
@@ -548,20 +629,19 @@ const Home = () => {
                 ))}
               </div>
             )}
-            {ownedAssets.isSuccess &&
-              (!ownedAssets.data || aggregatedAssets.length === 0) && (
-                <div className="flex items-center gap-3 rounded-lg border border-dashed border-border/60 bg-transparent px-3 py-3 text-xs text-muted-foreground">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full border border-border/40 bg-transparent text-muted-foreground">
-                    <PackageIcon className="h-4 w-4" />
-                  </div>
-                  <div>
-                    <div className="text-sm font-semibold text-foreground">
-                      {t('home.assets.emptyTitle')}
-                    </div>
-                    <div className="text-xs text-muted-foreground">{t('home.assets.empty')}</div>
-                  </div>
+            {ownedAssets.isSuccess && (!ownedAssets.data || aggregatedAssets.length === 0) && (
+              <div className="flex items-center gap-3 rounded-lg border border-dashed border-border/60 bg-transparent px-3 py-3 text-xs text-muted-foreground">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full border border-border/40 bg-transparent text-muted-foreground">
+                  <PackageIcon className="h-4 w-4" />
                 </div>
-              )}
+                <div>
+                  <div className="text-sm font-semibold text-foreground">
+                    {t('home.assets.emptyTitle')}
+                  </div>
+                  <div className="text-xs text-muted-foreground">{t('home.assets.empty')}</div>
+                </div>
+              </div>
+            )}
           </motion.div>
         </motion.div>
       </AnimatePresence>

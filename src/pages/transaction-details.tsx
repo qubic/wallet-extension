@@ -1,11 +1,16 @@
 import { useSdk } from '@qubic-labs/react'
 import { useQuery } from '@tanstack/react-query'
 import { CheckIcon, CopyIcon, ExternalLinkIcon } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { buildExplorerObjectUrl, truncateString } from '@/lib/utils'
+import {
+  getPendingTransaction,
+  resolvePendingTransactions,
+  usePendingTransactionsVersion,
+} from '@/lib/pending-transactions'
 
 const formatValue = (value: unknown): string => {
   if (value === null || value === undefined) return '--'
@@ -22,23 +27,57 @@ const formatValue = (value: unknown): string => {
 
 const TX_DETAILS_SKELETON_IDS = ['a', 'b', 'c', 'd', 'e', 'f'] as const
 
+type LatestStatsResponse = {
+  data?: {
+    currentTick?: number
+  }
+}
+
+const fetchLatestStats = async (): Promise<LatestStatsResponse> => {
+  const response = await fetch('https://rpc.qubic.org/v1/latest-stats')
+  if (!response.ok) {
+    throw new Error('Failed to load network stats.')
+  }
+  return response.json() as Promise<LatestStatsResponse>
+}
+
 const TransactionDetails = () => {
   const { t } = useTranslation()
   const { hash = '' } = useParams<{ hash: string }>()
   const sdk = useSdk()
+  usePendingTransactionsVersion()
   const [copiedKey, setCopiedKey] = useState<string | null>(null)
+  const latestStats = useQuery({
+    queryKey: ['qubic', 'latest-stats', 'tx-details'],
+    queryFn: fetchLatestStats,
+    refetchInterval: 15_000,
+    staleTime: 3_000,
+    gcTime: 120_000,
+  })
+  const currentTick = latestStats.data?.data?.currentTick
+  const pending = getPendingTransaction(hash, currentTick)
+  const isPending = Boolean(pending)
 
   const txQuery = useQuery({
     queryKey: ['qubic', 'tx-by-hash', hash],
     enabled: Boolean(hash),
     queryFn: () => sdk.rpc.query.getTransactionByHash(hash),
+    refetchInterval: isPending ? 5_000 : false,
   })
+  useEffect(() => {
+    if (!hash) return
+    resolvePendingTransactions([{ hash }], currentTick)
+  }, [hash, currentTick])
 
   const details = txQuery.data as Record<string, unknown> | undefined
   const rows: Array<{ key: string; label: string; value: unknown; copyable?: boolean }> = [
     { key: 'hash', label: t('txDetails.hash'), value: hash, copyable: true },
     { key: 'amount', label: t('txDetails.amount'), value: details?.amount },
-    { key: 'tick', label: t('txDetails.tick'), value: details?.tickNumber ?? details?.tick },
+    {
+      key: 'tick',
+      label: t('txDetails.tick'),
+      value: details?.tickNumber ?? details?.tick ?? pending?.targetTick ?? '--',
+    },
     { key: 'inputType', label: t('txDetails.inputType'), value: details?.inputType },
     { key: 'source', label: t('txDetails.source'), value: details?.source, copyable: true },
     {
@@ -113,9 +152,14 @@ const TransactionDetails = () => {
           </div>
         )}
 
-        {txQuery.error && (
+        {txQuery.error && !isPending && (
           <div className="text-xs text-destructive">
             {txQuery.error instanceof Error ? txQuery.error.message : t('txDetails.error')}
+          </div>
+        )}
+        {isPending && !details && (
+          <div className="animate-pulse text-xs text-amber-700 dark:text-amber-300">
+            {t('txDetails.pendingHint')}
           </div>
         )}
 
