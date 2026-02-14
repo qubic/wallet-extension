@@ -70,7 +70,8 @@
       "description": "Sending is disabled for this address."
     },
     "status": {
-      "syncing": "Syncing"
+      "syncing": "Syncing",
+      "pending": "Pending"
     },
     "accounts": {
       "title": "Accounts",
@@ -247,7 +248,9 @@
     "inputType": "Input type",
     "source": "Source",
     "destination": "Destination",
-    "openExplorer": "Open in explorer"
+    "openExplorer": "Open in explorer",
+    "pending": "Pending",
+    "pendingHint": "This transaction is still pending confirmation on network ticks."
   },
   "transfer": {
     "title": "Send",
@@ -270,7 +273,26 @@
       "max": "MAX",
       "fee": "Fee",
       "feeValue": "{{fee}} QUBIC",
-      "quBalance": "Balance: {{balance}} QUBIC"
+      "quBalance": "Balance: {{balance}} QUBIC",
+      "from": "From",
+      "watchOnly": "Watch-only",
+      "pasteRecipient": "Paste recipient",
+      "recipientHint": "Use a 60-letter identity or pick one from your vault.",
+      "available": "Available: {{balance}} {{token}}",
+      "vaultRecipients": "Your identities",
+      "vaultRecipientsPlaceholder": "Select an identity from your vault",
+      "vaultRecipientsManual": "Manual entry",
+      "sendAmount": "Amount",
+      "usdEquivalent": "Approx. USD: {{value}}",
+      "targetTickOffset": "Target tick (current + N)",
+      "targetTickManual": "Target tick (manual)",
+      "targetTickOffsetManual": "Manual",
+      "targetTickManualPlaceholder": "e.g. 4378123",
+      "targetTickCurrentHint": "Current network tick: {{tick}}",
+      "targetTickOffsetSoon": "Soon (1)",
+      "targetTickOffsetDefault": "Default (10)",
+      "targetTickOffsetLater": "Later (40)",
+      "fromPlaceholder": "Select source account"
     },
     "validation": {
       "recipientRequired": "Recipient identity is required.",
@@ -278,6 +300,9 @@
       "recipientSameAsSender": "Cannot send to your own identity.",
       "amountRequired": "Amount is required.",
       "amountInvalid": "Amount must be a positive number.",
+      "targetTickOffsetInvalid": "Target tick offset must be between 1 and 40.",
+      "targetTickManualInvalid": "Manual target tick must be a positive number.",
+      "targetTickManualPast": "Manual target tick must be greater than current network tick.",
       "amountExceedsBalance": "Amount exceeds available balance.",
       "balanceLoading": "Please wait for balance to load.",
       "insufficientQuForFee": "Insufficient QUBIC balance to cover the {{fee}} QU transfer fee."
@@ -288,7 +313,9 @@
       "to": "To",
       "amount": "Amount",
       "fee": "Network fee: {{fee}} QU",
-      "warning": "This action cannot be undone."
+      "warning": "This action cannot be undone.",
+      "feeLabel": "Network fee",
+      "feeIncluded": "Included"
     },
     "actions": {
       "continue": "Continue",
@@ -310,6 +337,7 @@
       "networkError": "Network error. Please retry.",
       "broadcastFailed": "Failed to broadcast transaction.",
       "watchOnly": "Watch-only accounts cannot send transfers.",
+      "pendingOutgoing": "A previous outgoing transfer is still pending. Please wait for confirmation.",
       "generic": "Transfer failed. Please retry."
     }
   },

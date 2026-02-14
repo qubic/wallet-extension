@@ -70,7 +70,8 @@
       "description": "El envio esta deshabilitado para esta direccion."
     },
     "status": {
-      "syncing": "Sincronizando"
+      "syncing": "Sincronizando",
+      "pending": "Pendiente"
     },
     "accounts": {
       "title": "Cuentas",
@@ -247,7 +248,9 @@
     "inputType": "Tipo de input",
     "source": "Origen",
     "destination": "Destino",
-    "openExplorer": "Abrir en explorador"
+    "openExplorer": "Abrir en explorador",
+    "pending": "Pendiente",
+    "pendingHint": "Esta transaccion aun esta pendiente de confirmacion en los ticks de red."
   },
   "transfer": {
     "title": "Enviar",
@@ -270,7 +273,26 @@
       "max": "MAX",
       "fee": "Comision",
       "feeValue": "{{fee}} QUBIC",
-      "quBalance": "Saldo: {{balance}} QUBIC"
+      "quBalance": "Saldo: {{balance}} QUBIC",
+      "from": "Desde",
+      "watchOnly": "Solo lectura",
+      "pasteRecipient": "Pegar destinatario",
+      "recipientHint": "Usa una identidad de 60 letras o elige una de tu vault.",
+      "available": "Disponible: {{balance}} {{token}}",
+      "vaultRecipients": "Tus identidades",
+      "vaultRecipientsPlaceholder": "Selecciona una identidad de tu vault",
+      "vaultRecipientsManual": "Entrada manual",
+      "sendAmount": "Monto",
+      "usdEquivalent": "Aprox. USD: {{value}}",
+      "targetTickOffset": "Tick objetivo (actual + N)",
+      "targetTickManual": "Tick objetivo (manual)",
+      "targetTickOffsetManual": "Manual",
+      "targetTickManualPlaceholder": "ej. 4378123",
+      "targetTickCurrentHint": "Tick actual de la red: {{tick}}",
+      "targetTickOffsetSoon": "Pronto (1)",
+      "targetTickOffsetDefault": "Por defecto (10)",
+      "targetTickOffsetLater": "Tarde (40)",
+      "fromPlaceholder": "Selecciona cuenta de origen"
     },
     "validation": {
       "recipientRequired": "La identidad del destinatario es requerida.",
@@ -278,6 +300,9 @@
       "recipientSameAsSender": "No puedes enviar a tu propia identidad.",
       "amountRequired": "El monto es requerido.",
       "amountInvalid": "El monto debe ser un numero positivo.",
+      "targetTickOffsetInvalid": "El desplazamiento del tick objetivo debe estar entre 1 y 40.",
+      "targetTickManualInvalid": "El tick objetivo manual debe ser un numero positivo.",
+      "targetTickManualPast": "El tick objetivo manual debe ser mayor que el tick actual de la red.",
       "amountExceedsBalance": "El monto excede el saldo disponible.",
       "balanceLoading": "Espera a que se cargue el saldo.",
       "insufficientQuForFee": "Saldo QUBIC insuficiente para cubrir la comision de {{fee}} QU."
@@ -288,7 +313,9 @@
       "to": "Para",
       "amount": "Monto",
       "fee": "Comision de red: {{fee}} QU",
-      "warning": "Esta accion no se puede deshacer."
+      "warning": "Esta accion no se puede deshacer.",
+      "feeLabel": "Comision de red",
+      "feeIncluded": "Incluida"
     },
     "actions": {
       "continue": "Continuar",
@@ -310,6 +337,7 @@
       "networkError": "Error de red. Intenta de nuevo.",
       "broadcastFailed": "Fallo al transmitir la transaccion.",
       "watchOnly": "Las cuentas de solo lectura no pueden enviar transferencias.",
+      "pendingOutgoing": "Hay una transferencia saliente pendiente. Espera su confirmacion antes de enviar otra.",
       "generic": "Transferencia fallida. Intenta de nuevo."
     }
   },
