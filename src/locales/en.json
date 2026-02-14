@@ -20,6 +20,9 @@
       "label": "Balance",
       "loading": "Loading..."
     },
+    "hero": {
+      "defaultAccount": "Main account"
+    },
     "recent": {
       "title": "Recent activity",
       "loading": "Loading recent activity...",
@@ -27,10 +30,13 @@
       "emptyTitle": "No activity yet",
       "incoming": "Incoming",
       "outgoing": "Outgoing",
-      "tick": "Tick {{tick}}"
+      "tick": "Tick {{tick}}",
+      "viewAll": "View all"
     },
     "network": {
       "title": "Network",
+      "showDetails": "Show details",
+      "hideDetails": "Hide details",
       "tick": "Tick",
       "epoch": "Epoch",
       "supply": "Supply",
@@ -58,6 +64,13 @@
       "copySuccessDesc": "Your public identity is now in the clipboard.",
       "copyFail": "Copy failed",
       "copyFailDesc": "Please try again or copy manually."
+    },
+    "watchOnly": {
+      "title": "Watch-only account",
+      "description": "Sending is disabled for this address."
+    },
+    "status": {
+      "syncing": "Syncing"
     },
     "accounts": {
       "title": "Accounts",
@@ -217,6 +230,24 @@
     "outgoing": "Outgoing",
     "tick": "Tick",
     "type": "Type"
+  },
+  "txDetails": {
+    "title": "Transaction details",
+    "loading": "Loading transaction...",
+    "error": "Unable to load transaction details.",
+    "back": "Back",
+    "refresh": "Refresh transaction",
+    "copy": "Copy",
+    "copyTxId": "Copy txid",
+    "copied": "Copied",
+    "copyFailed": "Copy failed",
+    "hash": "Hash",
+    "amount": "Amount",
+    "tick": "Tick",
+    "inputType": "Input type",
+    "source": "Source",
+    "destination": "Destination",
+    "openExplorer": "Open in explorer"
   },
   "transfer": {
     "title": "Send",

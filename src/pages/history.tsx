@@ -1,10 +1,17 @@
 import { useTransactions } from '@qubic-labs/react'
-import { ArrowDownLeftIcon, ArrowUpRightIcon, HashIcon, RefreshCwIcon } from 'lucide-react'
+import {
+  ArrowDownLeftIcon,
+  ArrowUpRightIcon,
+  HashIcon,
+  InboxIcon,
+  RefreshCwIcon,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { buildExplorerObjectUrl, truncateString } from '@/lib/utils'
 import { useTranslation } from 'react-i18next'
 import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
+import { useNavigate } from 'react-router-dom'
 
 const formatQus = (value: bigint) => {
   const formatter = new Intl.NumberFormat('en', {
@@ -16,6 +23,7 @@ const formatQus = (value: bigint) => {
 
 const History = () => {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const [identity, setIdentity] = useState(localStorage.getItem('currentIdentity') ?? '')
   const transactions = useTransactions(
     {
@@ -60,7 +68,7 @@ const History = () => {
       <AnimatePresence mode="wait">
         <motion.div
           key={identity || 'no-identity'}
-          className="flex w-full max-w-sm flex-col gap-4 px-6"
+          className="flex w-full max-w-sm flex-col gap-4 px-4"
           variants={listMotion}
           initial="hidden"
           animate="show"
@@ -85,8 +93,10 @@ const History = () => {
           </motion.div>
 
           {transactions.isLoading && (
-            <motion.div className="text-xs text-muted-foreground" variants={itemMotion}>
-              {t('history.loading')}
+            <motion.div className="space-y-2" variants={itemMotion}>
+              <div className="h-16 animate-pulse rounded-xl border border-border/40 bg-muted/20" />
+              <div className="h-16 animate-pulse rounded-xl border border-border/40 bg-muted/20" />
+              <div className="h-16 animate-pulse rounded-xl border border-border/40 bg-muted/20" />
             </motion.div>
           )}
 
@@ -97,12 +107,18 @@ const History = () => {
           )}
 
           {!transactions.isLoading && sorted.length === 0 && (
-            <motion.div className="text-xs text-muted-foreground" variants={itemMotion}>
-              {t('history.empty')}
+            <motion.div
+              className="flex items-center gap-3 rounded-lg border border-dashed border-border/60 bg-transparent px-3 py-3 text-xs text-muted-foreground"
+              variants={itemMotion}
+            >
+              <div className="flex h-9 w-9 items-center justify-center rounded-full border border-border/40 bg-transparent text-muted-foreground">
+                <InboxIcon className="h-4 w-4" />
+              </div>
+              <div>{t('history.empty')}</div>
             </motion.div>
           )}
 
-          <motion.div className="space-y-3" variants={itemMotion}>
+          <motion.div className="space-y-2" variants={itemMotion}>
             {sorted.map((tx) => {
               const isIncoming = tx.destination === identity
               const label = isIncoming ? t('history.incoming') : t('history.outgoing')
@@ -110,9 +126,11 @@ const History = () => {
               const Icon = isIncoming ? ArrowDownLeftIcon : ArrowUpRightIcon
 
               return (
-                <motion.div
+                <motion.button
+                  type="button"
                   key={tx.hash}
-                  className="space-y-3 rounded-lg bg-card px-3 py-3"
+                  className="w-full cursor-pointer space-y-3 rounded-xl border border-border/40 bg-background/40 px-3 py-3 text-left transition-colors hover:border-primary/30 hover:bg-background/60"
+                  onClick={() => navigate(`/tx/${tx.hash}`)}
                   variants={itemMotion}
                 >
                   <div className="flex items-center justify-between gap-3">
@@ -134,8 +152,10 @@ const History = () => {
                       </div>
                     </div>
                     <span
-                      className={`text-sm font-medium ${
-                        isIncoming ? 'text-primary' : 'text-[var(--destructive)]'
+                      className={`rounded-md px-2 py-0.5 text-sm font-semibold ${
+                        isIncoming
+                          ? 'bg-primary/10 text-primary'
+                          : 'bg-[var(--destructive)]/10 text-[var(--destructive)]'
                       }`}
                     >
                       {isIncoming ? '+' : '-'}
@@ -143,14 +163,15 @@ const History = () => {
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2 text-[11px] text-muted-foreground">
-                    <div className="flex items-center gap-2">
+                  <div className="grid grid-cols-[1fr_auto_auto] items-center gap-2 text-[11px] text-muted-foreground">
+                    <div className="flex min-w-0 items-center gap-2">
                       <HashIcon className="h-3.5 w-3.5" />
                       <a
                         href={buildExplorerObjectUrl('tx', tx.hash)}
-                        className="text-primary hover:underline"
+                        className="truncate font-mono text-primary hover:underline"
                         target="_blank"
                         rel="noreferrer"
+                        onClick={(event) => event.stopPropagation()}
                       >
                         {truncateString(tx.hash, {
                           leading: 6,
@@ -160,16 +181,16 @@ const History = () => {
                         })}
                       </a>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1 font-mono">
                       <span className="text-muted-foreground/70">{t('history.tick')}</span>
                       <span>{tx.tickNumber.toString()}</span>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1 font-mono">
                       <span className="text-muted-foreground/70">{t('history.type')}</span>
                       <span>{tx.inputType.toString()}</span>
                     </div>
                   </div>
-                </motion.div>
+                </motion.button>
               )
             })}
           </motion.div>

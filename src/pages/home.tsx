@@ -4,7 +4,9 @@ import {
   ArrowDownLeftIcon,
   ArrowUpRightIcon,
   CopyIcon,
+  EyeIcon,
   InboxIcon,
+  Loader2Icon,
   PackageIcon,
   DownloadIcon,
   RefreshCwIcon,
@@ -100,9 +102,15 @@ const sectionMotion = {
 const BalanceCard = ({
   balance,
   identity,
+  networkMeta,
 }: {
   balance: ReturnType<typeof useBalance>
   identity: string
+  networkMeta: {
+    tick: string | number
+    epoch: string | number
+    price: string
+  }
 }) => {
   const { t } = useTranslation()
   const [cachedBalance, setCachedBalanceState] = useState<bigint | null>(() =>
@@ -158,12 +166,15 @@ const BalanceCard = ({
   const displayBigInt = BigInt(Math.max(0, Math.floor(displayBalance)))
 
   return (
-    <div className="text-center">
-      <div className="text-4xl font-semibold text-foreground">
+    <div className="space-y-3 text-center">
+      <div className="text-5xl font-semibold leading-none tracking-tight text-foreground">
         {formatBalanceCompact(displayBigInt)}
       </div>
-      <div className="mt-2 text-sm text-muted-foreground">
+      <div className="inline-flex items-center rounded-full border border-primary/25 bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary">
         {formatUsdFromNumber(displayBalance)}
+      </div>
+      <div className="text-[11px] text-muted-foreground">
+        {networkMeta.price} / {networkMeta.tick} / {networkMeta.epoch}
       </div>
     </div>
   )
@@ -173,14 +184,22 @@ const TransactionsPreview = ({
   identity,
   transactions,
   onViewMore,
+  onOpenTx,
 }: {
   identity: string
   transactions: ReturnType<typeof useTransactions>
   onViewMore: () => void
+  onOpenTx: (hash: string) => void
 }) => {
   const { t } = useTranslation()
   if (transactions.isLoading) {
-    return <div className="text-xs text-muted-foreground">{t('home.recent.loading')}</div>
+    return (
+      <div className="space-y-2">
+        <div className="h-16 animate-pulse rounded-xl border border-border/40 bg-muted/20" />
+        <div className="h-16 animate-pulse rounded-xl border border-border/40 bg-muted/20" />
+        <div className="h-16 animate-pulse rounded-xl border border-border/40 bg-muted/20" />
+      </div>
+    )
   }
 
   if (transactions.error) {
@@ -213,11 +232,11 @@ const TransactionsPreview = ({
         const Icon = isIncoming ? ArrowDownLeftIcon : ArrowUpRightIcon
 
         return (
-          <motion.div
+          <motion.button
+            type="button"
             key={tx.hash}
-            className="flex items-center justify-between rounded-lg bg-card px-3 py-2"
-            whileHover={{ y: -1 }}
-            transition={{ type: 'spring', stiffness: 320, damping: 24 }}
+            className="group flex w-full cursor-pointer items-center justify-between rounded-xl border border-border/40 bg-background/40 px-3 py-2 text-left transition-colors hover:border-primary/30 hover:bg-background/60"
+            onClick={() => onOpenTx(tx.hash)}
           >
             <div className="flex items-center gap-3">
               <div
@@ -231,7 +250,7 @@ const TransactionsPreview = ({
               </div>
               <div className="flex flex-col">
                 <span className="text-xs font-semibold text-foreground">{label}</span>
-                <span className="text-xs text-muted-foreground">
+                <span className="font-mono text-xs text-muted-foreground">
                   {truncateString(counterparty)}
                 </span>
                 <span className="text-[11px] text-muted-foreground/70">
@@ -240,12 +259,12 @@ const TransactionsPreview = ({
               </div>
             </div>
             <span
-              className={`text-sm font-medium ${isIncoming ? 'text-primary' : 'text-[var(--destructive)]'}`}
+              className={`rounded-md px-2 py-0.5 text-sm font-semibold ${isIncoming ? 'bg-primary/10 text-primary' : 'bg-[var(--destructive)]/10 text-[var(--destructive)]'}`}
             >
               {isIncoming ? '+' : '-'}
               {formatBalanceCompact(tx.amount)}
             </span>
-          </motion.div>
+          </motion.button>
         )
       })}
       <button
@@ -254,7 +273,7 @@ const TransactionsPreview = ({
         onClick={onViewMore}
         aria-label={t('home.actions.history')}
       >
-        View all
+        {t('home.recent.viewAll')}
       </button>
     </div>
   )
@@ -274,14 +293,16 @@ const Home = () => {
   const isConstrainedLayout = isPopup || isSidePanel
   const assetsListMaxHeightClass = isPopup ? 'max-h-36' : isSidePanel ? 'max-h-44' : 'max-h-52'
   const navigate = useNavigate()
-  const balance = useBalance(identity, { refetchInterval: 10_000 })
+  const balance = useBalance(identity, { refetchInterval: 15_000 })
   const latestStats = useQuery({
     queryKey: ['qubic', 'latest-stats'],
     queryFn: fetchLatestStats,
-    staleTime: 120_000,
+    refetchInterval: 15_000,
+    staleTime: 3_000,
     gcTime: 120_000,
   })
   const ownedAssets = useOwnedAssets(identity)
+  const aggregatedAssets = ownedAssets.data ? aggregateAssets(ownedAssets.data) : []
   const transactions = useTransactions(
     {
       identity,
@@ -292,7 +313,14 @@ const Home = () => {
   )
   const [isReceiveOpen, setIsReceiveOpen] = useState(false)
   const [qrCode, setQrCode] = useState<string | null>(null)
-
+  const [virtualTick, setVirtualTick] = useState<number | null>(null)
+  const currentTickFromRpc = latestStats.data?.data?.currentTick
+  const hasVirtualTick = virtualTick !== null
+  const tickValue = virtualTick ?? currentTickFromRpc ?? '--'
+  const epochValue = latestStats.data?.data?.epoch ?? '--'
+  const pricePerBValue = latestStats.data?.data?.price
+    ? `$${(latestStats.data.data.price * 1_000_000_000).toFixed(2)}`
+    : '--'
   const handleRefresh = () => {
     void balance.refetch()
     void transactions.refetch()
@@ -352,170 +380,168 @@ const Home = () => {
     }
   }, [identity, isReceiveOpen])
 
+  useEffect(() => {
+    if (typeof currentTickFromRpc !== 'number') return
+    setVirtualTick(currentTickFromRpc)
+  }, [currentTickFromRpc])
+
+  useEffect(() => {
+    if (!hasVirtualTick) return
+    const timer = window.setInterval(() => {
+      setVirtualTick((previous) => (previous == null ? previous : previous + 1))
+    }, 1_300)
+    return () => {
+      window.clearInterval(timer)
+    }
+  }, [hasVirtualTick])
+
   return (
     <section
-      className={`flex w-full pt-4 ${isConstrainedLayout ? 'justify-start' : 'justify-center'}`}
+      className={`relative flex w-full pt-4 ${isConstrainedLayout ? 'justify-start' : 'justify-center'}`}
     >
+      {(balance.isFetching ||
+        transactions.isFetching ||
+        ownedAssets.isFetching ||
+        latestStats.isFetching) && (
+        <div className="pointer-events-none absolute left-4 top-2 z-10">
+          <div className="inline-flex shrink-0 items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-2 py-1 text-[11px] text-primary">
+            <Loader2Icon className="h-3.5 w-3.5 animate-spin" />
+            {t('home.status.syncing')}
+          </div>
+        </div>
+      )}
       <AnimatePresence mode="wait">
         <motion.div
           key={identity || 'no-identity'}
-          className="flex w-full max-w-sm flex-col gap-6 px-6"
+          className="flex w-full max-w-sm flex-col gap-5 px-4"
           variants={pageMotion}
           initial="initial"
           animate="animate"
           exit={{ opacity: 0, y: -8, transition: { duration: 0.16 } }}
         >
-          <motion.div className="flex items-center justify-between" variants={sectionMotion}>
-            <span className="text-xs font-semibold uppercase text-muted-foreground">
-              {t('home.balance.label')}
-            </span>
-            <Button
-              size="icon"
-              variant="ghost"
-              className="h-9 w-9"
-              aria-label="Refresh"
-              onClick={handleRefresh}
-              disabled={balance.isFetching || transactions.isFetching}
-            >
-              <RefreshCwIcon
-                className={`h-4 w-4 ${
-                  balance.isFetching || transactions.isFetching ? 'animate-spin' : ''
-                }`}
+          <motion.div className="space-y-4 p-1" variants={sectionMotion}>
+            <div className="flex items-start justify-end gap-3">
+              <Button
+                size="icon"
+                variant="ghost"
+                className="h-9 w-9 shrink-0"
+                aria-label="Refresh"
+                onClick={handleRefresh}
+                disabled={
+                  balance.isFetching ||
+                  transactions.isFetching ||
+                  ownedAssets.isFetching ||
+                  latestStats.isFetching
+                }
+              >
+                <RefreshCwIcon
+                  className={`h-4 w-4 ${
+                    balance.isFetching ||
+                    transactions.isFetching ||
+                    ownedAssets.isFetching ||
+                    latestStats.isFetching
+                      ? 'animate-spin'
+                      : ''
+                  }`}
+                />
+              </Button>
+            </div>
+            <div>
+              <BalanceCard
+                balance={balance}
+                identity={identity}
+                networkMeta={{ tick: tickValue, epoch: epochValue, price: pricePerBValue }}
               />
-            </Button>
-          </motion.div>
-          <motion.div className="rounded-lg bg-card p-4 text-center" variants={sectionMotion}>
-            <BalanceCard balance={balance} identity={identity} />
+            </div>
+            <div className="flex min-h-6 items-center gap-2 overflow-hidden">
+              {isWatchOnly && (
+                <div className="inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-1 text-[11px] text-amber-200">
+                  <EyeIcon className="h-3.5 w-3.5" />
+                  {t('home.watchOnly.title')}
+                </div>
+              )}
+            </div>
           </motion.div>
 
           <motion.div className="grid grid-cols-2 gap-3" variants={sectionMotion}>
             <Button
-              size="lg"
-              className="aspect-square w-full flex-row gap-2 rounded-md bg-primary/10 text-primary hover:bg-primary/20"
+              size="sm"
+              className="h-12 w-full gap-2 rounded-md bg-primary/10 text-primary hover:bg-primary/20"
               onClick={() => navigate('/transfer')}
               disabled={isWatchOnly}
               title={isWatchOnly ? t('transfer.errors.watchOnly') : undefined}
             >
-              <ArrowUpRightIcon className="h-6 w-6" />
+              <ArrowUpRightIcon className="h-4 w-4" />
               {t('home.actions.send')}
             </Button>
             <Button
-              size="lg"
+              size="sm"
               variant="secondary"
-              className="aspect-square w-full flex-row gap-2 rounded-md bg-card hover:bg-muted"
+              className="h-12 w-full gap-2 rounded-md bg-card hover:bg-muted"
               onClick={() => setIsReceiveOpen(true)}
             >
-              <DownloadIcon className="h-6 w-6" />
+              <DownloadIcon className="h-4 w-4" />
               {t('home.actions.receive')}
             </Button>
           </motion.div>
 
-          <motion.div className="space-y-2" variants={sectionMotion}>
-            <div className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-              {t('home.recent.title')}
+          <motion.div className="space-y-3" variants={sectionMotion}>
+            <div className="flex items-center justify-between">
+              <div className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                {t('home.recent.title')}
+              </div>
+              {transactions.isFetching && (
+                <Loader2Icon className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
+              )}
             </div>
             <TransactionsPreview
               identity={identity}
               transactions={transactions}
               onViewMore={() => navigate('/history')}
+              onOpenTx={(hash) => navigate(`/tx/${hash}`)}
             />
           </motion.div>
 
-          <motion.div className="space-y-2" variants={sectionMotion}>
-            <div className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-              {t('home.network.title')}
-            </div>
-            <div className="grid grid-cols-2 gap-2 text-sm">
-              <div className="rounded-lg bg-card px-3 py-2">
-                <div className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
-                  {t('home.network.tick')}
-                </div>
-                <div className="text-sm font-semibold text-foreground">
-                  {latestStats.data?.data?.currentTick ?? '--'}
-                </div>
+          <motion.div className="space-y-3" variants={sectionMotion}>
+            <div className="flex items-center justify-between">
+              <div className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                {t('home.assets.title')}
               </div>
-              <div className="rounded-lg bg-card px-3 py-2">
-                <div className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
-                  {t('home.network.epoch')}
-                </div>
-                <div className="text-sm font-semibold text-foreground">
-                  {latestStats.data?.data?.epoch ?? '--'}
-                </div>
+              <div className="flex items-center gap-2">
+                {ownedAssets.isFetching && (
+                  <Loader2Icon className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
+                )}
               </div>
-              <div className="rounded-lg bg-card px-3 py-2">
-                <div className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
-                  {t('home.network.supply')}
-                </div>
-                <div className="text-sm font-semibold text-foreground">
-                  {latestStats.data?.data?.circulatingSupply
-                    ? formatBalanceCompact(BigInt(latestStats.data.data.circulatingSupply))
-                    : '--'}
-                </div>
-              </div>
-              <div className="rounded-lg bg-card px-3 py-2">
-                <div className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
-                  {t('home.network.active')}
-                </div>
-                <div className="text-sm font-semibold text-foreground">
-                  {latestStats.data?.data?.activeAddresses ?? '--'}
-                </div>
-              </div>
-              <div className="rounded-lg bg-card px-3 py-2">
-                <div className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
-                  {t('home.network.pricePerB')}
-                </div>
-                <div className="text-sm font-semibold text-foreground">
-                  {latestStats.data?.data?.price
-                    ? `$${(latestStats.data.data.price * 1_000_000_000).toFixed(2)}`
-                    : '--'}
-                </div>
-              </div>
-              <div className="rounded-lg bg-card px-3 py-2">
-                <div className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
-                  {t('home.network.marketCap')}
-                </div>
-                <div className="text-sm font-semibold text-foreground">
-                  {latestStats.data?.data?.marketCap
-                    ? `$${Number(latestStats.data.data.marketCap).toLocaleString()}`
-                    : '--'}
-                </div>
-              </div>
-            </div>
-            {latestStats.error && (
-              <div className="text-xs text-destructive">{latestStats.error.message}</div>
-            )}
-          </motion.div>
-
-          <motion.div className="space-y-2" variants={sectionMotion}>
-            <div className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-              {t('home.assets.title')}
             </div>
             {ownedAssets.isLoading && (
-              <div className="text-xs text-muted-foreground">{t('home.assets.loading')}</div>
+              <div className="space-y-2">
+                <div className="h-11 animate-pulse rounded-lg bg-muted/25" />
+                <div className="h-11 animate-pulse rounded-lg bg-muted/25" />
+              </div>
             )}
             {ownedAssets.error && (
               <div className="text-xs text-destructive">{t('home.assets.error')}</div>
             )}
-            {ownedAssets.data && aggregateAssets(ownedAssets.data).length > 0 && (
+            {ownedAssets.data && aggregatedAssets.length > 0 && (
               <div
                 className={`app-scrollbar ${assetsListMaxHeightClass} space-y-2 overflow-y-auto pr-1`}
               >
-                {aggregateAssets(ownedAssets.data).map((asset) => (
+                {aggregatedAssets.map((asset) => (
                   <div
                     key={`${asset.issuerIdentity}-${asset.name}`}
-                    className="flex items-center justify-between bg-muted/20 px-3 py-2"
+                    className="group flex items-center justify-between rounded-lg border border-border/40 bg-transparent px-3 py-2.5 transition-colors hover:border-primary/30 hover:bg-background/40"
                   >
                     <div className="min-w-0 flex flex-col">
-                      <span className="truncate text-sm font-semibold text-foreground">
+                      <span className="truncate text-sm font-semibold leading-none text-foreground">
                         {asset.name}
                       </span>
                       {asset.issuerIdentity && (
-                        <span className="truncate text-xs text-muted-foreground">
+                        <span className="truncate font-mono text-[11px] text-muted-foreground">
                           {truncateString(asset.issuerIdentity)}
                         </span>
                       )}
                     </div>
-                    <div className="ml-3 shrink-0 text-sm font-semibold text-foreground">
+                    <div className="ml-3 shrink-0 text-right text-base font-semibold tabular-nums text-foreground">
                       {formatAssetUnits(asset.numberOfUnits, asset.decimals)}
                     </div>
                   </div>
@@ -523,9 +549,9 @@ const Home = () => {
               </div>
             )}
             {ownedAssets.isSuccess &&
-              (!ownedAssets.data || aggregateAssets(ownedAssets.data).length === 0) && (
-                <div className="flex items-center gap-3 rounded-lg border border-dashed border-border/60 bg-muted/20 px-3 py-3 text-xs text-muted-foreground">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted/40 text-muted-foreground">
+              (!ownedAssets.data || aggregatedAssets.length === 0) && (
+                <div className="flex items-center gap-3 rounded-lg border border-dashed border-border/60 bg-transparent px-3 py-3 text-xs text-muted-foreground">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full border border-border/40 bg-transparent text-muted-foreground">
                     <PackageIcon className="h-4 w-4" />
                   </div>
                   <div>
@@ -542,7 +568,7 @@ const Home = () => {
 
       <Drawer open={isReceiveOpen} onOpenChange={setIsReceiveOpen}>
         <DrawerContent
-          className={`max-h-[100vh] border-none bg-background px-6 pt-0 ${
+          className={`max-h-[100vh] border-none bg-background px-4 pt-0 ${
             isSidePanel ? 'pb-8' : isPopup ? 'pb-24' : 'pb-20'
           }`}
         >

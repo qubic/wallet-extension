@@ -20,6 +20,9 @@
       "label": "Saldo",
       "loading": "Cargando..."
     },
+    "hero": {
+      "defaultAccount": "Cuenta principal"
+    },
     "recent": {
       "title": "Actividad reciente",
       "loading": "Cargando actividad reciente...",
@@ -27,10 +30,13 @@
       "emptyTitle": "Sin actividad aun",
       "incoming": "Entrante",
       "outgoing": "Saliente",
-      "tick": "Tick {{tick}}"
+      "tick": "Tick {{tick}}",
+      "viewAll": "Ver todo"
     },
     "network": {
       "title": "Red",
+      "showDetails": "Mostrar detalles",
+      "hideDetails": "Ocultar detalles",
       "tick": "Tick",
       "epoch": "Epoca",
       "supply": "Suministro",
@@ -58,6 +64,13 @@
       "copySuccessDesc": "Tu identidad publica esta en el portapapeles.",
       "copyFail": "Fallo al copiar",
       "copyFailDesc": "Intenta de nuevo o copia manualmente."
+    },
+    "watchOnly": {
+      "title": "Cuenta de solo lectura",
+      "description": "El envio esta deshabilitado para esta direccion."
+    },
+    "status": {
+      "syncing": "Sincronizando"
     },
     "accounts": {
       "title": "Cuentas",
@@ -217,6 +230,24 @@
     "outgoing": "Saliente",
     "tick": "Tick",
     "type": "Tipo"
+  },
+  "txDetails": {
+    "title": "Detalles de transaccion",
+    "loading": "Cargando transaccion...",
+    "error": "No se pudieron cargar los detalles de la transaccion.",
+    "back": "Atras",
+    "refresh": "Actualizar transaccion",
+    "copy": "Copiar",
+    "copyTxId": "Copiar txid",
+    "copied": "Copiado",
+    "copyFailed": "Error al copiar",
+    "hash": "Hash",
+    "amount": "Monto",
+    "tick": "Tick",
+    "inputType": "Tipo de input",
+    "source": "Origen",
+    "destination": "Destino",
+    "openExplorer": "Abrir en explorador"
   },
   "transfer": {
     "title": "Enviar",
