@@ -219,17 +219,27 @@
     "type": "Type"
   },
   "transfer": {
-    "title": "Send QU",
+    "title": "Send",
     "subtitle": "Transfer funds to another identity",
+    "selectToken": {
+      "subtitle": "Select the token you want to send",
+      "label": "Available tokens",
+      "native": "Native token"
+    },
     "balance": {
       "label": "Available balance",
       "loading": "Loading balance..."
     },
     "form": {
+      "token": "Token",
       "recipient": "Recipient identity",
       "recipientPlaceholder": "60-character identity (A-Z)",
-      "amount": "Amount (QU)",
-      "amountPlaceholder": "Enter amount"
+      "amount": "Amount ({{token}})",
+      "amountPlaceholder": "Enter amount",
+      "max": "MAX",
+      "fee": "Fee",
+      "feeValue": "{{fee}} QUBIC",
+      "quBalance": "Balance: {{balance}} QUBIC"
     },
     "validation": {
       "recipientRequired": "Recipient identity is required.",
@@ -238,13 +248,15 @@
       "amountRequired": "Amount is required.",
       "amountInvalid": "Amount must be a positive number.",
       "amountExceedsBalance": "Amount exceeds available balance.",
-      "balanceLoading": "Please wait for balance to load."
+      "balanceLoading": "Please wait for balance to load.",
+      "insufficientQuForFee": "Insufficient QUBIC balance to cover the {{fee}} QU transfer fee."
     },
     "confirm": {
       "title": "Confirm transfer",
       "description": "Review the details before sending.",
       "to": "To",
       "amount": "Amount",
+      "fee": "Network fee: {{fee}} QU",
       "warning": "This action cannot be undone."
     },
     "actions": {
@@ -256,7 +268,7 @@
     },
     "success": {
       "title": "Transfer sent",
-      "description": "Transaction broadcast to the network.",
+      "description": "Your transaction has been broadcast and is scheduled for tick {{targetTick}}.",
       "txId": "Transaction ID",
       "targetTick": "Target tick",
       "amount": "Amount",

@@ -219,17 +219,27 @@
     "type": "Tipo"
   },
   "transfer": {
-    "title": "Enviar QU",
+    "title": "Enviar",
     "subtitle": "Transferir fondos a otra identidad",
+    "selectToken": {
+      "subtitle": "Selecciona el token que deseas enviar",
+      "label": "Tokens disponibles",
+      "native": "Token nativo"
+    },
     "balance": {
       "label": "Saldo disponible",
       "loading": "Cargando saldo..."
     },
     "form": {
+      "token": "Token",
       "recipient": "Identidad del destinatario",
       "recipientPlaceholder": "Identidad de 60 caracteres (A-Z)",
-      "amount": "Monto (QU)",
-      "amountPlaceholder": "Ingresa el monto"
+      "amount": "Monto ({{token}})",
+      "amountPlaceholder": "Ingresa el monto",
+      "max": "MAX",
+      "fee": "Comision",
+      "feeValue": "{{fee}} QUBIC",
+      "quBalance": "Saldo: {{balance}} QUBIC"
     },
     "validation": {
       "recipientRequired": "La identidad del destinatario es requerida.",
@@ -238,13 +248,15 @@
       "amountRequired": "El monto es requerido.",
       "amountInvalid": "El monto debe ser un numero positivo.",
       "amountExceedsBalance": "El monto excede el saldo disponible.",
-      "balanceLoading": "Espera a que se cargue el saldo."
+      "balanceLoading": "Espera a que se cargue el saldo.",
+      "insufficientQuForFee": "Saldo QUBIC insuficiente para cubrir la comision de {{fee}} QU."
     },
     "confirm": {
       "title": "Confirmar transferencia",
       "description": "Revisa los detalles antes de enviar.",
       "to": "Para",
       "amount": "Monto",
+      "fee": "Comision de red: {{fee}} QU",
       "warning": "Esta accion no se puede deshacer."
     },
     "actions": {
@@ -256,7 +268,7 @@
     },
     "success": {
       "title": "Transferencia enviada",
-      "description": "Transaccion transmitida a la red.",
+      "description": "Tu transaccion ha sido transmitida y esta programada para el tick {{targetTick}}.",
       "txId": "ID de transaccion",
       "targetTick": "Tick objetivo",
       "amount": "Monto",
