@@ -72,7 +72,7 @@ const TransferSuccess = ({
 
   return (
     <section className="flex w-full justify-center pt-4">
-      <div className="flex w-full max-w-sm flex-col gap-6 px-6">
+      <div className="flex w-full max-w-sm flex-col gap-6 px-4">
         <button
           type="button"
           onClick={onSendAnother}
@@ -294,7 +294,7 @@ const TransferForm = ({
 
   return (
     <section className="flex w-full justify-center pt-4">
-      <div className="flex w-full max-w-sm flex-col gap-6 px-6">
+      <div className="flex w-full max-w-sm flex-col gap-6 px-4">
         <div>
           <h1 className="text-2xl font-semibold">{t('transfer.title')}</h1>
           <p className="mt-1 text-sm text-muted-foreground">{t('transfer.subtitle')}</p>

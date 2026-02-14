@@ -81,7 +81,7 @@ const PassphraseAuth = ({ title, subtitle, onSuccess, onCancel }: PassphraseAuth
 
   return (
     <section className="flex min-h-full w-full justify-center">
-      <div className="flex min-h-full w-full max-w-sm flex-col px-6 pb-6 pt-4">
+      <div className="flex min-h-full w-full max-w-sm flex-col px-4 pb-6 pt-4">
         <div className="flex items-center justify-between">
           <button
             type="button"

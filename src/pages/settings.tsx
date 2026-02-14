@@ -142,7 +142,7 @@ const Settings = () => {
   return (
     <>
       <section className="flex w-full justify-center pt-4">
-        <div className="flex w-full max-w-sm flex-col gap-6 px-6">
+        <div className="flex w-full max-w-sm flex-col gap-6 px-4">
           <div className="space-y-3">
             <Label htmlFor="language" className="text-sm text-muted-foreground">
               {t('settings.language')}
