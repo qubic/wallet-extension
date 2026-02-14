@@ -20,6 +20,8 @@ const formatValue = (value: unknown): string => {
   return String(value)
 }
 
+const TX_DETAILS_SKELETON_IDS = ['a', 'b', 'c', 'd', 'e', 'f'] as const
+
 const TransactionDetails = () => {
   const { t } = useTranslation()
   const { hash = '' } = useParams<{ hash: string }>()
@@ -98,7 +100,17 @@ const TransactionDetails = () => {
         </div>
 
         {txQuery.isLoading && (
-          <div className="text-xs text-muted-foreground">{t('txDetails.loading')}</div>
+          <div className="space-y-2">
+            <div className="text-xs text-muted-foreground">{t('txDetails.loading')}</div>
+            <div className="divide-y divide-border/40">
+              {TX_DETAILS_SKELETON_IDS.map((id) => (
+                <div key={`tx-details-skeleton-${id}`} className="space-y-2 py-2">
+                  <div className="h-3 w-20 animate-pulse rounded bg-muted/35" />
+                  <div className="h-3 w-full animate-pulse rounded bg-muted/25" />
+                </div>
+              ))}
+            </div>
+          </div>
         )}
 
         {txQuery.error && (
