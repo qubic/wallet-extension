@@ -86,6 +86,9 @@ const fetchLatestStats = async (): Promise<LatestStatsResponse> => {
   return response.json() as Promise<LatestStatsResponse>
 }
 
+const SYNC_BADGE_SHOW_DELAY_MS = 180
+const SYNC_BADGE_MIN_VISIBLE_MS = 700
+
 const pageMotion = {
   initial: { opacity: 0, y: 14 },
   animate: {
@@ -382,6 +385,15 @@ const Home = () => {
     () => transactions.data?.pages.flatMap((page) => page.transactions) ?? [],
     [transactions.data],
   )
+  const isSyncingRaw =
+    balance.isFetching ||
+    transactions.isFetching ||
+    ownedAssets.isFetching ||
+    latestStats.isFetching
+  const [isSyncingVisible, setIsSyncingVisible] = useState(false)
+  const syncingShownAtRef = useRef<number | null>(null)
+  const syncShowTimerRef = useRef<number | null>(null)
+  const syncHideTimerRef = useRef<number | null>(null)
 
   const handleCopyIdentity = async () => {
     try {
@@ -415,6 +427,41 @@ const Home = () => {
   useEffect(() => {
     resolvePendingTransactions(transactionItems, currentTick)
   }, [transactionItems, currentTick])
+
+  useEffect(() => {
+    const clearTimers = () => {
+      if (syncShowTimerRef.current) {
+        window.clearTimeout(syncShowTimerRef.current)
+        syncShowTimerRef.current = null
+      }
+      if (syncHideTimerRef.current) {
+        window.clearTimeout(syncHideTimerRef.current)
+        syncHideTimerRef.current = null
+      }
+    }
+
+    clearTimers()
+
+    if (isSyncingRaw) {
+      if (isSyncingVisible) return undefined
+      syncShowTimerRef.current = window.setTimeout(() => {
+        syncingShownAtRef.current = Date.now()
+        setIsSyncingVisible(true)
+      }, SYNC_BADGE_SHOW_DELAY_MS)
+      return clearTimers
+    }
+
+    if (!isSyncingVisible) return undefined
+
+    const elapsed = syncingShownAtRef.current ? Date.now() - syncingShownAtRef.current : 0
+    const remaining = Math.max(0, SYNC_BADGE_MIN_VISIBLE_MS - elapsed)
+    syncHideTimerRef.current = window.setTimeout(() => {
+      syncingShownAtRef.current = null
+      setIsSyncingVisible(false)
+    }, remaining)
+
+    return clearTimers
+  }, [isSyncingRaw, isSyncingVisible])
 
   useEffect(() => {
     const handlePendingSettled = () => {
@@ -472,10 +519,7 @@ const Home = () => {
     <section
       className={`relative flex w-full pt-4 ${isConstrainedLayout ? 'justify-start' : 'justify-center'}`}
     >
-      {(balance.isFetching ||
-        transactions.isFetching ||
-        ownedAssets.isFetching ||
-        latestStats.isFetching) && (
+      {isSyncingVisible && (
         <div className="pointer-events-none absolute left-4 top-2 z-10">
           <div className="inline-flex shrink-0 items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-2 py-1 text-[11px] text-primary">
             <Loader2Icon className="h-3.5 w-3.5 animate-spin" />
@@ -500,23 +544,9 @@ const Home = () => {
                 className="h-9 w-9 shrink-0"
                 aria-label="Refresh"
                 onClick={handleRefresh}
-                disabled={
-                  balance.isFetching ||
-                  transactions.isFetching ||
-                  ownedAssets.isFetching ||
-                  latestStats.isFetching
-                }
+                disabled={isSyncingRaw}
               >
-                <RefreshCwIcon
-                  className={`h-4 w-4 ${
-                    balance.isFetching ||
-                    transactions.isFetching ||
-                    ownedAssets.isFetching ||
-                    latestStats.isFetching
-                      ? 'animate-spin'
-                      : ''
-                  }`}
-                />
+                <RefreshCwIcon className={`h-4 w-4 ${isSyncingRaw ? 'animate-spin' : ''}`} />
               </Button>
             </div>
             <div>
