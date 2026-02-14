@@ -941,26 +941,37 @@ const Transfer = () => {
       }
 
       let result: { txId: string; targetTick: bigint }
-      const latestStatsSnapshot = await latestStats.refetch()
-      const sendCurrentTick =
-        latestStatsSnapshot.data?.data?.currentTick ?? latestStats.data?.data?.currentTick
-      let requestedTargetTick: number | undefined
+      let requestedTargetTick: bigint | number | undefined
 
       if (isManualTargetTickEnabled) {
         const parsedManualTick = Number.parseInt(manualTargetTick.trim(), 10)
         if (!Number.isFinite(parsedManualTick) || parsedManualTick < 1) {
           throw new Error(t('transfer.validation.targetTickManualInvalid'))
         }
+        const latestStatsSnapshot = await latestStats.refetch()
+        const sendCurrentTick =
+          latestStatsSnapshot.data?.data?.currentTick ?? latestStats.data?.data?.currentTick
         if (typeof sendCurrentTick === 'number' && parsedManualTick <= sendCurrentTick) {
           throw new Error(t('transfer.validation.targetTickManualPast'))
         }
         requestedTargetTick = parsedManualTick
-      } else if (typeof sendCurrentTick === 'number') {
+      } else {
         const effectiveOffset = Math.min(
           TARGET_TICK_OFFSET_MAX,
           Math.max(TARGET_TICK_OFFSET_MIN, targetTickOffset),
         )
-        requestedTargetTick = sendCurrentTick + effectiveOffset
+        try {
+          requestedTargetTick = await sdk.tick.getSuggestedTargetTick({
+            offset: effectiveOffset,
+          })
+        } catch {
+          const latestStatsSnapshot = await latestStats.refetch()
+          const sendCurrentTick =
+            latestStatsSnapshot.data?.data?.currentTick ?? latestStats.data?.data?.currentTick
+          if (typeof sendCurrentTick === 'number') {
+            requestedTargetTick = sendCurrentTick + effectiveOffset
+          }
+        }
       }
 
       if (selectedAsset) {
