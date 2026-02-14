@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client'
 import './styles/global.css'
 import './i18n'
 import App from './app/app'
+import { startActionIconThemeSync } from './lib/extension-icons'
 
 const applyViewportSizing = () => {
   const html = document.documentElement
@@ -94,6 +95,7 @@ const startExtensionReloadWatcher = () => {
 }
 
 startExtensionReloadWatcher()
+startActionIconThemeSync()
 
 const rootElement = document.getElementById('root')
 

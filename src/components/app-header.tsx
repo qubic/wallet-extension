@@ -1,11 +1,4 @@
-import {
-  CopyIcon,
-  PanelRightOpenIcon,
-  SquareArrowOutUpRightIcon,
-  UsersIcon,
-  WalletIcon,
-} from 'lucide-react'
-import { toast } from 'sonner'
+import { PanelRightOpenIcon, SquareArrowOutUpRightIcon, UsersIcon, WalletIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { truncateString } from '@/lib/utils'
@@ -110,22 +103,8 @@ const AppHeader = ({
     }
   }, [refreshAccounts])
 
-  const handleCopy = async () => {
-    if (!identity) return
-    try {
-      await navigator.clipboard.writeText(identity)
-      toast.success(t('home.toast.copySuccess'), {
-        description: t('home.toast.copySuccessDesc'),
-      })
-    } catch {
-      toast.error(t('home.toast.copyFail'), {
-        description: t('home.toast.copyFailDesc'),
-      })
-    }
-  }
-
   return (
-    <header className="z-20 flex items-center justify-between gap-4 border-b border-border/60 bg-background px-4 py-4">
+    <header className="z-20 flex items-center justify-between gap-4 rounded-b-2xl border-b border-border/60 bg-background/95 px-4 py-4 shadow-[0_10px_25px_-18px_hsl(var(--primary)/0.45)] backdrop-blur supports-[backdrop-filter]:bg-background/82">
       <Popover
         open={isMenuOpen}
         onOpenChange={(open) => {
@@ -212,16 +191,6 @@ const AppHeader = ({
         </PopoverContent>
       </Popover>
       <div className="flex items-center gap-2 text-xs text-muted-foreground">
-        <Button
-          size="icon"
-          variant="ghost"
-          onClick={handleCopy}
-          aria-label="Copy address"
-          className="h-9 w-9"
-          disabled={!identity}
-        >
-          <CopyIcon className="size-4" />
-        </Button>
         <Button
           size="icon"
           variant="ghost"

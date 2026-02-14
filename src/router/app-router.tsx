@@ -12,6 +12,7 @@ import ImportVault from '../pages/onboarding/import-vault'
 import Transfer from '../pages/transfer'
 import Settings from '../pages/settings'
 import Security from '../pages/settings/security'
+import TransactionDetails from '../pages/transaction-details'
 import Unlock from '../pages/unlock'
 import Welcome from '../pages/welcome'
 import ImportWatchOnly from '../pages/accounts/import-watch-only'
@@ -188,6 +189,14 @@ const AppRouter = () => {
             element={
               <AnimatedRoute>
                 <History />
+              </AnimatedRoute>
+            }
+          />
+          <Route
+            path="/tx/:hash"
+            element={
+              <AnimatedRoute>
+                <TransactionDetails />
               </AnimatedRoute>
             }
           />

@@ -4,12 +4,14 @@ import {
   ArrowDownLeftIcon,
   ArrowUpRightIcon,
   CopyIcon,
+  EyeIcon,
   InboxIcon,
+  Loader2Icon,
   PackageIcon,
   DownloadIcon,
   RefreshCwIcon,
 } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import QRCode from 'qrcode'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
@@ -20,6 +22,14 @@ import { useTranslation } from 'react-i18next'
 import { normalizeBalance, formatBalanceCompact, truncateString } from '@/lib/utils'
 import { getWatchOnlyAccounts } from '@/lib/accounts'
 import { aggregateAssets, formatAssetUnits, useOwnedAssets } from '@/lib/assets'
+import {
+  getPendingOutgoingDebit,
+  PENDING_SETTLED_EVENT,
+  getPendingTransactionsForIdentity,
+  isTransactionPending,
+  resolvePendingTransactions,
+  usePendingTransactionsVersion,
+} from '@/lib/pending-transactions'
 
 const formatUsdFromNumber = (value: number) => {
   const usdPerBillion = 435
@@ -76,6 +86,9 @@ const fetchLatestStats = async (): Promise<LatestStatsResponse> => {
   return response.json() as Promise<LatestStatsResponse>
 }
 
+const SYNC_BADGE_SHOW_DELAY_MS = 180
+const SYNC_BADGE_MIN_VISIBLE_MS = 700
+
 const pageMotion = {
   initial: { opacity: 0, y: 14 },
   animate: {
@@ -100,9 +113,17 @@ const sectionMotion = {
 const BalanceCard = ({
   balance,
   identity,
+  pendingDebit,
+  networkMeta,
 }: {
   balance: ReturnType<typeof useBalance>
   identity: string
+  pendingDebit: bigint
+  networkMeta: {
+    tick: string | number
+    epoch: string | number
+    price: string
+  }
 }) => {
   const { t } = useTranslation()
   const [cachedBalance, setCachedBalanceState] = useState<bigint | null>(() =>
@@ -155,16 +176,28 @@ const BalanceCard = ({
     return <div className="text-sm text-destructive">{balance.error.message}</div>
   }
 
+  const effectiveBalance = normalized > pendingDebit ? normalized - pendingDebit : 0n
+  const pendingActive = pendingDebit > 0n
   const displayBigInt = BigInt(Math.max(0, Math.floor(displayBalance)))
+  const displayValue =
+    pendingActive && displayBigInt > pendingDebit ? displayBigInt - pendingDebit : effectiveBalance
 
   return (
-    <div className="text-center">
-      <div className="text-4xl font-semibold text-foreground">
-        {formatBalanceCompact(displayBigInt)}
+    <div className="space-y-3 text-center">
+      <div className="text-5xl font-semibold leading-none tracking-tight text-foreground">
+        {formatBalanceCompact(displayValue)}
       </div>
-      <div className="mt-2 text-sm text-muted-foreground">
-        {formatUsdFromNumber(displayBalance)}
+      <div className="inline-flex items-center rounded-full border border-primary/25 bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary">
+        {`≈ ${formatUsdFromNumber(Number(displayValue))}`}
       </div>
+      <div className="text-[11px] text-muted-foreground">
+        {networkMeta.price} / {networkMeta.tick} / {networkMeta.epoch}
+      </div>
+      {pendingActive && (
+        <div className="text-[11px] text-amber-700 dark:text-amber-300">
+          -{formatBalanceCompact(pendingDebit)} {t('home.status.pending').toLowerCase()}
+        </div>
+      )}
     </div>
   )
 }
@@ -172,15 +205,26 @@ const BalanceCard = ({
 const TransactionsPreview = ({
   identity,
   transactions,
+  currentTick,
   onViewMore,
+  onOpenTx,
 }: {
   identity: string
   transactions: ReturnType<typeof useTransactions>
+  currentTick?: number
   onViewMore: () => void
+  onOpenTx: (hash: string) => void
 }) => {
   const { t } = useTranslation()
+  usePendingTransactionsVersion()
   if (transactions.isLoading) {
-    return <div className="text-xs text-muted-foreground">{t('home.recent.loading')}</div>
+    return (
+      <div className="space-y-2">
+        <div className="h-16 animate-pulse rounded-xl border border-border/40 bg-muted/20" />
+        <div className="h-16 animate-pulse rounded-xl border border-border/40 bg-muted/20" />
+        <div className="h-16 animate-pulse rounded-xl border border-border/40 bg-muted/20" />
+      </div>
+    )
   }
 
   if (transactions.error) {
@@ -188,7 +232,21 @@ const TransactionsPreview = ({
   }
 
   const items = transactions.data?.pages.flatMap((page) => page.transactions) ?? []
-  const recent = items.slice(0, 3)
+  const pending = getPendingTransactionsForIdentity(identity, currentTick)
+  const pendingHashes = new Set(pending.map((tx) => tx.hash.toLowerCase()))
+  const pendingItems = pending.map((tx) => ({
+    hash: tx.hash,
+    source: tx.sourceIdentity,
+    destination: tx.destinationIdentity ?? '',
+    amount: tx.amount ?? 0n,
+    tickNumber: tx.targetTick,
+    inputType: tx.inputType ?? 0,
+  }))
+  const merged = [
+    ...pendingItems,
+    ...items.filter((tx) => !pendingHashes.has(tx.hash.toLowerCase())),
+  ]
+  const recent = merged.slice(0, 3)
 
   if (recent.length === 0) {
     return (
@@ -211,27 +269,34 @@ const TransactionsPreview = ({
         const label = isIncoming ? t('home.recent.incoming') : t('home.recent.outgoing')
         const counterparty = isIncoming ? tx.source : tx.destination
         const Icon = isIncoming ? ArrowDownLeftIcon : ArrowUpRightIcon
+        const isPending = isTransactionPending(tx.hash, currentTick)
 
         return (
-          <motion.div
+          <motion.button
+            type="button"
             key={tx.hash}
-            className="flex items-center justify-between rounded-lg bg-card px-3 py-2"
-            whileHover={{ y: -1 }}
-            transition={{ type: 'spring', stiffness: 320, damping: 24 }}
+            className={`group flex w-full cursor-pointer items-center justify-between rounded-xl border px-3 py-2 text-left transition-colors ${
+              isPending
+                ? 'animate-pulse border-amber-500/50 bg-amber-500/10 text-amber-800 dark:text-amber-200'
+                : 'border-border/40 bg-background/40 hover:border-primary/30 hover:bg-background/60'
+            }`}
+            onClick={() => onOpenTx(tx.hash)}
           >
             <div className="flex items-center gap-3">
               <div
                 className={`flex h-9 w-9 items-center justify-center rounded-full border ${
-                  isIncoming
-                    ? 'border-primary/40 bg-primary/10 text-primary'
-                    : 'border-[var(--destructive)]/40 bg-[var(--destructive)]/10 text-[var(--destructive)]'
+                  isPending
+                    ? 'border-amber-500/40 bg-amber-500/15 text-amber-700 dark:text-amber-300'
+                    : isIncoming
+                      ? 'border-primary/40 bg-primary/10 text-primary'
+                      : 'border-[var(--destructive)]/40 bg-[var(--destructive)]/10 text-[var(--destructive)]'
                 }`}
               >
                 <Icon className="h-4 w-4" />
               </div>
               <div className="flex flex-col">
                 <span className="text-xs font-semibold text-foreground">{label}</span>
-                <span className="text-xs text-muted-foreground">
+                <span className="font-mono text-xs text-muted-foreground">
                   {truncateString(counterparty)}
                 </span>
                 <span className="text-[11px] text-muted-foreground/70">
@@ -240,12 +305,18 @@ const TransactionsPreview = ({
               </div>
             </div>
             <span
-              className={`text-sm font-medium ${isIncoming ? 'text-primary' : 'text-[var(--destructive)]'}`}
+              className={`rounded-md px-2 py-0.5 text-sm font-semibold ${
+                isPending
+                  ? 'bg-amber-500/15 text-amber-700 dark:text-amber-300'
+                  : isIncoming
+                    ? 'bg-primary/10 text-primary'
+                    : 'bg-[var(--destructive)]/10 text-[var(--destructive)]'
+              }`}
             >
               {isIncoming ? '+' : '-'}
               {formatBalanceCompact(tx.amount)}
             </span>
-          </motion.div>
+          </motion.button>
         )
       })}
       <button
@@ -254,7 +325,7 @@ const TransactionsPreview = ({
         onClick={onViewMore}
         aria-label={t('home.actions.history')}
       >
-        View all
+        {t('home.recent.viewAll')}
       </button>
     </div>
   )
@@ -262,6 +333,7 @@ const TransactionsPreview = ({
 
 const Home = () => {
   const { t } = useTranslation()
+  usePendingTransactionsVersion()
   const [identity, setIdentity] = useState(localStorage.getItem('currentIdentity') ?? '')
   const [isWatchOnly, setIsWatchOnly] = useState(() =>
     getWatchOnlyAccounts().some(
@@ -274,14 +346,16 @@ const Home = () => {
   const isConstrainedLayout = isPopup || isSidePanel
   const assetsListMaxHeightClass = isPopup ? 'max-h-36' : isSidePanel ? 'max-h-44' : 'max-h-52'
   const navigate = useNavigate()
-  const balance = useBalance(identity, { refetchInterval: 10_000 })
+  const balance = useBalance(identity, { refetchInterval: 15_000 })
   const latestStats = useQuery({
     queryKey: ['qubic', 'latest-stats'],
     queryFn: fetchLatestStats,
-    staleTime: 120_000,
+    refetchInterval: 15_000,
+    staleTime: 3_000,
     gcTime: 120_000,
   })
   const ownedAssets = useOwnedAssets(identity)
+  const aggregatedAssets = ownedAssets.data ? aggregateAssets(ownedAssets.data) : []
   const transactions = useTransactions(
     {
       identity,
@@ -292,11 +366,34 @@ const Home = () => {
   )
   const [isReceiveOpen, setIsReceiveOpen] = useState(false)
   const [qrCode, setQrCode] = useState<string | null>(null)
-
+  const [virtualTick, setVirtualTick] = useState<number | null>(null)
+  const currentTickFromRpc = latestStats.data?.data?.currentTick
+  const hasVirtualTick = virtualTick !== null
+  const tickValue = virtualTick ?? currentTickFromRpc ?? '--'
+  const currentTick = typeof tickValue === 'number' ? tickValue : undefined
+  const pendingOutgoingDebit = getPendingOutgoingDebit(identity, currentTick)
+  const hasPendingOutgoing = getPendingTransactionsForIdentity(identity, currentTick).length > 0
+  const epochValue = latestStats.data?.data?.epoch ?? '--'
+  const pricePerBValue = latestStats.data?.data?.price
+    ? `$${(latestStats.data.data.price * 1_000_000_000).toFixed(2)}`
+    : '--'
   const handleRefresh = () => {
     void balance.refetch()
     void transactions.refetch()
   }
+  const transactionItems = useMemo(
+    () => transactions.data?.pages.flatMap((page) => page.transactions) ?? [],
+    [transactions.data],
+  )
+  const isSyncingRaw =
+    balance.isFetching ||
+    transactions.isFetching ||
+    ownedAssets.isFetching ||
+    latestStats.isFetching
+  const [isSyncingVisible, setIsSyncingVisible] = useState(false)
+  const syncingShownAtRef = useRef<number | null>(null)
+  const syncShowTimerRef = useRef<number | null>(null)
+  const syncHideTimerRef = useRef<number | null>(null)
 
   const handleCopyIdentity = async () => {
     try {
@@ -328,6 +425,57 @@ const Home = () => {
   }, [])
 
   useEffect(() => {
+    resolvePendingTransactions(transactionItems, currentTick)
+  }, [transactionItems, currentTick])
+
+  useEffect(() => {
+    const clearTimers = () => {
+      if (syncShowTimerRef.current) {
+        window.clearTimeout(syncShowTimerRef.current)
+        syncShowTimerRef.current = null
+      }
+      if (syncHideTimerRef.current) {
+        window.clearTimeout(syncHideTimerRef.current)
+        syncHideTimerRef.current = null
+      }
+    }
+
+    clearTimers()
+
+    if (isSyncingRaw) {
+      if (isSyncingVisible) return undefined
+      syncShowTimerRef.current = window.setTimeout(() => {
+        syncingShownAtRef.current = Date.now()
+        setIsSyncingVisible(true)
+      }, SYNC_BADGE_SHOW_DELAY_MS)
+      return clearTimers
+    }
+
+    if (!isSyncingVisible) return undefined
+
+    const elapsed = syncingShownAtRef.current ? Date.now() - syncingShownAtRef.current : 0
+    const remaining = Math.max(0, SYNC_BADGE_MIN_VISIBLE_MS - elapsed)
+    syncHideTimerRef.current = window.setTimeout(() => {
+      syncingShownAtRef.current = null
+      setIsSyncingVisible(false)
+    }, remaining)
+
+    return clearTimers
+  }, [isSyncingRaw, isSyncingVisible])
+
+  useEffect(() => {
+    const handlePendingSettled = () => {
+      void balance.refetch()
+      void transactions.refetch()
+      void ownedAssets.refetch()
+    }
+    window.addEventListener(PENDING_SETTLED_EVENT, handlePendingSettled)
+    return () => {
+      window.removeEventListener(PENDING_SETTLED_EVENT, handlePendingSettled)
+    }
+  }, [balance, ownedAssets, transactions])
+
+  useEffect(() => {
     let isActive = true
 
     if (!isReceiveOpen || !identity) {
@@ -352,197 +500,185 @@ const Home = () => {
     }
   }, [identity, isReceiveOpen])
 
+  useEffect(() => {
+    if (typeof currentTickFromRpc !== 'number') return
+    setVirtualTick(currentTickFromRpc)
+  }, [currentTickFromRpc])
+
+  useEffect(() => {
+    if (!hasVirtualTick) return
+    const timer = window.setInterval(() => {
+      setVirtualTick((previous) => (previous == null ? previous : previous + 1))
+    }, 1_300)
+    return () => {
+      window.clearInterval(timer)
+    }
+  }, [hasVirtualTick])
+
   return (
     <section
-      className={`flex w-full pt-4 ${isConstrainedLayout ? 'justify-start' : 'justify-center'}`}
+      className={`relative flex w-full pt-4 ${isConstrainedLayout ? 'justify-start' : 'justify-center'}`}
     >
+      {isSyncingVisible && (
+        <div className="pointer-events-none absolute left-4 top-2 z-10">
+          <div className="inline-flex shrink-0 items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-2 py-1 text-[11px] text-primary">
+            <Loader2Icon className="h-3.5 w-3.5 animate-spin" />
+            {t('home.status.syncing')}
+          </div>
+        </div>
+      )}
       <AnimatePresence mode="wait">
         <motion.div
           key={identity || 'no-identity'}
-          className="flex w-full max-w-sm flex-col gap-6 px-6"
+          className="flex w-full max-w-sm flex-col gap-5 px-4"
           variants={pageMotion}
           initial="initial"
           animate="animate"
           exit={{ opacity: 0, y: -8, transition: { duration: 0.16 } }}
         >
-          <motion.div className="flex items-center justify-between" variants={sectionMotion}>
-            <span className="text-xs font-semibold uppercase text-muted-foreground">
-              {t('home.balance.label')}
-            </span>
-            <Button
-              size="icon"
-              variant="ghost"
-              className="h-9 w-9"
-              aria-label="Refresh"
-              onClick={handleRefresh}
-              disabled={balance.isFetching || transactions.isFetching}
-            >
-              <RefreshCwIcon
-                className={`h-4 w-4 ${
-                  balance.isFetching || transactions.isFetching ? 'animate-spin' : ''
-                }`}
+          <motion.div className="space-y-4 p-1" variants={sectionMotion}>
+            <div className="flex items-start justify-end gap-3">
+              <Button
+                size="icon"
+                variant="ghost"
+                className="h-9 w-9 shrink-0"
+                aria-label="Refresh"
+                onClick={handleRefresh}
+                disabled={isSyncingRaw}
+              >
+                <RefreshCwIcon className={`h-4 w-4 ${isSyncingRaw ? 'animate-spin' : ''}`} />
+              </Button>
+            </div>
+            <div>
+              <BalanceCard
+                balance={balance}
+                identity={identity}
+                pendingDebit={pendingOutgoingDebit}
+                networkMeta={{ tick: tickValue, epoch: epochValue, price: pricePerBValue }}
               />
-            </Button>
-          </motion.div>
-          <motion.div className="rounded-lg bg-card p-4 text-center" variants={sectionMotion}>
-            <BalanceCard balance={balance} identity={identity} />
+            </div>
+            <div className="flex min-h-6 items-center gap-2 overflow-hidden">
+              {isWatchOnly && (
+                <div className="inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-1 text-[11px] text-amber-200">
+                  <EyeIcon className="h-3.5 w-3.5" />
+                  {t('home.watchOnly.title')}
+                </div>
+              )}
+            </div>
           </motion.div>
 
           <motion.div className="grid grid-cols-2 gap-3" variants={sectionMotion}>
             <Button
-              size="lg"
-              className="aspect-square w-full flex-row gap-2 rounded-md bg-primary/10 text-primary hover:bg-primary/20"
+              size="sm"
+              className="h-12 w-full gap-2 rounded-md bg-primary/10 text-primary hover:bg-primary/20"
               onClick={() => navigate('/transfer')}
-              disabled={isWatchOnly}
-              title={isWatchOnly ? t('transfer.errors.watchOnly') : undefined}
+              disabled={isWatchOnly || hasPendingOutgoing}
+              title={
+                isWatchOnly
+                  ? t('transfer.errors.watchOnly')
+                  : hasPendingOutgoing
+                    ? t('transfer.errors.pendingOutgoing')
+                    : undefined
+              }
             >
-              <ArrowUpRightIcon className="h-6 w-6" />
+              <ArrowUpRightIcon className="h-4 w-4" />
               {t('home.actions.send')}
             </Button>
             <Button
-              size="lg"
+              size="sm"
               variant="secondary"
-              className="aspect-square w-full flex-row gap-2 rounded-md bg-card hover:bg-muted"
+              className="h-12 w-full gap-2 rounded-md bg-card hover:bg-muted"
               onClick={() => setIsReceiveOpen(true)}
             >
-              <DownloadIcon className="h-6 w-6" />
+              <DownloadIcon className="h-4 w-4" />
               {t('home.actions.receive')}
             </Button>
           </motion.div>
 
-          <motion.div className="space-y-2" variants={sectionMotion}>
-            <div className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-              {t('home.recent.title')}
+          <motion.div className="space-y-3" variants={sectionMotion}>
+            <div className="flex items-center justify-between">
+              <div className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                {t('home.recent.title')}
+              </div>
+              {transactions.isFetching && (
+                <Loader2Icon className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
+              )}
             </div>
             <TransactionsPreview
               identity={identity}
               transactions={transactions}
+              currentTick={currentTick}
               onViewMore={() => navigate('/history')}
+              onOpenTx={(hash) => navigate(`/tx/${hash}`)}
             />
           </motion.div>
 
-          <motion.div className="space-y-2" variants={sectionMotion}>
-            <div className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-              {t('home.network.title')}
-            </div>
-            <div className="grid grid-cols-2 gap-2 text-sm">
-              <div className="rounded-lg bg-card px-3 py-2">
-                <div className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
-                  {t('home.network.tick')}
-                </div>
-                <div className="text-sm font-semibold text-foreground">
-                  {latestStats.data?.data?.currentTick ?? '--'}
-                </div>
+          <motion.div className="space-y-3" variants={sectionMotion}>
+            <div className="flex items-center justify-between">
+              <div className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                {t('home.assets.title')}
               </div>
-              <div className="rounded-lg bg-card px-3 py-2">
-                <div className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
-                  {t('home.network.epoch')}
-                </div>
-                <div className="text-sm font-semibold text-foreground">
-                  {latestStats.data?.data?.epoch ?? '--'}
-                </div>
+              <div className="flex items-center gap-2">
+                {ownedAssets.isFetching && (
+                  <Loader2Icon className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
+                )}
               </div>
-              <div className="rounded-lg bg-card px-3 py-2">
-                <div className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
-                  {t('home.network.supply')}
-                </div>
-                <div className="text-sm font-semibold text-foreground">
-                  {latestStats.data?.data?.circulatingSupply
-                    ? formatBalanceCompact(BigInt(latestStats.data.data.circulatingSupply))
-                    : '--'}
-                </div>
-              </div>
-              <div className="rounded-lg bg-card px-3 py-2">
-                <div className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
-                  {t('home.network.active')}
-                </div>
-                <div className="text-sm font-semibold text-foreground">
-                  {latestStats.data?.data?.activeAddresses ?? '--'}
-                </div>
-              </div>
-              <div className="rounded-lg bg-card px-3 py-2">
-                <div className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
-                  {t('home.network.pricePerB')}
-                </div>
-                <div className="text-sm font-semibold text-foreground">
-                  {latestStats.data?.data?.price
-                    ? `$${(latestStats.data.data.price * 1_000_000_000).toFixed(2)}`
-                    : '--'}
-                </div>
-              </div>
-              <div className="rounded-lg bg-card px-3 py-2">
-                <div className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
-                  {t('home.network.marketCap')}
-                </div>
-                <div className="text-sm font-semibold text-foreground">
-                  {latestStats.data?.data?.marketCap
-                    ? `$${Number(latestStats.data.data.marketCap).toLocaleString()}`
-                    : '--'}
-                </div>
-              </div>
-            </div>
-            {latestStats.error && (
-              <div className="text-xs text-destructive">{latestStats.error.message}</div>
-            )}
-          </motion.div>
-
-          <motion.div className="space-y-2" variants={sectionMotion}>
-            <div className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-              {t('home.assets.title')}
             </div>
             {ownedAssets.isLoading && (
-              <div className="text-xs text-muted-foreground">{t('home.assets.loading')}</div>
+              <div className="space-y-2">
+                <div className="h-11 animate-pulse rounded-lg bg-muted/25" />
+                <div className="h-11 animate-pulse rounded-lg bg-muted/25" />
+              </div>
             )}
             {ownedAssets.error && (
               <div className="text-xs text-destructive">{t('home.assets.error')}</div>
             )}
-            {ownedAssets.data && aggregateAssets(ownedAssets.data).length > 0 && (
+            {ownedAssets.data && aggregatedAssets.length > 0 && (
               <div
                 className={`app-scrollbar ${assetsListMaxHeightClass} space-y-2 overflow-y-auto pr-1`}
               >
-                {aggregateAssets(ownedAssets.data).map((asset) => (
+                {aggregatedAssets.map((asset) => (
                   <div
                     key={`${asset.issuerIdentity}-${asset.name}`}
-                    className="flex items-center justify-between bg-muted/20 px-3 py-2"
+                    className="group flex items-center justify-between rounded-lg border border-border/40 bg-transparent px-3 py-2.5 transition-colors hover:border-primary/30 hover:bg-background/40"
                   >
                     <div className="min-w-0 flex flex-col">
-                      <span className="truncate text-sm font-semibold text-foreground">
+                      <span className="truncate text-sm font-semibold leading-none text-foreground">
                         {asset.name}
                       </span>
                       {asset.issuerIdentity && (
-                        <span className="truncate text-xs text-muted-foreground">
+                        <span className="truncate font-mono text-[11px] text-muted-foreground">
                           {truncateString(asset.issuerIdentity)}
                         </span>
                       )}
                     </div>
-                    <div className="ml-3 shrink-0 text-sm font-semibold text-foreground">
+                    <div className="ml-3 shrink-0 text-right text-base font-semibold tabular-nums text-foreground">
                       {formatAssetUnits(asset.numberOfUnits, asset.decimals)}
                     </div>
                   </div>
                 ))}
               </div>
             )}
-            {ownedAssets.isSuccess &&
-              (!ownedAssets.data || aggregateAssets(ownedAssets.data).length === 0) && (
-                <div className="flex items-center gap-3 rounded-lg border border-dashed border-border/60 bg-muted/20 px-3 py-3 text-xs text-muted-foreground">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted/40 text-muted-foreground">
-                    <PackageIcon className="h-4 w-4" />
-                  </div>
-                  <div>
-                    <div className="text-sm font-semibold text-foreground">
-                      {t('home.assets.emptyTitle')}
-                    </div>
-                    <div className="text-xs text-muted-foreground">{t('home.assets.empty')}</div>
-                  </div>
+            {ownedAssets.isSuccess && (!ownedAssets.data || aggregatedAssets.length === 0) && (
+              <div className="flex items-center gap-3 rounded-lg border border-dashed border-border/60 bg-transparent px-3 py-3 text-xs text-muted-foreground">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full border border-border/40 bg-transparent text-muted-foreground">
+                  <PackageIcon className="h-4 w-4" />
                 </div>
-              )}
+                <div>
+                  <div className="text-sm font-semibold text-foreground">
+                    {t('home.assets.emptyTitle')}
+                  </div>
+                  <div className="text-xs text-muted-foreground">{t('home.assets.empty')}</div>
+                </div>
+              </div>
+            )}
           </motion.div>
         </motion.div>
       </AnimatePresence>
 
       <Drawer open={isReceiveOpen} onOpenChange={setIsReceiveOpen}>
         <DrawerContent
-          className={`max-h-[100vh] border-none bg-background px-6 pt-0 ${
+          className={`max-h-[100vh] border-none bg-background px-4 pt-0 ${
             isSidePanel ? 'pb-8' : isPopup ? 'pb-24' : 'pb-20'
           }`}
         >
