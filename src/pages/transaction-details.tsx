@@ -1,8 +1,8 @@
 import { useSdk } from '@qubic-labs/react'
 import { useQuery } from '@tanstack/react-query'
-import { CheckIcon, CopyIcon, ExternalLinkIcon } from 'lucide-react'
+import { ArrowLeftIcon, CheckIcon, CopyIcon, ExternalLinkIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { buildExplorerObjectUrl, truncateString } from '@/lib/utils'
@@ -43,6 +43,7 @@ const fetchLatestStats = async (): Promise<LatestStatsResponse> => {
 
 const TransactionDetails = () => {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const { hash = '' } = useParams<{ hash: string }>()
   const sdk = useSdk()
   usePendingTransactionsVersion()
@@ -104,6 +105,14 @@ const TransactionDetails = () => {
   return (
     <section className="flex w-full justify-center pt-4">
       <div className="flex w-full max-w-sm flex-col gap-4 px-4 pb-4">
+        <button
+          type="button"
+          className="flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
+          onClick={() => navigate(-1)}
+        >
+          <ArrowLeftIcon className="h-3.5 w-3.5" />
+          {t('txDetails.back')}
+        </button>
         <div className="space-y-2">
           <div className="text-xs font-semibold uppercase text-muted-foreground">
             {t('txDetails.title')}
