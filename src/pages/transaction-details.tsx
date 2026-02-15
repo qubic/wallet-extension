@@ -25,6 +25,30 @@ const formatValue = (value: unknown): string => {
   return String(value)
 }
 
+const formatIntegerLike = (value: unknown): string => {
+  if (value === null || value === undefined) return '--'
+
+  if (typeof value === 'bigint') {
+    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+  }
+
+  if (typeof value === 'number') {
+    if (!Number.isFinite(value)) return '--'
+    return Math.trunc(value).toLocaleString()
+  }
+
+  if (typeof value === 'string') {
+    const normalized = value.trim()
+    if (/^-?\d+$/.test(normalized)) {
+      const sign = normalized.startsWith('-') ? '-' : ''
+      const digits = sign ? normalized.slice(1) : normalized
+      return `${sign}${digits.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`
+    }
+  }
+
+  return formatValue(value)
+}
+
 const TX_DETAILS_SKELETON_IDS = ['a', 'b', 'c', 'd', 'e', 'f'] as const
 
 type LatestStatsResponse = {
@@ -92,10 +116,7 @@ const TransactionDetails = () => {
     {
       key: 'amount',
       label: t('txDetails.amount'),
-      value:
-        details?.amount !== null && details?.amount !== undefined
-          ? Number(details.amount).toLocaleString()
-          : '--',
+      value: formatIntegerLike(details?.amount),
     },
     {
       key: 'timestamp',
