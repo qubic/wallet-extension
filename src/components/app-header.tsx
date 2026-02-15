@@ -2,6 +2,7 @@ import {
   CopyIcon,
   EyeIcon,
   PanelRightOpenIcon,
+  PlusIcon,
   SquareArrowOutUpRightIcon,
   UsersIcon,
   WalletIcon,
@@ -218,18 +219,26 @@ const AppHeader = ({
                       </div>
                     </button>
                   ))}
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="mt-2 w-full justify-start gap-2 text-xs text-muted-foreground"
+                  <button
+                    type="button"
+                    className="mt-2 flex w-full items-center gap-2 border-t border-border/40 px-2 pt-3 text-left transition hover:opacity-80"
                     onClick={() => {
                       setIsMenuOpen(false)
-                      navigate('/accounts/create')
+                      navigate('/accounts', { state: { openAdd: true } })
                     }}
                   >
-                    <UsersIcon className="h-4 w-4" />
-                    {t('home.accounts.create')}
-                  </Button>
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-muted/30">
+                      <PlusIcon className="h-3.5 w-3.5 text-muted-foreground" />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-xs font-semibold text-foreground">
+                        {t('accounts.manage.addTitle')}
+                      </span>
+                      <span className="text-[11px] text-muted-foreground">
+                        {t('accounts.manage.addNewDesc')}
+                      </span>
+                    </div>
+                  </button>
                 </div>
               )}
             </div>

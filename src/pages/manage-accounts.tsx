@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useQueries } from '@tanstack/react-query'
 import { useSdk } from '@qubic-labs/react'
 import { VaultInvalidPassphraseError, VaultEntryNotFoundError } from '@qubic-labs/sdk'
@@ -59,6 +59,7 @@ const ManageAccounts = () => {
   const { t } = useTranslation()
   const sdk = useSdk()
   const navigate = useNavigate()
+  const location = useLocation()
   const [accounts, setAccounts] = useState<AccountEntry[]>(() => {
     const cached = getCachedAccounts().map((entry) => ({
       name: entry.name,
@@ -119,6 +120,14 @@ const ManageAccounts = () => {
   useEffect(() => {
     refreshFromCache()
   }, [refreshFromCache])
+
+  useEffect(() => {
+    const state = location.state as { openAdd?: boolean } | null
+    if (state?.openAdd) {
+      setAddOpen(true)
+      navigate(location.pathname, { replace: true, state: {} })
+    }
+  }, [location.state, navigate, location.pathname])
 
   useEffect(() => {
     const refreshCurrentIdentity = () => {
