@@ -120,6 +120,7 @@ const AppHeader = ({
     setAccountName(selected.name)
     setIdentity(selected.identity)
     setIsMenuOpen(false)
+    navigate('/home')
   }
 
   useEffect(() => {
@@ -149,7 +150,6 @@ const AppHeader = ({
               type="button"
               className="flex min-w-0 items-center gap-3 text-left"
               aria-label={t('home.accounts.selectLabel')}
-              onMouseEnter={() => setIsMenuOpen(true)}
             >
               <div className="flex h-10 w-10 items-center justify-center rounded-md border border-border/60 bg-card">
                 <WalletIcon className="h-5 w-5 text-primary" />
@@ -158,16 +158,24 @@ const AppHeader = ({
                 <span className="truncate text-sm font-semibold text-foreground">
                   {accountName}
                 </span>
-                <span className="text-xs text-muted-foreground">{truncateString(identity)}</span>
+                <div className="flex items-center gap-1">
+                  <span className="text-xs text-muted-foreground">{truncateString(identity)}</span>
+                  <button
+                    type="button"
+                    className="shrink-0 rounded p-0.5 transition-colors hover:bg-muted/40"
+                    aria-label={t('home.receive.copy')}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      void handleCopyIdentity()
+                    }}
+                  >
+                    <CopyIcon className="size-3.5 text-muted-foreground" />
+                  </button>
+                </div>
               </div>
             </button>
           </PopoverTrigger>
-          <PopoverContent
-            align="start"
-            className="w-72 p-3"
-            onMouseEnter={() => setIsMenuOpen(true)}
-            onMouseLeave={() => setIsMenuOpen(false)}
-          >
+          <PopoverContent align="start" className="w-72 p-3">
             <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
               <UsersIcon className="h-4 w-4" />
               {t('home.accounts.title')}
@@ -227,14 +235,6 @@ const AppHeader = ({
             </div>
           </PopoverContent>
         </Popover>
-        <button
-          type="button"
-          className="mb-0.5 shrink-0 self-end rounded p-0.5 transition-colors hover:bg-muted/40"
-          aria-label={t('home.receive.copy')}
-          onClick={handleCopyIdentity}
-        >
-          <CopyIcon className="size-3.5 text-muted-foreground" />
-        </button>
       </div>
       <div className="flex items-center gap-2 text-xs text-muted-foreground">
         <Button
