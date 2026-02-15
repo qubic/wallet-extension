@@ -23,6 +23,7 @@ import {
   getLastUnlockAt,
   isWalletLocked,
   lockWallet,
+  reconcileLockStateWithBrowserSession,
 } from '../lib/lock'
 import { getCurrentIdentity } from '../lib/accounts'
 
@@ -74,9 +75,20 @@ const AppRouter = () => {
 
   useEffect(() => {
     if (!isOnboarded) return undefined
-    ensureUnlockTimestamp()
-    setIsLocked(isWalletLocked())
-    return undefined
+    let isDisposed = false
+
+    const syncLockState = async () => {
+      ensureUnlockTimestamp()
+      await reconcileLockStateWithBrowserSession()
+      if (isDisposed) return
+      setIsLocked(isWalletLocked())
+    }
+
+    void syncLockState()
+
+    return () => {
+      isDisposed = true
+    }
   }, [isOnboarded])
 
   useEffect(() => {

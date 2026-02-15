@@ -1,9 +1,43 @@
 const LOCKED_KEY = 'walletLocked'
 const LAST_UNLOCK_AT_KEY = 'walletLastUnlockAt'
 const LOCK_TIMEOUT_MINUTES_KEY = 'walletLockTimeoutMinutes'
-export const DEFAULT_LOCK_TIMEOUT_MINUTES = 10
+const SESSION_UNLOCKED_KEY = 'walletSessionUnlocked'
+export const DEFAULT_LOCK_TIMEOUT_MINUTES = 15
 const MIN_LOCK_TIMEOUT_MINUTES = 1
 const MAX_LOCK_TIMEOUT_MINUTES = 120
+
+type ChromeStorageSession = {
+  get: (keys: string[], callback: (items: Record<string, unknown>) => void) => void
+  set: (items: Record<string, unknown>, callback?: () => void) => void
+  remove: (keys: string | string[], callback?: () => void) => void
+}
+
+const getChromeSessionStorage = (): ChromeStorageSession | null => {
+  if (typeof window === 'undefined') return null
+
+  const maybeChrome = (
+    window as Window & {
+      chrome?: { storage?: { session?: ChromeStorageSession } }
+    }
+  ).chrome
+
+  return maybeChrome?.storage?.session ?? null
+}
+
+const setSessionUnlockedFlag = (value: boolean) => {
+  const sessionStorage = getChromeSessionStorage()
+  if (!sessionStorage) return
+
+  try {
+    if (value) {
+      sessionStorage.set({ [SESSION_UNLOCKED_KEY]: true })
+      return
+    }
+    sessionStorage.remove(SESSION_UNLOCKED_KEY)
+  } catch {
+    // Ignore storage failures.
+  }
+}
 
 const notifyLockUpdate = () => {
   if (typeof window === 'undefined') return
@@ -40,6 +74,7 @@ export const lockWallet = () => {
   } catch {
     // Ignore storage failures.
   }
+  setSessionUnlockedFlag(false)
   notifyLockUpdate()
 }
 
@@ -50,6 +85,7 @@ export const setUnlocked = () => {
   } catch {
     // Ignore storage failures.
   }
+  setSessionUnlockedFlag(true)
   notifyLockUpdate()
 }
 
@@ -88,4 +124,31 @@ export const isWalletLocked = () => {
   const lastUnlockAt = getLastUnlockAt()
   if (!lastUnlockAt) return true
   return Date.now() - lastUnlockAt >= getLockTimeoutMs()
+}
+
+const readSessionUnlockedFlag = async () => {
+  const sessionStorage = getChromeSessionStorage()
+  if (!sessionStorage) return true
+
+  return new Promise<boolean>((resolve) => {
+    try {
+      sessionStorage.get([SESSION_UNLOCKED_KEY], (items) => {
+        resolve(items?.[SESSION_UNLOCKED_KEY] === true)
+      })
+    } catch {
+      resolve(true)
+    }
+  })
+}
+
+export const reconcileLockStateWithBrowserSession = async () => {
+  if (isWalletLocked()) return true
+
+  const hasActiveSession = await readSessionUnlockedFlag()
+  if (!hasActiveSession) {
+    lockWallet()
+    return true
+  }
+
+  return false
 }
