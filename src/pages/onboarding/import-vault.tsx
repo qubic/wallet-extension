@@ -10,7 +10,7 @@ import { setUnlocked } from '@/lib/lock'
 import { openBrowserVault, setOnboarded } from '@/lib/vault'
 // @ts-expect-error - No type definitions available for this library
 import { QubicVault } from '@qubic-lib/qubic-ts-vault-library/dist/vault.js'
-import { getWatchOnlyAccounts, saveWatchOnlyAccounts } from '@/lib/accounts'
+import { getWatchOnlyAccounts, saveCachedAccounts, saveWatchOnlyAccounts } from '@/lib/accounts'
 
 const TOTAL_STEPS = 3
 
@@ -139,6 +139,7 @@ const ImportVault = () => {
 
         saveWatchOnlyAccounts(watchOnlyAccounts)
         await vault.save()
+        saveCachedAccounts(vault.list().map((e) => ({ name: e.name, identity: e.identity })))
 
         const firstEntry = vault.list()[0]
         const firstWatchOnly = seeds.find((s) => s.isOnlyWatch)
@@ -156,6 +157,7 @@ const ImportVault = () => {
           sourcePassphrase: sourcePassphrase.trim() || passphrase.trim(),
         })
         await vault.save()
+        saveCachedAccounts(vault.list().map((e) => ({ name: e.name, identity: e.identity })))
 
         const entries = vault.list()
         if (entries.length === 0) {

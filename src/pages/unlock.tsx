@@ -11,6 +11,7 @@ import {
   InputGroupInput,
 } from '@/components/ui/input-group'
 import { setUnlocked } from '@/lib/lock'
+import { saveCachedAccounts } from '@/lib/accounts'
 import { openBrowserVault } from '@/lib/vault'
 
 const Unlock = () => {
@@ -40,6 +41,7 @@ const Unlock = () => {
       }
 
       await vault.getSeed(identityToValidate)
+      saveCachedAccounts(vault.list().map((e) => ({ name: e.name, identity: e.identity })))
       setUnlocked()
       setPassphrase('')
       navigate('/home')
