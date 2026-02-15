@@ -222,7 +222,7 @@
         "passphraseRequired": "Se requiere contraseña.",
         "invalidPassphrase": "Contraseña invalida.",
         "nameDuplicate": "Ya existe una cuenta con este nombre.",
-        "lastAccount": "No puedes eliminar la ultima cuenta.",
+        "lastAccount": "No puedes eliminar la última cuenta.",
         "watchOnlySeed": "Las cuentas de solo lectura no tienen semilla.",
         "watchOnlyRequired": "Se requiere nombre e identidad.",
         "watchOnlyInvalid": "Formato de identidad invalido.",
