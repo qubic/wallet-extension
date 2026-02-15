@@ -95,3 +95,9 @@ bun run build
   rm -rf node_modules
   bun install
   ```
+
+## Releases
+- Releases are automated with Semantic Release (`.github/workflows/release.yml`).
+- `main` publishes stable releases.
+- Stable release titles use date kebab-case format: `release-YYYY-MM-DD`.
+- Local dry-run: `bun run release:dry`
