@@ -553,7 +553,7 @@ const Home = () => {
                 networkMeta={{ tick: tickValue, epoch: epochValue, price: pricePerBValue }}
               />
             </div>
-            <div className="flex min-h-6 items-center gap-2 overflow-hidden">
+            <div className="flex min-h-6 items-center justify-center gap-2 overflow-hidden">
               {isWatchOnly && (
                 <div className="inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-1 text-[11px] text-amber-200">
                   <EyeIcon className="h-3.5 w-3.5" />
