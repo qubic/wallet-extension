@@ -1,22 +1,10 @@
 import { useMemo, useState } from 'react'
-import {
-  ArrowLeftIcon,
-  ArrowRightIcon,
-  EyeIcon,
-  EyeOffIcon,
-  FileJsonIcon,
-  UploadCloudIcon,
-} from 'lucide-react'
+import { ArrowLeftIcon, ArrowRightIcon, FileJsonIcon, UploadCloudIcon } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupButton,
-  InputGroupInput,
-} from '@/components/ui/input-group'
+import { PasswordInput } from '@/components/ui/password-input'
 import { Label } from '@/components/ui/label'
 import { Progress } from '@/components/ui/progress'
 import { setUnlocked } from '@/lib/lock'
@@ -37,9 +25,6 @@ const ImportVault = () => {
   const [status, setStatus] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
-  const [showPassphrase, setShowPassphrase] = useState(false)
-  const [showSourcePassphrase, setShowSourcePassphrase] = useState(false)
-
   const progressValue = useMemo(() => (step / TOTAL_STEPS) * 100, [step])
 
   const clearSensitiveState = () => {
@@ -271,53 +256,21 @@ const ImportVault = () => {
                 <Label htmlFor="passphrase">
                   {t('onboarding.importVault.unlockSecure.newPassphrase')}
                 </Label>
-                <InputGroup>
-                  <InputGroupInput
-                    id="passphrase"
-                    type={showPassphrase ? 'text' : 'password'}
-                    value={passphrase}
-                    onChange={(event) => setPassphrase(event.target.value)}
-                  />
-                  <InputGroupAddon align="inline-end">
-                    <InputGroupButton
-                      type="button"
-                      variant="ghost"
-                      onClick={() => setShowPassphrase((v) => !v)}
-                    >
-                      {showPassphrase ? (
-                        <EyeOffIcon className="size-4" />
-                      ) : (
-                        <EyeIcon className="size-4" />
-                      )}
-                    </InputGroupButton>
-                  </InputGroupAddon>
-                </InputGroup>
+                <PasswordInput
+                  id="passphrase"
+                  value={passphrase}
+                  onChange={(event) => setPassphrase(event.target.value)}
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="source-passphrase">
                   {t('onboarding.importVault.unlockSecure.sourcePassphrase')}
                 </Label>
-                <InputGroup>
-                  <InputGroupInput
-                    id="source-passphrase"
-                    type={showSourcePassphrase ? 'text' : 'password'}
-                    value={sourcePassphrase}
-                    onChange={(event) => setSourcePassphrase(event.target.value)}
-                  />
-                  <InputGroupAddon align="inline-end">
-                    <InputGroupButton
-                      type="button"
-                      variant="ghost"
-                      onClick={() => setShowSourcePassphrase((v) => !v)}
-                    >
-                      {showSourcePassphrase ? (
-                        <EyeOffIcon className="size-4" />
-                      ) : (
-                        <EyeIcon className="size-4" />
-                      )}
-                    </InputGroupButton>
-                  </InputGroupAddon>
-                </InputGroup>
+                <PasswordInput
+                  id="source-passphrase"
+                  value={sourcePassphrase}
+                  onChange={(event) => setSourcePassphrase(event.target.value)}
+                />
               </div>
             </div>
           )}

@@ -1,18 +1,13 @@
 import { useMemo, useState } from 'react'
 import { identityFromSeed } from '@qubic-labs/core'
-import { ArrowLeftIcon, ArrowRightIcon, EyeIcon, EyeOffIcon, KeyRoundIcon } from 'lucide-react'
+import { ArrowLeftIcon, ArrowRightIcon, KeyRoundIcon } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Progress } from '@/components/ui/progress'
 import { Textarea } from '@/components/ui/textarea'
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupButton,
-  InputGroupInput,
-} from '@/components/ui/input-group'
+import { PasswordInput } from '@/components/ui/password-input'
 import { isSeedLike } from '@/lib/seed'
 import { getCachedAccounts, getWatchOnlyAccounts, saveCachedAccounts } from '@/lib/accounts'
 import { setUnlocked } from '@/lib/lock'
@@ -51,8 +46,6 @@ const ImportSeed = ({
   const [status, setStatus] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [derivedIdentity, setDerivedIdentity] = useState<string | null>(null)
-  const [showPassphrase, setShowPassphrase] = useState(false)
-
   const progressValue = useMemo(() => (step / TOTAL_STEPS) * 100, [step])
   const seedLength = seed.length
   const isSeedValid = isSeedLike(seed)
@@ -262,27 +255,11 @@ const ImportSeed = ({
                 <Label htmlFor="passphrase">
                   {variant === 'add-address' ? 'Current vault passphrase' : 'Vault passphrase'}
                 </Label>
-                <InputGroup>
-                  <InputGroupInput
-                    id="passphrase"
-                    type={showPassphrase ? 'text' : 'password'}
-                    value={passphrase}
-                    onChange={(event) => setPassphrase(event.target.value)}
-                  />
-                  <InputGroupAddon align="inline-end">
-                    <InputGroupButton
-                      size="icon-xs"
-                      aria-label={showPassphrase ? 'Hide passphrase' : 'Show passphrase'}
-                      onClick={() => setShowPassphrase((prev) => !prev)}
-                    >
-                      {showPassphrase ? (
-                        <EyeOffIcon className="size-4" />
-                      ) : (
-                        <EyeIcon className="size-4" />
-                      )}
-                    </InputGroupButton>
-                  </InputGroupAddon>
-                </InputGroup>
+                <PasswordInput
+                  id="passphrase"
+                  value={passphrase}
+                  onChange={(event) => setPassphrase(event.target.value)}
+                />
               </div>
             </div>
           )}
