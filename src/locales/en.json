@@ -111,6 +111,8 @@
       }
     },
     "categories": {
+      "general": "General",
+      "generalDesc": "Language and theme preferences",
       "security": "Security",
       "securityDesc": "Password, auto-lock, and app reset",
       "backup": "Backup",
@@ -121,6 +123,10 @@
       "supportDesc": "Get help and report issues",
       "about": "About",
       "aboutDesc": "App version and info"
+    },
+    "general": {
+      "title": "General",
+      "back": "Settings"
     },
     "security": {
       "title": "Security",

@@ -11,6 +11,7 @@ import ImportSeed from '../pages/onboarding/import-seed'
 import ImportVault from '../pages/onboarding/import-vault'
 import Transfer from '../pages/transfer'
 import Settings from '../pages/settings'
+import General from '../pages/settings/general'
 import Security from '../pages/settings/security'
 import TransactionDetails from '../pages/transaction-details'
 import Unlock from '../pages/unlock'
@@ -221,6 +222,14 @@ const AppRouter = () => {
             element={
               <AnimatedRoute>
                 <Settings />
+              </AnimatedRoute>
+            }
+          />
+          <Route
+            path="/settings/general"
+            element={
+              <AnimatedRoute>
+                <General />
               </AnimatedRoute>
             }
           />
