@@ -20,6 +20,7 @@ import {
   resolvePendingTransactions,
   usePendingTransactionsVersion,
 } from '@/lib/pending-transactions'
+import { getCurrentIdentity } from '@/lib/accounts'
 
 const formatQus = (value: bigint) => {
   const formatter = new Intl.NumberFormat('en', {
@@ -47,7 +48,7 @@ const History = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
   usePendingTransactionsVersion()
-  const [identity, setIdentity] = useState(localStorage.getItem('currentIdentity') ?? '')
+  const [identity, setIdentity] = useState(getCurrentIdentity())
   const transactions = useTransactions(
     {
       identity,
@@ -66,7 +67,7 @@ const History = () => {
 
   useEffect(() => {
     const refreshIdentity = () => {
-      setIdentity(localStorage.getItem('currentIdentity') ?? '')
+      setIdentity(getCurrentIdentity())
     }
 
     refreshIdentity()

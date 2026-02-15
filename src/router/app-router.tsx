@@ -23,11 +23,12 @@ import {
   isWalletLocked,
   lockWallet,
 } from '../lib/lock'
+import { getCurrentIdentity } from '../lib/accounts'
 
 const hasAccounts = () => {
   try {
     const hasAccount = localStorage.getItem('hasAccount') === 'true'
-    const identity = localStorage.getItem('currentIdentity')
+    const identity = getCurrentIdentity()
     return hasAccount && Boolean(identity)
   } catch {
     return false

@@ -89,3 +89,18 @@ export const saveAccountOrder = (identities: string[]) => {
     // Ignore storage failures.
   }
 }
+
+export const getCurrentIdentity = (): string => localStorage.getItem('currentIdentity') ?? ''
+
+export const isWatchOnlyIdentity = (identity: string): boolean =>
+  getWatchOnlyAccounts().some((entry) => entry.identity === identity)
+
+/**
+ * Return the current identity only if it belongs to the encrypted vault
+ * (i.e. it is not watch-only). Falls back to the first cached vault account.
+ */
+export const getCurrentVaultIdentity = (): string => {
+  const stored = getCurrentIdentity()
+  if (stored && !isWatchOnlyIdentity(stored)) return stored
+  return getCachedAccounts()[0]?.identity ?? ''
+}

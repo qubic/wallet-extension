@@ -20,7 +20,7 @@ import { Button } from '@/components/ui/button'
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer'
 import { useTranslation } from 'react-i18next'
 import { normalizeBalance, formatBalanceCompact, truncateString } from '@/lib/utils'
-import { getWatchOnlyAccounts } from '@/lib/accounts'
+import { getCurrentIdentity, isWatchOnlyIdentity } from '@/lib/accounts'
 import { aggregateAssets, formatAssetUnits, useOwnedAssets } from '@/lib/assets'
 import {
   getPendingOutgoingDebit,
@@ -334,12 +334,8 @@ const TransactionsPreview = ({
 const Home = () => {
   const { t } = useTranslation()
   usePendingTransactionsVersion()
-  const [identity, setIdentity] = useState(localStorage.getItem('currentIdentity') ?? '')
-  const [isWatchOnly, setIsWatchOnly] = useState(() =>
-    getWatchOnlyAccounts().some(
-      (entry) => entry.identity === (localStorage.getItem('currentIdentity') ?? ''),
-    ),
-  )
+  const [identity, setIdentity] = useState(getCurrentIdentity())
+  const [isWatchOnly, setIsWatchOnly] = useState(() => isWatchOnlyIdentity(getCurrentIdentity()))
   const pathname = globalThis.location?.pathname ?? ''
   const isSidePanel = pathname.endsWith('sidepanel.html')
   const isPopup = pathname.endsWith('popup.html')
@@ -410,9 +406,9 @@ const Home = () => {
 
   useEffect(() => {
     const refreshIdentity = () => {
-      const nextIdentity = localStorage.getItem('currentIdentity') ?? ''
+      const nextIdentity = getCurrentIdentity()
       setIdentity(nextIdentity)
-      setIsWatchOnly(getWatchOnlyAccounts().some((entry) => entry.identity === nextIdentity))
+      setIsWatchOnly(isWatchOnlyIdentity(nextIdentity))
     }
 
     refreshIdentity()
