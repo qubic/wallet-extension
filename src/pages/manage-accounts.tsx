@@ -15,10 +15,8 @@ import {
   ShieldCheckIcon,
   TrashIcon,
   UploadIcon,
-  WalletIcon,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   Drawer,
@@ -419,23 +417,20 @@ const ManageAccounts = () => {
                 } ${isDragging ? 'opacity-60' : ''}`}
               >
                 <div className="flex min-w-0 items-center gap-2">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted/30">
-                    <WalletIcon className="h-4 w-4 text-muted-foreground" />
-                  </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
                       <span className="truncate text-sm font-semibold text-foreground">
                         {account.name}
                       </span>
                       {account.watchOnly && (
-                        <Badge variant="outline" className="text-[10px] uppercase">
+                        <span className="inline-flex shrink-0 items-center rounded-full border border-amber-500/30 bg-amber-500/10 px-1.5 py-0.5 text-[10px] text-amber-200">
                           {t('accounts.manage.watchOnly')}
-                        </Badge>
+                        </span>
                       )}
                       {isActive && (
-                        <Badge variant="secondary" className="text-[10px] uppercase">
+                        <span className="shrink-0 text-[11px] text-primary">
                           {t('accounts.manage.active')}
-                        </Badge>
+                        </span>
                       )}
                     </div>
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
