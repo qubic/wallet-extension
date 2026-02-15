@@ -19,7 +19,7 @@
       "128": "icons/light-128.png"
     }
   },
-  "permissions": ["sidePanel", "tabs", "windows"],
+  "permissions": ["sidePanel", "windows"],
   "host_permissions": ["https://rpc.qubic.org/*"],
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'; font-src 'self' data:; style-src 'self' 'unsafe-inline'; connect-src 'self' https://rpc.qubic.org"
