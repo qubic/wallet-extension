@@ -1,5 +1,5 @@
 module.exports = {
-  branches: ['main', { name: 'dev', prerelease: 'dev' }],
+  branches: ['main'],
   plugins: [
     '@semantic-release/commit-analyzer',
     '@semantic-release/release-notes-generator',
@@ -18,8 +18,7 @@ module.exports = {
     [
       '@semantic-release/github',
       {
-        releaseNameTemplate:
-          "<%= branch.name === 'main' ? 'release-' + new Date().toISOString().slice(0, 10) : 'dev-release-' + new Date().toISOString().slice(0, 10) %>",
+        releaseNameTemplate: 'release-<%= new Date().toISOString().slice(0, 10) %>',
       },
     ],
     [
