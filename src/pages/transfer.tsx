@@ -64,6 +64,7 @@ import {
   PENDING_SETTLED_EVENT,
   usePendingTransactionsVersion,
 } from '@/lib/pending-transactions'
+import { isWalletLocked } from '@/lib/lock'
 import { setOnboarded } from '@/lib/vault'
 
 type Step = 'form' | 'auth' | 'success'
@@ -848,6 +849,21 @@ const Transfer = () => {
       window.removeEventListener(PENDING_SETTLED_EVENT, handlePendingSettled)
     }
   }, [balance, latestStats])
+
+  useEffect(() => {
+    const handleLockUpdate = () => {
+      if (!isWalletLocked()) return
+      seedRef.current = null
+      setDrawerOpen(false)
+      setStep('form')
+      setSending(false)
+    }
+
+    window.addEventListener('wallet-lock-updated', handleLockUpdate)
+    return () => {
+      window.removeEventListener('wallet-lock-updated', handleLockUpdate)
+    }
+  }, [])
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {}
