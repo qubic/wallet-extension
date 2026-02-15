@@ -1,12 +1,8 @@
 import { useTransactions } from '@qubic-labs/react'
 import { useQuery } from '@tanstack/react-query'
-import {
-  ArrowDownLeftIcon,
-  ArrowUpRightIcon,
-  HashIcon,
-  InboxIcon,
-  RefreshCwIcon,
-} from 'lucide-react'
+import { HashIcon, InboxIcon, RefreshCwIcon } from 'lucide-react'
+import { ReceiveIcon } from '@/components/icons/receive-icon'
+import { SendIcon } from '@/components/icons/send-icon'
 import { Button } from '@/components/ui/button'
 import { buildExplorerObjectUrl, truncateString } from '@/lib/utils'
 import { useTranslation } from 'react-i18next'
@@ -239,9 +235,21 @@ const History = () => {
               </span>
               {group.items.map((tx) => {
                 const isIncoming = tx.destination === identity
-                const label = isIncoming ? t('history.incoming') : t('history.outgoing')
+                const isSimpleTransfer = Number(tx.inputType) === 0
+                const label = isSimpleTransfer
+                  ? isIncoming
+                    ? t('history.received')
+                    : t('history.sent')
+                  : isIncoming
+                    ? t('history.incoming')
+                    : t('history.outgoing')
                 const counterparty = isIncoming ? tx.source : tx.destination
-                const Icon = isIncoming ? ArrowDownLeftIcon : ArrowUpRightIcon
+                const counterpartyLabel = isSimpleTransfer
+                  ? isIncoming
+                    ? t('history.from', { address: truncateString(counterparty) })
+                    : t('history.to', { address: truncateString(counterparty) })
+                  : truncateString(counterparty)
+                const Icon = isIncoming ? ReceiveIcon : SendIcon
                 const isPending = isTransactionPending(tx.hash, currentTick)
 
                 return (
@@ -271,9 +279,7 @@ const History = () => {
                         </div>
                         <div className="flex flex-col">
                           <span className="text-xs font-semibold text-foreground">{label}</span>
-                          <span className="text-xs text-muted-foreground">
-                            {truncateString(counterparty)}
-                          </span>
+                          <span className="text-xs text-muted-foreground">{counterpartyLabel}</span>
                         </div>
                       </div>
                       <span

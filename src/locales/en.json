@@ -28,9 +28,6 @@
       "loading": "Loading recent activity...",
       "empty": "No recent transactions.",
       "emptyTitle": "No activity yet",
-      "incoming": "Incoming",
-      "outgoing": "Outgoing",
-      "tick": "Tick {{tick}}",
       "viewAll": "View all"
     },
     "network": {
@@ -236,6 +233,10 @@
     "empty": "No transactions found.",
     "incoming": "Incoming",
     "outgoing": "Outgoing",
+    "sent": "Sent",
+    "received": "Received",
+    "to": "To: {{address}}",
+    "from": "From: {{address}}",
     "tick": "Tick",
     "type": "Type",
     "pending": "Pending",

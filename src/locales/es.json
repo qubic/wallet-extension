@@ -28,9 +28,6 @@
       "loading": "Cargando actividad reciente...",
       "empty": "Sin transacciones recientes.",
       "emptyTitle": "Sin actividad aún",
-      "incoming": "Entrante",
-      "outgoing": "Saliente",
-      "tick": "Tick {{tick}}",
       "viewAll": "Ver todo"
     },
     "network": {
@@ -236,6 +233,10 @@
     "empty": "No hay transacciones.",
     "incoming": "Entrante",
     "outgoing": "Saliente",
+    "sent": "Enviado",
+    "received": "Recibido",
+    "to": "A: {{address}}",
+    "from": "De: {{address}}",
     "tick": "Tick",
     "type": "Tipo",
     "pending": "Pendiente",
