@@ -76,11 +76,11 @@
     "accounts": {
       "title": "Cuentas",
       "selectLabel": "Seleccionar cuenta",
-      "passphrasePlaceholder": "Contrasena del vault",
-      "passphraseRequired": "Ingresa la contrasena del vault para ver cuentas.",
+      "passphrasePlaceholder": "Contraseña del vault",
+      "passphraseRequired": "Ingresa la contraseña del vault para ver cuentas.",
       "unlock": "Desbloquear cuentas",
       "unlocking": "Desbloqueando...",
-      "unlockFailed": "No se pudo desbloquear el vault. Verifica la contrasena.",
+      "unlockFailed": "No se pudo desbloquear el vault. Verifica la contraseña.",
       "empty": "No hay cuentas adicionales.",
       "create": "Crear una nueva cuenta"
     }
@@ -101,18 +101,20 @@
       "button": "Exportar vault",
       "drawerTitle": "Exportar archivo vault",
       "drawerDescription": "Descarga tu vault en un formato compatible con la billetera web de Qubic.",
-      "passphrase": "Contrasena del vault",
+      "passphrase": "Contraseña del vault",
       "confirm": "Exportar vault",
       "exporting": "Exportando...",
       "errors": {
-        "passphraseRequired": "Se requiere contrasena.",
-        "invalidPassphrase": "Contrasena invalida.",
+        "passphraseRequired": "Se requiere contraseña.",
+        "invalidPassphrase": "Contraseña invalida.",
         "exportFailed": "No se pudo exportar el vault."
       }
     },
     "categories": {
+      "general": "General",
+      "generalDesc": "Preferencias de idioma y tema",
       "security": "Seguridad",
-      "securityDesc": "Contrasena, bloqueo automatico y restablecer",
+      "securityDesc": "Contraseña, bloqueo automatico y restablecer",
       "backup": "Respaldo",
       "backupDesc": "Exportar tu archivo vault",
       "accounts": "Administrar cuentas",
@@ -122,18 +124,22 @@
       "about": "Acerca de",
       "aboutDesc": "Version de la aplicacion e informacion"
     },
+    "general": {
+      "title": "General",
+      "back": "Configuración"
+    },
     "security": {
       "title": "Seguridad",
       "back": "Ajustes",
-      "changePassword": "Cambiar contrasena",
-      "changePasswordDesc": "Actualizar la contrasena de tu vault",
-      "changePasswordDrawerTitle": "Cambiar contrasena",
-      "changePasswordDrawerDesc": "Ingresa tu contrasena actual y elige una nueva.",
-      "currentPassphrase": "Contrasena actual",
-      "newPassphrase": "Nueva contrasena",
-      "confirmPassphrase": "Confirmar nueva contrasena",
+      "changePassword": "Cambiar contraseña",
+      "changePasswordDesc": "Actualizar la contraseña de tu vault",
+      "changePasswordDrawerTitle": "Cambiar contraseña",
+      "changePasswordDrawerDesc": "Ingresa tu contraseña actual y elige una nueva.",
+      "currentPassphrase": "Contraseña actual",
+      "newPassphrase": "Nueva contraseña",
+      "confirmPassphrase": "Confirmar nueva contraseña",
       "minChars": "Minimo 12 caracteres.",
-      "save": "Guardar nueva contrasena",
+      "save": "Guardar nueva contraseña",
       "saving": "Guardando...",
       "cancel": "Cancelar",
       "resetApp": "Eliminar billetera",
@@ -141,19 +147,19 @@
       "resetAppDesc": "Esto borrara todos los datos incluyendo tu vault, cuentas y ajustes. Esta accion no se puede deshacer. Asegurate de haber respaldado tus semillas.",
       "resetAppConfirm": "Eliminar billetera",
       "errors": {
-        "currentRequired": "Se requiere contrasena actual.",
-        "newRequired": "Se requiere nueva contrasena.",
-        "confirmRequired": "Confirma tu nueva contrasena.",
-        "tooShort": "La contrasena debe tener al menos 12 caracteres.",
-        "mismatch": "Las contrasenas no coinciden.",
-        "invalidCurrent": "La contrasena actual es incorrecta.",
-        "changeFailed": "No se pudo cambiar la contrasena. Intenta de nuevo."
+        "currentRequired": "Se requiere contraseña actual.",
+        "newRequired": "Se requiere nueva contraseña.",
+        "confirmRequired": "Confirma tu nueva contraseña.",
+        "tooShort": "La contraseña debe tener al menos 12 caracteres.",
+        "mismatch": "Las contraseñas no coinciden.",
+        "invalidCurrent": "La contraseña actual es incorrecta.",
+        "changeFailed": "No se pudo cambiar la contraseña. Intenta de nuevo."
       }
     },
     "support": {
       "title": "Soporte",
       "warningTitle": "Cuidado con los estafadores",
-      "warningDescription": "Los miembros del equipo de Qubic nunca te pediran tu semilla o contrasena. Nunca compartas tus claves privadas con nadie.",
+      "warningDescription": "Los miembros del equipo de Qubic nunca te pediran tu semilla o contraseña. Nunca compartas tus claves privadas con nadie.",
       "discord": "Comunidad de Discord",
       "github": "Reportar un problema en GitHub"
     },
@@ -173,7 +179,7 @@
     "manage": {
       "title": "Administrar cuentas",
       "subtitle": "Ver, ordenar y gestionar tus identidades.",
-      "passphrase": "Contrasena del vault",
+      "passphrase": "Contraseña del vault",
       "passphraseTitle": "Desbloquear vault",
       "load": "Cargar cuentas",
       "unlock": "Desbloquear vault",
@@ -213,8 +219,8 @@
         "rename": "No se pudo renombrar la cuenta.",
         "reveal": "No se pudo mostrar la semilla.",
         "nameRequired": "Se requiere nombre de cuenta.",
-        "passphraseRequired": "Se requiere contrasena.",
-        "invalidPassphrase": "Contrasena invalida.",
+        "passphraseRequired": "Se requiere contraseña.",
+        "invalidPassphrase": "Contraseña invalida.",
         "nameDuplicate": "Ya existe una cuenta con este nombre.",
         "watchOnlySeed": "Las cuentas de solo lectura no tienen semilla.",
         "watchOnlyRequired": "Se requiere nombre e identidad.",
@@ -343,17 +349,17 @@
   },
   "passphraseAuth": {
     "title": "Autenticacion Requerida",
-    "subtitle": "Ingresa tu contrasena del vault para continuar con esta accion.",
+    "subtitle": "Ingresa tu contraseña del vault para continuar con esta accion.",
     "form": {
-      "passphrase": "Contrasena del vault",
-      "passphrasePlaceholder": "Ingresa tu contrasena",
-      "showPassphrase": "Mostrar contrasena",
-      "hidePassphrase": "Ocultar contrasena"
+      "passphrase": "Contraseña del vault",
+      "passphrasePlaceholder": "Ingresa tu contraseña",
+      "showPassphrase": "Mostrar contraseña",
+      "hidePassphrase": "Ocultar contraseña"
     },
     "validation": {
-      "required": "Se requiere contrasena."
+      "required": "Se requiere contraseña."
     },
-    "securityNote": "Tu contrasena se usa localmente para descifrar tu vault y firmar transacciones. Nunca se transmite por la red.",
+    "securityNote": "Tu contraseña se usa localmente para descifrar tu vault y firmar transacciones. Nunca se transmite por la red.",
     "actions": {
       "back": "Atras",
       "cancel": "Cancelar",
@@ -361,14 +367,14 @@
       "unlocking": "Desbloqueando..."
     },
     "errors": {
-      "invalidPassphrase": "Contrasena invalida. Intenta de nuevo.",
+      "invalidPassphrase": "Contraseña invalida. Intenta de nuevo.",
       "accountNotFound": "Cuenta no encontrada en el vault.",
       "generic": "Autenticacion fallida. Intenta de nuevo."
     }
   },
   "unlock": {
     "title": "Desbloquea tu billetera",
-    "subtitle": "Tu billetera esta bloqueada por seguridad. Ingresa tu contrasena para continuar."
+    "subtitle": "Tu billetera esta bloqueada por seguridad. Ingresa tu contraseña para continuar."
   },
   "onboarding": {
     "importVault": {
@@ -383,18 +389,18 @@
       },
       "unlockSecure": {
         "title": "Desbloquear y asegurar",
-        "subtitle": "Proporciona una nueva contrasena para este dispositivo y, si es necesario, la contrasena de origen.",
-        "newPassphrase": "Nueva contrasena del vault",
-        "sourcePassphrase": "Contrasena del vault de origen"
+        "subtitle": "Proporciona una nueva contraseña para este dispositivo y, si es necesario, la contraseña de origen.",
+        "newPassphrase": "Nueva contraseña del vault",
+        "sourcePassphrase": "Contraseña del vault de origen"
       },
       "review": {
         "title": "Revisar importacion",
-        "subtitle": "Confirma los detalles del archivo y la contrasena antes de importar.",
+        "subtitle": "Confirma los detalles del archivo y la contraseña antes de importar.",
         "vaultFile": "Archivo vault",
         "notSelected": "No seleccionado",
         "sourcePassphraseProvided": "Proporcionada",
         "sourcePassphraseSame": "Igual que la nueva",
-        "sourcePassphraseLabel": "Contrasena de origen",
+        "sourcePassphraseLabel": "Contraseña de origen",
         "addMoreLater": "Puedes agregar mas cuentas mas tarde en Administrar Cuentas."
       },
       "actions": {
@@ -406,7 +412,7 @@
       },
       "errors": {
         "selectFile": "Selecciona un archivo vault.",
-        "passphraseRequired": "Se requiere contrasena.",
+        "passphraseRequired": "Se requiere contraseña.",
         "importFailed": "No se pudo importar el vault de la billetera web.",
         "noEntries": "Vault importado pero no se encontraron entradas.",
         "generic": "No se pudo importar el vault."

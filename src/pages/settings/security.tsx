@@ -170,7 +170,11 @@ const Security = () => {
 
           <Separator />
 
-          <Button variant="destructive" onClick={() => setResetAppOpen(true)}>
+          <Button
+            variant="destructive-outline"
+            className="w-full"
+            onClick={() => setResetAppOpen(true)}
+          >
             <TrashIcon className="h-4 w-4" />
             {t('settings.security.resetApp')}
           </Button>
