@@ -26,3 +26,6 @@ dist-ssr
 
 # Temporary scaffolding
 tmp
+
+# Claude
+CLAUDE.md
