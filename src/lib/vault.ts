@@ -7,7 +7,7 @@ import {
 } from '@qubic-labs/sdk'
 import { emitAccountUpdated } from '@/lib/accounts'
 
-const VAULT_STORAGE_KEY = 'qubic.vault'
+export const VAULT_STORAGE_KEY = 'qubic.vault'
 
 export const openBrowserVault = async (passphrase: string, create = false) => {
   const store = createLocalStorageVaultStore(VAULT_STORAGE_KEY)
