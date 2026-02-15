@@ -1,5 +1,12 @@
 import { useBalance, useTransactions } from '@qubic-labs/react'
-import { CopyIcon, EyeIcon, InboxIcon, Loader2Icon, PackageIcon, RefreshCwIcon } from 'lucide-react'
+import {
+  ArrowUpRightIcon,
+  CopyIcon,
+  EyeIcon,
+  Loader2Icon,
+  PackageIcon,
+  RefreshCwIcon,
+} from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import QRCode from 'qrcode'
 import { useNavigate } from 'react-router-dom'
@@ -9,50 +16,20 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/u
 import { ReceiveIcon } from '@/components/icons/receive-icon'
 import { SendIcon } from '@/components/icons/send-icon'
 import { useTranslation } from 'react-i18next'
-import { normalizeBalance, formatBalanceCompact, truncateString } from '@/lib/utils'
+import { truncateString } from '@/lib/utils'
 import { getCurrentIdentity, isWatchOnlyIdentity } from '@/lib/accounts'
 import { aggregateAssets, formatAssetUnits, useOwnedAssets } from '@/lib/assets'
 import { useLatestStats } from '@/lib/network-stats'
 import { useClipboardCopy } from '@/hooks/use-clipboard-copy'
+import BalanceCard from '@/components/pages/home/balance-card'
+import TransactionsPreview from '@/components/pages/home/transactions-preview'
 import {
   getPendingOutgoingDebit,
   PENDING_SETTLED_EVENT,
   getPendingTransactionsForIdentity,
-  isTransactionPending,
   resolvePendingTransactions,
   usePendingTransactionsVersion,
 } from '@/lib/pending-transactions'
-
-const formatUsdFromNumber = (value: number) => {
-  const usdPerBillion = 435
-  const billions = value / 1_000_000_000
-  const usdValue = billions * usdPerBillion
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 2,
-  }).format(usdValue)
-}
-
-const getCachedBalance = (identity: string): bigint | null => {
-  if (!identity) return null
-  try {
-    const raw = localStorage.getItem(`wallet:balance:${identity}`)
-    if (!raw) return null
-    return BigInt(raw)
-  } catch {
-    return null
-  }
-}
-
-const setCachedBalance = (identity: string, value: bigint) => {
-  if (!identity) return
-  try {
-    localStorage.setItem(`wallet:balance:${identity}`, value.toString())
-  } catch {
-    // ignore cache failures
-  }
-}
 
 const SYNC_BADGE_SHOW_DELAY_MS = 180
 const SYNC_BADGE_MIN_VISIBLE_MS = 700
@@ -76,253 +53,6 @@ const sectionMotion = {
     y: 0,
     transition: { duration: 0.28 },
   },
-}
-
-const BalanceCard = ({
-  balance,
-  identity,
-  pendingDebit,
-  networkMeta,
-}: {
-  balance: ReturnType<typeof useBalance>
-  identity: string
-  pendingDebit: bigint
-  networkMeta: {
-    tick: string | number
-    epoch: string | number
-    price: string
-  }
-}) => {
-  const { t } = useTranslation()
-  const [cachedBalance, setCachedBalanceState] = useState<bigint | null>(() =>
-    getCachedBalance(identity),
-  )
-  const normalized = normalizeBalance(balance.data?.balance ?? cachedBalance ?? 0n)
-  const numericBalance = Number(normalized)
-  const [displayBalance, setDisplayBalance] = useState(0)
-  const displayRef = useRef(0)
-
-  useEffect(() => {
-    setCachedBalanceState(getCachedBalance(identity))
-  }, [identity])
-
-  useEffect(() => {
-    if (balance.data?.balance === undefined) return
-    setCachedBalance(identity, balance.data.balance)
-    setCachedBalanceState(balance.data.balance)
-  }, [balance.data?.balance, identity])
-
-  useEffect(() => {
-    if (!Number.isFinite(numericBalance)) return undefined
-    const from = displayRef.current
-    const to = numericBalance
-    const duration = 750
-    const start = performance.now()
-    let frame = 0
-
-    const easeOutCubic = (x: number) => 1 - (1 - x) ** 3
-    const tick = (now: number) => {
-      const progress = Math.min(1, (now - start) / duration)
-      const eased = easeOutCubic(progress)
-      const nextValue = from + (to - from) * eased
-      displayRef.current = nextValue
-      setDisplayBalance(nextValue)
-      if (progress < 1) {
-        frame = requestAnimationFrame(tick)
-      }
-    }
-
-    frame = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(frame)
-  }, [numericBalance])
-
-  if (balance.isLoading && cachedBalance == null) {
-    return <div className="text-sm text-muted-foreground">{t('home.balance.loading')}</div>
-  }
-
-  if (balance.error) {
-    return <div className="text-sm text-destructive">{balance.error.message}</div>
-  }
-
-  const effectiveBalance = normalized > pendingDebit ? normalized - pendingDebit : 0n
-  const pendingActive = pendingDebit > 0n
-  const displayBigInt = BigInt(Math.max(0, Math.floor(displayBalance)))
-  const displayValue =
-    pendingActive && displayBigInt > pendingDebit ? displayBigInt - pendingDebit : effectiveBalance
-
-  return (
-    <div className="space-y-3 text-center">
-      <div className="text-5xl font-semibold leading-none tracking-tight text-foreground">
-        {formatBalanceCompact(displayValue)}
-      </div>
-      <div className="inline-flex items-center rounded-full border border-primary/25 bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary">
-        {`≈ ${formatUsdFromNumber(Number(displayValue))}`}
-      </div>
-      <div className="text-[11px] text-muted-foreground">
-        {networkMeta.price} / {networkMeta.tick} / {networkMeta.epoch}
-      </div>
-      {pendingActive && (
-        <div className="text-[11px] text-amber-700 dark:text-amber-300">
-          -{formatBalanceCompact(pendingDebit)} {t('home.status.pending').toLowerCase()}
-        </div>
-      )}
-    </div>
-  )
-}
-
-const TransactionsPreview = ({
-  identity,
-  transactions,
-  currentTick,
-  onViewMore,
-  onOpenTx,
-}: {
-  identity: string
-  transactions: ReturnType<typeof useTransactions>
-  currentTick?: number
-  onViewMore: () => void
-  onOpenTx: (hash: string) => void
-}) => {
-  const { t } = useTranslation()
-  usePendingTransactionsVersion()
-  if (transactions.isLoading) {
-    return (
-      <div className="space-y-2">
-        <div className="h-16 animate-pulse rounded-xl border border-border/40 bg-muted/20" />
-        <div className="h-16 animate-pulse rounded-xl border border-border/40 bg-muted/20" />
-        <div className="h-16 animate-pulse rounded-xl border border-border/40 bg-muted/20" />
-      </div>
-    )
-  }
-
-  if (transactions.error) {
-    return <div className="text-xs text-destructive">{transactions.error.message}</div>
-  }
-
-  const items = transactions.data?.pages.flatMap((page) => page.transactions) ?? []
-  const pending = getPendingTransactionsForIdentity(identity, currentTick)
-  const pendingHashes = new Set(pending.map((tx) => tx.hash.toLowerCase()))
-  const pendingItems = pending.map((tx) => ({
-    hash: tx.hash,
-    source: tx.sourceIdentity,
-    destination: tx.destinationIdentity ?? '',
-    amount: tx.amount ?? 0n,
-    tickNumber: tx.targetTick,
-    inputType: tx.inputType ?? 0,
-    timestamp: BigInt(tx.createdAt),
-  }))
-  const merged = [
-    ...pendingItems,
-    ...items.filter((tx) => !pendingHashes.has(tx.hash.toLowerCase())),
-  ]
-  const recent = merged.slice(0, 3)
-
-  if (recent.length === 0) {
-    return (
-      <div className="flex items-center gap-3 rounded-lg border border-dashed border-border/60 bg-muted/20 px-3 py-3 text-xs text-muted-foreground">
-        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted/40 text-muted-foreground">
-          <InboxIcon className="h-4 w-4" />
-        </div>
-        <div>
-          <div className="text-sm font-semibold text-foreground">{t('home.recent.emptyTitle')}</div>
-          <div className="text-xs text-muted-foreground">{t('home.recent.empty')}</div>
-        </div>
-      </div>
-    )
-  }
-
-  return (
-    <div className="w-full space-y-2 text-left">
-      {recent.map((tx) => {
-        const isIncoming = tx.destination === identity
-        const isSimpleTransfer = Number(tx.inputType) === 0
-        const label = isSimpleTransfer
-          ? isIncoming
-            ? t('history.received')
-            : t('history.sent')
-          : isIncoming
-            ? t('history.incoming')
-            : t('history.outgoing')
-        const counterparty = isIncoming ? tx.source : tx.destination
-        const counterpartyLabel = isSimpleTransfer
-          ? isIncoming
-            ? t('history.from', { address: truncateString(counterparty) })
-            : t('history.to', { address: truncateString(counterparty) })
-          : truncateString(counterparty)
-        const Icon = isIncoming ? ReceiveIcon : SendIcon
-        const isPending = isTransactionPending(tx.hash, currentTick)
-
-        return (
-          <motion.button
-            type="button"
-            key={tx.hash}
-            className={`group flex w-full cursor-pointer items-center justify-between rounded-xl border px-3 py-2 text-left transition-colors ${
-              isPending
-                ? 'animate-pulse border-amber-500/50 bg-amber-500/10 text-amber-800 dark:text-amber-200'
-                : 'border-border/40 bg-background/40 hover:border-primary/30 hover:bg-background/60'
-            }`}
-            onClick={() => onOpenTx(tx.hash)}
-          >
-            <div className="flex items-center gap-3">
-              <div
-                className={`flex h-9 w-9 items-center justify-center rounded-full border ${
-                  isPending
-                    ? 'border-amber-500/40 bg-amber-500/15 text-amber-700 dark:text-amber-300'
-                    : isIncoming
-                      ? 'border-primary/40 bg-primary/10 text-primary'
-                      : 'border-[var(--destructive)]/40 bg-[var(--destructive)]/10 text-[var(--destructive)]'
-                }`}
-              >
-                <Icon className="h-4 w-4" />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-xs font-semibold text-foreground">{label}</span>
-                <span className="text-xs text-muted-foreground">{counterpartyLabel}</span>
-                <span className="text-[11px] text-muted-foreground/70">
-                  {(() => {
-                    const ts = Number(tx.timestamp)
-                    if (!ts) return '--'
-                    const date = new Date(ts > 1e12 ? ts : ts * 1000)
-                    const now = new Date()
-                    if (date.toDateString() === now.toDateString()) return t('history.today')
-                    const yesterday = new Date(now)
-                    yesterday.setDate(yesterday.getDate() - 1)
-                    if (date.toDateString() === yesterday.toDateString())
-                      return t('history.yesterday')
-                    return date.toLocaleDateString(undefined, {
-                      month: 'short',
-                      day: 'numeric',
-                      year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined,
-                    })
-                  })()}
-                </span>
-              </div>
-            </div>
-            <span
-              className={`text-sm font-semibold ${
-                isPending
-                  ? 'text-amber-700 dark:text-amber-300'
-                  : isIncoming
-                    ? 'text-primary'
-                    : 'text-[var(--destructive)]'
-              }`}
-            >
-              {isIncoming ? '+' : '-'}
-              {formatBalanceCompact(tx.amount)}
-            </span>
-          </motion.button>
-        )
-      })}
-      <button
-        type="button"
-        className="w-full cursor-pointer pt-1 text-center text-xs text-muted-foreground transition-colors hover:text-foreground"
-        onClick={onViewMore}
-        aria-label={t('home.actions.history')}
-      >
-        {t('home.recent.viewAll')}
-      </button>
-    </div>
-  )
 }
 
 const Home = () => {
