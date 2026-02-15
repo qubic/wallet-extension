@@ -1,12 +1,5 @@
 import { useBalance, useTransactions } from '@qubic-labs/react'
-import {
-  ArrowUpRightIcon,
-  CopyIcon,
-  EyeIcon,
-  Loader2Icon,
-  PackageIcon,
-  RefreshCwIcon,
-} from 'lucide-react'
+import { CopyIcon, EyeIcon, Loader2Icon, PackageIcon, RefreshCwIcon } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import QRCode from 'qrcode'
 import { useNavigate } from 'react-router-dom'

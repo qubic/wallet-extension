@@ -1,5 +1,5 @@
 import { useTransactions } from '@qubic-labs/react'
-import { HashIcon, InboxIcon, RefreshCwIcon } from 'lucide-react'
+import { HashIcon, RefreshCwIcon } from 'lucide-react'
 import { ReceiveIcon } from '@/components/icons/receive-icon'
 import { SendIcon } from '@/components/icons/send-icon'
 import { Button } from '@/components/ui/button'
@@ -17,6 +17,7 @@ import {
 } from '@/lib/pending-transactions'
 import { getCurrentIdentity } from '@/lib/accounts'
 import { useLatestStats } from '@/lib/network-stats'
+import HistoryEmptyState from '@/components/pages/history/history-empty-state'
 
 const formatQus = (value: bigint) => {
   const formatter = new Intl.NumberFormat('en', {
@@ -197,14 +198,8 @@ const History = () => {
           )}
 
           {!transactions.isLoading && sorted.length === 0 && (
-            <motion.div
-              className="flex items-center gap-3 rounded-lg border border-dashed border-border/60 bg-transparent px-3 py-3 text-xs text-muted-foreground"
-              variants={itemMotion}
-            >
-              <div className="flex h-9 w-9 items-center justify-center rounded-full border border-border/40 bg-transparent text-muted-foreground">
-                <InboxIcon className="h-4 w-4" />
-              </div>
-              <div>{t('history.empty')}</div>
+            <motion.div variants={itemMotion}>
+              <HistoryEmptyState />
             </motion.div>
           )}
 
