@@ -145,7 +145,7 @@ const AppHeader = ({
               <div className="text-xs text-muted-foreground">{t('home.accounts.empty')}</div>
             )}
             {accounts.length > 0 && (
-              <div className="space-y-1">
+              <div className="max-h-[50vh] space-y-1 overflow-y-auto">
                 {accounts.map((account) => (
                   <button
                     key={account.identity}
