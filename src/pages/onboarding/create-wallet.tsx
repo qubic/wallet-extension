@@ -5,9 +5,13 @@ import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { generateSeed, isSeedLike } from '@/lib/seed'
-import { VaultEntryNotFoundError, VaultInvalidPassphraseError } from '@qubic-labs/sdk'
 import { setUnlocked } from '@/lib/lock'
-import { openBrowserVault, setOnboarded } from '@/lib/vault'
+import {
+  openBrowserVault,
+  setOnboarded,
+  validateVaultPassphrase,
+  verifyVaultAccess,
+} from '@/lib/vault'
 import { getCachedAccounts, getWatchOnlyAccounts, saveCachedAccounts } from '@/lib/accounts'
 import SeedSecurityStep from '@/components/onboarding/seed-security-step'
 import PassphraseStep from '@/components/onboarding/passphrase-step'
@@ -112,15 +116,15 @@ const CreateWallet = ({
       setStatus('Passphrase is required.')
       return
     }
-    if (step === 2 && !confirmPassphrase.trim()) {
-      setStatus('Please re-enter your passphrase.')
-      return
-    }
-    if (step === 2 && passphrase !== confirmPassphrase) {
-      setStatus('Passphrases do not match.')
-      return
-    }
     if (step === 2 && variant !== 'add-address') {
+      if (!confirmPassphrase.trim()) {
+        setStatus('Please re-enter your passphrase.')
+        return
+      }
+      if (passphrase !== confirmPassphrase) {
+        setStatus('Passphrases do not match.')
+        return
+      }
       if (passphrase.length < 12) {
         setStatus('Passphrase must be at least 12 characters.')
         return
@@ -135,23 +139,13 @@ const CreateWallet = ({
         setStatus('Wallet name already exists.')
         return
       }
-      try {
-        const vault = await openBrowserVault(passphrase.trim(), false)
-        const cached = getCachedAccounts()
-        const currentIdentity = localStorage.getItem('currentIdentity')
-        const expectedIdentity = currentIdentity ?? cached[0]?.identity
-        if (expectedIdentity) {
-          await vault.getSeed(expectedIdentity)
-        }
-      } catch (error) {
-        if (
-          error instanceof VaultInvalidPassphraseError ||
-          error instanceof VaultEntryNotFoundError
-        ) {
-          setStatus('Invalid vault passphrase.')
-          return
-        }
-        setStatus('Failed to validate vault passphrase.')
+      const result = await validateVaultPassphrase(passphrase.trim())
+      if (!result.valid) {
+        setStatus(
+          result.reason === 'invalid'
+            ? 'Invalid vault passphrase.'
+            : 'Failed to validate vault passphrase.',
+        )
         return
       }
     }
@@ -183,17 +177,17 @@ const CreateWallet = ({
       setStep(2)
       return
     }
-    if (!confirmPassphrase.trim()) {
-      setStatus('Please re-enter your passphrase.')
-      setStep(2)
-      return
-    }
-    if (passphrase !== confirmPassphrase) {
-      setStatus('Passphrases do not match.')
-      setStep(2)
-      return
-    }
     if (variant !== 'add-address') {
+      if (!confirmPassphrase.trim()) {
+        setStatus('Please re-enter your passphrase.')
+        setStep(2)
+        return
+      }
+      if (passphrase !== confirmPassphrase) {
+        setStatus('Passphrases do not match.')
+        setStep(2)
+        return
+      }
       if (passphrase.length < 12) {
         setStatus('Passphrase must be at least 12 characters.')
         setStep(2)
@@ -221,23 +215,11 @@ const CreateWallet = ({
       setIsSaving(true)
       const vault = await openBrowserVault(passphrase, variant !== 'add-address')
       if (variant === 'add-address') {
-        const cached = getCachedAccounts()
-        const currentIdentity = localStorage.getItem('currentIdentity')
-        const expectedIdentity = currentIdentity ?? cached[0]?.identity
-        if (expectedIdentity) {
-          try {
-            await vault.getSeed(expectedIdentity)
-          } catch (error) {
-            if (
-              error instanceof VaultInvalidPassphraseError ||
-              error instanceof VaultEntryNotFoundError
-            ) {
-              setStatus('Invalid vault passphrase.')
-              setIsSaving(false)
-              return
-            }
-            throw error
-          }
+        const check = await verifyVaultAccess(vault)
+        if (!check.valid) {
+          setStatus('Invalid vault passphrase.')
+          setIsSaving(false)
+          return
         }
       }
       const entry = await vault.addSeed({ name, seed, overwrite: true })

@@ -1,17 +1,27 @@
 import { useMemo, useState } from 'react'
 import { identityFromSeed } from '@qubic-labs/core'
-import { ArrowLeftIcon, ArrowRightIcon, KeyRoundIcon } from 'lucide-react'
+import { ArrowLeftIcon, ArrowRightIcon, EyeIcon, EyeOffIcon, KeyRoundIcon } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Progress } from '@/components/ui/progress'
 import { Textarea } from '@/components/ui/textarea'
-import { VaultEntryNotFoundError, VaultInvalidPassphraseError } from '@qubic-labs/sdk'
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from '@/components/ui/input-group'
 import { isSeedLike } from '@/lib/seed'
 import { getCachedAccounts, getWatchOnlyAccounts, saveCachedAccounts } from '@/lib/accounts'
 import { setUnlocked } from '@/lib/lock'
-import { openBrowserVault, setOnboarded } from '@/lib/vault'
+import {
+  openBrowserVault,
+  setOnboarded,
+  validateVaultPassphrase,
+  verifyVaultAccess,
+} from '@/lib/vault'
 
 const TOTAL_STEPS = 3
 const SEED_LENGTH = 55
@@ -41,6 +51,7 @@ const ImportSeed = ({
   const [status, setStatus] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [derivedIdentity, setDerivedIdentity] = useState<string | null>(null)
+  const [showPassphrase, setShowPassphrase] = useState(false)
 
   const progressValue = useMemo(() => (step / TOTAL_STEPS) * 100, [step])
   const seedLength = seed.length
@@ -98,23 +109,13 @@ const ImportSeed = ({
         setStatus('Wallet name already exists.')
         return
       }
-      try {
-        const vault = await openBrowserVault(passphrase.trim(), false)
-        const cached = getCachedAccounts()
-        const currentIdentity = localStorage.getItem('currentIdentity')
-        const expectedIdentity = currentIdentity ?? cached[0]?.identity
-        if (expectedIdentity) {
-          await vault.getSeed(expectedIdentity)
-        }
-      } catch (error) {
-        if (
-          error instanceof VaultInvalidPassphraseError ||
-          error instanceof VaultEntryNotFoundError
-        ) {
-          setStatus('Invalid vault passphrase.')
-          return
-        }
-        setStatus('Failed to validate vault passphrase.')
+      const result = await validateVaultPassphrase(passphrase.trim())
+      if (!result.valid) {
+        setStatus(
+          result.reason === 'invalid'
+            ? 'Invalid vault passphrase.'
+            : 'Failed to validate vault passphrase.',
+        )
         return
       }
     }
@@ -162,23 +163,11 @@ const ImportSeed = ({
       setIsSaving(true)
       const vault = await openBrowserVault(passphrase, variant !== 'add-address')
       if (variant === 'add-address') {
-        const cached = getCachedAccounts()
-        const currentIdentity = localStorage.getItem('currentIdentity')
-        const expectedIdentity = currentIdentity ?? cached[0]?.identity
-        if (expectedIdentity) {
-          try {
-            await vault.getSeed(expectedIdentity)
-          } catch (error) {
-            if (
-              error instanceof VaultInvalidPassphraseError ||
-              error instanceof VaultEntryNotFoundError
-            ) {
-              setStatus('Invalid vault passphrase.')
-              setIsSaving(false)
-              return
-            }
-            throw error
-          }
+        const check = await verifyVaultAccess(vault)
+        if (!check.valid) {
+          setStatus('Invalid vault passphrase.')
+          setIsSaving(false)
+          return
         }
       }
       if (variant === 'add-address') {
@@ -273,12 +262,27 @@ const ImportSeed = ({
                 <Label htmlFor="passphrase">
                   {variant === 'add-address' ? 'Current vault passphrase' : 'Vault passphrase'}
                 </Label>
-                <Input
-                  id="passphrase"
-                  type="password"
-                  value={passphrase}
-                  onChange={(event) => setPassphrase(event.target.value)}
-                />
+                <InputGroup>
+                  <InputGroupInput
+                    id="passphrase"
+                    type={showPassphrase ? 'text' : 'password'}
+                    value={passphrase}
+                    onChange={(event) => setPassphrase(event.target.value)}
+                  />
+                  <InputGroupAddon align="inline-end">
+                    <InputGroupButton
+                      size="icon-xs"
+                      aria-label={showPassphrase ? 'Hide passphrase' : 'Show passphrase'}
+                      onClick={() => setShowPassphrase((prev) => !prev)}
+                    >
+                      {showPassphrase ? (
+                        <EyeOffIcon className="size-4" />
+                      ) : (
+                        <EyeIcon className="size-4" />
+                      )}
+                    </InputGroupButton>
+                  </InputGroupAddon>
+                </InputGroup>
               </div>
             </div>
           )}
