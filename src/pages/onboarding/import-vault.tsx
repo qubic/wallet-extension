@@ -6,12 +6,12 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/ui/password-input'
 import { Label } from '@/components/ui/label'
-import { Progress } from '@/components/ui/progress'
 import { setUnlocked } from '@/lib/lock'
 import { openBrowserVault, setOnboarded } from '@/lib/vault'
 // @ts-expect-error - No type definitions available for this library
 import { QubicVault } from '@qubic-lib/qubic-ts-vault-library/dist/vault.js'
 import { getWatchOnlyAccounts, saveCachedAccounts, saveWatchOnlyAccounts } from '@/lib/accounts'
+import FlowHeader from '@/components/onboarding/flow-header'
 
 const TOTAL_STEPS = 3
 
@@ -181,13 +181,11 @@ const ImportVault = () => {
     <section className="flex h-full w-full justify-center px-6 py-8">
       <div className="flex w-full max-w-sm flex-col justify-between gap-6">
         <div className="space-y-3 text-center">
-          <div className="space-y-1">
-            <h2 className="text-xl font-semibold">{t('onboarding.importVault.title')}</h2>
-            <p className="text-sm text-muted-foreground">
-              {t('onboarding.importVault.step', { current: step, total: TOTAL_STEPS })}
-            </p>
-          </div>
-          <Progress value={progressValue} />
+          <FlowHeader
+            title={t('onboarding.importVault.title')}
+            stepLabel={t('onboarding.importVault.step', { current: step, total: TOTAL_STEPS })}
+            progressValue={progressValue}
+          />
         </div>
 
         <div className="flex-1 space-y-4">

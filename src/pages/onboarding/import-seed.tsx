@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Progress } from '@/components/ui/progress'
 import { Textarea } from '@/components/ui/textarea'
 import { PasswordInput } from '@/components/ui/password-input'
 import { isSeedLike } from '@/lib/seed'
@@ -17,6 +16,7 @@ import {
   validateVaultPassphrase,
   verifyVaultAccess,
 } from '@/lib/vault'
+import FlowHeader from '@/components/onboarding/flow-header'
 
 const TOTAL_STEPS = 3
 const SEED_LENGTH = 55
@@ -195,15 +195,11 @@ const ImportSeed = ({
     <section className="flex h-full w-full justify-center px-6 py-8">
       <div className="flex w-full max-w-sm flex-col justify-between gap-6">
         <div className="space-y-3 text-center">
-          <div className="space-y-1">
-            <h2 className="text-xl font-semibold">
-              {variant === 'add-address' ? 'Import address seed' : 'Import private seed'}
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              Step {step} of {TOTAL_STEPS}
-            </p>
-          </div>
-          <Progress value={progressValue} />
+          <FlowHeader
+            title={variant === 'add-address' ? 'Import address seed' : 'Import private seed'}
+            stepLabel={`Step ${step} of ${TOTAL_STEPS}`}
+            progressValue={progressValue}
+          />
         </div>
 
         <div className="flex-1 space-y-4">
