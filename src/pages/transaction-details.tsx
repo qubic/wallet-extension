@@ -1,16 +1,17 @@
 import { useSdk } from '@qubic-labs/react'
 import { useQuery } from '@tanstack/react-query'
 import { ArrowLeftIcon, CheckIcon, CopyIcon, ExternalLinkIcon } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { toast } from 'sonner'
 import { buildExplorerObjectUrl, truncateString } from '@/lib/utils'
 import {
   getPendingTransaction,
   resolvePendingTransactions,
   usePendingTransactionsVersion,
 } from '@/lib/pending-transactions'
+import { useLatestStats } from '@/lib/network-stats'
+import { useClipboardCopy } from '@/hooks/use-clipboard-copy'
 
 const formatValue = (value: unknown): string => {
   if (value === null || value === undefined) return '--'
@@ -51,34 +52,17 @@ const formatIntegerLike = (value: unknown): string => {
 
 const TX_DETAILS_SKELETON_IDS = ['a', 'b', 'c', 'd', 'e', 'f'] as const
 
-type LatestStatsResponse = {
-  data?: {
-    currentTick?: number
-  }
-}
-
-const fetchLatestStats = async (): Promise<LatestStatsResponse> => {
-  const response = await fetch('https://rpc.qubic.org/v1/latest-stats')
-  if (!response.ok) {
-    throw new Error('Failed to load network stats.')
-  }
-  return response.json() as Promise<LatestStatsResponse>
-}
-
 const TransactionDetails = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const { hash = '' } = useParams<{ hash: string }>()
   const sdk = useSdk()
   usePendingTransactionsVersion()
-  const [copiedKey, setCopiedKey] = useState<string | null>(null)
-  const latestStats = useQuery({
-    queryKey: ['qubic', 'latest-stats', 'tx-details'],
-    queryFn: fetchLatestStats,
-    refetchInterval: 15_000,
-    staleTime: 3_000,
-    gcTime: 120_000,
+  const { copiedKey, copyText } = useClipboardCopy({
+    successTitle: t('txDetails.copied'),
+    errorTitle: t('txDetails.copyFailed'),
   })
+  const latestStats = useLatestStats('tx-details')
   const currentTick = latestStats.data?.data?.currentTick
   const pending = getPendingTransaction(hash, currentTick)
   const isPending = Boolean(pending)
@@ -143,16 +127,7 @@ const TransactionDetails = () => {
   ]
 
   const copyValue = async (key: string, value: unknown) => {
-    try {
-      await navigator.clipboard.writeText(formatValue(value))
-      setCopiedKey(key)
-      toast.success(t('txDetails.copied'))
-      window.setTimeout(() => {
-        setCopiedKey((current) => (current === key ? null : current))
-      }, 1200)
-    } catch {
-      toast.error(t('txDetails.copyFailed'))
-    }
+    await copyText(formatValue(value), { key })
   }
 
   return (

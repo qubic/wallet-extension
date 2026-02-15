@@ -1,10 +1,8 @@
 import { useBalance, useTransactions } from '@qubic-labs/react'
-import { useQuery } from '@tanstack/react-query'
 import { CopyIcon, EyeIcon, InboxIcon, Loader2Icon, PackageIcon, RefreshCwIcon } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import QRCode from 'qrcode'
 import { useNavigate } from 'react-router-dom'
-import { toast } from 'sonner'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer'
@@ -14,6 +12,8 @@ import { useTranslation } from 'react-i18next'
 import { normalizeBalance, formatBalanceCompact, truncateString } from '@/lib/utils'
 import { getCurrentIdentity, isWatchOnlyIdentity } from '@/lib/accounts'
 import { aggregateAssets, formatAssetUnits, useOwnedAssets } from '@/lib/assets'
+import { useLatestStats } from '@/lib/network-stats'
+import { useClipboardCopy } from '@/hooks/use-clipboard-copy'
 import {
   getPendingOutgoingDebit,
   PENDING_SETTLED_EVENT,
@@ -52,30 +52,6 @@ const setCachedBalance = (identity: string, value: bigint) => {
   } catch {
     // ignore cache failures
   }
-}
-
-type LatestStatsResponse = {
-  data?: {
-    timestamp?: string
-    circulatingSupply?: string
-    activeAddresses?: number
-    price?: number
-    marketCap?: string
-    epoch?: number
-    currentTick?: number
-    ticksInCurrentEpoch?: number
-    emptyTicksInCurrentEpoch?: number
-    epochTickQuality?: number
-    burnedQus?: string
-  }
-}
-
-const fetchLatestStats = async (): Promise<LatestStatsResponse> => {
-  const response = await fetch('https://rpc.qubic.org/v1/latest-stats')
-  if (!response.ok) {
-    throw new Error('Failed to load network stats.')
-  }
-  return response.json() as Promise<LatestStatsResponse>
 }
 
 const SYNC_BADGE_SHOW_DELAY_MS = 180
@@ -360,14 +336,9 @@ const Home = () => {
   const isConstrainedLayout = isPopup || isSidePanel
   const assetsListMaxHeightClass = isPopup ? 'max-h-36' : isSidePanel ? 'max-h-44' : 'max-h-52'
   const navigate = useNavigate()
+  const { copyText } = useClipboardCopy()
   const balance = useBalance(identity, { refetchInterval: 15_000 })
-  const latestStats = useQuery({
-    queryKey: ['qubic', 'latest-stats'],
-    queryFn: fetchLatestStats,
-    refetchInterval: 15_000,
-    staleTime: 3_000,
-    gcTime: 120_000,
-  })
+  const latestStats = useLatestStats('home')
   const ownedAssets = useOwnedAssets(identity)
   const aggregatedAssets = ownedAssets.data ? aggregateAssets(ownedAssets.data) : []
   const transactions = useTransactions(
@@ -410,16 +381,14 @@ const Home = () => {
   const syncHideTimerRef = useRef<number | null>(null)
 
   const handleCopyIdentity = async () => {
-    try {
-      await navigator.clipboard.writeText(identity)
-      toast.success(t('home.toast.copySuccess'), {
-        description: t('home.toast.copySuccessDesc'),
-      })
-    } catch {
-      toast.error(t('home.toast.copyFail'), {
-        description: t('home.toast.copyFailDesc'),
-      })
-    }
+    await copyText(identity, {
+      messages: {
+        successTitle: t('home.toast.copySuccess'),
+        successDescription: t('home.toast.copySuccessDesc'),
+        errorTitle: t('home.toast.copyFail'),
+        errorDescription: t('home.toast.copyFailDesc'),
+      },
+    })
   }
 
   useEffect(() => {

@@ -19,7 +19,6 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { useBalance, useSdk, useSend } from '@qubic-labs/react'
-import { useQuery } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -65,6 +64,8 @@ import {
   usePendingTransactionsVersion,
 } from '@/lib/pending-transactions'
 import { setOnboarded } from '@/lib/vault'
+import { useLatestStats } from '@/lib/network-stats'
+import { useClipboardCopy } from '@/hooks/use-clipboard-copy'
 
 type Step = 'form' | 'auth' | 'success'
 
@@ -90,24 +91,9 @@ type SourceAccount = {
   watchOnly?: boolean
 }
 
-type LatestStatsResponse = {
-  data?: {
-    price?: number
-    currentTick?: number
-  }
-}
-
 const TARGET_TICK_OFFSET_MIN = 1
 const TARGET_TICK_OFFSET_MAX = 40
 const QUICK_TARGET_TICK_OFFSETS = [5, 10, 15] as const
-
-const fetchLatestStats = async (): Promise<LatestStatsResponse> => {
-  const response = await fetch('https://rpc.qubic.org/v1/latest-stats')
-  if (!response.ok) {
-    throw new Error('Failed to load network stats.')
-  }
-  return response.json() as Promise<LatestStatsResponse>
-}
 
 const formatUsd = (value: number) =>
   new Intl.NumberFormat('en-US', {
@@ -184,18 +170,17 @@ const TransferSuccess = ({
   onViewDetails: () => void
 }) => {
   const { t } = useTranslation()
+  const { copyText } = useClipboardCopy()
 
   const handleCopyTxId = async () => {
-    try {
-      await navigator.clipboard.writeText(txResult.txId)
-      toast.success(t('home.toast.copySuccess'), {
-        description: t('home.toast.copySuccessDesc'),
-      })
-    } catch {
-      toast.error(t('home.toast.copyFail'), {
-        description: t('home.toast.copyFailDesc'),
-      })
-    }
+    await copyText(txResult.txId, {
+      messages: {
+        successTitle: t('home.toast.copySuccess'),
+        successDescription: t('home.toast.copySuccessDesc'),
+        errorTitle: t('home.toast.copyFail'),
+        errorDescription: t('home.toast.copyFailDesc'),
+      },
+    })
   }
 
   return (
@@ -728,13 +713,7 @@ const Transfer = () => {
   const balance = useBalance(currentIdentity)
   const ownedAssets = useOwnedAssets(currentIdentity)
   const sendMutation = useSend()
-  const latestStats = useQuery({
-    queryKey: ['qubic', 'latest-stats', 'transfer'],
-    queryFn: fetchLatestStats,
-    refetchInterval: 15_000,
-    staleTime: 5_000,
-    gcTime: 120_000,
-  })
+  const latestStats = useLatestStats('transfer', { staleTime: 5_000 })
 
   const [step, setStep] = useState<Step>('form')
   const [selectedToken, setSelectedToken] = useState('qu')

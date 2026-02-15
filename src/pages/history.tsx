@@ -1,5 +1,4 @@
 import { useTransactions } from '@qubic-labs/react'
-import { useQuery } from '@tanstack/react-query'
 import { HashIcon, InboxIcon, RefreshCwIcon } from 'lucide-react'
 import { ReceiveIcon } from '@/components/icons/receive-icon'
 import { SendIcon } from '@/components/icons/send-icon'
@@ -17,6 +16,7 @@ import {
   usePendingTransactionsVersion,
 } from '@/lib/pending-transactions'
 import { getCurrentIdentity } from '@/lib/accounts'
+import { useLatestStats } from '@/lib/network-stats'
 
 const formatQus = (value: bigint) => {
   const formatter = new Intl.NumberFormat('en', {
@@ -24,20 +24,6 @@ const formatQus = (value: bigint) => {
     maximumFractionDigits: 2,
   })
   return formatter.format(Number(value))
-}
-
-type LatestStatsResponse = {
-  data?: {
-    currentTick?: number
-  }
-}
-
-const fetchLatestStats = async (): Promise<LatestStatsResponse> => {
-  const response = await fetch('https://rpc.qubic.org/v1/latest-stats')
-  if (!response.ok) {
-    throw new Error('Failed to load network stats.')
-  }
-  return response.json() as Promise<LatestStatsResponse>
 }
 
 const History = () => {
@@ -53,13 +39,7 @@ const History = () => {
     },
     { refetchInterval: 15_000 },
   )
-  const latestStats = useQuery({
-    queryKey: ['qubic', 'latest-stats', 'history'],
-    queryFn: fetchLatestStats,
-    refetchInterval: 15_000,
-    staleTime: 3_000,
-    gcTime: 120_000,
-  })
+  const latestStats = useLatestStats('history')
 
   useEffect(() => {
     const refreshIdentity = () => {
