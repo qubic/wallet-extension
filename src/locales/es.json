@@ -28,9 +28,6 @@
       "loading": "Cargando actividad reciente...",
       "empty": "Sin transacciones recientes.",
       "emptyTitle": "Sin actividad aún",
-      "incoming": "Entrante",
-      "outgoing": "Saliente",
-      "tick": "Tick {{tick}}",
       "viewAll": "Ver todo"
     },
     "network": {
@@ -236,8 +233,15 @@
     "empty": "No hay transacciones.",
     "incoming": "Entrante",
     "outgoing": "Saliente",
+    "sent": "Enviado",
+    "received": "Recibido",
+    "to": "A: {{address}}",
+    "from": "De: {{address}}",
     "tick": "Tick",
-    "type": "Tipo"
+    "type": "Tipo",
+    "pending": "Pendiente",
+    "today": "Hoy",
+    "yesterday": "Ayer"
   },
   "txDetails": {
     "title": "Detalles de transacción",
@@ -255,6 +259,7 @@
     "inputType": "Tipo de input",
     "source": "Origen",
     "destination": "Destino",
+    "timestamp": "Fecha",
     "openExplorer": "Abrir en explorador",
     "pending": "Pendiente",
     "pendingHint": "Esta transacción aún está pendiente de confirmación en los ticks de red."

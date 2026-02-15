@@ -1,16 +1,12 @@
 import { useTransactions } from '@qubic-labs/react'
 import { useQuery } from '@tanstack/react-query'
-import {
-  ArrowDownLeftIcon,
-  ArrowUpRightIcon,
-  HashIcon,
-  InboxIcon,
-  RefreshCwIcon,
-} from 'lucide-react'
+import { HashIcon, InboxIcon, RefreshCwIcon } from 'lucide-react'
+import { ReceiveIcon } from '@/components/icons/receive-icon'
+import { SendIcon } from '@/components/icons/send-icon'
 import { Button } from '@/components/ui/button'
 import { buildExplorerObjectUrl, truncateString } from '@/lib/utils'
 import { useTranslation } from 'react-i18next'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -90,11 +86,66 @@ const History = () => {
     amount: tx.amount ?? 0n,
     tickNumber: tx.targetTick,
     inputType: tx.inputType ?? 0,
+    timestamp: BigInt(tx.createdAt),
   }))
   const sorted = [
     ...pendingItems,
     ...items.filter((tx) => !pendingHashes.has(tx.hash.toLowerCase())),
   ].sort((a, b) => Number(b.tickNumber) - Number(a.tickNumber))
+
+  const grouped = useMemo(() => {
+    const now = new Date()
+    const todayKey = now.toDateString()
+    const yesterday = new Date(now)
+    yesterday.setDate(yesterday.getDate() - 1)
+    const yesterdayKey = yesterday.toDateString()
+
+    const groups: Array<{
+      key: string
+      label: string
+      items: typeof sorted
+    }> = []
+    const groupMap = new Map<string, typeof sorted>()
+
+    for (const tx of sorted) {
+      const isPending = isTransactionPending(tx.hash, currentTick)
+      let key: string
+      if (isPending) {
+        key = '__pending__'
+      } else {
+        const ts = Number(tx.timestamp)
+        const date = new Date(ts > 1e12 ? ts : ts * 1000)
+        key = date.toDateString()
+      }
+      const group = groupMap.get(key)
+      if (group) {
+        group.push(tx)
+      } else {
+        groupMap.set(key, [tx])
+      }
+    }
+
+    for (const [key, groupItems] of groupMap) {
+      let label: string
+      if (key === '__pending__') {
+        label = t('history.pending')
+      } else if (key === todayKey) {
+        label = t('history.today')
+      } else if (key === yesterdayKey) {
+        label = t('history.yesterday')
+      } else {
+        const date = new Date(key)
+        label = date.toLocaleDateString(undefined, {
+          month: 'short',
+          day: 'numeric',
+          year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined,
+        })
+      }
+      groups.push({ key, label, items: groupItems })
+    }
+
+    return groups
+  }, [sorted, currentTick, t])
   const listMotion = {
     hidden: { opacity: 0, y: 10 },
     show: {
@@ -177,91 +228,106 @@ const History = () => {
             </motion.div>
           )}
 
-          <motion.div className="space-y-2" variants={itemMotion}>
-            {sorted.map((tx) => {
-              const isIncoming = tx.destination === identity
-              const label = isIncoming ? t('history.incoming') : t('history.outgoing')
-              const counterparty = isIncoming ? tx.source : tx.destination
-              const Icon = isIncoming ? ArrowDownLeftIcon : ArrowUpRightIcon
-              const isPending = isTransactionPending(tx.hash, currentTick)
+          {grouped.map((group) => (
+            <motion.div key={group.key} className="space-y-2" variants={itemMotion}>
+              <span className="text-[11px] font-semibold uppercase text-muted-foreground/70">
+                {group.label}
+              </span>
+              {group.items.map((tx) => {
+                const isIncoming = tx.destination === identity
+                const isSimpleTransfer = Number(tx.inputType) === 0
+                const label = isSimpleTransfer
+                  ? isIncoming
+                    ? t('history.received')
+                    : t('history.sent')
+                  : isIncoming
+                    ? t('history.incoming')
+                    : t('history.outgoing')
+                const counterparty = isIncoming ? tx.source : tx.destination
+                const counterpartyLabel = isSimpleTransfer
+                  ? isIncoming
+                    ? t('history.from', { address: truncateString(counterparty) })
+                    : t('history.to', { address: truncateString(counterparty) })
+                  : truncateString(counterparty)
+                const Icon = isIncoming ? ReceiveIcon : SendIcon
+                const isPending = isTransactionPending(tx.hash, currentTick)
 
-              return (
-                <motion.button
-                  type="button"
-                  key={tx.hash}
-                  className={`w-full cursor-pointer space-y-3 rounded-xl border px-3 py-3 text-left transition-colors ${
-                    isPending
-                      ? 'animate-pulse border-amber-500/50 bg-amber-500/10'
-                      : 'border-border/40 bg-background/40 hover:border-primary/30 hover:bg-background/60'
-                  }`}
-                  onClick={() => navigate(`/tx/${tx.hash}`)}
-                  variants={itemMotion}
-                >
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      <div
-                        className={`flex h-9 w-9 items-center justify-center rounded-full border ${
+                return (
+                  <motion.button
+                    type="button"
+                    key={tx.hash}
+                    className={`w-full cursor-pointer space-y-3 rounded-xl border px-3 py-3 text-left transition-colors ${
+                      isPending
+                        ? 'animate-pulse border-amber-500/50 bg-amber-500/10'
+                        : 'border-border/40 bg-background/40 hover:border-primary/30 hover:bg-background/60'
+                    }`}
+                    onClick={() => navigate(`/tx/${tx.hash}`)}
+                    variants={itemMotion}
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        <div
+                          className={`flex h-9 w-9 items-center justify-center rounded-full border ${
+                            isPending
+                              ? 'border-amber-500/40 bg-amber-500/15 text-amber-700 dark:text-amber-300'
+                              : isIncoming
+                                ? 'border-primary/40 bg-primary/10 text-primary'
+                                : 'border-[var(--destructive)]/40 bg-[var(--destructive)]/10 text-[var(--destructive)]'
+                          }`}
+                        >
+                          <Icon className="h-4 w-4" />
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-xs font-semibold text-foreground">{label}</span>
+                          <span className="text-xs text-muted-foreground">{counterpartyLabel}</span>
+                        </div>
+                      </div>
+                      <span
+                        className={`text-sm font-semibold ${
                           isPending
-                            ? 'border-amber-500/40 bg-amber-500/15 text-amber-700 dark:text-amber-300'
+                            ? 'text-amber-700 dark:text-amber-300'
                             : isIncoming
-                              ? 'border-primary/40 bg-primary/10 text-primary'
-                              : 'border-[var(--destructive)]/40 bg-[var(--destructive)]/10 text-[var(--destructive)]'
+                              ? 'text-primary'
+                              : 'text-[var(--destructive)]'
                         }`}
                       >
-                        <Icon className="h-4 w-4" />
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-xs font-semibold text-foreground">{label}</span>
-                        <span className="text-xs text-muted-foreground">
-                          {truncateString(counterparty)}
-                        </span>
-                      </div>
+                        {isIncoming ? '+' : '-'}
+                        {formatQus(tx.amount)}
+                      </span>
                     </div>
-                    <span
-                      className={`rounded-md px-2 py-0.5 text-sm font-semibold ${
-                        isPending
-                          ? 'bg-amber-500/15 text-amber-700 dark:text-amber-300'
-                          : isIncoming
-                            ? 'bg-primary/10 text-primary'
-                            : 'bg-[var(--destructive)]/10 text-[var(--destructive)]'
-                      }`}
-                    >
-                      {isIncoming ? '+' : '-'}
-                      {formatQus(tx.amount)}
-                    </span>
-                  </div>
 
-                  <div className="grid grid-cols-[1fr_auto_auto] items-center gap-2 text-[11px] text-muted-foreground">
-                    <div className="flex min-w-0 items-center gap-2">
-                      <HashIcon className="h-3.5 w-3.5" />
-                      <a
-                        href={buildExplorerObjectUrl('tx', tx.hash)}
-                        className="truncate font-mono text-primary hover:underline"
-                        target="_blank"
-                        rel="noreferrer"
-                        onClick={(event) => event.stopPropagation()}
-                      >
-                        {truncateString(tx.hash, {
-                          leading: 6,
-                          trailing: 6,
-                          minLength: 12,
-                          emptyLabel: '',
-                        })}
-                      </a>
+                    <div className="grid grid-cols-[1fr_auto_auto] items-center gap-2 text-[11px] text-muted-foreground">
+                      <div className="flex min-w-0 items-center gap-2">
+                        <HashIcon className="h-3.5 w-3.5" />
+                        <a
+                          href={buildExplorerObjectUrl('tx', tx.hash)}
+                          className="truncate font-mono text-primary hover:underline"
+                          target="_blank"
+                          rel="noreferrer"
+                          onClick={(event) => event.stopPropagation()}
+                        >
+                          {truncateString(tx.hash, {
+                            leading: 6,
+                            trailing: 6,
+                            minLength: 12,
+                            emptyLabel: '',
+                          })}
+                        </a>
+                      </div>
+                      <div className="flex items-center gap-1 font-mono">
+                        <span className="text-muted-foreground/70">{t('history.tick')}</span>
+                        <span>{Number(tx.tickNumber).toLocaleString()}</span>
+                      </div>
+                      <div className="flex items-center gap-1 font-mono">
+                        <span className="text-muted-foreground/70">{t('history.type')}</span>
+                        <span>{tx.inputType.toString()}</span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-1 font-mono">
-                      <span className="text-muted-foreground/70">{t('history.tick')}</span>
-                      <span>{tx.tickNumber.toString()}</span>
-                    </div>
-                    <div className="flex items-center gap-1 font-mono">
-                      <span className="text-muted-foreground/70">{t('history.type')}</span>
-                      <span>{tx.inputType.toString()}</span>
-                    </div>
-                  </div>
-                </motion.button>
-              )
-            })}
-          </motion.div>
+                  </motion.button>
+                )
+              })}
+            </motion.div>
+          ))}
         </motion.div>
       </AnimatePresence>
     </section>

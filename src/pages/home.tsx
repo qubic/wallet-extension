@@ -1,15 +1,6 @@
 import { useBalance, useTransactions } from '@qubic-labs/react'
 import { useQuery } from '@tanstack/react-query'
-import {
-  ArrowDownLeftIcon,
-  ArrowUpRightIcon,
-  CopyIcon,
-  EyeIcon,
-  InboxIcon,
-  Loader2Icon,
-  PackageIcon,
-  RefreshCwIcon,
-} from 'lucide-react'
+import { CopyIcon, EyeIcon, InboxIcon, Loader2Icon, PackageIcon, RefreshCwIcon } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import QRCode from 'qrcode'
 import { useNavigate } from 'react-router-dom'
@@ -242,6 +233,7 @@ const TransactionsPreview = ({
     amount: tx.amount ?? 0n,
     tickNumber: tx.targetTick,
     inputType: tx.inputType ?? 0,
+    timestamp: BigInt(tx.createdAt),
   }))
   const merged = [
     ...pendingItems,
@@ -267,9 +259,21 @@ const TransactionsPreview = ({
     <div className="w-full space-y-2 text-left">
       {recent.map((tx) => {
         const isIncoming = tx.destination === identity
-        const label = isIncoming ? t('home.recent.incoming') : t('home.recent.outgoing')
+        const isSimpleTransfer = Number(tx.inputType) === 0
+        const label = isSimpleTransfer
+          ? isIncoming
+            ? t('history.received')
+            : t('history.sent')
+          : isIncoming
+            ? t('history.incoming')
+            : t('history.outgoing')
         const counterparty = isIncoming ? tx.source : tx.destination
-        const Icon = isIncoming ? ArrowDownLeftIcon : ArrowUpRightIcon
+        const counterpartyLabel = isSimpleTransfer
+          ? isIncoming
+            ? t('history.from', { address: truncateString(counterparty) })
+            : t('history.to', { address: truncateString(counterparty) })
+          : truncateString(counterparty)
+        const Icon = isIncoming ? ReceiveIcon : SendIcon
         const isPending = isTransactionPending(tx.hash, currentTick)
 
         return (
@@ -297,21 +301,34 @@ const TransactionsPreview = ({
               </div>
               <div className="flex flex-col">
                 <span className="text-xs font-semibold text-foreground">{label}</span>
-                <span className="font-mono text-xs text-muted-foreground">
-                  {truncateString(counterparty)}
-                </span>
+                <span className="text-xs text-muted-foreground">{counterpartyLabel}</span>
                 <span className="text-[11px] text-muted-foreground/70">
-                  {t('home.recent.tick', { tick: tx.tickNumber })}
+                  {(() => {
+                    const ts = Number(tx.timestamp)
+                    if (!ts) return '--'
+                    const date = new Date(ts > 1e12 ? ts : ts * 1000)
+                    const now = new Date()
+                    if (date.toDateString() === now.toDateString()) return t('history.today')
+                    const yesterday = new Date(now)
+                    yesterday.setDate(yesterday.getDate() - 1)
+                    if (date.toDateString() === yesterday.toDateString())
+                      return t('history.yesterday')
+                    return date.toLocaleDateString(undefined, {
+                      month: 'short',
+                      day: 'numeric',
+                      year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined,
+                    })
+                  })()}
                 </span>
               </div>
             </div>
             <span
-              className={`rounded-md px-2 py-0.5 text-sm font-semibold ${
+              className={`text-sm font-semibold ${
                 isPending
-                  ? 'bg-amber-500/15 text-amber-700 dark:text-amber-300'
+                  ? 'text-amber-700 dark:text-amber-300'
                   : isIncoming
-                    ? 'bg-primary/10 text-primary'
-                    : 'bg-[var(--destructive)]/10 text-[var(--destructive)]'
+                    ? 'text-primary'
+                    : 'text-[var(--destructive)]'
               }`}
             >
               {isIncoming ? '+' : '-'}

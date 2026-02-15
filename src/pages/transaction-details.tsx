@@ -25,6 +25,30 @@ const formatValue = (value: unknown): string => {
   return String(value)
 }
 
+const formatIntegerLike = (value: unknown): string => {
+  if (value === null || value === undefined) return '--'
+
+  if (typeof value === 'bigint') {
+    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+  }
+
+  if (typeof value === 'number') {
+    if (!Number.isFinite(value)) return '--'
+    return Math.trunc(value).toLocaleString()
+  }
+
+  if (typeof value === 'string') {
+    const normalized = value.trim()
+    if (/^-?\d+$/.test(normalized)) {
+      const sign = normalized.startsWith('-') ? '-' : ''
+      const digits = sign ? normalized.slice(1) : normalized
+      return `${sign}${digits.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`
+    }
+  }
+
+  return formatValue(value)
+}
+
 const TX_DETAILS_SKELETON_IDS = ['a', 'b', 'c', 'd', 'e', 'f'] as const
 
 type LatestStatsResponse = {
@@ -71,13 +95,42 @@ const TransactionDetails = () => {
   }, [hash, currentTick])
 
   const details = txQuery.data as Record<string, unknown> | undefined
+
+  const formatTimestamp = (ts: unknown): string => {
+    if (ts === null || ts === undefined) return '--'
+    const num = typeof ts === 'bigint' ? Number(ts) : Number(ts)
+    if (!num || Number.isNaN(num)) return '--'
+    const ms = num > 1e12 ? num : num * 1000
+    return new Date(ms).toLocaleString(undefined, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    })
+  }
+
   const rows: Array<{ key: string; label: string; value: unknown; copyable?: boolean }> = [
     { key: 'hash', label: t('txDetails.hash'), value: hash, copyable: true },
-    { key: 'amount', label: t('txDetails.amount'), value: details?.amount },
+    {
+      key: 'amount',
+      label: t('txDetails.amount'),
+      value: formatIntegerLike(details?.amount),
+    },
+    {
+      key: 'timestamp',
+      label: t('txDetails.timestamp'),
+      value: formatTimestamp(details?.timestamp),
+    },
     {
       key: 'tick',
       label: t('txDetails.tick'),
-      value: details?.tickNumber ?? details?.tick ?? pending?.targetTick ?? '--',
+      value: (() => {
+        const tick = details?.tickNumber ?? details?.tick ?? pending?.targetTick
+        if (tick === null || tick === undefined) return '--'
+        return Number(tick).toLocaleString()
+      })(),
     },
     { key: 'inputType', label: t('txDetails.inputType'), value: details?.inputType },
     { key: 'source', label: t('txDetails.source'), value: details?.source, copyable: true },

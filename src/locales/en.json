@@ -28,9 +28,6 @@
       "loading": "Loading recent activity...",
       "empty": "No recent transactions.",
       "emptyTitle": "No activity yet",
-      "incoming": "Incoming",
-      "outgoing": "Outgoing",
-      "tick": "Tick {{tick}}",
       "viewAll": "View all"
     },
     "network": {
@@ -236,8 +233,15 @@
     "empty": "No transactions found.",
     "incoming": "Incoming",
     "outgoing": "Outgoing",
+    "sent": "Sent",
+    "received": "Received",
+    "to": "To: {{address}}",
+    "from": "From: {{address}}",
     "tick": "Tick",
-    "type": "Type"
+    "type": "Type",
+    "pending": "Pending",
+    "today": "Today",
+    "yesterday": "Yesterday"
   },
   "txDetails": {
     "title": "Transaction details",
@@ -255,6 +259,7 @@
     "inputType": "Input type",
     "source": "Source",
     "destination": "Destination",
+    "timestamp": "Timestamp",
     "openExplorer": "Open in explorer",
     "pending": "Pending",
     "pendingHint": "This transaction is still pending confirmation on network ticks."
