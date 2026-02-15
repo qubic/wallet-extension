@@ -237,7 +237,10 @@
     "incoming": "Entrante",
     "outgoing": "Saliente",
     "tick": "Tick",
-    "type": "Tipo"
+    "type": "Tipo",
+    "pending": "Pendiente",
+    "today": "Hoy",
+    "yesterday": "Ayer"
   },
   "txDetails": {
     "title": "Detalles de transacción",
@@ -255,6 +258,7 @@
     "inputType": "Tipo de input",
     "source": "Origen",
     "destination": "Destino",
+    "timestamp": "Fecha",
     "openExplorer": "Abrir en explorador",
     "pending": "Pendiente",
     "pendingHint": "Esta transacción aún está pendiente de confirmación en los ticks de red."

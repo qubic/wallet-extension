@@ -237,7 +237,10 @@
     "incoming": "Incoming",
     "outgoing": "Outgoing",
     "tick": "Tick",
-    "type": "Type"
+    "type": "Type",
+    "pending": "Pending",
+    "today": "Today",
+    "yesterday": "Yesterday"
   },
   "txDetails": {
     "title": "Transaction details",
@@ -255,6 +258,7 @@
     "inputType": "Input type",
     "source": "Source",
     "destination": "Destination",
+    "timestamp": "Timestamp",
     "openExplorer": "Open in explorer",
     "pending": "Pending",
     "pendingHint": "This transaction is still pending confirmation on network ticks."
