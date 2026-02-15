@@ -19,11 +19,12 @@ import {
 } from '@/components/ui/input-group'
 import { getCurrentVaultIdentity } from '@/lib/accounts'
 import { setUnlocked } from '@/lib/lock'
-import { openBrowserVault } from '@/lib/vault'
+import { openBrowserVault, verifyVaultAccess } from '@/lib/vault'
 import { truncateString } from '@/lib/utils'
 
 type PassphraseAuthProps = {
   open?: boolean
+  identity?: string
   title?: string
   subtitle?: string
   onSuccess: (seed: string) => void
@@ -32,13 +33,14 @@ type PassphraseAuthProps = {
 
 const PassphraseAuth = ({
   open = true,
+  identity,
   title,
   subtitle,
   onSuccess,
   onCancel,
 }: PassphraseAuthProps) => {
   const { t } = useTranslation()
-  const currentIdentity = getCurrentVaultIdentity()
+  const currentIdentity = identity ?? getCurrentVaultIdentity()
 
   const [passphrase, setPassphrase] = useState('')
   const [error, setError] = useState('')
@@ -56,7 +58,22 @@ const PassphraseAuth = ({
 
     try {
       const vault = await openBrowserVault(passphrase, false)
-      const seed = await vault.getSeed(currentIdentity)
+      const access = await verifyVaultAccess(vault)
+      if (!access.valid) {
+        setError(
+          access.reason === 'invalid'
+            ? t('passphraseAuth.errors.invalidPassphrase')
+            : t('passphraseAuth.errors.generic'),
+        )
+        return
+      }
+
+      const seedIdentity = identity ?? vault.list()[0]?.identity
+      if (!seedIdentity) {
+        setError(t('passphraseAuth.errors.accountNotFound'))
+        return
+      }
+      const seed = await vault.getSeed(seedIdentity)
 
       setUnlocked()
       setPassphrase('')

@@ -1174,6 +1174,7 @@ const Transfer = () => {
       {step === 'auth' && (
         <PassphraseAuth
           open={step === 'auth'}
+          identity={currentIdentity}
           onSuccess={handleAuthSuccess}
           onCancel={handleAuthCancel}
         />
