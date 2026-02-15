@@ -164,6 +164,8 @@ const ManageAccounts = () => {
     return map
   }, [balanceQueries, orderedAccounts])
 
+  const canRemoveAnyAccount = orderedAccounts.length > 1
+
   const loadAccounts = async (passphrase: string) => {
     setStatus(null)
     setLoading(true)
@@ -241,6 +243,11 @@ const ManageAccounts = () => {
   }
 
   const handleRemove = async (account: AccountEntry, passphrase: string) => {
+    if (orderedAccounts.length <= 1) {
+      setStatus(t('accounts.manage.errors.lastAccount'))
+      return
+    }
+
     setStatus(null)
     setLoading(true)
     try {
@@ -486,6 +493,7 @@ const ManageAccounts = () => {
                       <DropdownMenuSeparator />
                       <DropdownMenuItem
                         variant="destructive"
+                        disabled={!canRemoveAnyAccount}
                         onClick={() => setRemoveTarget(account)}
                       >
                         <TrashIcon className="h-4 w-4" />
@@ -668,10 +676,16 @@ const ManageAccounts = () => {
             <DrawerTitle>{t('accounts.manage.removeTitle')}</DrawerTitle>
             <DrawerDescription>{t('accounts.manage.removeDesc')}</DrawerDescription>
           </DrawerHeader>
+          {!canRemoveAnyAccount && (
+            <p className="px-4 text-xs text-destructive">
+              {t('accounts.manage.errors.lastAccount')}
+            </p>
+          )}
           <DrawerFooter>
             <Button
               variant="destructive-outline"
               className="w-full"
+              disabled={!canRemoveAnyAccount}
               onClick={() => {
                 if (removeTarget) {
                   if (removeTarget.watchOnly) {

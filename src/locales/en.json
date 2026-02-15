@@ -222,6 +222,7 @@
         "passphraseRequired": "Passphrase is required.",
         "invalidPassphrase": "Invalid passphrase.",
         "nameDuplicate": "An account with this name already exists.",
+        "lastAccount": "You cannot remove the last account.",
         "watchOnlySeed": "Watch-only accounts do not have a seed.",
         "watchOnlyRequired": "Name and identity are required.",
         "watchOnlyInvalid": "Identity format is invalid.",
