@@ -1,7 +1,7 @@
 {
   "app": {
     "sidepanel": "Abrir panel lateral",
-    "opentab": "Abrir pestana"
+    "opentab": "Abrir pestaña"
   },
   "nav": {
     "home": "Inicio",
@@ -27,7 +27,7 @@
       "title": "Actividad reciente",
       "loading": "Cargando actividad reciente...",
       "empty": "Sin transacciones recientes.",
-      "emptyTitle": "Sin actividad aun",
+      "emptyTitle": "Sin actividad aún",
       "incoming": "Entrante",
       "outgoing": "Saliente",
       "tick": "Tick {{tick}}",
@@ -38,7 +38,7 @@
       "showDetails": "Mostrar detalles",
       "hideDetails": "Ocultar detalles",
       "tick": "Tick",
-      "epoch": "Epoca",
+      "epoch": "Época",
       "supply": "Suministro",
       "active": "Activas",
       "pricePerB": "Precio / B",
@@ -49,25 +49,25 @@
       "more": "Otros activos pronto.",
       "loading": "Cargando activos...",
       "empty": "No hay activos adicionales.",
-      "emptyTitle": "Sin activos aun",
+      "emptyTitle": "Sin activos aún",
       "error": "No se pudieron cargar los activos.",
       "unknown": "Activo desconocido"
     },
     "receive": {
       "title": "Recibir Qubic",
-      "description": "Comparte este codigo QR o copia tu identidad publica.",
-      "generating": "Generando codigo QR...",
-      "copy": "Copiar direccion"
+      "description": "Comparte este código QR o copia tu identidad pública.",
+      "generating": "Generando código QR...",
+      "copy": "Copiar dirección"
     },
     "toast": {
-      "copySuccess": "Direccion copiada",
-      "copySuccessDesc": "Tu identidad publica esta en el portapapeles.",
+      "copySuccess": "Dirección copiada",
+      "copySuccessDesc": "Tu identidad pública está en el portapapeles.",
       "copyFail": "Fallo al copiar",
       "copyFailDesc": "Intenta de nuevo o copia manualmente."
     },
     "watchOnly": {
       "title": "Cuenta de solo lectura",
-      "description": "El envio esta deshabilitado para esta direccion."
+      "description": "El envío está deshabilitado para esta dirección."
     },
     "status": {
       "syncing": "Sincronizando",
@@ -91,11 +91,11 @@
     "themeDark": "Oscuro",
     "themeLight": "Claro",
     "themeSystem": "Sistema",
-    "lock": "Bloqueo automatico por inactividad",
+    "lock": "Bloqueo automático por inactividad",
     "lockNow": "Bloquear billetera",
     "lockTimeout": {
       "label": "Tiempo de bloqueo (minutos)",
-      "helper": "Bloquea la billetera despues del tiempo seleccionado."
+      "helper": "Bloquea la billetera después del tiempo seleccionado."
     },
     "exportVault": {
       "button": "Exportar vault",
@@ -106,7 +106,7 @@
       "exporting": "Exportando...",
       "errors": {
         "passphraseRequired": "Se requiere contraseña.",
-        "invalidPassphrase": "Contraseña invalida.",
+        "invalidPassphrase": "Contraseña inválida.",
         "exportFailed": "No se pudo exportar el vault."
       }
     },
@@ -114,7 +114,7 @@
       "general": "General",
       "generalDesc": "Preferencias de idioma y tema",
       "security": "Seguridad",
-      "securityDesc": "Contraseña, bloqueo automatico y restablecer",
+      "securityDesc": "Contraseña, bloqueo automático y restablecer",
       "backup": "Respaldo",
       "backupDesc": "Exportar tu archivo vault",
       "accounts": "Administrar cuentas",
@@ -122,7 +122,7 @@
       "support": "Soporte",
       "supportDesc": "Obtener ayuda y reportar problemas",
       "about": "Acerca de",
-      "aboutDesc": "Version de la aplicacion e informacion"
+      "aboutDesc": "Versión de la aplicación e información"
     },
     "general": {
       "title": "General",
@@ -138,13 +138,13 @@
       "currentPassphrase": "Contraseña actual",
       "newPassphrase": "Nueva contraseña",
       "confirmPassphrase": "Confirmar nueva contraseña",
-      "minChars": "Minimo 12 caracteres.",
+      "minChars": "Mínimo 12 caracteres.",
       "save": "Guardar nueva contraseña",
       "saving": "Guardando...",
       "cancel": "Cancelar",
       "resetApp": "Eliminar billetera",
-      "resetAppTitle": "Eliminar billetera?",
-      "resetAppDesc": "Esto borrara todos los datos incluyendo tu vault, cuentas y ajustes. Esta accion no se puede deshacer. Asegurate de haber respaldado tus semillas.",
+      "resetAppTitle": "¿Eliminar billetera?",
+      "resetAppDesc": "Esto borrará todos los datos incluyendo tu vault, cuentas y ajustes. Esta acción no se puede deshacer. Asegúrate de haber respaldado tus semillas.",
       "resetAppConfirm": "Eliminar billetera",
       "errors": {
         "currentRequired": "Se requiere contraseña actual.",
@@ -159,21 +159,21 @@
     "support": {
       "title": "Soporte",
       "warningTitle": "Cuidado con los estafadores",
-      "warningDescription": "Los miembros del equipo de Qubic nunca te pediran tu semilla o contraseña. Nunca compartas tus claves privadas con nadie.",
+      "warningDescription": "Los miembros del equipo de Qubic nunca te pedirán tu semilla o contraseña. Nunca compartas tus claves privadas con nadie.",
       "discord": "Comunidad de Discord",
       "github": "Reportar un problema en GitHub"
     },
     "about": {
       "title": "Acerca de",
-      "appVersion": "Version de la aplicacion",
-      "extensionName": "Extension",
+      "appVersion": "Versión de la aplicación",
+      "extensionName": "Extensión",
       "versionLabel": "v{{version}}"
     }
   },
   "accounts": {
     "watchOnly": {
-      "title": "Agregar direccion solo lectura",
-      "subtitle": "Sigue una identidad publica sin importar su semilla.",
+      "title": "Agregar dirección solo lectura",
+      "subtitle": "Sigue una identidad pública sin importar su semilla.",
       "submit": "Agregar solo lectura"
     },
     "manage": {
@@ -198,18 +198,18 @@
       "confirm": "Confirmar",
       "remove": "Eliminar",
       "removeTitle": "Eliminar cuenta",
-      "removeDesc": "Esta accion elimina la cuenta de este dispositivo. No se puede deshacer.",
+      "removeDesc": "Esta acción elimina la cuenta de este dispositivo. No se puede deshacer.",
       "reveal": "Mostrar semilla",
       "revealTitle": "Frase semilla",
       "copySeed": "Copiar semilla",
       "done": "Listo",
       "addTitle": "Agregar cuenta",
-      "addNewDesc": "Agrega otra direccion a esta billetera.",
-      "addCreate": "Agregar nueva direccion",
+      "addNewDesc": "Agrega otra dirección a esta billetera.",
+      "addCreate": "Agregar nueva dirección",
       "addImport": "Importar semilla",
       "watchOnlyTitle": "Cuenta solo lectura",
       "watchOnlyName": "Nombre de cuenta",
-      "watchOnlyIdentity": "Identidad publica",
+      "watchOnlyIdentity": "Identidad pública",
       "watchOnlyAdd": "Agregar solo lectura",
       "watchOnly": "Solo lectura",
       "close": "Cerrar",
@@ -220,13 +220,13 @@
         "reveal": "No se pudo mostrar la semilla.",
         "nameRequired": "Se requiere nombre de cuenta.",
         "passphraseRequired": "Se requiere contraseña.",
-        "invalidPassphrase": "Contraseña invalida.",
+        "invalidPassphrase": "Contraseña inválida.",
         "nameDuplicate": "Ya existe una cuenta con este nombre.",
         "lastAccount": "No puedes eliminar la última cuenta.",
         "watchOnlySeed": "Las cuentas de solo lectura no tienen semilla.",
         "watchOnlyRequired": "Se requiere nombre e identidad.",
-        "watchOnlyInvalid": "Formato de identidad invalido.",
-        "watchOnlyDuplicate": "Esta identidad ya esta agregada."
+        "watchOnlyInvalid": "Formato de identidad inválido.",
+        "watchOnlyDuplicate": "Esta identidad ya está agregada."
       }
     }
   },
@@ -240,11 +240,11 @@
     "type": "Tipo"
   },
   "txDetails": {
-    "title": "Detalles de transaccion",
-    "loading": "Cargando transaccion...",
-    "error": "No se pudieron cargar los detalles de la transaccion.",
-    "back": "Atras",
-    "refresh": "Actualizar transaccion",
+    "title": "Detalles de transacción",
+    "loading": "Cargando transacción...",
+    "error": "No se pudieron cargar los detalles de la transacción.",
+    "back": "Atrás",
+    "refresh": "Actualizar transacción",
     "copy": "Copiar",
     "copyTxId": "Copiar txid",
     "copied": "Copiado",
@@ -257,7 +257,7 @@
     "destination": "Destino",
     "openExplorer": "Abrir en explorador",
     "pending": "Pendiente",
-    "pendingHint": "Esta transaccion aun esta pendiente de confirmacion en los ticks de red."
+    "pendingHint": "Esta transacción aún está pendiente de confirmación en los ticks de red."
   },
   "transfer": {
     "title": "Enviar",
@@ -278,7 +278,7 @@
       "amount": "Monto ({{token}})",
       "amountPlaceholder": "Ingresa el monto",
       "max": "MAX",
-      "fee": "Comision",
+      "fee": "Comisión",
       "feeValue": "{{fee}} QUBIC",
       "quBalance": "Saldo: {{balance}} QUBIC",
       "from": "Desde",
@@ -303,25 +303,25 @@
     },
     "validation": {
       "recipientRequired": "La identidad del destinatario es requerida.",
-      "recipientInvalid": "La identidad debe ser 60 letras mayusculas (A-Z).",
+      "recipientInvalid": "La identidad debe ser 60 letras mayúsculas (A-Z).",
       "recipientSameAsSender": "No puedes enviar a tu propia identidad.",
       "amountRequired": "El monto es requerido.",
-      "amountInvalid": "El monto debe ser un numero positivo.",
+      "amountInvalid": "El monto debe ser un número positivo.",
       "targetTickOffsetInvalid": "El desplazamiento del tick objetivo debe estar entre 1 y 40.",
-      "targetTickManualInvalid": "El tick objetivo manual debe ser un numero positivo.",
+      "targetTickManualInvalid": "El tick objetivo manual debe ser un número positivo.",
       "targetTickManualPast": "El tick objetivo manual debe ser mayor que el tick actual de la red.",
       "amountExceedsBalance": "El monto excede el saldo disponible.",
       "balanceLoading": "Espera a que se cargue el saldo.",
-      "insufficientQuForFee": "Saldo QUBIC insuficiente para cubrir la comision de {{fee}} QU."
+      "insufficientQuForFee": "Saldo QUBIC insuficiente para cubrir la comisión de {{fee}} QU."
     },
     "confirm": {
       "title": "Confirmar transferencia",
       "description": "Revisa los detalles antes de enviar.",
       "to": "Para",
       "amount": "Monto",
-      "fee": "Comision de red: {{fee}} QU",
-      "warning": "Esta accion no se puede deshacer.",
-      "feeLabel": "Comision de red",
+      "fee": "Comisión de red: {{fee}} QU",
+      "warning": "Esta acción no se puede deshacer.",
+      "feeLabel": "Comisión de red",
       "feeIncluded": "Incluida"
     },
     "actions": {
@@ -329,12 +329,12 @@
       "confirm": "Confirmar y enviar",
       "sending": "Enviando...",
       "cancel": "Cancelar",
-      "back": "Atras"
+      "back": "Atrás"
     },
     "success": {
       "title": "Transferencia enviada",
-      "description": "Tu transaccion ha sido transmitida y esta programada para el tick {{targetTick}}.",
-      "txId": "ID de transaccion",
+      "description": "Tu transacción ha sido transmitida y está programada para el tick {{targetTick}}.",
+      "txId": "ID de transacción",
       "targetTick": "Tick objetivo",
       "amount": "Monto",
       "viewHistory": "Ver historial",
@@ -342,15 +342,15 @@
     },
     "errors": {
       "networkError": "Error de red. Intenta de nuevo.",
-      "broadcastFailed": "Fallo al transmitir la transaccion.",
+      "broadcastFailed": "Fallo al transmitir la transacción.",
       "watchOnly": "Las cuentas de solo lectura no pueden enviar transferencias.",
-      "pendingOutgoing": "Hay una transferencia saliente pendiente. Espera su confirmacion antes de enviar otra.",
+      "pendingOutgoing": "Hay una transferencia saliente pendiente. Espera su confirmación antes de enviar otra.",
       "generic": "Transferencia fallida. Intenta de nuevo."
     }
   },
   "passphraseAuth": {
-    "title": "Autenticacion Requerida",
-    "subtitle": "Ingresa tu contraseña del vault para continuar con esta accion.",
+    "title": "Autenticación requerida",
+    "subtitle": "Ingresa tu contraseña del vault para continuar con esta acción.",
     "form": {
       "passphrase": "Contraseña del vault",
       "passphrasePlaceholder": "Ingresa tu contraseña",
@@ -362,20 +362,20 @@
     },
     "securityNote": "Tu contraseña se usa localmente para descifrar tu vault y firmar transacciones. Nunca se transmite por la red.",
     "actions": {
-      "back": "Atras",
+      "back": "Atrás",
       "cancel": "Cancelar",
       "unlock": "Desbloquear",
       "unlocking": "Desbloqueando..."
     },
     "errors": {
-      "invalidPassphrase": "Contraseña invalida. Intenta de nuevo.",
+      "invalidPassphrase": "Contraseña inválida. Intenta de nuevo.",
       "accountNotFound": "Cuenta no encontrada en el vault.",
-      "generic": "Autenticacion fallida. Intenta de nuevo."
+      "generic": "Autenticación fallida. Intenta de nuevo."
     }
   },
   "unlock": {
     "title": "Desbloquea tu billetera",
-    "subtitle": "Tu billetera esta bloqueada por seguridad. Ingresa tu contraseña para continuar."
+    "subtitle": "Tu billetera está bloqueada por seguridad. Ingresa tu contraseña para continuar."
   },
   "onboarding": {
     "importVault": {
@@ -383,7 +383,7 @@
       "step": "Paso {{current}} de {{total}}",
       "selectVault": {
         "title": "Selecciona tu vault",
-        "subtitle": "Sube un archivo vault exportado desde esta extension o la billetera web de Qubic.",
+        "subtitle": "Sube un archivo vault exportado desde esta extensión o la billetera web de Qubic.",
         "label": "Archivo vault",
         "dropText": "Suelta tu archivo vault",
         "browseText": "o haz clic para buscar (.json, .qubic-vault)"
@@ -395,17 +395,17 @@
         "sourcePassphrase": "Contraseña del vault de origen"
       },
       "review": {
-        "title": "Revisar importacion",
+        "title": "Revisar importación",
         "subtitle": "Confirma los detalles del archivo y la contraseña antes de importar.",
         "vaultFile": "Archivo vault",
         "notSelected": "No seleccionado",
         "sourcePassphraseProvided": "Proporcionada",
         "sourcePassphraseSame": "Igual que la nueva",
         "sourcePassphraseLabel": "Contraseña de origen",
-        "addMoreLater": "Puedes agregar mas cuentas mas tarde en Administrar Cuentas."
+        "addMoreLater": "Puedes agregar más cuentas luego en Administrar Cuentas."
       },
       "actions": {
-        "back": "Atras",
+        "back": "Atrás",
         "previous": "Anterior",
         "continue": "Continuar",
         "import": "Importar vault",
