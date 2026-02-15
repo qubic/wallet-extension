@@ -301,17 +301,17 @@ const TransactionsPreview = ({
                   {truncateString(counterparty)}
                 </span>
                 <span className="text-[11px] text-muted-foreground/70">
-                  {t('home.recent.tick', { tick: tx.tickNumber })}
+                  {t('home.recent.tick', { tick: Number(tx.tickNumber).toLocaleString() })}
                 </span>
               </div>
             </div>
             <span
-              className={`rounded-md px-2 py-0.5 text-sm font-semibold ${
+              className={`text-sm font-semibold ${
                 isPending
-                  ? 'bg-amber-500/15 text-amber-700 dark:text-amber-300'
+                  ? 'text-amber-700 dark:text-amber-300'
                   : isIncoming
-                    ? 'bg-primary/10 text-primary'
-                    : 'bg-[var(--destructive)]/10 text-[var(--destructive)]'
+                    ? 'text-primary'
+                    : 'text-[var(--destructive)]'
               }`}
             >
               {isIncoming ? '+' : '-'}
