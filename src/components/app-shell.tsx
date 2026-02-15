@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { motion } from 'framer-motion'
 import { ArrowLeftRightIcon, HistoryIcon, HomeIcon, SettingsIcon, UsersIcon } from 'lucide-react'
 import AppHeader from '@/components/app-header'
+import { getWatchOnlyAccounts } from '@/lib/accounts'
 
 const AppShell = ({
   children,
@@ -14,10 +15,14 @@ const AppShell = ({
 }: PropsWithChildren<{ showNav?: boolean; showHeader?: boolean }>) => {
   const { t } = useTranslation()
   const { pathname } = useLocation()
-  const isSidePanel = globalThis.location?.pathname?.endsWith('sidepanel.html')
   const scrollContainerRef = useRef<HTMLDivElement | null>(null)
   const navRef = useRef<HTMLElement | null>(null)
   const navItemRefs = useRef<Array<HTMLAnchorElement | null>>([])
+  const [isWatchOnly, setIsWatchOnly] = useState(() =>
+    getWatchOnlyAccounts().some(
+      (entry) => entry.identity === (localStorage.getItem('currentIdentity') ?? ''),
+    ),
+  )
   const [activeIndicator, setActiveIndicator] = useState<{ x: number; width: number }>({
     x: 0,
     width: 0,
@@ -29,6 +34,19 @@ const AppShell = ({
     if (!el) return
     el.scrollTo({ top: 0, left: 0, behavior: 'auto' })
   }, [pathname])
+
+  useEffect(() => {
+    const refreshWatchOnly = () => {
+      const currentId = localStorage.getItem('currentIdentity') ?? ''
+      setIsWatchOnly(getWatchOnlyAccounts().some((entry) => entry.identity === currentId))
+    }
+    window.addEventListener('storage', refreshWatchOnly)
+    window.addEventListener('wallet-account-updated', refreshWatchOnly)
+    return () => {
+      window.removeEventListener('storage', refreshWatchOnly)
+      window.removeEventListener('wallet-account-updated', refreshWatchOnly)
+    }
+  }, [])
 
   const openSidePanel = async () => {
     const chromeApi = (
@@ -102,9 +120,16 @@ const AppShell = ({
     [t],
   )
 
+  const filteredNavItems = useMemo(
+    () => (isWatchOnly ? navItems.filter((item) => item.key !== 'transfer') : navItems),
+    [isWatchOnly, navItems],
+  )
+
   const getActiveNavIndex = useCallback(() => {
-    return navItems.findIndex((item) => pathname === item.to || pathname.startsWith(`${item.to}/`))
-  }, [navItems, pathname])
+    return filteredNavItems.findIndex(
+      (item) => pathname === item.to || pathname.startsWith(`${item.to}/`),
+    )
+  }, [filteredNavItems, pathname])
 
   const updateActiveIndicator = useCallback(() => {
     const activeIndex = getActiveNavIndex()
@@ -193,7 +218,7 @@ const AppShell = ({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1], delay: 0.03 }}
           className={`relative z-20 grid h-[56px] shrink-0 items-center gap-0 overflow-visible rounded-t-2xl border-t border-border/60 bg-background/95 px-0 py-0 shadow-[0_-10px_25px_-18px_hsl(var(--primary)/0.45)] backdrop-blur supports-[backdrop-filter]:bg-background/82 ${
-            isSidePanel ? 'grid-cols-5' : 'grid-cols-5'
+            filteredNavItems.length === 4 ? 'grid-cols-4' : 'grid-cols-5'
           }`}
         >
           <motion.div
@@ -211,7 +236,7 @@ const AppShell = ({
             />
           </motion.div>
 
-          {navItems.map((item, index) => (
+          {filteredNavItems.map((item, index) => (
             <Button
               key={item.key}
               asChild
