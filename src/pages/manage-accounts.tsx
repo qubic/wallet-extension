@@ -42,6 +42,7 @@ import { Textarea } from '@/components/ui/textarea'
 import {
   getAccountOrder,
   getCachedAccounts,
+  getCurrentIdentity,
   getWatchOnlyAccounts,
   saveAccountOrder,
   saveCachedAccounts,
@@ -74,9 +75,7 @@ const ManageAccounts = () => {
   })
   const [status, setStatus] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
-  const [currentIdentity, setCurrentIdentity] = useState(
-    localStorage.getItem('currentIdentity') ?? '',
-  )
+  const [currentIdentity, setCurrentIdentity] = useState(getCurrentIdentity())
   const [draggedId, setDraggedId] = useState<string | null>(null)
   const [dragOverId, setDragOverId] = useState<string | null>(null)
   const [renameTarget, setRenameTarget] = useState<AccountEntry | null>(null)
@@ -125,7 +124,7 @@ const ManageAccounts = () => {
 
   useEffect(() => {
     const refreshCurrentIdentity = () => {
-      setCurrentIdentity(localStorage.getItem('currentIdentity') ?? '')
+      setCurrentIdentity(getCurrentIdentity())
     }
     window.addEventListener('storage', refreshCurrentIdentity)
     window.addEventListener('wallet-account-updated', refreshCurrentIdentity)

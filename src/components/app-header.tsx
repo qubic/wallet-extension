@@ -8,7 +8,12 @@ import { useTranslation } from 'react-i18next'
 import { useQueries } from '@tanstack/react-query'
 import { useSdk } from '@qubic-labs/react'
 import { formatBalanceCompact } from '@/lib/utils'
-import { getAccountOrder, getCachedAccounts, getWatchOnlyAccounts } from '@/lib/accounts'
+import {
+  getAccountOrder,
+  getCachedAccounts,
+  getCurrentIdentity,
+  getWatchOnlyAccounts,
+} from '@/lib/accounts'
 import { useNavigate } from 'react-router-dom'
 import { useCallback } from 'react'
 
@@ -31,13 +36,13 @@ const AppHeader = ({
   const [accountName, setAccountName] = useState(
     localStorage.getItem('currentAccountName') ?? 'Main account',
   )
-  const [identity, setIdentity] = useState(localStorage.getItem('currentIdentity') ?? '')
+  const [identity, setIdentity] = useState(getCurrentIdentity())
   const [accounts, setAccounts] = useState<Array<{ name: string; identity: string }>>([])
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   const refreshAccounts = useCallback(() => {
     const nextAccountName = localStorage.getItem('currentAccountName') ?? 'Main account'
-    const nextIdentity = localStorage.getItem('currentIdentity') ?? ''
+    const nextIdentity = getCurrentIdentity()
     setAccountName(nextAccountName)
     setIdentity(nextIdentity)
 

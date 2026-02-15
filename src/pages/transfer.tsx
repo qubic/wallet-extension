@@ -39,7 +39,12 @@ import {
   truncateString,
 } from '@/lib/utils'
 import PassphraseAuth from '@/pages/passphrase-auth'
-import { getCachedAccounts, getWatchOnlyAccounts } from '@/lib/accounts'
+import {
+  getCachedAccounts,
+  getCurrentIdentity,
+  getWatchOnlyAccounts,
+  isWatchOnlyIdentity,
+} from '@/lib/accounts'
 import {
   type AggregatedAsset,
   aggregateAssets,
@@ -714,14 +719,8 @@ const Transfer = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
   usePendingTransactionsVersion()
-  const [currentIdentity, setCurrentIdentity] = useState(
-    localStorage.getItem('currentIdentity') ?? '',
-  )
-  const [isWatchOnly, setIsWatchOnly] = useState(() =>
-    getWatchOnlyAccounts().some(
-      (entry) => entry.identity === (localStorage.getItem('currentIdentity') ?? ''),
-    ),
-  )
+  const [currentIdentity, setCurrentIdentity] = useState(getCurrentIdentity())
+  const [isWatchOnly, setIsWatchOnly] = useState(() => isWatchOnlyIdentity(getCurrentIdentity()))
   const [fromAccounts, setFromAccounts] = useState<SourceAccount[]>(() => getSourceAccounts())
   const [vaultRecipients, setVaultRecipients] = useState(() => getCachedAccounts())
 
@@ -805,13 +804,11 @@ const Transfer = () => {
 
   useEffect(() => {
     const refreshAccount = () => {
-      const nextIdentity = localStorage.getItem('currentIdentity') ?? ''
+      const nextIdentity = getCurrentIdentity()
       const nextAccounts = getSourceAccounts()
       setCurrentIdentity(nextIdentity)
       setFromAccounts(nextAccounts)
-      setIsWatchOnly(
-        nextAccounts.some((entry) => entry.identity === nextIdentity && entry.watchOnly),
-      )
+      setIsWatchOnly(isWatchOnlyIdentity(nextIdentity))
       setVaultRecipients(getCachedAccounts())
     }
 

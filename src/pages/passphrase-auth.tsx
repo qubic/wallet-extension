@@ -17,7 +17,7 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from '@/components/ui/input-group'
-import { getCachedAccounts } from '@/lib/accounts'
+import { getCurrentVaultIdentity } from '@/lib/accounts'
 import { setUnlocked } from '@/lib/lock'
 import { openBrowserVault } from '@/lib/vault'
 import { truncateString } from '@/lib/utils'
@@ -38,8 +38,7 @@ const PassphraseAuth = ({
   onCancel,
 }: PassphraseAuthProps) => {
   const { t } = useTranslation()
-  const storedIdentity = localStorage.getItem('currentIdentity')
-  const currentIdentity = storedIdentity ?? getCachedAccounts()[0]?.identity ?? ''
+  const currentIdentity = getCurrentVaultIdentity()
 
   const [passphrase, setPassphrase] = useState('')
   const [error, setError] = useState('')
