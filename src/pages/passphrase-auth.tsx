@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { EyeIcon, EyeOffIcon, LockOpenIcon, ShieldCheckIcon } from 'lucide-react'
+import { LockOpenIcon, ShieldCheckIcon } from 'lucide-react'
 import { VaultInvalidPassphraseError, VaultEntryNotFoundError } from '@qubic-labs/sdk'
 import { Button } from '@/components/ui/button'
 import {
@@ -11,12 +11,7 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from '@/components/ui/drawer'
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupButton,
-  InputGroupInput,
-} from '@/components/ui/input-group'
+import { PasswordInput } from '@/components/ui/password-input'
 import { getCurrentVaultIdentity } from '@/lib/accounts'
 import { setUnlocked } from '@/lib/lock'
 import { openBrowserVault, verifyVaultAccess } from '@/lib/vault'
@@ -45,8 +40,6 @@ const PassphraseAuth = ({
   const [passphrase, setPassphrase] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const [showPassphrase, setShowPassphrase] = useState(false)
-
   const handleSubmit = async () => {
     if (!passphrase.trim()) {
       setError(t('passphraseAuth.validation.required'))
@@ -134,37 +127,17 @@ const PassphraseAuth = ({
         </DrawerHeader>
 
         <div className="space-y-3 px-4 pb-2">
-          <InputGroup className="h-12">
-            <InputGroupInput
-              id="passphrase"
-              type={showPassphrase ? 'text' : 'password'}
-              placeholder={t('passphraseAuth.form.passphrasePlaceholder')}
-              value={passphrase}
-              onChange={(e) => handlePassphraseChange(e.target.value)}
-              onKeyDown={handleKeyDown}
-              aria-invalid={Boolean(error)}
-              className="h-12 text-base"
-              autoFocus
-            />
-            <InputGroupAddon align="inline-end">
-              <InputGroupButton
-                type="button"
-                variant="ghost"
-                aria-label={
-                  showPassphrase
-                    ? t('passphraseAuth.form.hidePassphrase')
-                    : t('passphraseAuth.form.showPassphrase')
-                }
-                onClick={() => setShowPassphrase((current) => !current)}
-              >
-                {showPassphrase ? (
-                  <EyeOffIcon className="h-4 w-4" />
-                ) : (
-                  <EyeIcon className="h-4 w-4" />
-                )}
-              </InputGroupButton>
-            </InputGroupAddon>
-          </InputGroup>
+          <PasswordInput
+            id="passphrase"
+            groupClassName="h-12"
+            placeholder={t('passphraseAuth.form.passphrasePlaceholder')}
+            value={passphrase}
+            onChange={(e) => handlePassphraseChange(e.target.value)}
+            onKeyDown={handleKeyDown}
+            aria-invalid={Boolean(error)}
+            className="h-12 text-base"
+            autoFocus
+          />
           {error && <p className="text-xs text-destructive">{error}</p>}
           <p className="text-xs text-muted-foreground">{t('passphraseAuth.securityNote')}</p>
         </div>
