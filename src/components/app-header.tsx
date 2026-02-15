@@ -117,15 +117,15 @@ const AppHeader = ({
         <PopoverTrigger asChild>
           <button
             type="button"
-            className="flex items-center gap-3 text-left"
+            className="flex min-w-0 items-center gap-3 text-left"
             aria-label={t('home.accounts.selectLabel')}
             onMouseEnter={() => setIsMenuOpen(true)}
           >
             <div className="flex h-10 w-10 items-center justify-center rounded-md border border-border/60 bg-card">
               <WalletIcon className="h-5 w-5 text-primary" />
             </div>
-            <div className="flex flex-col">
-              <span className="text-sm font-semibold text-foreground">{accountName}</span>
+            <div className="flex min-w-0 flex-col">
+              <span className="truncate text-sm font-semibold text-foreground">{accountName}</span>
               <span className="text-xs text-muted-foreground">{truncateString(identity)}</span>
             </div>
           </button>
