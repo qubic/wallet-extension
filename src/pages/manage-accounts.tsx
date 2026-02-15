@@ -671,7 +671,8 @@ const ManageAccounts = () => {
           </DrawerHeader>
           <DrawerFooter>
             <Button
-              variant="destructive"
+              variant="destructive-outline"
+              className="w-full"
               onClick={() => {
                 if (removeTarget) {
                   if (removeTarget.watchOnly) {
