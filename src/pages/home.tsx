@@ -8,7 +8,6 @@ import {
   InboxIcon,
   Loader2Icon,
   PackageIcon,
-  DownloadIcon,
   RefreshCwIcon,
 } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -18,6 +17,8 @@ import { toast } from 'sonner'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer'
+import { ReceiveIcon } from '@/components/icons/receive-icon'
+import { SendIcon } from '@/components/icons/send-icon'
 import { useTranslation } from 'react-i18next'
 import { normalizeBalance, formatBalanceCompact, truncateString } from '@/lib/utils'
 import { getCurrentIdentity, isWatchOnlyIdentity } from '@/lib/accounts'
@@ -553,43 +554,38 @@ const Home = () => {
                 networkMeta={{ tick: tickValue, epoch: epochValue, price: pricePerBValue }}
               />
             </div>
-            <div className="flex min-h-6 items-center justify-center gap-2 overflow-hidden">
-              {isWatchOnly && (
+            {isWatchOnly && (
+              <div className="flex items-center justify-center gap-2">
                 <div className="inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-1 text-[11px] text-amber-200">
                   <EyeIcon className="h-3.5 w-3.5" />
                   {t('home.watchOnly.title')}
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </motion.div>
 
-          <motion.div className="grid grid-cols-2 gap-3" variants={sectionMotion}>
-            <Button
-              size="sm"
-              className="h-12 w-full gap-2 rounded-md bg-primary/10 text-primary hover:bg-primary/20"
-              onClick={() => navigate('/transfer')}
-              disabled={isWatchOnly || hasPendingOutgoing}
-              title={
-                isWatchOnly
-                  ? t('transfer.errors.watchOnly')
-                  : hasPendingOutgoing
-                    ? t('transfer.errors.pendingOutgoing')
-                    : undefined
-              }
-            >
-              <ArrowUpRightIcon className="h-4 w-4" />
-              {t('home.actions.send')}
-            </Button>
-            <Button
-              size="sm"
-              variant="secondary"
-              className="h-12 w-full gap-2 rounded-md bg-card hover:bg-muted"
-              onClick={() => setIsReceiveOpen(true)}
-            >
-              <DownloadIcon className="h-4 w-4" />
-              {t('home.actions.receive')}
-            </Button>
-          </motion.div>
+          {!isWatchOnly && (
+            <motion.div className="grid grid-cols-2 gap-3" variants={sectionMotion}>
+              <Button
+                size="sm"
+                className="h-12 w-full gap-2 rounded-md bg-primary/10 text-primary hover:bg-primary/20"
+                onClick={() => navigate('/transfer')}
+                disabled={hasPendingOutgoing}
+                title={hasPendingOutgoing ? t('transfer.errors.pendingOutgoing') : undefined}
+              >
+                <SendIcon className="h-4 w-4" />
+                {t('home.actions.send')}
+              </Button>
+              <Button
+                size="sm"
+                className="h-12 w-full gap-2 rounded-md bg-primary/10 text-primary hover:bg-primary/20"
+                onClick={() => setIsReceiveOpen(true)}
+              >
+                <ReceiveIcon className="h-4 w-4" />
+                {t('home.actions.receive')}
+              </Button>
+            </motion.div>
+          )}
 
           <motion.div className="space-y-3" variants={sectionMotion}>
             <div className="flex items-center justify-between">
