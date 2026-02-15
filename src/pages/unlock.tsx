@@ -12,7 +12,6 @@ import {
 } from '@/components/ui/input-group'
 import { setUnlocked } from '@/lib/lock'
 import { openBrowserVault } from '@/lib/vault'
-import { truncateString } from '@/lib/utils'
 
 const Unlock = () => {
   const { t } = useTranslation()
@@ -21,7 +20,6 @@ const Unlock = () => {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [showPassphrase, setShowPassphrase] = useState(false)
-  const currentIdentity = localStorage.getItem('currentIdentity') ?? ''
 
   const handleSubmit = async () => {
     if (!passphrase.trim()) {
@@ -74,14 +72,6 @@ const Unlock = () => {
   return (
     <section className="flex min-h-full w-full justify-center">
       <div className="flex min-h-full w-full max-w-sm flex-col px-4 pb-6 pt-4">
-        <div className="flex items-center justify-end">
-          {currentIdentity && (
-            <span className="font-mono text-[11px] text-muted-foreground">
-              {truncateString(currentIdentity)}
-            </span>
-          )}
-        </div>
-
         <div className="mt-8 flex flex-col items-center gap-4 text-center">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
             <ShieldCheckIcon className="h-8 w-8 text-primary" />
