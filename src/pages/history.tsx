@@ -270,22 +270,24 @@ const History = () => {
                   <motion.button
                     type="button"
                     key={tx.hash}
-                    className={`w-full cursor-pointer space-y-3 rounded-xl border px-3 py-3 text-left transition-colors ${isPending
-                      ? 'animate-pulse border-amber-500/50 bg-amber-500/10'
-                      : 'border-border/40 bg-background/40 hover:border-primary/30 hover:bg-background/60'
-                      }`}
+                    className={`w-full cursor-pointer space-y-3 rounded-xl border px-3 py-3 text-left transition-colors ${
+                      isPending
+                        ? 'animate-pulse border-amber-500/50 bg-amber-500/10'
+                        : 'border-border/40 bg-background/40 hover:border-primary/30 hover:bg-background/60'
+                    }`}
                     onClick={() => navigate(`/tx/${tx.hash}`)}
                     variants={itemMotion}
                   >
                     <div className="flex items-center justify-between gap-3">
                       <div className="flex items-center gap-3">
                         <div
-                          className={`flex h-9 w-9 items-center justify-center rounded-full border ${isPending
-                            ? 'border-amber-500/40 bg-amber-500/15 text-amber-700 dark:text-amber-300'
-                            : isIncoming
-                              ? 'border-primary/40 bg-primary/10 text-primary'
-                              : 'border-[var(--destructive)]/40 bg-[var(--destructive)]/10 text-[var(--destructive)]'
-                            }`}
+                          className={`flex h-9 w-9 items-center justify-center rounded-full border ${
+                            isPending
+                              ? 'border-amber-500/40 bg-amber-500/15 text-amber-700 dark:text-amber-300'
+                              : isIncoming
+                                ? 'border-primary/40 bg-primary/10 text-primary'
+                                : 'border-[var(--destructive)]/40 bg-[var(--destructive)]/10 text-[var(--destructive)]'
+                          }`}
                         >
                           <Icon className="h-4 w-4" />
                         </div>
@@ -295,12 +297,13 @@ const History = () => {
                         </div>
                       </div>
                       <span
-                        className={`text-sm font-semibold ${isPending
-                          ? 'text-amber-700 dark:text-amber-300'
-                          : isIncoming
-                            ? 'text-primary'
-                            : 'text-[var(--destructive)]'
-                          }`}
+                        className={`text-sm font-semibold ${
+                          isPending
+                            ? 'text-amber-700 dark:text-amber-300'
+                            : isIncoming
+                              ? 'text-primary'
+                              : 'text-[var(--destructive)]'
+                        }`}
                       >
                         {isIncoming ? '+' : '-'}
                         {formatQus(tx.amount)}
