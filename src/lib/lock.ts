@@ -2,9 +2,12 @@ const LOCKED_KEY = 'walletLocked'
 const LAST_UNLOCK_AT_KEY = 'walletLastUnlockAt'
 const LOCK_TIMEOUT_MINUTES_KEY = 'walletLockTimeoutMinutes'
 const SESSION_UNLOCKED_KEY = 'walletSessionUnlocked'
+export const LOCK_TIMEOUT_OPTIONS_MINUTES = [0, 1, 3, 5, 10, 15, 20, 30, 45, 60] as const
 export const DEFAULT_LOCK_TIMEOUT_MINUTES = 15
-const MIN_LOCK_TIMEOUT_MINUTES = 1
+const MIN_LOCK_TIMEOUT_MINUTES = 0
 const MAX_LOCK_TIMEOUT_MINUTES = 120
+const ACTIVITY_TOUCH_THROTTLE_MS = 1_000
+let lastActivityTouchAt = 0
 
 type ChromeStorageSession = {
   get: (keys: string[], callback: (items: Record<string, unknown>) => void) => void
@@ -50,7 +53,8 @@ export const getLockTimeoutMinutes = () => {
     if (!raw) return DEFAULT_LOCK_TIMEOUT_MINUTES
     const parsed = Number(raw)
     if (!Number.isFinite(parsed)) return DEFAULT_LOCK_TIMEOUT_MINUTES
-    return Math.min(MAX_LOCK_TIMEOUT_MINUTES, Math.max(MIN_LOCK_TIMEOUT_MINUTES, parsed))
+    const clamped = Math.min(MAX_LOCK_TIMEOUT_MINUTES, Math.max(MIN_LOCK_TIMEOUT_MINUTES, parsed))
+    return normalizeLockTimeoutOption(clamped)
   } catch {
     return DEFAULT_LOCK_TIMEOUT_MINUTES
   }
@@ -58,8 +62,9 @@ export const getLockTimeoutMinutes = () => {
 
 export const setLockTimeoutMinutes = (minutes: number) => {
   const clamped = Math.min(MAX_LOCK_TIMEOUT_MINUTES, Math.max(MIN_LOCK_TIMEOUT_MINUTES, minutes))
+  const normalized = normalizeLockTimeoutOption(clamped)
   try {
-    localStorage.setItem(LOCK_TIMEOUT_MINUTES_KEY, clamped.toString())
+    localStorage.setItem(LOCK_TIMEOUT_MINUTES_KEY, normalized.toString())
   } catch {
     // Ignore storage failures.
   }
@@ -87,6 +92,18 @@ export const setUnlocked = () => {
   }
   setSessionUnlockedFlag(true)
   notifyLockUpdate()
+}
+
+export const touchWalletActivity = () => {
+  const now = Date.now()
+  if (now - lastActivityTouchAt < ACTIVITY_TOUCH_THROTTLE_MS) return
+  lastActivityTouchAt = now
+  try {
+    if (localStorage.getItem(LOCKED_KEY) === 'true') return
+    localStorage.setItem(LAST_UNLOCK_AT_KEY, now.toString())
+  } catch {
+    // Ignore storage failures.
+  }
 }
 
 export const getLastUnlockAt = () => {
@@ -121,9 +138,33 @@ export const isWalletLocked = () => {
     return true
   }
 
+  const timeoutMs = getLockTimeoutMs()
+  if (timeoutMs <= 0) return false
+
   const lastUnlockAt = getLastUnlockAt()
   if (!lastUnlockAt) return true
-  return Date.now() - lastUnlockAt >= getLockTimeoutMs()
+  return Date.now() - lastUnlockAt >= timeoutMs
+}
+
+const normalizeLockTimeoutOption = (minutes: number) => {
+  if (
+    LOCK_TIMEOUT_OPTIONS_MINUTES.includes(minutes as (typeof LOCK_TIMEOUT_OPTIONS_MINUTES)[number])
+  ) {
+    return minutes
+  }
+
+  let nearest = DEFAULT_LOCK_TIMEOUT_MINUTES
+  let nearestDistance = Number.POSITIVE_INFINITY
+
+  for (const option of LOCK_TIMEOUT_OPTIONS_MINUTES) {
+    const distance = Math.abs(option - minutes)
+    if (distance < nearestDistance) {
+      nearest = option
+      nearestDistance = distance
+    }
+  }
+
+  return nearest
 }
 
 const readSessionUnlockedFlag = async () => {
