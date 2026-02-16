@@ -320,9 +320,9 @@ const Home = () => {
               pendingTransactions={pendingForIdentity}
               onViewMore={() => navigate('/history')}
               onOpenTx={(hash) => navigate(`/tx/${hash}`)}
-              onResend={(recipient, amount) =>
+              onResend={(failedHash, recipient, amount) =>
                 navigate(
-                  `/transfer?recipient=${encodeURIComponent(recipient)}&amount=${encodeURIComponent(amount.toString())}`,
+                  `/transfer?failedHash=${encodeURIComponent(failedHash)}&recipient=${encodeURIComponent(recipient)}&amount=${encodeURIComponent(amount.toString())}`,
                 )
               }
             />

@@ -242,6 +242,7 @@
     "pending": "Pendiente",
     "failed": "Fallida",
     "resend": "Reenviar",
+    "deleteFailed": "Eliminar transacción fallida",
     "today": "Hoy",
     "yesterday": "Ayer"
   },

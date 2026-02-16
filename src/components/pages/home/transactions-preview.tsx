@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { InboxIcon } from 'lucide-react'
+import { InboxIcon, XIcon } from 'lucide-react'
 import type { useTransactions } from '@qubic-labs/react'
 import { motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
@@ -10,6 +10,7 @@ import {
   type PendingTransaction,
   isTransactionFailed,
   isTransactionPending,
+  removePendingTransaction,
 } from '@/lib/pending-transactions'
 
 type PreviewTransaction = {
@@ -29,7 +30,7 @@ type TransactionsPreviewProps = {
   pendingTransactions: PendingTransaction[]
   onViewMore: () => void
   onOpenTx: (hash: string) => void
-  onResend: (recipient: string, amount: bigint) => void
+  onResend: (failedHash: string, recipient: string, amount: bigint) => void
 }
 
 const TransactionsPreview = ({
@@ -97,7 +98,7 @@ const TransactionsPreview = ({
         }`}
         onClick={() => {
           if (tx.status === 'failed') {
-            onResend(tx.destination, tx.amount)
+            onResend(tx.hash, tx.destination, tx.amount)
             return
           }
           onOpenTx(tx.hash)
@@ -155,9 +156,23 @@ const TransactionsPreview = ({
           {formatBalanceCompact(tx.amount)}
         </span>
         {isFailed && (
-          <span className="ml-2 text-[11px] font-semibold uppercase tracking-wide text-primary">
-            {t('history.resend')}
-          </span>
+          <div className="ml-2 flex items-center gap-1">
+            <span className="text-[11px] font-semibold uppercase tracking-wide text-primary">
+              {t('history.resend')}
+            </span>
+            <button
+              type="button"
+              className="cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
+              onClick={(event) => {
+                event.stopPropagation()
+                removePendingTransaction(tx.hash)
+              }}
+              aria-label={t('history.deleteFailed')}
+              title={t('history.deleteFailed')}
+            >
+              <XIcon className="h-3.5 w-3.5" />
+            </button>
+          </div>
         )}
       </motion.button>
     )
@@ -207,6 +222,11 @@ const TransactionsPreview = ({
             {t('history.failed')}
           </div>
           {failedTop.map((tx) => renderRow(tx))}
+        </div>
+      )}
+      {(pendingTop.length > 0 || failedTop.length > 0) && recentChain.length > 0 && (
+        <div className="pt-1">
+          <div className="h-px w-full bg-border/40" />
         </div>
       )}
       {recentChain.map((tx) => renderRow(tx))}

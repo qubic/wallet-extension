@@ -1,5 +1,5 @@
 import { useTransactions } from '@qubic-labs/react'
-import { HashIcon, RefreshCwIcon } from 'lucide-react'
+import { HashIcon, RefreshCwIcon, XIcon } from 'lucide-react'
 import { ReceiveIcon } from '@/components/icons/receive-icon'
 import { SendIcon } from '@/components/icons/send-icon'
 import { Button } from '@/components/ui/button'
@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom'
 import {
   getPendingTransactionsForIdentity,
   PENDING_SETTLED_EVENT,
+  removePendingTransaction,
   resolvePendingTransactions,
   usePendingTransactionsVersion,
 } from '@/lib/pending-transactions'
@@ -383,7 +384,7 @@ const History = () => {
                         className="w-full cursor-pointer space-y-3 rounded-xl border border-red-500/50 bg-red-500/10 px-3 py-3 text-left transition-colors"
                         onClick={() =>
                           navigate(
-                            `/transfer?recipient=${encodeURIComponent(tx.destination)}&amount=${encodeURIComponent(tx.amount.toString())}`,
+                            `/transfer?failedHash=${encodeURIComponent(tx.hash)}&recipient=${encodeURIComponent(tx.destination)}&amount=${encodeURIComponent(tx.amount.toString())}`,
                           )
                         }
                         variants={itemMotion}
@@ -405,9 +406,23 @@ const History = () => {
                               {isIncoming ? '+' : '-'}
                               {formatBalanceCompact(tx.amount)}
                             </span>
-                            <span className="text-[11px] font-semibold uppercase tracking-wide text-primary">
-                              {t('history.resend')}
-                            </span>
+                            <div className="flex items-center gap-1">
+                              <span className="text-[11px] font-semibold uppercase tracking-wide text-primary">
+                                {t('history.resend')}
+                              </span>
+                              <button
+                                type="button"
+                                className="cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
+                                onClick={(event) => {
+                                  event.stopPropagation()
+                                  removePendingTransaction(tx.hash)
+                                }}
+                                aria-label={t('history.deleteFailed')}
+                                title={t('history.deleteFailed')}
+                              >
+                                <XIcon className="h-3.5 w-3.5" />
+                              </button>
+                            </div>
                           </div>
                         </div>
 

@@ -18,6 +18,7 @@ import {
   getPendingOutgoingDebit,
   getPendingTransactionsForIdentity,
   PENDING_SETTLED_EVENT,
+  removePendingTransaction,
   usePendingTransactionsVersion,
 } from '@/lib/pending-transactions'
 import { useLatestStats } from '@/lib/network-stats'
@@ -42,7 +43,13 @@ const formatUsd = (value: number) =>
 const Transfer = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const [searchParams, setSearchParams] = useSearchParams()
+  const [searchParams] = useSearchParams()
+  const initialPrefillRecipient = (searchParams.get('recipient') ?? '').trim().toUpperCase()
+  const initialPrefillAmount = (() => {
+    const value = (searchParams.get('amount') ?? '').trim()
+    return /^\d+$/.test(value) ? value : ''
+  })()
+  const resendFromFailedHash = (searchParams.get('failedHash') ?? '').trim()
   usePendingTransactionsVersion()
   const [currentIdentity, setCurrentIdentity] = useState(getCurrentIdentity())
   const [isWatchOnly, setIsWatchOnly] = useState(() => isWatchOnlyIdentity(getCurrentIdentity()))
@@ -56,8 +63,8 @@ const Transfer = () => {
 
   const [step, setStep] = useState<Step>('form')
   const [selectedToken, setSelectedToken] = useState('qu')
-  const [recipient, setRecipient] = useState('')
-  const [amount, setAmount] = useState('')
+  const [recipient, setRecipient] = useState(initialPrefillRecipient)
+  const [amount, setAmount] = useState(initialPrefillAmount)
   const [errors, setErrors] = useState<FormErrors>({})
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [sending, setSending] = useState(false)
@@ -120,27 +127,6 @@ const Transfer = () => {
       window.removeEventListener('wallet-account-updated', refreshAccount)
     }
   }, [])
-
-  useEffect(() => {
-    const prefillRecipient = searchParams.get('recipient')?.trim()
-    const prefillAmount = searchParams.get('amount')?.trim()
-    let didPrefill = false
-
-    if (prefillRecipient) {
-      setRecipient(prefillRecipient.toUpperCase())
-      didPrefill = true
-    }
-    if (prefillAmount && /^\d+$/.test(prefillAmount)) {
-      setAmount(prefillAmount)
-      didPrefill = true
-    }
-
-    if (didPrefill) {
-      setErrors({})
-      setErrorMessage('')
-      setSearchParams({}, { replace: true })
-    }
-  }, [searchParams, setSearchParams])
 
   useEffect(() => {
     if (selectedToken === 'qu') return
@@ -329,6 +315,9 @@ const Transfer = () => {
         inputType: selectedAsset ? QX_TRANSFER_ASSET_INPUT_TYPE : 0,
         targetTick: Number(result.targetTick),
       })
+      if (resendFromFailedHash) {
+        removePendingTransaction(resendFromFailedHash)
+      }
 
       setTxResult({
         txId: result.txId,
