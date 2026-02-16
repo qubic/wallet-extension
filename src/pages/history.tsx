@@ -160,8 +160,8 @@ const History = () => {
   }
 
   useEffect(() => {
-    resolvePendingTransactions(sorted, currentTick)
-  }, [sorted, currentTick])
+    resolvePendingTransactions(items, currentTick)
+  }, [items, currentTick])
 
   useEffect(() => {
     const handlePendingSettled = () => {
