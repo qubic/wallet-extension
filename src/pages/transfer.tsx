@@ -49,6 +49,10 @@ const Transfer = () => {
     const value = (searchParams.get('amount') ?? '').trim()
     return /^\d+$/.test(value) ? value : ''
   })()
+  const initialPrefillInputType = (() => {
+    const value = Number.parseInt((searchParams.get('inputType') ?? '').trim(), 10)
+    return Number.isFinite(value) ? value : 0
+  })()
   const resendFromFailedHash = (searchParams.get('failedHash') ?? '').trim()
   usePendingTransactionsVersion()
   const [currentIdentity, setCurrentIdentity] = useState(getCurrentIdentity())
@@ -74,6 +78,12 @@ const Transfer = () => {
   const [isManualTargetTickEnabled, setIsManualTargetTickEnabled] = useState(false)
   const [manualTargetTick, setManualTargetTick] = useState('')
   const seedRef = useRef<string | null>(null)
+
+  useEffect(() => {
+    if (!resendFromFailedHash) return
+    if (initialPrefillInputType === 0) return
+    setErrorMessage(t('transfer.errors.resendUnsupported'))
+  }, [initialPrefillInputType, resendFromFailedHash, t])
 
   const parsedAssets = aggregateAssets(ownedAssets.data ?? {})
   const filteredVaultRecipients = useMemo(

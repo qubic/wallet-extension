@@ -30,7 +30,7 @@ type TransactionsPreviewProps = {
   pendingTransactions: PendingTransaction[]
   onViewMore: () => void
   onOpenTx: (hash: string) => void
-  onResend: (failedHash: string, recipient: string, amount: bigint) => void
+  onResend: (failedHash: string, recipient: string, amount: bigint, inputType: number) => void
 }
 
 const TransactionsPreview = ({
@@ -84,25 +84,18 @@ const TransactionsPreview = ({
     const Icon = isIncoming ? ReceiveIcon : SendIcon
     const isPending = isTransactionPending(tx.hash)
     const isFailed = isTransactionFailed(tx.hash)
+    const canResend = isFailed && Number(tx.inputType) === 0 && Boolean(tx.destination)
 
     return (
-      <motion.button
-        type="button"
+      <motion.div
         key={tx.hash}
-        className={`group flex w-full cursor-pointer items-center justify-between rounded-xl border px-3 py-2 text-left transition-colors ${
+        className={`group relative flex w-full items-center justify-between rounded-xl border px-3 py-2 text-left transition-colors ${
           isPending
             ? 'animate-pulse border-amber-500/50 bg-amber-500/10 text-amber-800 dark:text-amber-200'
             : isFailed
               ? 'border-red-500/50 bg-red-500/10 text-red-800 dark:text-red-200'
               : 'border-border/40 bg-background/40 hover:border-primary/30 hover:bg-background/60'
         }`}
-        onClick={() => {
-          if (tx.status === 'failed') {
-            onResend(tx.hash, tx.destination, tx.amount)
-            return
-          }
-          onOpenTx(tx.hash)
-        }}
       >
         <div className="flex items-center gap-3">
           <div
@@ -157,16 +150,19 @@ const TransactionsPreview = ({
         </span>
         {isFailed && (
           <div className="ml-2 flex items-center gap-1">
-            <span className="text-[11px] font-semibold uppercase tracking-wide text-primary">
-              {t('history.resend')}
-            </span>
+            {canResend && (
+              <button
+                type="button"
+                className="cursor-pointer text-[11px] font-semibold uppercase tracking-wide text-primary hover:underline"
+                onClick={() => onResend(tx.hash, tx.destination, tx.amount, Number(tx.inputType))}
+              >
+                {t('history.resend')}
+              </button>
+            )}
             <button
               type="button"
               className="cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
-              onClick={(event) => {
-                event.stopPropagation()
-                removePendingTransaction(tx.hash)
-              }}
+              onClick={() => removePendingTransaction(tx.hash)}
               aria-label={t('history.deleteFailed')}
               title={t('history.deleteFailed')}
             >
@@ -174,7 +170,15 @@ const TransactionsPreview = ({
             </button>
           </div>
         )}
-      </motion.button>
+        {!isFailed && (
+          <button
+            type="button"
+            className="absolute inset-0 cursor-pointer rounded-xl"
+            aria-label={t('txDetails.title')}
+            onClick={() => onOpenTx(tx.hash)}
+          />
+        )}
+      </motion.div>
     )
   }
 

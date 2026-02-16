@@ -33,6 +33,7 @@ const PENDING_SETTLED_REFETCH_DELAY_MS = 2_500
 const pendingByHash = new Map<string, PendingTransaction>()
 const listeners = new Set<() => void>()
 const settledEventTimers = new Map<string, number>()
+let pendingVersion = 0
 
 const normalizeHash = (hash: string) => hash.trim().toLowerCase()
 const hasStorage = () => typeof localStorage !== 'undefined'
@@ -130,6 +131,11 @@ const notify = () => {
   })
 }
 
+const notifyPendingChanged = () => {
+  pendingVersion += 1
+  notify()
+}
+
 const subscribe = (listener: () => void) => {
   listeners.add(listener)
   return () => {
@@ -137,7 +143,7 @@ const subscribe = (listener: () => void) => {
   }
 }
 
-const getSnapshot = () => pendingByHash.size
+const getSnapshot = () => pendingVersion
 
 export const usePendingTransactionsVersion = () =>
   useSyncExternalStore(subscribe, getSnapshot, getSnapshot)
@@ -162,7 +168,7 @@ export const addPendingTransaction = (pending: {
     status: 'pending',
   })
   persistPending()
-  notify()
+  notifyPendingChanged()
 }
 
 export const removePendingTransaction = (hash: string) => {
@@ -170,7 +176,7 @@ export const removePendingTransaction = (hash: string) => {
   if (!key) return
   if (pendingByHash.delete(key)) {
     persistPending()
-    notify()
+    notifyPendingChanged()
   }
 }
 
@@ -258,6 +264,6 @@ export const resolvePendingTransactions = (
 
   if (changed) {
     persistPending()
-    notify()
+    notifyPendingChanged()
   }
 }

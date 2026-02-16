@@ -38,6 +38,15 @@ const HistoryRowSkeleton = () => (
   </div>
 )
 
+type HistoryRowTransaction = {
+  hash: string
+  source: string
+  destination: string
+  amount: bigint
+  tickNumber: number | bigint
+  inputType: number | bigint
+}
+
 const History = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
@@ -175,6 +184,26 @@ const History = () => {
     hidden: { opacity: 0, y: 8 },
     show: { opacity: 1, y: 0, transition: { duration: 0.2 } },
   }
+  const getRowPresentation = (tx: HistoryRowTransaction) => {
+    const isIncoming = tx.destination === identity
+    const isSimpleTransfer = Number(tx.inputType) === 0
+    const label = isSimpleTransfer
+      ? isIncoming
+        ? t('history.received')
+        : t('history.sent')
+      : isIncoming
+        ? t('history.incoming')
+        : t('history.outgoing')
+    const counterparty = isIncoming ? tx.source : tx.destination
+    const counterpartyLabel = isSimpleTransfer
+      ? isIncoming
+        ? t('history.from', { address: truncateString(counterparty) })
+        : t('history.to', { address: truncateString(counterparty) })
+      : truncateString(counterparty)
+    const Icon = isIncoming ? ReceiveIcon : SendIcon
+
+    return { isIncoming, label, counterpartyLabel, Icon }
+  }
 
   useEffect(() => {
     resolvePendingTransactions(items, archiverProcessedTick)
@@ -278,22 +307,7 @@ const History = () => {
                     {t('history.pending')}
                   </span>
                   {pendingTopItems.map((tx) => {
-                    const isIncoming = tx.destination === identity
-                    const isSimpleTransfer = Number(tx.inputType) === 0
-                    const label = isSimpleTransfer
-                      ? isIncoming
-                        ? t('history.received')
-                        : t('history.sent')
-                      : isIncoming
-                        ? t('history.incoming')
-                        : t('history.outgoing')
-                    const counterparty = isIncoming ? tx.source : tx.destination
-                    const counterpartyLabel = isSimpleTransfer
-                      ? isIncoming
-                        ? t('history.from', { address: truncateString(counterparty) })
-                        : t('history.to', { address: truncateString(counterparty) })
-                      : truncateString(counterparty)
-                    const Icon = isIncoming ? ReceiveIcon : SendIcon
+                    const { isIncoming, label, counterpartyLabel, Icon } = getRowPresentation(tx)
 
                     return (
                       <motion.button
@@ -360,33 +374,13 @@ const History = () => {
                     {t('history.failed')}
                   </span>
                   {failedTopItems.map((tx) => {
-                    const isIncoming = tx.destination === identity
-                    const isSimpleTransfer = Number(tx.inputType) === 0
-                    const label = isSimpleTransfer
-                      ? isIncoming
-                        ? t('history.received')
-                        : t('history.sent')
-                      : isIncoming
-                        ? t('history.incoming')
-                        : t('history.outgoing')
-                    const counterparty = isIncoming ? tx.source : tx.destination
-                    const counterpartyLabel = isSimpleTransfer
-                      ? isIncoming
-                        ? t('history.from', { address: truncateString(counterparty) })
-                        : t('history.to', { address: truncateString(counterparty) })
-                      : truncateString(counterparty)
-                    const Icon = isIncoming ? ReceiveIcon : SendIcon
+                    const { isIncoming, label, counterpartyLabel, Icon } = getRowPresentation(tx)
+                    const canResend = Number(tx.inputType) === 0 && Boolean(tx.destination)
 
                     return (
-                      <motion.button
-                        type="button"
+                      <motion.div
                         key={tx.hash}
                         className="w-full cursor-pointer space-y-3 rounded-xl border border-red-500/50 bg-red-500/10 px-3 py-3 text-left transition-colors"
-                        onClick={() =>
-                          navigate(
-                            `/transfer?failedHash=${encodeURIComponent(tx.hash)}&recipient=${encodeURIComponent(tx.destination)}&amount=${encodeURIComponent(tx.amount.toString())}`,
-                          )
-                        }
                         variants={itemMotion}
                       >
                         <div className="flex items-center justify-between gap-3">
@@ -407,16 +401,23 @@ const History = () => {
                               {formatBalanceCompact(tx.amount)}
                             </span>
                             <div className="flex items-center gap-1">
-                              <span className="text-[11px] font-semibold uppercase tracking-wide text-primary">
-                                {t('history.resend')}
-                              </span>
+                              {canResend && (
+                                <button
+                                  type="button"
+                                  className="cursor-pointer text-[11px] font-semibold uppercase tracking-wide text-primary hover:underline"
+                                  onClick={() =>
+                                    navigate(
+                                      `/transfer?failedHash=${encodeURIComponent(tx.hash)}&recipient=${encodeURIComponent(tx.destination)}&amount=${encodeURIComponent(tx.amount.toString())}&inputType=${encodeURIComponent(tx.inputType.toString())}`,
+                                    )
+                                  }
+                                >
+                                  {t('history.resend')}
+                                </button>
+                              )}
                               <button
                                 type="button"
                                 className="cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
-                                onClick={(event) => {
-                                  event.stopPropagation()
-                                  removePendingTransaction(tx.hash)
-                                }}
+                                onClick={() => removePendingTransaction(tx.hash)}
                                 aria-label={t('history.deleteFailed')}
                                 title={t('history.deleteFailed')}
                               >
@@ -447,7 +448,7 @@ const History = () => {
                             <span>{tx.inputType.toString()}</span>
                           </div>
                         </div>
-                      </motion.button>
+                      </motion.div>
                     )
                   })}
                 </div>
@@ -461,22 +462,7 @@ const History = () => {
                 {group.label}
               </span>
               {group.items.map((tx) => {
-                const isIncoming = tx.destination === identity
-                const isSimpleTransfer = Number(tx.inputType) === 0
-                const label = isSimpleTransfer
-                  ? isIncoming
-                    ? t('history.received')
-                    : t('history.sent')
-                  : isIncoming
-                    ? t('history.incoming')
-                    : t('history.outgoing')
-                const counterparty = isIncoming ? tx.source : tx.destination
-                const counterpartyLabel = isSimpleTransfer
-                  ? isIncoming
-                    ? t('history.from', { address: truncateString(counterparty) })
-                    : t('history.to', { address: truncateString(counterparty) })
-                  : truncateString(counterparty)
-                const Icon = isIncoming ? ReceiveIcon : SendIcon
+                const { isIncoming, label, counterpartyLabel, Icon } = getRowPresentation(tx)
 
                 return (
                   <motion.button

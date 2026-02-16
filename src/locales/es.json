@@ -353,6 +353,7 @@
       "broadcastFailed": "Fallo al transmitir la transacción.",
       "watchOnly": "Las cuentas de solo lectura no pueden enviar transferencias.",
       "pendingOutgoing": "Hay una transferencia saliente pendiente. Espera su confirmación antes de enviar otra.",
+      "resendUnsupported": "El reenvío por ahora solo es compatible con transferencias simples de QU.",
       "generic": "Transferencia fallida. Intenta de nuevo."
     }
   },
