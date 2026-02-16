@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { identityFromSeed } from '@qubic-labs/core'
 import { ArrowLeftIcon, ArrowRightIcon, KeyRoundIcon } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -39,6 +40,7 @@ const ImportSeed = ({
   variant = 'onboarding',
 }: ImportSeedProps) => {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [step, setStep] = useState(1)
   const [seed, setSeed] = useState('')
   const [passphrase, setPassphrase] = useState('')
@@ -196,8 +198,12 @@ const ImportSeed = ({
       <div className="flex w-full max-w-sm flex-col justify-between gap-6">
         <div className="space-y-3 text-center">
           <FlowHeader
-            title={variant === 'add-address' ? 'Import address seed' : 'Import private seed'}
-            stepLabel={`Step ${step} of ${TOTAL_STEPS}`}
+            title={
+              variant === 'add-address'
+                ? t('onboarding.importSeed.titleAddAddress')
+                : t('onboarding.importSeed.title')
+            }
+            stepLabel={t('onboarding.importSeed.step', { current: step, total: TOTAL_STEPS })}
             progressValue={progressValue}
           />
         </div>

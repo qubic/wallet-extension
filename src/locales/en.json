@@ -383,6 +383,11 @@
     "subtitle": "Your wallet is locked for safety. Enter your passphrase to proceed."
   },
   "onboarding": {
+    "importSeed": {
+      "title": "Import private seed",
+      "titleAddAddress": "Import address seed",
+      "step": "Step {{current}} of {{total}}"
+    },
     "importVault": {
       "title": "Import vault file",
       "step": "Step {{current}} of {{total}}",
