@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from 'react'
+import { QX_TRANSFER_ASSET_INPUT_TYPE } from '@/lib/qx'
 
 export type PendingTransactionStatus = 'pending' | 'failed'
 
@@ -9,6 +10,7 @@ export type PendingTransaction = {
   amount?: bigint
   quImpact?: bigint
   inputType?: number
+  tokenKey?: string
   targetTick: number
   createdAt: number
   status: PendingTransactionStatus
@@ -21,6 +23,7 @@ type SerializedPendingTransaction = {
   amount?: string
   quImpact?: string
   inputType?: number
+  tokenKey?: string
   targetTick: number
   createdAt: number
   status?: PendingTransactionStatus
@@ -70,6 +73,7 @@ const toSerialized = (pending: PendingTransaction): SerializedPendingTransaction
   amount: pending.amount?.toString(),
   quImpact: pending.quImpact?.toString(),
   inputType: pending.inputType,
+  tokenKey: pending.tokenKey,
   targetTick: pending.targetTick,
   createdAt: pending.createdAt,
   status: pending.status,
@@ -89,6 +93,7 @@ const fromSerialized = (value: unknown): PendingTransaction | null => {
       amount: data.amount ? BigInt(data.amount) : undefined,
       quImpact: data.quImpact ? BigInt(data.quImpact) : undefined,
       inputType: data.inputType,
+      tokenKey: data.tokenKey,
       targetTick: data.targetTick,
       createdAt: typeof data.createdAt === 'number' ? data.createdAt : Date.now(),
       status: data.status === 'failed' ? 'failed' : 'pending',
@@ -157,6 +162,7 @@ export const addPendingTransaction = (pending: {
   amount?: bigint
   quImpact?: bigint
   inputType?: number
+  tokenKey?: string
   targetTick: number
 }) => {
   const key = normalizeHash(pending.hash)
@@ -220,6 +226,18 @@ export const getPendingOutgoingDebit = (identity: string) => {
     const debit = tx.quImpact ?? tx.amount ?? 0n
     return sum + (debit > 0n ? debit : 0n)
   }, 0n)
+}
+
+export const canResendPendingTransaction = (
+  pending: Pick<PendingTransaction, 'status' | 'destinationIdentity' | 'inputType' | 'tokenKey'>,
+) => {
+  if (pending.status !== 'failed') return false
+  if (!pending.destinationIdentity) return false
+  if (pending.inputType === 0 || pending.inputType === undefined) return true
+  if (pending.inputType === QX_TRANSFER_ASSET_INPUT_TYPE) {
+    return Boolean(pending.tokenKey)
+  }
+  return false
 }
 
 const parseProcessedTick = (value?: number | bigint | null) => {

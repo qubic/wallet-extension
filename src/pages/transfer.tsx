@@ -49,10 +49,7 @@ const Transfer = () => {
     const value = (searchParams.get('amount') ?? '').trim()
     return /^\d+$/.test(value) ? value : ''
   })()
-  const initialPrefillInputType = (() => {
-    const value = Number.parseInt((searchParams.get('inputType') ?? '').trim(), 10)
-    return Number.isFinite(value) ? value : 0
-  })()
+  const initialPrefillToken = (searchParams.get('token') ?? 'qu').trim()
   const resendFromFailedHash = (searchParams.get('failedHash') ?? '').trim()
   usePendingTransactionsVersion()
   const [currentIdentity, setCurrentIdentity] = useState(getCurrentIdentity())
@@ -66,7 +63,7 @@ const Transfer = () => {
   const latestStats = useLatestStats('transfer', { staleTime: 5_000 })
 
   const [step, setStep] = useState<Step>('form')
-  const [selectedToken, setSelectedToken] = useState('qu')
+  const [selectedToken, setSelectedToken] = useState(initialPrefillToken || 'qu')
   const [recipient, setRecipient] = useState(initialPrefillRecipient)
   const [amount, setAmount] = useState(initialPrefillAmount)
   const [errors, setErrors] = useState<FormErrors>({})
@@ -78,12 +75,6 @@ const Transfer = () => {
   const [isManualTargetTickEnabled, setIsManualTargetTickEnabled] = useState(false)
   const [manualTargetTick, setManualTargetTick] = useState('')
   const seedRef = useRef<string | null>(null)
-
-  useEffect(() => {
-    if (!resendFromFailedHash) return
-    if (initialPrefillInputType === 0) return
-    setErrorMessage(t('transfer.errors.resendUnsupported'))
-  }, [initialPrefillInputType, resendFromFailedHash, t])
 
   const parsedAssets = aggregateAssets(ownedAssets.data ?? {})
   const filteredVaultRecipients = useMemo(
@@ -320,9 +311,10 @@ const Transfer = () => {
         hash: result.txId,
         sourceIdentity: currentIdentity,
         destinationIdentity: recipient.trim(),
-        amount: selectedAsset ? QX_TRANSFER_ASSET_FEE : parsedAmount,
+        amount: parsedAmount,
         quImpact: selectedAsset ? QX_TRANSFER_ASSET_FEE : parsedAmount,
         inputType: selectedAsset ? QX_TRANSFER_ASSET_INPUT_TYPE : 0,
+        tokenKey: selectedAsset ? `${selectedAsset.issuerIdentity}-${selectedAsset.name}` : 'qu',
         targetTick: Number(result.targetTick),
       })
       if (resendFromFailedHash) {

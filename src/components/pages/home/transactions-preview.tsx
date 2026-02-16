@@ -7,6 +7,7 @@ import { formatBalanceCompact, truncateString } from '@/lib/utils'
 import { ReceiveIcon } from '@/components/icons/receive-icon'
 import { SendIcon } from '@/components/icons/send-icon'
 import {
+  canResendPendingTransaction,
   type PendingTransaction,
   isTransactionFailed,
   isTransactionPending,
@@ -20,6 +21,7 @@ type PreviewTransaction = {
   amount: bigint
   tickNumber: number | bigint
   inputType: number | bigint
+  tokenKey?: string
   timestamp: bigint
   status?: PendingTransaction['status']
 }
@@ -30,7 +32,13 @@ type TransactionsPreviewProps = {
   pendingTransactions: PendingTransaction[]
   onViewMore: () => void
   onOpenTx: (hash: string) => void
-  onResend: (failedHash: string, recipient: string, amount: bigint, inputType: number) => void
+  onResend: (
+    failedHash: string,
+    recipient: string,
+    amount: bigint,
+    inputType: number,
+    tokenKey?: string,
+  ) => void
 }
 
 const TransactionsPreview = ({
@@ -52,6 +60,7 @@ const TransactionsPreview = ({
       amount: tx.amount ?? 0n,
       tickNumber: tx.targetTick,
       inputType: tx.inputType ?? 0,
+      tokenKey: tx.tokenKey,
       timestamp: BigInt(tx.createdAt),
       status: tx.status,
     }))
@@ -84,7 +93,12 @@ const TransactionsPreview = ({
     const Icon = isIncoming ? ReceiveIcon : SendIcon
     const isPending = isTransactionPending(tx.hash)
     const isFailed = isTransactionFailed(tx.hash)
-    const canResend = isFailed && Number(tx.inputType) === 0 && Boolean(tx.destination)
+    const canResend = canResendPendingTransaction({
+      status: tx.status ?? 'pending',
+      destinationIdentity: tx.destination,
+      inputType: Number(tx.inputType),
+      tokenKey: tx.tokenKey,
+    })
 
     return (
       <motion.div
@@ -154,7 +168,9 @@ const TransactionsPreview = ({
               <button
                 type="button"
                 className="cursor-pointer text-[11px] font-semibold uppercase tracking-wide text-primary hover:underline"
-                onClick={() => onResend(tx.hash, tx.destination, tx.amount, Number(tx.inputType))}
+                onClick={() =>
+                  onResend(tx.hash, tx.destination, tx.amount, Number(tx.inputType), tx.tokenKey)
+                }
               >
                 {t('history.resend')}
               </button>

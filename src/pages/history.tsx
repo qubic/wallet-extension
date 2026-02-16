@@ -9,6 +9,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import {
+  canResendPendingTransaction,
   getPendingTransactionsForIdentity,
   PENDING_SETTLED_EVENT,
   removePendingTransaction,
@@ -45,7 +46,10 @@ type HistoryRowTransaction = {
   amount: bigint
   tickNumber: number | bigint
   inputType: number | bigint
+  tokenKey?: string
 }
+
+type HistoryRowState = 'default' | 'pending' | 'failed'
 
 const History = () => {
   const { t } = useTranslation()
@@ -106,6 +110,7 @@ const History = () => {
         amount: tx.amount ?? 0n,
         tickNumber: tx.targetTick,
         inputType: tx.inputType ?? 0,
+        tokenKey: tx.tokenKey,
         timestamp: BigInt(tx.createdAt),
         status: tx.status,
       })),
@@ -203,6 +208,97 @@ const History = () => {
     const Icon = isIncoming ? ReceiveIcon : SendIcon
 
     return { isIncoming, label, counterpartyLabel, Icon }
+  }
+
+  const renderHistoryRow = (tx: HistoryRowTransaction, state: HistoryRowState) => {
+    const { isIncoming, label, counterpartyLabel, Icon } = getRowPresentation(tx)
+    const isPending = state === 'pending'
+    const isDefault = state === 'default'
+
+    return (
+      <motion.button
+        type="button"
+        key={tx.hash}
+        className={`w-full cursor-pointer space-y-3 rounded-xl border px-3 py-3 text-left transition-colors ${
+          isPending
+            ? 'border-amber-500/50 bg-amber-500/10'
+            : 'border-border/40 bg-background/40 hover:border-primary/30 hover:bg-background/60'
+        }`}
+        onClick={() => navigate(`/tx/${tx.hash}`)}
+        variants={itemMotion}
+      >
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div
+              className={`flex h-9 w-9 items-center justify-center rounded-full border ${
+                isPending
+                  ? 'border-amber-500/40 bg-amber-500/15 text-amber-700 dark:text-amber-300'
+                  : isIncoming
+                    ? 'border-primary/40 bg-primary/10 text-primary'
+                    : 'border-[var(--destructive)]/40 bg-[var(--destructive)]/10 text-[var(--destructive)]'
+              }`}
+            >
+              <Icon className="h-4 w-4" />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-xs font-semibold text-foreground">{label}</span>
+              <span className="text-xs text-muted-foreground">{counterpartyLabel}</span>
+            </div>
+          </div>
+          <span
+            className={`text-sm font-semibold ${
+              isPending
+                ? 'text-amber-700 dark:text-amber-300'
+                : isIncoming
+                  ? 'text-primary'
+                  : 'text-[var(--destructive)]'
+            }`}
+          >
+            {isIncoming ? '+' : '-'}
+            {formatBalanceCompact(tx.amount)}
+          </span>
+        </div>
+
+        <div className="grid grid-cols-[1fr_auto_auto] items-center gap-2 text-[11px] text-muted-foreground">
+          <div className="flex min-w-0 items-center gap-2">
+            <HashIcon className="h-3.5 w-3.5" />
+            {isDefault ? (
+              <a
+                href={buildExplorerObjectUrl('tx', tx.hash)}
+                className="truncate font-mono text-primary hover:underline"
+                target="_blank"
+                rel="noreferrer"
+                onClick={(event) => event.stopPropagation()}
+              >
+                {truncateString(tx.hash, {
+                  leading: 6,
+                  trailing: 6,
+                  minLength: 12,
+                  emptyLabel: '',
+                })}
+              </a>
+            ) : (
+              <span className="truncate font-mono">
+                {truncateString(tx.hash, {
+                  leading: 6,
+                  trailing: 6,
+                  minLength: 12,
+                  emptyLabel: '',
+                })}
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-1 font-mono">
+            <span className="text-muted-foreground/70">{t('history.tick')}</span>
+            <span>{Number(tx.tickNumber).toLocaleString()}</span>
+          </div>
+          <div className="flex items-center gap-1 font-mono">
+            <span className="text-muted-foreground/70">{t('history.type')}</span>
+            <span>{tx.inputType.toString()}</span>
+          </div>
+        </div>
+      </motion.button>
+    )
   }
 
   useEffect(() => {
@@ -306,65 +402,7 @@ const History = () => {
                   <span className="text-[11px] font-semibold uppercase text-muted-foreground/70">
                     {t('history.pending')}
                   </span>
-                  {pendingTopItems.map((tx) => {
-                    const { isIncoming, label, counterpartyLabel, Icon } = getRowPresentation(tx)
-
-                    return (
-                      <motion.button
-                        type="button"
-                        key={tx.hash}
-                        className="w-full cursor-pointer space-y-3 rounded-xl border border-amber-500/50 bg-amber-500/10 px-3 py-3 text-left transition-colors"
-                        onClick={() => navigate(`/tx/${tx.hash}`)}
-                        variants={itemMotion}
-                      >
-                        <div className="flex items-center justify-between gap-3">
-                          <div className="flex items-center gap-3">
-                            <div className="flex h-9 w-9 items-center justify-center rounded-full border border-amber-500/40 bg-amber-500/15 text-amber-700 dark:text-amber-300">
-                              <Icon className="h-4 w-4" />
-                            </div>
-                            <div className="flex flex-col">
-                              <span className="text-xs font-semibold text-foreground">{label}</span>
-                              <span className="text-xs text-muted-foreground">
-                                {counterpartyLabel}
-                              </span>
-                            </div>
-                          </div>
-                          <span className="text-sm font-semibold text-amber-700 dark:text-amber-300">
-                            {isIncoming ? '+' : '-'}
-                            {formatBalanceCompact(tx.amount)}
-                          </span>
-                        </div>
-
-                        <div className="grid grid-cols-[1fr_auto_auto] items-center gap-2 text-[11px] text-muted-foreground">
-                          <div className="flex min-w-0 items-center gap-2">
-                            <HashIcon className="h-3.5 w-3.5" />
-                            <a
-                              href={buildExplorerObjectUrl('tx', tx.hash)}
-                              className="truncate font-mono text-primary hover:underline"
-                              target="_blank"
-                              rel="noreferrer"
-                              onClick={(event) => event.stopPropagation()}
-                            >
-                              {truncateString(tx.hash, {
-                                leading: 6,
-                                trailing: 6,
-                                minLength: 12,
-                                emptyLabel: '',
-                              })}
-                            </a>
-                          </div>
-                          <div className="flex items-center gap-1 font-mono">
-                            <span className="text-muted-foreground/70">{t('history.tick')}</span>
-                            <span>{Number(tx.tickNumber).toLocaleString()}</span>
-                          </div>
-                          <div className="flex items-center gap-1 font-mono">
-                            <span className="text-muted-foreground/70">{t('history.type')}</span>
-                            <span>{tx.inputType.toString()}</span>
-                          </div>
-                        </div>
-                      </motion.button>
-                    )
-                  })}
+                  {pendingTopItems.map((tx) => renderHistoryRow(tx, 'pending'))}
                 </div>
               )}
 
@@ -375,7 +413,12 @@ const History = () => {
                   </span>
                   {failedTopItems.map((tx) => {
                     const { isIncoming, label, counterpartyLabel, Icon } = getRowPresentation(tx)
-                    const canResend = Number(tx.inputType) === 0 && Boolean(tx.destination)
+                    const canResend = canResendPendingTransaction({
+                      status: tx.status,
+                      destinationIdentity: tx.destination,
+                      inputType: Number(tx.inputType),
+                      tokenKey: tx.tokenKey,
+                    })
 
                     return (
                       <motion.div
@@ -407,7 +450,7 @@ const History = () => {
                                   className="cursor-pointer text-[11px] font-semibold uppercase tracking-wide text-primary hover:underline"
                                   onClick={() =>
                                     navigate(
-                                      `/transfer?failedHash=${encodeURIComponent(tx.hash)}&recipient=${encodeURIComponent(tx.destination)}&amount=${encodeURIComponent(tx.amount.toString())}&inputType=${encodeURIComponent(tx.inputType.toString())}`,
+                                      `/transfer?failedHash=${encodeURIComponent(tx.hash)}&recipient=${encodeURIComponent(tx.destination)}&amount=${encodeURIComponent(tx.amount.toString())}&inputType=${encodeURIComponent(tx.inputType.toString())}&token=${encodeURIComponent(tx.tokenKey ?? 'qu')}`,
                                     )
                                   }
                                 >
@@ -461,73 +504,7 @@ const History = () => {
               <span className="text-[11px] font-semibold uppercase text-muted-foreground/70">
                 {group.label}
               </span>
-              {group.items.map((tx) => {
-                const { isIncoming, label, counterpartyLabel, Icon } = getRowPresentation(tx)
-
-                return (
-                  <motion.button
-                    type="button"
-                    key={tx.hash}
-                    className="w-full cursor-pointer space-y-3 rounded-xl border border-border/40 bg-background/40 px-3 py-3 text-left transition-colors hover:border-primary/30 hover:bg-background/60"
-                    onClick={() => navigate(`/tx/${tx.hash}`)}
-                    variants={itemMotion}
-                  >
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={`flex h-9 w-9 items-center justify-center rounded-full border ${
-                            isIncoming
-                              ? 'border-primary/40 bg-primary/10 text-primary'
-                              : 'border-[var(--destructive)]/40 bg-[var(--destructive)]/10 text-[var(--destructive)]'
-                          }`}
-                        >
-                          <Icon className="h-4 w-4" />
-                        </div>
-                        <div className="flex flex-col">
-                          <span className="text-xs font-semibold text-foreground">{label}</span>
-                          <span className="text-xs text-muted-foreground">{counterpartyLabel}</span>
-                        </div>
-                      </div>
-                      <span
-                        className={`text-sm font-semibold ${
-                          isIncoming ? 'text-primary' : 'text-[var(--destructive)]'
-                        }`}
-                      >
-                        {isIncoming ? '+' : '-'}
-                        {formatBalanceCompact(tx.amount)}
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-[1fr_auto_auto] items-center gap-2 text-[11px] text-muted-foreground">
-                      <div className="flex min-w-0 items-center gap-2">
-                        <HashIcon className="h-3.5 w-3.5" />
-                        <a
-                          href={buildExplorerObjectUrl('tx', tx.hash)}
-                          className="truncate font-mono text-primary hover:underline"
-                          target="_blank"
-                          rel="noreferrer"
-                          onClick={(event) => event.stopPropagation()}
-                        >
-                          {truncateString(tx.hash, {
-                            leading: 6,
-                            trailing: 6,
-                            minLength: 12,
-                            emptyLabel: '',
-                          })}
-                        </a>
-                      </div>
-                      <div className="flex items-center gap-1 font-mono">
-                        <span className="text-muted-foreground/70">{t('history.tick')}</span>
-                        <span>{Number(tx.tickNumber).toLocaleString()}</span>
-                      </div>
-                      <div className="flex items-center gap-1 font-mono">
-                        <span className="text-muted-foreground/70">{t('history.type')}</span>
-                        <span>{tx.inputType.toString()}</span>
-                      </div>
-                    </div>
-                  </motion.button>
-                )
-              })}
+              {group.items.map((tx) => renderHistoryRow(tx, 'default'))}
             </motion.div>
           ))}
 
