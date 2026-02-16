@@ -1,5 +1,5 @@
 import type { SeedVault } from '@qubic-labs/sdk'
-import { getWatchOnlyAccounts } from './accounts'
+import { getAccountOrder, getWatchOnlyAccounts } from './accounts'
 
 const RSA_ALG = {
   name: 'RSA-OAEP',
@@ -61,6 +61,16 @@ export async function exportVaultToWebWalletFormat(
       alias: acc.name,
       publicId: acc.identity,
       isOnlyWatch: true,
+    })
+  }
+
+  const savedAccountOrder = getAccountOrder()
+  if (savedAccountOrder.length > 0) {
+    const positionByIdentity = new Map(savedAccountOrder.map((id, position) => [id, position]))
+    seeds.sort((a, b) => {
+      const positionA = positionByIdentity.get(a.publicId) ?? Number.MAX_SAFE_INTEGER
+      const positionB = positionByIdentity.get(b.publicId) ?? Number.MAX_SAFE_INTEGER
+      return positionA - positionB
     })
   }
 
