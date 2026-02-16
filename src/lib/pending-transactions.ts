@@ -1,6 +1,8 @@
 import { useSyncExternalStore } from 'react'
 
-type PendingTransaction = {
+export type PendingTransactionStatus = 'pending' | 'failed'
+
+export type PendingTransaction = {
   hash: string
   sourceIdentity: string
   destinationIdentity?: string
@@ -9,6 +11,7 @@ type PendingTransaction = {
   inputType?: number
   targetTick: number
   createdAt: number
+  status: PendingTransactionStatus
 }
 
 type SerializedPendingTransaction = {
@@ -20,6 +23,7 @@ type SerializedPendingTransaction = {
   inputType?: number
   targetTick: number
   createdAt: number
+  status?: PendingTransactionStatus
 }
 
 const PENDING_STORAGE_KEY = 'wallet:pending-transactions:v1'
@@ -67,6 +71,7 @@ const toSerialized = (pending: PendingTransaction): SerializedPendingTransaction
   inputType: pending.inputType,
   targetTick: pending.targetTick,
   createdAt: pending.createdAt,
+  status: pending.status,
 })
 
 const fromSerialized = (value: unknown): PendingTransaction | null => {
@@ -85,6 +90,7 @@ const fromSerialized = (value: unknown): PendingTransaction | null => {
       inputType: data.inputType,
       targetTick: data.targetTick,
       createdAt: typeof data.createdAt === 'number' ? data.createdAt : Date.now(),
+      status: data.status === 'failed' ? 'failed' : 'pending',
     }
   } catch {
     return null
@@ -153,6 +159,7 @@ export const addPendingTransaction = (pending: {
     ...pending,
     hash: pending.hash,
     createdAt: Date.now(),
+    status: 'pending',
   })
   persistPending()
   notify()
@@ -167,74 +174,83 @@ export const removePendingTransaction = (hash: string) => {
   }
 }
 
-export const isTransactionPending = (hash: string, currentTick?: number) => {
+export const isTransactionPending = (hash: string) => {
   const key = normalizeHash(hash)
   if (!key) return false
   const pending = pendingByHash.get(key)
-  if (!pending) return false
-
-  const isTickReached =
-    typeof currentTick === 'number' &&
-    Number.isFinite(currentTick) &&
-    Number.isFinite(pending.targetTick) &&
-    currentTick >= pending.targetTick
-
-  if (isTickReached) {
-    if (pendingByHash.delete(key)) {
-      schedulePendingSettledEvent(pending)
-      persistPending()
-      notify()
-    }
-    return false
-  }
-
-  return true
+  return Boolean(pending && pending.status === 'pending')
 }
 
-export const getPendingTransaction = (hash: string, currentTick?: number) => {
-  if (!isTransactionPending(hash, currentTick)) return null
-  return pendingByHash.get(normalizeHash(hash)) ?? null
+export const isTransactionFailed = (hash: string) => {
+  const key = normalizeHash(hash)
+  if (!key) return false
+  const pending = pendingByHash.get(key)
+  return Boolean(pending && pending.status === 'failed')
 }
 
-export const getPendingTransactionsForIdentity = (identity: string, currentTick?: number) => {
+export const getPendingTransaction = (hash: string) => {
+  const key = normalizeHash(hash)
+  if (!key) return null
+  return pendingByHash.get(key) ?? null
+}
+
+export const getPendingTransactionsForIdentity = (identity: string) => {
   if (!identity) return []
   const items: PendingTransaction[] = []
   for (const pending of pendingByHash.values()) {
     if (pending.sourceIdentity !== identity) continue
-    if (!isTransactionPending(pending.hash, currentTick)) continue
     items.push(pending)
   }
-  return items.sort((a, b) => b.createdAt - a.createdAt)
+  return items.sort((a, b) => {
+    if (a.status === b.status) return b.createdAt - a.createdAt
+    return a.status === 'pending' ? -1 : 1
+  })
 }
 
-export const getPendingOutgoingDebit = (identity: string, currentTick?: number) => {
-  const pending = getPendingTransactionsForIdentity(identity, currentTick)
+export const getPendingOutgoingDebit = (identity: string) => {
+  const pending = getPendingTransactionsForIdentity(identity)
   return pending.reduce((sum, tx) => {
+    if (tx.status !== 'pending') return sum
     const debit = tx.quImpact ?? tx.amount ?? 0n
     return sum + (debit > 0n ? debit : 0n)
   }, 0n)
 }
 
+const parseProcessedTick = (value?: number | bigint | null) => {
+  if (typeof value === 'number') {
+    return Number.isFinite(value) ? value : null
+  }
+  if (typeof value === 'bigint') {
+    const parsed = Number(value)
+    return Number.isFinite(parsed) ? parsed : null
+  }
+  return null
+}
+
 export const resolvePendingTransactions = (
   transactions: Array<{ hash: string }>,
-  currentTick?: number,
+  processedTick?: number | bigint,
 ) => {
   if (pendingByHash.size === 0) return
   let changed = false
+  const confirmedHashes = new Set(transactions.map((tx) => normalizeHash(tx.hash)))
 
-  for (const tx of transactions) {
-    const key = normalizeHash(tx.hash)
+  for (const key of confirmedHashes) {
     if (pendingByHash.has(key)) {
-      pendingByHash.delete(key)
-      changed = true
+      const settled = pendingByHash.get(key)
+      if (settled && pendingByHash.delete(key)) {
+        schedulePendingSettledEvent(settled)
+        changed = true
+      }
     }
   }
 
-  if (typeof currentTick === 'number' && Number.isFinite(currentTick)) {
+  const lastProcessedTick = parseProcessedTick(processedTick)
+  if (lastProcessedTick != null) {
     for (const [key, pending] of pendingByHash.entries()) {
-      if (currentTick >= pending.targetTick) {
-        pendingByHash.delete(key)
-        schedulePendingSettledEvent(pending)
+      if (pending.status !== 'pending') continue
+      if (lastProcessedTick > pending.targetTick) {
+        pendingByHash.set(key, { ...pending, status: 'failed' })
         changed = true
       }
     }
