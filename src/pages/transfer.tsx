@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { useBalance, useSdk, useSend } from '@qubic-labs/react'
@@ -42,6 +42,7 @@ const formatUsd = (value: number) =>
 const Transfer = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
   usePendingTransactionsVersion()
   const [currentIdentity, setCurrentIdentity] = useState(getCurrentIdentity())
   const [isWatchOnly, setIsWatchOnly] = useState(() => isWatchOnlyIdentity(getCurrentIdentity()))
@@ -83,9 +84,9 @@ const Transfer = () => {
       : (parsedAssets.find((a) => `${a.issuerIdentity}-${a.name}` === selectedToken) ?? null)
   const parsedAmount = parseAmount(amount)
   const currentTick = latestStats.data?.data?.currentTick
-  const pendingOutgoingDebit = getPendingOutgoingDebit(currentIdentity, currentTick)
-  const hasPendingOutgoing =
-    getPendingTransactionsForIdentity(currentIdentity, currentTick).length > 0
+  const pendingForIdentity = getPendingTransactionsForIdentity(currentIdentity)
+  const pendingOutgoingDebit = getPendingOutgoingDebit(currentIdentity)
+  const hasPendingOutgoing = pendingForIdentity.some((tx) => tx.status === 'pending')
   const onChainQuBalance = normalizeBalance(balance.data?.balance)
   const effectiveQuBalance =
     onChainQuBalance > pendingOutgoingDebit ? onChainQuBalance - pendingOutgoingDebit : 0n
@@ -119,6 +120,27 @@ const Transfer = () => {
       window.removeEventListener('wallet-account-updated', refreshAccount)
     }
   }, [])
+
+  useEffect(() => {
+    const prefillRecipient = searchParams.get('recipient')?.trim()
+    const prefillAmount = searchParams.get('amount')?.trim()
+    let didPrefill = false
+
+    if (prefillRecipient) {
+      setRecipient(prefillRecipient.toUpperCase())
+      didPrefill = true
+    }
+    if (prefillAmount && /^\d+$/.test(prefillAmount)) {
+      setAmount(prefillAmount)
+      didPrefill = true
+    }
+
+    if (didPrefill) {
+      setErrors({})
+      setErrorMessage('')
+      setSearchParams({}, { replace: true })
+    }
+  }, [searchParams, setSearchParams])
 
   useEffect(() => {
     if (selectedToken === 'qu') return
