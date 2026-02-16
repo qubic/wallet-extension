@@ -70,26 +70,48 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
     return null
   }
 
-  return (
-    <style
-      dangerouslySetInnerHTML={{
-        __html: Object.entries(THEMES)
-          .map(
-            ([theme, prefix]) => `
-${prefix} [data-chart=${id}] {
-${colorConfig
-  .map(([key, itemConfig]) => {
-    const color = itemConfig.theme?.[theme as keyof typeof itemConfig.theme] || itemConfig.color
-    return color ? `  --color-${key}: ${color};` : null
-  })
-  .join('\n')}
+  const cssText = Object.entries(THEMES)
+    .map(([theme, prefix]) => {
+      const declarations = colorConfig
+        .map(([key, itemConfig]) => {
+          const rawColor =
+            itemConfig.theme?.[theme as keyof typeof itemConfig.theme] || itemConfig.color
+          const color = sanitizeCssValue(rawColor)
+          if (!color) return null
+          return `  --color-${sanitizeCssVarToken(key)}: ${color};`
+        })
+        .filter(Boolean)
+        .join('\n')
+
+      if (!declarations) return null
+
+      return `${prefix} [data-chart="${escapeCssAttributeValue(id)}"] {\n${declarations}\n}`
+    })
+    .filter(Boolean)
+    .join('\n')
+
+  if (!cssText) {
+    return null
+  }
+
+  return <style>{cssText}</style>
 }
-`,
-          )
-          .join('\n'),
-      }}
-    />
-  )
+
+function escapeCssAttributeValue(value: string) {
+  if (typeof CSS !== 'undefined' && typeof CSS.escape === 'function') {
+    return CSS.escape(value)
+  }
+  return value.replace(/[^a-zA-Z0-9_-]/g, '')
+}
+
+function sanitizeCssVarToken(value: string) {
+  return value.replace(/[^a-zA-Z0-9_-]/g, '')
+}
+
+function sanitizeCssValue(value?: string) {
+  if (!value) return null
+  if (/[;{}]/.test(value)) return null
+  return value
 }
 
 const ChartTooltip = RechartsPrimitive.Tooltip

@@ -26,6 +26,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { getLockTimeoutMinutes, lockWallet, setLockTimeoutMinutes } from '@/lib/lock'
+import { clearWalletStorage } from '@/lib/storage'
 import { changeVaultPassphrase } from '@/lib/vault-password'
 
 const Security = () => {
@@ -110,7 +111,7 @@ const Security = () => {
   }
 
   const handleResetApp = () => {
-    localStorage.clear()
+    clearWalletStorage()
     window.location.reload()
   }
 

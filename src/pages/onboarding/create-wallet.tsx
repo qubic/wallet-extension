@@ -3,7 +3,6 @@ import { identityFromSeed } from '@qubic-labs/core'
 import { ArrowLeftIcon, ArrowRightIcon, CheckCircleIcon } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
-import { Progress } from '@/components/ui/progress'
 import { generateSeed, isSeedLike } from '@/lib/seed'
 import { setUnlocked } from '@/lib/lock'
 import {
@@ -15,6 +14,7 @@ import {
 import { getCachedAccounts, getWatchOnlyAccounts, saveCachedAccounts } from '@/lib/accounts'
 import SeedSecurityStep from '@/components/onboarding/seed-security-step'
 import PassphraseStep from '@/components/onboarding/passphrase-step'
+import FlowHeader from '@/components/onboarding/flow-header'
 
 const TOTAL_STEPS = 3
 
@@ -242,15 +242,11 @@ const CreateWallet = ({
     <section className="flex h-full w-full justify-center px-6 py-8">
       <div className="flex w-full max-w-sm flex-col justify-between gap-6">
         <div className="space-y-3 text-center">
-          <div className="space-y-1">
-            <h2 className="text-xl font-semibold">
-              {variant === 'add-address' ? 'Add new address' : 'Create new wallet'}
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              Step {step} of {TOTAL_STEPS}
-            </p>
-          </div>
-          <Progress value={progressValue} />
+          <FlowHeader
+            title={variant === 'add-address' ? 'Add new address' : 'Create new wallet'}
+            stepLabel={`Step ${step} of ${TOTAL_STEPS}`}
+            progressValue={progressValue}
+          />
         </div>
 
         <div className="flex-1 space-y-4">

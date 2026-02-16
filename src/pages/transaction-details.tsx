@@ -1,29 +1,18 @@
 import { useSdk } from '@qubic-labs/react'
 import { useQuery } from '@tanstack/react-query'
-import { ArrowLeftIcon, CheckIcon, CopyIcon, ExternalLinkIcon } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { ArrowLeftIcon } from 'lucide-react'
+import { useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { toast } from 'sonner'
-import { buildExplorerObjectUrl, truncateString } from '@/lib/utils'
 import {
   getPendingTransaction,
   resolvePendingTransactions,
   usePendingTransactionsVersion,
 } from '@/lib/pending-transactions'
-
-const formatValue = (value: unknown): string => {
-  if (value === null || value === undefined) return '--'
-  if (typeof value === 'bigint') return value.toString()
-  if (typeof value === 'object') {
-    try {
-      return JSON.stringify(value)
-    } catch {
-      return String(value)
-    }
-  }
-  return String(value)
-}
+import { useLatestStats } from '@/lib/network-stats'
+import { useClipboardCopy } from '@/hooks/use-clipboard-copy'
+import TxDetailsHeader from '@/components/pages/transaction-details/tx-details-header'
+import TxDetailsRow, { formatValue } from '@/components/pages/transaction-details/tx-details-row'
 
 const formatIntegerLike = (value: unknown): string => {
   if (value === null || value === undefined) return '--'
@@ -51,34 +40,17 @@ const formatIntegerLike = (value: unknown): string => {
 
 const TX_DETAILS_SKELETON_IDS = ['a', 'b', 'c', 'd', 'e', 'f'] as const
 
-type LatestStatsResponse = {
-  data?: {
-    currentTick?: number
-  }
-}
-
-const fetchLatestStats = async (): Promise<LatestStatsResponse> => {
-  const response = await fetch('https://rpc.qubic.org/v1/latest-stats')
-  if (!response.ok) {
-    throw new Error('Failed to load network stats.')
-  }
-  return response.json() as Promise<LatestStatsResponse>
-}
-
 const TransactionDetails = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const { hash = '' } = useParams<{ hash: string }>()
   const sdk = useSdk()
   usePendingTransactionsVersion()
-  const [copiedKey, setCopiedKey] = useState<string | null>(null)
-  const latestStats = useQuery({
-    queryKey: ['qubic', 'latest-stats', 'tx-details'],
-    queryFn: fetchLatestStats,
-    refetchInterval: 15_000,
-    staleTime: 3_000,
-    gcTime: 120_000,
+  const { copiedKey, copyText } = useClipboardCopy({
+    successTitle: t('txDetails.copied'),
+    errorTitle: t('txDetails.copyFailed'),
   })
+  const latestStats = useLatestStats('tx-details')
   const currentTick = latestStats.data?.data?.currentTick
   const pending = getPendingTransaction(hash, currentTick)
   const isPending = Boolean(pending)
@@ -143,16 +115,7 @@ const TransactionDetails = () => {
   ]
 
   const copyValue = async (key: string, value: unknown) => {
-    try {
-      await navigator.clipboard.writeText(formatValue(value))
-      setCopiedKey(key)
-      toast.success(t('txDetails.copied'))
-      window.setTimeout(() => {
-        setCopiedKey((current) => (current === key ? null : current))
-      }, 1200)
-    } catch {
-      toast.error(t('txDetails.copyFailed'))
-    }
+    await copyText(formatValue(value), { key })
   }
 
   return (
@@ -166,39 +129,7 @@ const TransactionDetails = () => {
           <ArrowLeftIcon className="h-3.5 w-3.5" />
           {t('txDetails.back')}
         </button>
-        <div className="space-y-2">
-          <div className="text-xs font-semibold uppercase text-muted-foreground">
-            {t('txDetails.title')}
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="font-mono text-xs text-foreground">
-              {truncateString(hash, { emptyLabel: '--' })}
-            </div>
-            <button
-              type="button"
-              className="h-4 w-4 cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
-              onClick={() => copyValue('hash', hash)}
-              aria-label={t('txDetails.copyTxId')}
-            >
-              {copiedKey === 'hash' ? (
-                <CheckIcon className="h-3 w-3" />
-              ) : (
-                <CopyIcon className="h-3 w-3" />
-              )}
-            </button>
-          </div>
-          <div className="flex items-center gap-2">
-            <a
-              href={buildExplorerObjectUrl('tx', hash)}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex h-8 items-center gap-1 rounded-md border border-border/50 px-2 text-xs text-muted-foreground transition-colors hover:text-foreground"
-            >
-              <ExternalLinkIcon className="h-3.5 w-3.5" />
-              {t('txDetails.openExplorer')}
-            </a>
-          </div>
-        </div>
+        <TxDetailsHeader hash={hash} copiedKey={copiedKey} onCopy={copyValue} />
 
         {txQuery.isLoading && (
           <div className="space-y-2">
@@ -228,28 +159,7 @@ const TransactionDetails = () => {
         {details && (
           <div className="divide-y divide-border/40">
             {rows.map((row) => (
-              <div key={row.key} className="py-2">
-                <div className="mb-1 flex items-center justify-between gap-2">
-                  <span className="text-[11px] uppercase text-muted-foreground">{row.label}</span>
-                  {row.copyable && (
-                    <button
-                      type="button"
-                      className="h-5 w-5 shrink-0 cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
-                      onClick={() => copyValue(row.key, row.value)}
-                      aria-label={`${t('txDetails.copy')} ${row.label}`}
-                    >
-                      {copiedKey === row.key ? (
-                        <CheckIcon className="h-3 w-3" />
-                      ) : (
-                        <CopyIcon className="h-3 w-3" />
-                      )}
-                    </button>
-                  )}
-                </div>
-                <div className="break-all font-mono text-xs text-foreground">
-                  {formatValue(row.value)}
-                </div>
-              </div>
+              <TxDetailsRow key={row.key} row={row} copiedKey={copiedKey} onCopy={copyValue} />
             ))}
           </div>
         )}

@@ -1,6 +1,5 @@
 import { useTransactions } from '@qubic-labs/react'
-import { useQuery } from '@tanstack/react-query'
-import { HashIcon, InboxIcon, RefreshCwIcon } from 'lucide-react'
+import { HashIcon, RefreshCwIcon } from 'lucide-react'
 import { ReceiveIcon } from '@/components/icons/receive-icon'
 import { SendIcon } from '@/components/icons/send-icon'
 import { Button } from '@/components/ui/button'
@@ -17,6 +16,8 @@ import {
   usePendingTransactionsVersion,
 } from '@/lib/pending-transactions'
 import { getCurrentIdentity } from '@/lib/accounts'
+import { useLatestStats } from '@/lib/network-stats'
+import HistoryEmptyState from '@/components/pages/history/history-empty-state'
 
 const formatQus = (value: bigint) => {
   const formatter = new Intl.NumberFormat('en', {
@@ -24,20 +25,6 @@ const formatQus = (value: bigint) => {
     maximumFractionDigits: 2,
   })
   return formatter.format(Number(value))
-}
-
-type LatestStatsResponse = {
-  data?: {
-    currentTick?: number
-  }
-}
-
-const fetchLatestStats = async (): Promise<LatestStatsResponse> => {
-  const response = await fetch('https://rpc.qubic.org/v1/latest-stats')
-  if (!response.ok) {
-    throw new Error('Failed to load network stats.')
-  }
-  return response.json() as Promise<LatestStatsResponse>
 }
 
 const History = () => {
@@ -53,13 +40,7 @@ const History = () => {
     },
     { refetchInterval: 15_000 },
   )
-  const latestStats = useQuery({
-    queryKey: ['qubic', 'latest-stats', 'history'],
-    queryFn: fetchLatestStats,
-    refetchInterval: 15_000,
-    staleTime: 3_000,
-    gcTime: 120_000,
-  })
+  const latestStats = useLatestStats('history')
 
   useEffect(() => {
     const refreshIdentity = () => {
@@ -217,14 +198,8 @@ const History = () => {
           )}
 
           {!transactions.isLoading && sorted.length === 0 && (
-            <motion.div
-              className="flex items-center gap-3 rounded-lg border border-dashed border-border/60 bg-transparent px-3 py-3 text-xs text-muted-foreground"
-              variants={itemMotion}
-            >
-              <div className="flex h-9 w-9 items-center justify-center rounded-full border border-border/40 bg-transparent text-muted-foreground">
-                <InboxIcon className="h-4 w-4" />
-              </div>
-              <div>{t('history.empty')}</div>
+            <motion.div variants={itemMotion}>
+              <HistoryEmptyState />
             </motion.div>
           )}
 

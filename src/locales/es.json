@@ -383,6 +383,11 @@
     "subtitle": "Tu billetera está bloqueada por seguridad. Ingresa tu contraseña para continuar."
   },
   "onboarding": {
+    "importSeed": {
+      "title": "Importar semilla privada",
+      "titleAddAddress": "Importar semilla de dirección",
+      "step": "Paso {{current}} de {{total}}"
+    },
     "importVault": {
       "title": "Importar archivo vault",
       "step": "Paso {{current}} de {{total}}",

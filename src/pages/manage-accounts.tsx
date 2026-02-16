@@ -3,40 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { useQueries } from '@tanstack/react-query'
 import { useSdk } from '@qubic-labs/react'
 import { VaultInvalidPassphraseError, VaultEntryNotFoundError } from '@qubic-labs/sdk'
-import {
-  CheckIcon,
-  CopyIcon,
-  GripVerticalIcon,
-  KeyRoundIcon,
-  MoreHorizontalIcon,
-  PencilIcon,
-  PlusCircleIcon,
-  PlusIcon,
-  ShieldCheckIcon,
-  TrashIcon,
-  UploadIcon,
-} from 'lucide-react'
+import { PlusIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { Button } from '@/components/ui/button'
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-} from '@/components/ui/drawer'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
 import {
   getAccountOrder,
   getCachedAccounts,
@@ -46,14 +14,14 @@ import {
   saveCachedAccounts,
   saveWatchOnlyAccounts,
 } from '@/lib/accounts'
-import { formatBalanceCompact, truncateString } from '@/lib/utils'
 import { clearOnboarded, openBrowserVault, setOnboarded } from '@/lib/vault'
-
-type AccountEntry = {
-  name: string
-  identity: string
-  watchOnly?: boolean
-}
+import AccountListItem from '@/components/pages/manage-accounts/account-list-item'
+import AddAccountDrawer from '@/components/pages/manage-accounts/add-account-drawer'
+import RenameAccountDrawer from '@/components/pages/manage-accounts/rename-account-drawer'
+import RevealSeedDrawer from '@/components/pages/manage-accounts/reveal-seed-drawer'
+import RemoveAccountDrawer from '@/components/pages/manage-accounts/remove-account-drawer'
+import PassphrasePromptDrawer from '@/components/pages/manage-accounts/passphrase-prompt-drawer'
+import type { AccountEntry } from '@/components/pages/manage-accounts/types'
 
 const ManageAccounts = () => {
   const { t } = useTranslation()
@@ -402,102 +370,29 @@ const ManageAccounts = () => {
             const isDragging = draggedId === account.identity
             const isOver = dragOverId === account.identity
             return (
-              <button
+              <AccountListItem
                 key={account.identity}
-                type="button"
-                draggable
+                account={account}
+                balance={balance}
+                isActive={isActive}
+                isDragging={isDragging}
+                isOver={isOver}
+                canRemoveAnyAccount={canRemoveAnyAccount}
                 onDragStart={handleDragStart(account.identity)}
                 onDragOver={handleDragOver(account.identity)}
                 onDrop={handleDrop(account.identity)}
                 onDragEnd={handleDragEnd}
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter' || event.key === ' ') {
-                    event.preventDefault()
-                    setRenameTarget(account)
-                    setRenameValue(account.name)
-                    setRenameError('')
-                  }
+                onRequestRename={(item) => {
+                  setRenameTarget(item)
+                  setRenameValue(item.name)
+                  setRenameError('')
                 }}
-                aria-label={`${t('accounts.manage.menu')} ${account.name}`}
-                className={`flex w-full items-center justify-between gap-2 rounded-lg border border-border/60 bg-card/80 px-3 py-2 ${
-                  isOver ? 'ring-2 ring-primary/40' : ''
-                } ${isDragging ? 'opacity-60' : ''}`}
-              >
-                <div className="flex min-w-0 items-center gap-2">
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="truncate text-sm font-semibold text-foreground">
-                        {account.name}
-                      </span>
-                      {account.watchOnly && (
-                        <span className="inline-flex shrink-0 items-center rounded-full border border-amber-500/30 bg-amber-500/10 px-1.5 py-0.5 text-[10px] text-amber-200">
-                          {t('accounts.manage.watchOnly')}
-                        </span>
-                      )}
-                      {isActive && (
-                        <span className="shrink-0 text-[11px] text-primary">
-                          {t('accounts.manage.active')}
-                        </span>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <span className="truncate">
-                        {truncateString(account.identity, { leading: 5, trailing: 5 })}
-                      </span>
-                      <span className="text-[11px] font-semibold text-foreground">
-                        {balance ? formatBalanceCompact(balance) : '--'}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Button size="icon" variant="ghost" aria-label={t('accounts.manage.drag')}>
-                    <GripVerticalIcon className="h-4 w-4 text-muted-foreground" />
-                  </Button>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button size="icon" variant="ghost" aria-label={t('accounts.manage.menu')}>
-                        <MoreHorizontalIcon className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => setActive(account.identity, account.name)}>
-                        <CheckIcon className="h-4 w-4" />
-                        {t('accounts.manage.select')}
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => {
-                          setRenameTarget(account)
-                          setRenameValue(account.name)
-                          setRenameError('')
-                        }}
-                      >
-                        <PencilIcon className="h-4 w-4" />
-                        {t('accounts.manage.rename')}
-                      </DropdownMenuItem>
-                      {!account.watchOnly && (
-                        <DropdownMenuItem
-                          onClick={() => {
-                            handleRequestPassphrase({ type: 'reveal', account })
-                          }}
-                        >
-                          <ShieldCheckIcon className="h-4 w-4" />
-                          {t('accounts.manage.reveal')}
-                        </DropdownMenuItem>
-                      )}
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        variant="destructive"
-                        disabled={!canRemoveAnyAccount}
-                        onClick={() => setRemoveTarget(account)}
-                      >
-                        <TrashIcon className="h-4 w-4" />
-                        {t('accounts.manage.remove')}
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </button>
+                onSelect={(item) => setActive(item.identity, item.name)}
+                onReveal={(item) => {
+                  handleRequestPassphrase({ type: 'reveal', account: item })
+                }}
+                onRemove={(item) => setRemoveTarget(item)}
+              />
             )
           })}
           {orderedAccounts.length === 0 && (
@@ -526,182 +421,102 @@ const ManageAccounts = () => {
         </div>
       </div>
 
-      <Drawer open={addOpen} onOpenChange={setAddOpen}>
-        <DrawerContent>
-          <DrawerHeader>
-            <DrawerTitle>{t('accounts.manage.addTitle')}</DrawerTitle>
-            <DrawerDescription>{t('accounts.manage.addNewDesc')}</DrawerDescription>
-          </DrawerHeader>
-          <div className="grid gap-3 px-4 pb-2">
-            <Button
-              size="lg"
-              className="w-full"
-              onClick={() => {
-                setAddOpen(false)
-                navigate('/accounts/create')
-              }}
-            >
-              <PlusCircleIcon className="h-5 w-5" />
-              {t('accounts.manage.addCreate')}
-            </Button>
-            <Button
-              size="lg"
-              variant="secondary"
-              className="w-full"
-              onClick={() => {
-                setAddOpen(false)
-                navigate('/accounts/import-seed')
-              }}
-            >
-              <KeyRoundIcon className="h-5 w-5" />
-              {t('accounts.manage.addImport')}
-            </Button>
-            <Button
-              size="lg"
-              variant="secondary"
-              className="w-full"
-              onClick={() => {
-                setAddOpen(false)
-                navigate('/accounts/watch-only')
-              }}
-            >
-              <UploadIcon className="h-5 w-5" />
-              {t('accounts.manage.watchOnlyAdd')}
-            </Button>
-          </div>
-        </DrawerContent>
-      </Drawer>
+      <AddAccountDrawer
+        open={addOpen}
+        onOpenChange={setAddOpen}
+        onCreate={() => {
+          setAddOpen(false)
+          navigate('/accounts/create')
+        }}
+        onImportSeed={() => {
+          setAddOpen(false)
+          navigate('/accounts/import-seed')
+        }}
+        onWatchOnly={() => {
+          setAddOpen(false)
+          navigate('/accounts/watch-only')
+        }}
+      />
 
-      <Drawer
+      <RenameAccountDrawer
         open={Boolean(renameTarget)}
+        target={renameTarget}
+        value={renameValue}
+        error={renameError}
+        loading={loading}
         onOpenChange={(open) => {
           if (!open) {
             setRenameTarget(null)
             setRenameError('')
           }
         }}
-      >
-        <DrawerContent>
-          <DrawerHeader>
-            <DrawerTitle>{t('accounts.manage.renameTitle')}</DrawerTitle>
-          </DrawerHeader>
-          <div className="space-y-2 px-4">
-            <Label htmlFor="rename-input">{t('accounts.manage.renameLabel')}</Label>
-            <Input
-              id="rename-input"
-              value={renameValue}
-              onChange={(event) => {
-                setRenameValue(event.target.value)
-                if (renameError) {
-                  setRenameError('')
-                }
-              }}
-            />
-            {renameError && <p className="text-xs text-destructive">{renameError}</p>}
-          </div>
-          <DrawerFooter>
-            <Button
-              onClick={() => {
-                if (!renameTarget) return
-                const name = renameValue.trim()
-                const hasNameConflict = accounts.some(
-                  (entry) =>
-                    entry.identity !== renameTarget.identity &&
-                    entry.name.toLowerCase() === name.toLowerCase(),
-                )
-                if (hasNameConflict) {
-                  setRenameError(t('accounts.manage.errors.nameDuplicate'))
-                  return
-                }
-                setRenameError('')
-                if (renameTarget.watchOnly) {
-                  handleRename(renameTarget, name, '')
-                  return
-                }
-                setRenameTarget(null)
-                handleRequestPassphrase({ type: 'rename', account: renameTarget, name })
-              }}
-              disabled={!renameValue.trim() || loading}
-            >
-              <CheckIcon className="h-4 w-4" />
-              {t('accounts.manage.save')}
-            </Button>
-          </DrawerFooter>
-        </DrawerContent>
-      </Drawer>
-
-      <Drawer
-        open={Boolean(seedTarget)}
-        onOpenChange={() => {
-          setSeedTarget(null)
-          setRevealedSeed('')
+        onValueChange={(value) => {
+          setRenameValue(value)
+          if (renameError) {
+            setRenameError('')
+          }
         }}
-      >
-        <DrawerContent>
-          <DrawerHeader>
-            <DrawerTitle>{t('accounts.manage.revealTitle')}</DrawerTitle>
-          </DrawerHeader>
-          <div className="px-4">
-            <Textarea value={revealedSeed} rows={3} readOnly className="resize-none" />
-          </div>
-          <DrawerFooter>
-            <Button
-              variant="outline"
-              onClick={async () => {
-                if (!revealedSeed) return
-                await navigator.clipboard.writeText(revealedSeed)
-              }}
-            >
-              <CopyIcon className="h-4 w-4" />
-              {t('accounts.manage.copySeed')}
-            </Button>
-            <DrawerClose asChild>
-              <Button>
-                <CheckIcon className="h-4 w-4" />
-                {t('accounts.manage.done')}
-              </Button>
-            </DrawerClose>
-          </DrawerFooter>
-        </DrawerContent>
-      </Drawer>
+        onSubmit={() => {
+          if (!renameTarget) return
+          const name = renameValue.trim()
+          const hasNameConflict = accounts.some(
+            (entry) =>
+              entry.identity !== renameTarget.identity &&
+              entry.name.toLowerCase() === name.toLowerCase(),
+          )
+          if (hasNameConflict) {
+            setRenameError(t('accounts.manage.errors.nameDuplicate'))
+            return
+          }
+          setRenameError('')
+          if (renameTarget.watchOnly) {
+            handleRename(renameTarget, name, '')
+            return
+          }
+          setRenameTarget(null)
+          handleRequestPassphrase({ type: 'rename', account: renameTarget, name })
+        }}
+      />
 
-      <Drawer open={Boolean(removeTarget)} onOpenChange={() => setRemoveTarget(null)}>
-        <DrawerContent>
-          <DrawerHeader>
-            <DrawerTitle>{t('accounts.manage.removeTitle')}</DrawerTitle>
-            <DrawerDescription>{t('accounts.manage.removeDesc')}</DrawerDescription>
-          </DrawerHeader>
-          {!canRemoveAnyAccount && (
-            <p className="px-4 text-xs text-destructive">
-              {t('accounts.manage.errors.lastAccount')}
-            </p>
-          )}
-          <DrawerFooter>
-            <Button
-              variant="destructive-outline"
-              className="w-full"
-              disabled={!canRemoveAnyAccount}
-              onClick={() => {
-                if (removeTarget) {
-                  if (removeTarget.watchOnly) {
-                    handleRemove(removeTarget, '')
-                    setRemoveTarget(null)
-                    return
-                  }
-                  handleRequestPassphrase({ type: 'remove', account: removeTarget })
-                  setRemoveTarget(null)
-                }
-              }}
-            >
-              <TrashIcon className="h-4 w-4" />
-              {t('accounts.manage.remove')}
-            </Button>
-          </DrawerFooter>
-        </DrawerContent>
-      </Drawer>
+      <RevealSeedDrawer
+        open={Boolean(seedTarget)}
+        seed={revealedSeed}
+        onOpenChange={(open) => {
+          if (!open) {
+            setSeedTarget(null)
+            setRevealedSeed('')
+          }
+        }}
+        onCopy={async () => {
+          if (!revealedSeed) return
+          await navigator.clipboard.writeText(revealedSeed)
+        }}
+      />
 
-      <Drawer
+      <RemoveAccountDrawer
+        open={Boolean(removeTarget)}
+        canRemoveAnyAccount={canRemoveAnyAccount}
+        onOpenChange={(open) => {
+          if (!open) {
+            setRemoveTarget(null)
+          }
+        }}
+        onConfirm={() => {
+          if (!removeTarget) return
+          if (removeTarget.watchOnly) {
+            handleRemove(removeTarget, '')
+            setRemoveTarget(null)
+            return
+          }
+          handleRequestPassphrase({ type: 'remove', account: removeTarget })
+          setRemoveTarget(null)
+        }}
+      />
+
+      <PassphrasePromptDrawer
         open={passphrasePromptOpen}
+        passphrase={passphraseInput}
+        error={passphraseError}
         onOpenChange={(open) => {
           setPassphrasePromptOpen(open)
           if (!open) {
@@ -710,29 +525,9 @@ const ManageAccounts = () => {
             setPendingAction(null)
           }
         }}
-      >
-        <DrawerContent>
-          <DrawerHeader>
-            <DrawerTitle>{t('accounts.manage.passphraseTitle')}</DrawerTitle>
-          </DrawerHeader>
-          <div className="space-y-2 px-4">
-            <Label htmlFor="vault-passphrase">{t('accounts.manage.passphrase')}</Label>
-            <Input
-              id="vault-passphrase"
-              type="password"
-              value={passphraseInput}
-              onChange={(event) => setPassphraseInput(event.target.value)}
-            />
-            {passphraseError && <p className="text-xs text-destructive">{passphraseError}</p>}
-          </div>
-          <DrawerFooter>
-            <Button onClick={handlePassphraseSubmit}>
-              <CheckIcon className="h-4 w-4" />
-              {t('accounts.manage.confirm')}
-            </Button>
-          </DrawerFooter>
-        </DrawerContent>
-      </Drawer>
+        onPassphraseChange={setPassphraseInput}
+        onSubmit={handlePassphraseSubmit}
+      />
     </section>
   )
 }
