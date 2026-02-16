@@ -62,9 +62,9 @@ const TransactionDetails = () => {
     refetchInterval: isPending ? 5_000 : false,
   })
   useEffect(() => {
-    if (!hash) return
+    if (!hash || !txQuery.data) return
     resolvePendingTransactions([{ hash }], currentTick)
-  }, [hash, currentTick])
+  }, [hash, currentTick, txQuery.data])
 
   const details = txQuery.data as Record<string, unknown> | undefined
 
