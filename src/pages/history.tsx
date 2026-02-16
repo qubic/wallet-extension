@@ -53,6 +53,7 @@ const History = () => {
   usePendingTransactionsVersion()
   const [identity, setIdentity] = useState(getCurrentIdentity())
   const loadMoreRef = useRef<HTMLDivElement | null>(null)
+  const loadInFlightRef = useRef(false)
   const transactions = useTransactions(
     {
       identity,
@@ -174,7 +175,16 @@ const History = () => {
         const [entry] = entries
         if (!entry?.isIntersecting) return
         if (transactions.isFetchingNextPage) return
-        void transactions.fetchNextPage()
+        if (loadInFlightRef.current) return
+
+        loadInFlightRef.current = true
+        observer.unobserve(target)
+        void transactions.fetchNextPage().finally(() => {
+          loadInFlightRef.current = false
+          if (transactions.hasNextPage) {
+            observer.observe(target)
+          }
+        })
       },
       { rootMargin: '200px 0px' },
     )
