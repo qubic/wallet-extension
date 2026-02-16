@@ -32,6 +32,13 @@ jobs:
           key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
       - name: install deps
         run: bun install
+      - name: build extension
+        run: bun run build
+      - name: package dist artifact
+        run: |
+          rm -f dist.zip
+          cd dist
+          zip -r ../dist.zip .
       - name: release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

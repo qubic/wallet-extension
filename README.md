@@ -99,5 +99,6 @@ bun run build
 ## Releases
 - Releases are automated with Semantic Release (`.github/workflows/release.yml`).
 - `main` publishes stable releases.
-- Stable release titles use date kebab-case format: `release-YYYY-MM-DD`.
+- Stable release titles use semantic version format: `v<version>`.
+- Each release includes a zipped build artifact: `dist.zip`.
 - Local dry-run: `bun run release:dry`

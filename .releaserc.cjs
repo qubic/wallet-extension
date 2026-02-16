@@ -18,7 +18,13 @@ module.exports = {
     [
       '@semantic-release/github',
       {
-        releaseNameTemplate: 'release-<%= new Date().toISOString().slice(0, 10) %>',
+        releaseNameTemplate: 'v<%= nextRelease.version %>',
+        assets: [
+          {
+            path: 'dist.zip',
+            label: 'wallet-extension-dist.zip',
+          },
+        ],
       },
     ],
     [
