@@ -240,6 +240,8 @@
     "tick": "Tick",
     "type": "Tipo",
     "pending": "Pendiente",
+    "failed": "Fallida",
+    "resend": "Reenviar",
     "today": "Hoy",
     "yesterday": "Ayer"
   },

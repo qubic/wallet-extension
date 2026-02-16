@@ -240,6 +240,8 @@
     "tick": "Tick",
     "type": "Type",
     "pending": "Pending",
+    "failed": "Failed",
+    "resend": "Resend",
     "today": "Today",
     "yesterday": "Yesterday"
   },

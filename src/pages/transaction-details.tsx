@@ -1,4 +1,4 @@
-import { useSdk } from '@qubic-labs/react'
+import { useLastProcessedTick, useSdk } from '@qubic-labs/react'
 import { useQuery } from '@tanstack/react-query'
 import { ArrowLeftIcon } from 'lucide-react'
 import { useEffect } from 'react'
@@ -9,7 +9,6 @@ import {
   resolvePendingTransactions,
   usePendingTransactionsVersion,
 } from '@/lib/pending-transactions'
-import { useLatestStats } from '@/lib/network-stats'
 import { useClipboardCopy } from '@/hooks/use-clipboard-copy'
 import TxDetailsHeader from '@/components/pages/transaction-details/tx-details-header'
 import TxDetailsRow, { formatValue } from '@/components/pages/transaction-details/tx-details-row'
@@ -50,10 +49,10 @@ const TransactionDetails = () => {
     successTitle: t('txDetails.copied'),
     errorTitle: t('txDetails.copyFailed'),
   })
-  const latestStats = useLatestStats('tx-details')
-  const currentTick = latestStats.data?.data?.currentTick
-  const pending = getPendingTransaction(hash, currentTick)
-  const isPending = Boolean(pending)
+  const lastProcessedTickQuery = useLastProcessedTick({ refetchInterval: 15_000 })
+  const archiverProcessedTick = lastProcessedTickQuery.data?.tickNumber
+  const pending = getPendingTransaction(hash)
+  const isPending = pending?.status === 'pending'
 
   const txQuery = useQuery({
     queryKey: ['qubic', 'tx-by-hash', hash],
@@ -62,9 +61,13 @@ const TransactionDetails = () => {
     refetchInterval: isPending ? 5_000 : false,
   })
   useEffect(() => {
-    if (!hash || !txQuery.data) return
-    resolvePendingTransactions([{ hash }], currentTick)
-  }, [hash, currentTick, txQuery.data])
+    if (!hash) return
+    if (txQuery.data) {
+      resolvePendingTransactions([{ hash }], archiverProcessedTick)
+      return
+    }
+    resolvePendingTransactions([], archiverProcessedTick)
+  }, [hash, archiverProcessedTick, txQuery.data])
 
   const details = txQuery.data as Record<string, unknown> | undefined
 

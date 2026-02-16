@@ -78,9 +78,9 @@ const Home = () => {
   const currentTickFromRpc = latestStats.data?.data?.currentTick
   const hasVirtualTick = virtualTick !== null
   const tickValue = virtualTick ?? currentTickFromRpc ?? '--'
-  const currentTick = typeof tickValue === 'number' ? tickValue : undefined
-  const pendingOutgoingDebit = getPendingOutgoingDebit(identity, currentTick)
-  const hasPendingOutgoing = getPendingTransactionsForIdentity(identity, currentTick).length > 0
+  const pendingForIdentity = getPendingTransactionsForIdentity(identity)
+  const pendingOutgoingDebit = getPendingOutgoingDebit(identity)
+  const hasPendingOutgoing = pendingForIdentity.some((tx) => tx.status === 'pending')
   const epochValue = latestStats.data?.data?.epoch ?? '--'
   const pricePerBValue = latestStats.data?.data?.price
     ? `$${(latestStats.data.data.price * 1_000_000_000).toFixed(2)}`
@@ -93,6 +93,15 @@ const Home = () => {
     () => transactions.data?.pages.flatMap((page) => page.transactions) ?? [],
     [transactions.data],
   )
+  const archiverProcessedTick = useMemo(() => {
+    const pages = transactions.data?.pages ?? []
+    if (pages.length === 0) return undefined
+    return pages.reduce<bigint | undefined>((max, page) => {
+      if (typeof page.validForTick !== 'bigint') return max
+      if (max === undefined || page.validForTick > max) return page.validForTick
+      return max
+    }, undefined)
+  }, [transactions.data])
   const isSyncingRaw =
     balance.isFetching ||
     transactions.isFetching ||
@@ -131,8 +140,8 @@ const Home = () => {
   }, [])
 
   useEffect(() => {
-    resolvePendingTransactions(transactionItems, currentTick)
-  }, [transactionItems, currentTick])
+    resolvePendingTransactions(transactionItems, archiverProcessedTick)
+  }, [transactionItems, archiverProcessedTick])
 
   useEffect(() => {
     const clearTimers = () => {
@@ -308,9 +317,14 @@ const Home = () => {
             <TransactionsPreview
               identity={identity}
               transactions={transactions}
-              currentTick={currentTick}
+              pendingTransactions={pendingForIdentity}
               onViewMore={() => navigate('/history')}
               onOpenTx={(hash) => navigate(`/tx/${hash}`)}
+              onResend={(recipient, amount) =>
+                navigate(
+                  `/transfer?recipient=${encodeURIComponent(recipient)}&amount=${encodeURIComponent(amount.toString())}`,
+                )
+              }
             />
           </motion.div>
 
