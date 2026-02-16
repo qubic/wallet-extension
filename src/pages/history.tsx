@@ -418,7 +418,7 @@ const History = () => {
                     return (
                       <motion.div
                         key={tx.hash}
-                        className="w-full cursor-pointer space-y-3 rounded-xl border border-red-500/50 bg-red-500/10 px-3 py-3 text-left transition-colors"
+                        className="w-full space-y-3 rounded-xl border border-red-500/50 bg-red-500/10 px-3 py-3 text-left transition-colors"
                         variants={itemMotion}
                       >
                         <div className="flex items-center justify-between gap-3">
