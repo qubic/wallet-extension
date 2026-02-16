@@ -353,7 +353,6 @@
       "broadcastFailed": "Failed to broadcast transaction.",
       "watchOnly": "Watch-only accounts cannot send transfers.",
       "pendingOutgoing": "A previous outgoing transfer is still pending. Please wait for confirmation.",
-      "resendUnsupported": "Resend is currently supported only for simple QU transfers.",
       "generic": "Transfer failed. Please retry."
     }
   },
