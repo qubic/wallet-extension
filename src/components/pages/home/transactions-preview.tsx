@@ -32,13 +32,7 @@ type TransactionsPreviewProps = {
   pendingTransactions: PendingTransaction[]
   onViewMore: () => void
   onOpenTx: (hash: string) => void
-  onResend: (
-    failedHash: string,
-    recipient: string,
-    amount: bigint,
-    inputType: number,
-    tokenKey?: string,
-  ) => void
+  onResend: (failedHash: string, recipient: string, amount: bigint, tokenKey?: string) => void
 }
 
 const TransactionsPreview = ({
@@ -168,9 +162,7 @@ const TransactionsPreview = ({
               <button
                 type="button"
                 className="cursor-pointer text-[11px] font-semibold uppercase tracking-wide text-primary hover:underline"
-                onClick={() =>
-                  onResend(tx.hash, tx.destination, tx.amount, Number(tx.inputType), tx.tokenKey)
-                }
+                onClick={() => onResend(tx.hash, tx.destination, tx.amount, tx.tokenKey)}
               >
                 {t('history.resend')}
               </button>

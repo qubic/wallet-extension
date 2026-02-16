@@ -445,7 +445,7 @@ const History = () => {
                                   className="cursor-pointer text-[11px] font-semibold uppercase tracking-wide text-primary hover:underline"
                                   onClick={() =>
                                     navigate(
-                                      `/transfer?failedHash=${encodeURIComponent(tx.hash)}&recipient=${encodeURIComponent(tx.destination)}&amount=${encodeURIComponent(tx.amount.toString())}&inputType=${encodeURIComponent(tx.inputType.toString())}&token=${encodeURIComponent(tx.tokenKey ?? 'qu')}`,
+                                      `/transfer?failedHash=${encodeURIComponent(tx.hash)}&recipient=${encodeURIComponent(tx.destination)}&amount=${encodeURIComponent(tx.amount.toString())}&token=${encodeURIComponent(tx.tokenKey ?? 'qu')}`,
                                     )
                                   }
                                 >

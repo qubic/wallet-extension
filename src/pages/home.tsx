@@ -315,9 +315,9 @@ const Home = () => {
               pendingTransactions={pendingForIdentity}
               onViewMore={() => navigate('/history')}
               onOpenTx={(hash) => navigate(`/tx/${hash}`)}
-              onResend={(failedHash, recipient, amount, inputType, tokenKey) =>
+              onResend={(failedHash, recipient, amount, tokenKey) =>
                 navigate(
-                  `/transfer?failedHash=${encodeURIComponent(failedHash)}&recipient=${encodeURIComponent(recipient)}&amount=${encodeURIComponent(amount.toString())}&inputType=${encodeURIComponent(inputType.toString())}&token=${encodeURIComponent(tokenKey ?? 'qu')}`,
+                  `/transfer?failedHash=${encodeURIComponent(failedHash)}&recipient=${encodeURIComponent(recipient)}&amount=${encodeURIComponent(amount.toString())}&token=${encodeURIComponent(tokenKey ?? 'qu')}`,
                 )
               }
             />
