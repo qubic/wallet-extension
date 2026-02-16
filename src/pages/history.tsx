@@ -5,7 +5,7 @@ import { SendIcon } from '@/components/icons/send-icon'
 import { Button } from '@/components/ui/button'
 import { buildExplorerObjectUrl, truncateString } from '@/lib/utils'
 import { useTranslation } from 'react-i18next'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -27,16 +27,36 @@ const formatQus = (value: bigint) => {
   return formatter.format(Number(value))
 }
 
+const HistoryRowSkeleton = () => (
+  <div className="space-y-3 rounded-xl border border-border/40 bg-background/40 px-3 py-3">
+    <div className="flex items-center justify-between gap-3">
+      <div className="flex items-center gap-3">
+        <div className="h-9 w-9 animate-pulse rounded-full bg-muted/40" />
+        <div className="space-y-1.5">
+          <div className="h-3 w-20 animate-pulse rounded bg-muted/40" />
+          <div className="h-3 w-28 animate-pulse rounded bg-muted/30" />
+        </div>
+      </div>
+      <div className="h-4 w-14 animate-pulse rounded bg-muted/40" />
+    </div>
+    <div className="grid grid-cols-[1fr_auto_auto] gap-2">
+      <div className="h-3 animate-pulse rounded bg-muted/30" />
+      <div className="h-3 w-16 animate-pulse rounded bg-muted/30" />
+      <div className="h-3 w-12 animate-pulse rounded bg-muted/30" />
+    </div>
+  </div>
+)
+
 const History = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
   usePendingTransactionsVersion()
   const [identity, setIdentity] = useState(getCurrentIdentity())
+  const loadMoreRef = useRef<HTMLDivElement | null>(null)
   const transactions = useTransactions(
     {
       identity,
-      pageSize: 20,
-      limit: 20,
+      pageSize: 10,
     },
     { refetchInterval: 15_000 },
   )
@@ -145,6 +165,25 @@ const History = () => {
   }, [items, currentTick])
 
   useEffect(() => {
+    const target = loadMoreRef.current
+    if (!target) return undefined
+    if (!transactions.hasNextPage) return undefined
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries
+        if (!entry?.isIntersecting) return
+        if (transactions.isFetchingNextPage) return
+        void transactions.fetchNextPage()
+      },
+      { rootMargin: '200px 0px' },
+    )
+
+    observer.observe(target)
+    return () => observer.disconnect()
+  }, [transactions.hasNextPage, transactions.isFetchingNextPage, transactions.fetchNextPage])
+
+  useEffect(() => {
     const handlePendingSettled = () => {
       void transactions.refetch()
     }
@@ -185,9 +224,9 @@ const History = () => {
 
           {transactions.isLoading && (
             <motion.div className="space-y-2" variants={itemMotion}>
-              <div className="h-16 animate-pulse rounded-xl border border-border/40 bg-muted/20" />
-              <div className="h-16 animate-pulse rounded-xl border border-border/40 bg-muted/20" />
-              <div className="h-16 animate-pulse rounded-xl border border-border/40 bg-muted/20" />
+              <HistoryRowSkeleton />
+              <HistoryRowSkeleton />
+              <HistoryRowSkeleton />
             </motion.div>
           )}
 
@@ -231,24 +270,22 @@ const History = () => {
                   <motion.button
                     type="button"
                     key={tx.hash}
-                    className={`w-full cursor-pointer space-y-3 rounded-xl border px-3 py-3 text-left transition-colors ${
-                      isPending
-                        ? 'animate-pulse border-amber-500/50 bg-amber-500/10'
-                        : 'border-border/40 bg-background/40 hover:border-primary/30 hover:bg-background/60'
-                    }`}
+                    className={`w-full cursor-pointer space-y-3 rounded-xl border px-3 py-3 text-left transition-colors ${isPending
+                      ? 'animate-pulse border-amber-500/50 bg-amber-500/10'
+                      : 'border-border/40 bg-background/40 hover:border-primary/30 hover:bg-background/60'
+                      }`}
                     onClick={() => navigate(`/tx/${tx.hash}`)}
                     variants={itemMotion}
                   >
                     <div className="flex items-center justify-between gap-3">
                       <div className="flex items-center gap-3">
                         <div
-                          className={`flex h-9 w-9 items-center justify-center rounded-full border ${
-                            isPending
-                              ? 'border-amber-500/40 bg-amber-500/15 text-amber-700 dark:text-amber-300'
-                              : isIncoming
-                                ? 'border-primary/40 bg-primary/10 text-primary'
-                                : 'border-[var(--destructive)]/40 bg-[var(--destructive)]/10 text-[var(--destructive)]'
-                          }`}
+                          className={`flex h-9 w-9 items-center justify-center rounded-full border ${isPending
+                            ? 'border-amber-500/40 bg-amber-500/15 text-amber-700 dark:text-amber-300'
+                            : isIncoming
+                              ? 'border-primary/40 bg-primary/10 text-primary'
+                              : 'border-[var(--destructive)]/40 bg-[var(--destructive)]/10 text-[var(--destructive)]'
+                            }`}
                         >
                           <Icon className="h-4 w-4" />
                         </div>
@@ -258,13 +295,12 @@ const History = () => {
                         </div>
                       </div>
                       <span
-                        className={`text-sm font-semibold ${
-                          isPending
-                            ? 'text-amber-700 dark:text-amber-300'
-                            : isIncoming
-                              ? 'text-primary'
-                              : 'text-[var(--destructive)]'
-                        }`}
+                        className={`text-sm font-semibold ${isPending
+                          ? 'text-amber-700 dark:text-amber-300'
+                          : isIncoming
+                            ? 'text-primary'
+                            : 'text-[var(--destructive)]'
+                          }`}
                       >
                         {isIncoming ? '+' : '-'}
                         {formatQus(tx.amount)}
@@ -303,6 +339,17 @@ const History = () => {
               })}
             </motion.div>
           ))}
+
+          {!transactions.isLoading && transactions.isFetchingNextPage && (
+            <motion.div className="space-y-2" variants={itemMotion}>
+              <HistoryRowSkeleton />
+              <HistoryRowSkeleton />
+            </motion.div>
+          )}
+
+          {!transactions.isLoading && transactions.hasNextPage && (
+            <div ref={loadMoreRef} className="h-1" />
+          )}
         </motion.div>
       </AnimatePresence>
     </section>
