@@ -17,6 +17,7 @@ import { useClipboardCopy } from '@/hooks/use-clipboard-copy'
 import BalanceCard from '@/components/pages/home/balance-card'
 import TransactionsPreview from '@/components/pages/home/transactions-preview'
 import {
+  getArchiverProcessedTick,
   getPendingOutgoingDebit,
   PENDING_SETTLED_EVENT,
   getPendingTransactionsForIdentity,
@@ -94,13 +95,7 @@ const Home = () => {
     [transactions.data],
   )
   const archiverProcessedTick = useMemo(() => {
-    const pages = transactions.data?.pages ?? []
-    if (pages.length === 0) return undefined
-    return pages.reduce<bigint | undefined>((max, page) => {
-      if (typeof page.validForTick !== 'bigint') return max
-      if (max === undefined || page.validForTick > max) return page.validForTick
-      return max
-    }, undefined)
+    return getArchiverProcessedTick(transactions.data?.pages)
   }, [transactions.data])
   const isSyncingRaw =
     balance.isFetching ||

@@ -240,6 +240,17 @@ export const canResendPendingTransaction = (
   return false
 }
 
+export const getArchiverProcessedTick = (
+  pages: Array<{ validForTick?: bigint }> | undefined,
+): bigint | undefined => {
+  if (!pages || pages.length === 0) return undefined
+  return pages.reduce<bigint | undefined>((max, page) => {
+    if (typeof page.validForTick !== 'bigint') return max
+    if (max === undefined || page.validForTick > max) return page.validForTick
+    return max
+  }, undefined)
+}
+
 const parseProcessedTick = (value?: number | bigint | null) => {
   if (typeof value === 'number') {
     return Number.isFinite(value) ? value : null

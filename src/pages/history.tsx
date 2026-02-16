@@ -9,6 +9,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import {
+  getArchiverProcessedTick,
   canResendPendingTransaction,
   getPendingTransactionsForIdentity,
   PENDING_SETTLED_EVENT,
@@ -89,13 +90,7 @@ const History = () => {
     return getPendingTransactionsForIdentity(identity)
   }, [identity, pendingVersion])
   const archiverProcessedTick = useMemo(() => {
-    const pages = transactions.data?.pages ?? []
-    if (pages.length === 0) return undefined
-    return pages.reduce<bigint | undefined>((max, page) => {
-      if (typeof page.validForTick !== 'bigint') return max
-      if (max === undefined || page.validForTick > max) return page.validForTick
-      return max
-    }, undefined)
+    return getArchiverProcessedTick(transactions.data?.pages)
   }, [transactions.data])
   const pendingHashes = useMemo(
     () => new Set(pending.map((tx) => tx.hash.toLowerCase())),
