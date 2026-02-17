@@ -42,7 +42,7 @@ const HistoryRowSkeleton = () => (
 const History = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  usePendingTransactionsVersion()
+  const pendingVersion = usePendingTransactionsVersion()
   const [identity, setIdentity] = useState(getCurrentIdentity())
   const loadMoreRef = useRef<HTMLDivElement | null>(null)
   const loadInFlightRef = useRef(false)
@@ -70,22 +70,31 @@ const History = () => {
   }, [])
 
   const currentTick = latestStats.data?.data?.currentTick
-  const items = transactions.data?.pages.flatMap((page) => page.transactions) ?? []
-  const pending = getPendingTransactionsForIdentity(identity, currentTick)
-  const pendingHashes = new Set(pending.map((tx) => tx.hash.toLowerCase()))
-  const pendingItems = pending.map((tx) => ({
-    hash: tx.hash,
-    source: tx.sourceIdentity,
-    destination: tx.destinationIdentity ?? '',
-    amount: tx.amount ?? 0n,
-    tickNumber: tx.targetTick,
-    inputType: tx.inputType ?? 0,
-    timestamp: BigInt(tx.createdAt),
-  }))
-  const sorted = [
-    ...pendingItems,
-    ...items.filter((tx) => !pendingHashes.has(tx.hash.toLowerCase())),
-  ].sort((a, b) => Number(b.tickNumber) - Number(a.tickNumber))
+  const items = useMemo(
+    () => transactions.data?.pages.flatMap((page) => page.transactions) ?? [],
+    [transactions.data],
+  )
+  const pending = useMemo(() => {
+    void pendingVersion
+    return getPendingTransactionsForIdentity(identity, currentTick)
+  }, [identity, currentTick, pendingVersion])
+  const sorted = useMemo(() => {
+    const pendingHashes = new Set(pending.map((tx) => tx.hash.toLowerCase()))
+    const pendingItems = pending.map((tx) => ({
+      hash: tx.hash,
+      source: tx.sourceIdentity,
+      destination: tx.destinationIdentity ?? '',
+      amount: tx.amount ?? 0n,
+      tickNumber: tx.targetTick,
+      inputType: tx.inputType ?? 0,
+      timestamp: BigInt(tx.createdAt),
+    }))
+
+    return [
+      ...pendingItems,
+      ...items.filter((tx) => !pendingHashes.has(tx.hash.toLowerCase())),
+    ].sort((a, b) => Number(b.tickNumber) - Number(a.tickNumber))
+  }, [items, pending])
 
   const grouped = useMemo(() => {
     const now = new Date()
