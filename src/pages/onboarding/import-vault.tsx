@@ -143,11 +143,11 @@ const ImportVault = () => {
 
         const firstEntry = vault.list()[0]
         const firstWatchOnly = seeds.find((s) => s.isOnlyWatch)
+        setUnlocked()
         setOnboarded(
           firstEntry?.identity ?? firstWatchOnly?.publicId,
           firstEntry?.name ?? firstWatchOnly?.alias,
         )
-        setUnlocked()
         clearSensitiveState()
         navigate('/home')
       } else {
@@ -166,8 +166,8 @@ const ImportVault = () => {
           return
         }
 
-        setOnboarded(entries[0].identity, entries[0].name)
         setUnlocked()
+        setOnboarded(entries[0].identity, entries[0].name)
         clearSensitiveState()
         navigate('/home')
       }

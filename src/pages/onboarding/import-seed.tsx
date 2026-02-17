@@ -182,8 +182,8 @@ const ImportSeed = ({
       const existing = getCachedAccounts().filter((item) => item.identity !== entry.identity)
       saveCachedAccounts([...existing, { name: entry.name, identity: entry.identity }])
       if (variant !== 'add-address') {
-        setOnboarded(entry.identity, name)
         setUnlocked()
+        setOnboarded(entry.identity, name)
       }
       clearSensitiveState()
       navigate(onCompletePath)
