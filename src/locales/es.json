@@ -209,6 +209,7 @@
       "watchOnlyIdentity": "Identidad pública",
       "watchOnlyAdd": "Agregar solo lectura",
       "watchOnly": "Solo lectura",
+      "defaultNamePrefix": "Cuenta",
       "close": "Cerrar",
       "errors": {
         "load": "No se pudo abrir el vault.",

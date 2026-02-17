@@ -50,7 +50,11 @@ const ImportSeed = ({
   const [seed, setSeed] = useState('')
   const [passphrase, setPassphrase] = useState('')
   const [name, setName] = useState(() =>
-    variant === 'add-address' ? getSuggestedNextAccountName() : 'main',
+    getSuggestedNextAccountName({
+      enableAutoName: variant === 'add-address',
+      prefix: t('accounts.manage.defaultNamePrefix'),
+      fallbackName: 'main',
+    }),
   )
   const [status, setStatus] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)

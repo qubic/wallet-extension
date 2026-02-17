@@ -209,6 +209,7 @@
       "watchOnlyIdentity": "Public identity",
       "watchOnlyAdd": "Add watch-only",
       "watchOnly": "Watch-only",
+      "defaultNamePrefix": "Account",
       "close": "Close",
       "errors": {
         "load": "Failed to open vault.",

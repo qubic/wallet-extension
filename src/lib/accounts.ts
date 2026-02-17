@@ -105,15 +105,29 @@ export const getCurrentVaultIdentity = (): string => {
   return getCachedAccounts()[0]?.identity ?? ''
 }
 
-export const getSuggestedNextAccountName = () => {
+type SuggestedNameOptions = {
+  enableAutoName: boolean
+  prefix: string
+  fallbackName: string
+}
+
+export const getSuggestedNextAccountName = ({
+  enableAutoName,
+  prefix,
+  fallbackName,
+}: SuggestedNameOptions) => {
+  if (!enableAutoName) return fallbackName
+
+  const basePrefix = prefix.trim() || 'Account'
+  const normalizedPrefix = basePrefix.toLowerCase()
   const used = new Set(
     [...getCachedAccounts(), ...getWatchOnlyAccounts()].map((entry) => entry.name.toLowerCase()),
   )
 
   let index = 1
-  while (used.has(`account ${index}`)) {
+  while (used.has(`${normalizedPrefix} ${index}`)) {
     index += 1
   }
 
-  return `Account ${index}`
+  return `${basePrefix} ${index}`
 }

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { identityFromSeed } from '@qubic-labs/core'
 import { ArrowLeftIcon, ArrowRightIcon, CheckCircleIcon } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { generateSeed, isSeedLike } from '@/lib/seed'
 import { setUnlocked } from '@/lib/lock'
@@ -34,13 +35,18 @@ const CreateWallet = ({
   onCompletePath = '/home',
   variant = 'onboarding',
 }: CreateWalletProps) => {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [step, setStep] = useState(1)
   const [seed, setSeed] = useState(() => generateSeed())
   const [passphrase, setPassphrase] = useState('')
   const [confirmPassphrase, setConfirmPassphrase] = useState('')
   const [name, setName] = useState(() =>
-    variant === 'add-address' ? getSuggestedNextAccountName() : 'main',
+    getSuggestedNextAccountName({
+      enableAutoName: variant === 'add-address',
+      prefix: t('accounts.manage.defaultNamePrefix'),
+      fallbackName: 'main',
+    }),
   )
   const [status, setStatus] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
