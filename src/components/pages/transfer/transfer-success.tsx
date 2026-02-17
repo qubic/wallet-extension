@@ -53,7 +53,9 @@ const TransferSuccess = ({
           <div>
             <h2 className="text-2xl font-semibold">{t('transfer.success.title')}</h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              {t('transfer.success.description', { targetTick: txResult.targetTick })}
+              {t('transfer.success.description', {
+                targetTick: Number(txResult.targetTick).toLocaleString(),
+              })}
             </p>
           </div>
 
@@ -65,7 +67,11 @@ const TransferSuccess = ({
               value={`${formatBalance(txResult.amount)} ${txResult.tokenName}`}
               emphasize
             />
-            <SummaryRow label={t('transfer.success.targetTick')} value={txResult.targetTick} mono />
+            <SummaryRow
+              label={t('transfer.success.targetTick')}
+              value={Number(txResult.targetTick).toLocaleString()}
+              mono
+            />
             {txResult.fee > 0n && (
               <SummaryRow
                 label={t('transfer.confirm.fee', { fee: '100' })}

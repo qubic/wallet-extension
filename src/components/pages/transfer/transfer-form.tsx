@@ -318,7 +318,7 @@ const TransferForm = ({
                 />
                 <div className="text-[11px] text-muted-foreground">
                   {t('transfer.form.targetTickCurrentHint', {
-                    tick: typeof currentTick === 'number' ? currentTick : '--',
+                    tick: typeof currentTick === 'number' ? currentTick.toLocaleString() : '--',
                   })}
                 </div>
               </div>
