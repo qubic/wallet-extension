@@ -226,10 +226,10 @@ const CreateWallet = ({
       await vault.save()
       const existing = getCachedAccounts().filter((item) => item.identity !== entry.identity)
       saveCachedAccounts([...existing, { name: entry.name, identity: entry.identity }])
-      setOnboarded(entry.identity, entry.name)
       if (variant !== 'add-address') {
         setUnlocked()
       }
+      setOnboarded(entry.identity, entry.name)
       clearSensitiveState()
       navigate(onCompletePath)
     } catch (error) {
