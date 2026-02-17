@@ -51,12 +51,12 @@ const BalanceCard = ({ balance, identity, pendingDebit, networkMeta }: BalanceCa
     getCachedBalance(identity),
   )
   const normalized = normalizeBalance(balance.data?.balance ?? cachedBalance ?? 0n)
-  const numericBalance = Number(normalized)
-  const [displayBalance, setDisplayBalance] = useState(0)
-  const displayRef = useRef(0)
+  const prevBalanceRef = useRef(normalized)
+  const [balanceChanged, setBalanceChanged] = useState(false)
 
   useEffect(() => {
     setCachedBalanceState(getCachedBalance(identity))
+    prevBalanceRef.current = normalizeBalance(getCachedBalance(identity) ?? 0n)
   }, [identity])
 
   useEffect(() => {
@@ -66,28 +66,12 @@ const BalanceCard = ({ balance, identity, pendingDebit, networkMeta }: BalanceCa
   }, [balance.data?.balance, identity])
 
   useEffect(() => {
-    if (!Number.isFinite(numericBalance)) return undefined
-    const from = displayRef.current
-    const to = numericBalance
-    const duration = 750
-    const start = performance.now()
-    let frame = 0
-
-    const easeOutCubic = (x: number) => 1 - (1 - x) ** 3
-    const tick = (now: number) => {
-      const progress = Math.min(1, (now - start) / duration)
-      const eased = easeOutCubic(progress)
-      const nextValue = from + (to - from) * eased
-      displayRef.current = nextValue
-      setDisplayBalance(nextValue)
-      if (progress < 1) {
-        frame = requestAnimationFrame(tick)
-      }
-    }
-
-    frame = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(frame)
-  }, [numericBalance])
+    if (prevBalanceRef.current === normalized) return
+    prevBalanceRef.current = normalized
+    setBalanceChanged(true)
+    const timer = window.setTimeout(() => setBalanceChanged(false), 400)
+    return () => window.clearTimeout(timer)
+  }, [normalized])
 
   if (balance.isLoading && cachedBalance == null) {
     return <div className="text-sm text-muted-foreground">{t('home.balance.loading')}</div>
@@ -99,13 +83,15 @@ const BalanceCard = ({ balance, identity, pendingDebit, networkMeta }: BalanceCa
 
   const effectiveBalance = normalized > pendingDebit ? normalized - pendingDebit : 0n
   const pendingActive = pendingDebit > 0n
-  const displayBigInt = BigInt(Math.max(0, Math.floor(displayBalance)))
-  const displayValue =
-    pendingActive && displayBigInt > pendingDebit ? displayBigInt - pendingDebit : effectiveBalance
+  const displayValue = effectiveBalance
 
   return (
     <div className="space-y-3 text-center">
-      <div className="text-5xl font-semibold leading-none tracking-tight text-foreground">
+      <div
+        className={`text-5xl font-semibold leading-none tracking-tight text-foreground transition-all duration-400 ${
+          balanceChanged ? 'scale-105 text-primary' : ''
+        }`}
+      >
         {formatBalanceCompact(displayValue)}
       </div>
       <div className="inline-flex items-center rounded-full border border-primary/25 bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary">
