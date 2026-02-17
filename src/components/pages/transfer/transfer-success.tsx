@@ -90,7 +90,7 @@ const TransferSuccess = ({
 
         <div className="flex flex-col gap-2">
           <Button onClick={onViewDetails} variant="secondary" size="lg" className="w-full">
-            {t('history.details.title')}
+            {t('txDetails.title')}
           </Button>
           <Button onClick={onViewHistory} variant="outline" size="lg" className="w-full">
             {t('transfer.success.viewHistory')}

@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { InboxIcon } from 'lucide-react'
+import { InboxIcon, XIcon } from 'lucide-react'
 import type { useTransactions } from '@qubic-labs/react'
 import { motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
@@ -7,48 +7,188 @@ import { formatBalanceCompact, truncateString } from '@/lib/utils'
 import { ReceiveIcon } from '@/components/icons/receive-icon'
 import { SendIcon } from '@/components/icons/send-icon'
 import {
-  getPendingTransactionsForIdentity,
+  canResendPendingTransaction,
+  type PendingTransaction,
+  isTransactionFailed,
   isTransactionPending,
-  usePendingTransactionsVersion,
+  removePendingTransaction,
 } from '@/lib/pending-transactions'
+
+type PreviewTransaction = {
+  hash: string
+  source: string
+  destination: string
+  amount: bigint
+  tickNumber: number | bigint
+  inputType: number | bigint
+  tokenKey?: string
+  timestamp: bigint
+  status?: PendingTransaction['status']
+}
 
 type TransactionsPreviewProps = {
   identity: string
   transactions: ReturnType<typeof useTransactions>
-  currentTick?: number
+  pendingTransactions: PendingTransaction[]
   onViewMore: () => void
   onOpenTx: (hash: string) => void
+  onResend: (failedHash: string, recipient: string, amount: bigint, tokenKey?: string) => void
 }
 
 const TransactionsPreview = ({
   identity,
   transactions,
-  currentTick,
+  pendingTransactions,
   onViewMore,
   onOpenTx,
+  onResend,
 }: TransactionsPreviewProps) => {
   const { t } = useTranslation()
-  usePendingTransactionsVersion()
 
-  const recent = useMemo(() => {
+  const { pendingTop, failedTop, recentChain } = useMemo(() => {
     const items = transactions.data?.pages.flatMap((page) => page.transactions) ?? []
-    const pending = getPendingTransactionsForIdentity(identity, currentTick)
-    const pendingHashes = new Set(pending.map((tx) => tx.hash.toLowerCase()))
-    const pendingItems = pending.map((tx) => ({
+    const pendingItems: PreviewTransaction[] = pendingTransactions.map((tx) => ({
       hash: tx.hash,
       source: tx.sourceIdentity,
       destination: tx.destinationIdentity ?? '',
       amount: tx.amount ?? 0n,
       tickNumber: tx.targetTick,
       inputType: tx.inputType ?? 0,
+      tokenKey: tx.tokenKey,
       timestamp: BigInt(tx.createdAt),
+      status: tx.status,
     }))
-    const merged = [
-      ...pendingItems,
-      ...items.filter((tx) => !pendingHashes.has(tx.hash.toLowerCase())),
-    ]
-    return merged.slice(0, 3)
-  }, [transactions.data, identity, currentTick])
+    const pendingHashes = new Set(pendingItems.map((tx) => tx.hash.toLowerCase()))
+    const pendingTop = pendingItems.filter((tx) => tx.status === 'pending')
+    const failedTop = pendingItems.filter((tx) => tx.status === 'failed')
+    const recentChain: PreviewTransaction[] = items
+      .filter((tx) => !pendingHashes.has(tx.hash.toLowerCase()))
+      .slice(0, 3)
+
+    return { pendingTop, failedTop, recentChain }
+  }, [transactions.data, pendingTransactions])
+
+  const renderRow = (tx: PreviewTransaction) => {
+    const isIncoming = tx.destination === identity
+    const isSimpleTransfer = Number(tx.inputType) === 0
+    const label = isSimpleTransfer
+      ? isIncoming
+        ? t('history.received')
+        : t('history.sent')
+      : isIncoming
+        ? t('history.incoming')
+        : t('history.outgoing')
+    const counterparty = isIncoming ? tx.source : tx.destination
+    const counterpartyLabel = isSimpleTransfer
+      ? isIncoming
+        ? t('history.from', { address: truncateString(counterparty) })
+        : t('history.to', { address: truncateString(counterparty) })
+      : truncateString(counterparty)
+    const Icon = isIncoming ? ReceiveIcon : SendIcon
+    const isPending = isTransactionPending(tx.hash)
+    const isFailed = isTransactionFailed(tx.hash)
+    const canResend = canResendPendingTransaction({
+      status: tx.status ?? 'pending',
+      destinationIdentity: tx.destination,
+      inputType: Number(tx.inputType),
+      tokenKey: tx.tokenKey,
+    })
+
+    return (
+      <motion.div
+        key={tx.hash}
+        className={`group relative flex w-full items-center justify-between rounded-xl border px-3 py-2 text-left transition-colors ${
+          isPending
+            ? 'animate-pulse border-amber-500/50 bg-amber-500/10 text-amber-800 dark:text-amber-200'
+            : isFailed
+              ? 'border-red-500/50 bg-red-500/10 text-red-800 dark:text-red-200'
+              : 'border-border/40 bg-background/40 hover:border-primary/30 hover:bg-background/60'
+        }`}
+      >
+        <div className="flex items-center gap-3">
+          <div
+            className={`flex h-9 w-9 items-center justify-center rounded-full border ${
+              isPending
+                ? 'border-amber-500/40 bg-amber-500/15 text-amber-700 dark:text-amber-300'
+                : isFailed
+                  ? 'border-red-500/40 bg-red-500/15 text-red-700 dark:text-red-300'
+                  : isIncoming
+                    ? 'border-primary/40 bg-primary/10 text-primary'
+                    : 'border-[var(--destructive)]/40 bg-[var(--destructive)]/10 text-[var(--destructive)]'
+            }`}
+          >
+            <Icon className="h-4 w-4" />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-xs font-semibold text-foreground">{label}</span>
+            <span className="text-xs text-muted-foreground">{counterpartyLabel}</span>
+            <span className="text-[11px] text-muted-foreground/70">
+              {(() => {
+                if (isFailed) return t('history.failed')
+                const ts = Number(tx.timestamp)
+                if (!ts) return '--'
+                const date = new Date(ts > 1e12 ? ts : ts * 1000)
+                const now = new Date()
+                if (date.toDateString() === now.toDateString()) return t('history.today')
+                const yesterday = new Date(now)
+                yesterday.setDate(yesterday.getDate() - 1)
+                if (date.toDateString() === yesterday.toDateString()) return t('history.yesterday')
+                return date.toLocaleDateString(undefined, {
+                  month: 'short',
+                  day: 'numeric',
+                  year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined,
+                })
+              })()}
+            </span>
+          </div>
+        </div>
+        <span
+          className={`text-sm font-semibold ${
+            isPending
+              ? 'text-amber-700 dark:text-amber-300'
+              : isFailed
+                ? 'text-red-700 dark:text-red-300'
+                : isIncoming
+                  ? 'text-primary'
+                  : 'text-[var(--destructive)]'
+          }`}
+        >
+          {isIncoming ? '+' : '-'}
+          {formatBalanceCompact(tx.amount)}
+        </span>
+        {isFailed && (
+          <div className="ml-2 flex items-center gap-1">
+            {canResend && (
+              <button
+                type="button"
+                className="cursor-pointer text-[11px] font-semibold uppercase tracking-wide text-primary hover:underline"
+                onClick={() => onResend(tx.hash, tx.destination, tx.amount, tx.tokenKey)}
+              >
+                {t('history.resend')}
+              </button>
+            )}
+            <button
+              type="button"
+              className="cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
+              onClick={() => removePendingTransaction(tx.hash)}
+              aria-label={t('history.deleteFailed')}
+              title={t('history.deleteFailed')}
+            >
+              <XIcon className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        )}
+        {!isFailed && (
+          <button
+            type="button"
+            className="absolute inset-0 cursor-pointer rounded-xl"
+            aria-label={t('txDetails.title')}
+            onClick={() => onOpenTx(tx.hash)}
+          />
+        )}
+      </motion.div>
+    )
+  }
 
   if (transactions.isLoading) {
     return (
@@ -64,7 +204,7 @@ const TransactionsPreview = ({
     return <div className="text-xs text-destructive">{transactions.error.message}</div>
   }
 
-  if (recent.length === 0) {
+  if (pendingTop.length === 0 && failedTop.length === 0 && recentChain.length === 0) {
     return (
       <div className="flex items-center gap-3 rounded-lg border border-dashed border-border/60 bg-muted/20 px-3 py-3 text-xs text-muted-foreground">
         <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted/40 text-muted-foreground">
@@ -80,86 +220,28 @@ const TransactionsPreview = ({
 
   return (
     <div className="w-full space-y-2 text-left">
-      {recent.map((tx) => {
-        const isIncoming = tx.destination === identity
-        const isSimpleTransfer = Number(tx.inputType) === 0
-        const label = isSimpleTransfer
-          ? isIncoming
-            ? t('history.received')
-            : t('history.sent')
-          : isIncoming
-            ? t('history.incoming')
-            : t('history.outgoing')
-        const counterparty = isIncoming ? tx.source : tx.destination
-        const counterpartyLabel = isSimpleTransfer
-          ? isIncoming
-            ? t('history.from', { address: truncateString(counterparty) })
-            : t('history.to', { address: truncateString(counterparty) })
-          : truncateString(counterparty)
-        const Icon = isIncoming ? ReceiveIcon : SendIcon
-        const isPending = isTransactionPending(tx.hash, currentTick)
-
-        return (
-          <motion.button
-            type="button"
-            key={tx.hash}
-            className={`group flex w-full cursor-pointer items-center justify-between rounded-xl border px-3 py-2 text-left transition-colors ${
-              isPending
-                ? 'animate-pulse border-amber-500/50 bg-amber-500/10 text-amber-800 dark:text-amber-200'
-                : 'border-border/40 bg-background/40 hover:border-primary/30 hover:bg-background/60'
-            }`}
-            onClick={() => onOpenTx(tx.hash)}
-          >
-            <div className="flex items-center gap-3">
-              <div
-                className={`flex h-9 w-9 items-center justify-center rounded-full border ${
-                  isPending
-                    ? 'border-amber-500/40 bg-amber-500/15 text-amber-700 dark:text-amber-300'
-                    : isIncoming
-                      ? 'border-primary/40 bg-primary/10 text-primary'
-                      : 'border-[var(--destructive)]/40 bg-[var(--destructive)]/10 text-[var(--destructive)]'
-                }`}
-              >
-                <Icon className="h-4 w-4" />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-xs font-semibold text-foreground">{label}</span>
-                <span className="text-xs text-muted-foreground">{counterpartyLabel}</span>
-                <span className="text-[11px] text-muted-foreground/70">
-                  {(() => {
-                    const ts = Number(tx.timestamp)
-                    if (!ts) return '--'
-                    const date = new Date(ts > 1e12 ? ts : ts * 1000)
-                    const now = new Date()
-                    if (date.toDateString() === now.toDateString()) return t('history.today')
-                    const yesterday = new Date(now)
-                    yesterday.setDate(yesterday.getDate() - 1)
-                    if (date.toDateString() === yesterday.toDateString())
-                      return t('history.yesterday')
-                    return date.toLocaleDateString(undefined, {
-                      month: 'short',
-                      day: 'numeric',
-                      year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined,
-                    })
-                  })()}
-                </span>
-              </div>
-            </div>
-            <span
-              className={`text-sm font-semibold ${
-                isPending
-                  ? 'text-amber-700 dark:text-amber-300'
-                  : isIncoming
-                    ? 'text-primary'
-                    : 'text-[var(--destructive)]'
-              }`}
-            >
-              {isIncoming ? '+' : '-'}
-              {formatBalanceCompact(tx.amount)}
-            </span>
-          </motion.button>
-        )
-      })}
+      {pendingTop.length > 0 && (
+        <div className="space-y-2">
+          <div className="text-[11px] font-semibold uppercase text-muted-foreground/70">
+            {t('history.pending')}
+          </div>
+          {pendingTop.map((tx) => renderRow(tx))}
+        </div>
+      )}
+      {failedTop.length > 0 && (
+        <div className="space-y-2">
+          <div className="text-[11px] font-semibold uppercase text-muted-foreground/70">
+            {t('history.failed')}
+          </div>
+          {failedTop.map((tx) => renderRow(tx))}
+        </div>
+      )}
+      {(pendingTop.length > 0 || failedTop.length > 0) && recentChain.length > 0 && (
+        <div className="pt-1">
+          <div className="h-px w-full bg-border/40" />
+        </div>
+      )}
+      {recentChain.map((tx) => renderRow(tx))}
       <button
         type="button"
         className="w-full cursor-pointer pt-1 text-center text-xs text-muted-foreground transition-colors hover:text-foreground"

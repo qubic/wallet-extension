@@ -1,5 +1,5 @@
 import { useTransactions } from '@qubic-labs/react'
-import { HashIcon, RefreshCwIcon } from 'lucide-react'
+import { HashIcon, RefreshCwIcon, XIcon } from 'lucide-react'
 import { ReceiveIcon } from '@/components/icons/receive-icon'
 import { SendIcon } from '@/components/icons/send-icon'
 import { Button } from '@/components/ui/button'
@@ -9,14 +9,15 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import {
+  getArchiverProcessedTick,
+  canResendPendingTransaction,
   getPendingTransactionsForIdentity,
   PENDING_SETTLED_EVENT,
-  isTransactionPending,
+  removePendingTransaction,
   resolvePendingTransactions,
   usePendingTransactionsVersion,
 } from '@/lib/pending-transactions'
 import { getCurrentIdentity } from '@/lib/accounts'
-import { useLatestStats } from '@/lib/network-stats'
 import HistoryEmptyState from '@/components/pages/history/history-empty-state'
 
 const HistoryRowSkeleton = () => (
@@ -39,6 +40,18 @@ const HistoryRowSkeleton = () => (
   </div>
 )
 
+type HistoryRowTransaction = {
+  hash: string
+  source: string
+  destination: string
+  amount: bigint
+  tickNumber: number | bigint
+  inputType: number | bigint
+  tokenKey?: string
+}
+
+type HistoryRowState = 'default' | 'pending' | 'failed'
+
 const History = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
@@ -53,7 +66,6 @@ const History = () => {
     },
     { refetchInterval: 15_000 },
   )
-  const latestStats = useLatestStats('history')
 
   useEffect(() => {
     const refreshIdentity = () => {
@@ -69,32 +81,51 @@ const History = () => {
     }
   }, [])
 
-  const currentTick = latestStats.data?.data?.currentTick
   const items = useMemo(
     () => transactions.data?.pages.flatMap((page) => page.transactions) ?? [],
     [transactions.data],
   )
   const pending = useMemo(() => {
     void pendingVersion
-    return getPendingTransactionsForIdentity(identity, currentTick)
-  }, [identity, currentTick, pendingVersion])
-  const sorted = useMemo(() => {
-    const pendingHashes = new Set(pending.map((tx) => tx.hash.toLowerCase()))
-    const pendingItems = pending.map((tx) => ({
-      hash: tx.hash,
-      source: tx.sourceIdentity,
-      destination: tx.destinationIdentity ?? '',
-      amount: tx.amount ?? 0n,
-      tickNumber: tx.targetTick,
-      inputType: tx.inputType ?? 0,
-      timestamp: BigInt(tx.createdAt),
-    }))
-
-    return [
-      ...pendingItems,
-      ...items.filter((tx) => !pendingHashes.has(tx.hash.toLowerCase())),
-    ].sort((a, b) => Number(b.tickNumber) - Number(a.tickNumber))
-  }, [items, pending])
+    return getPendingTransactionsForIdentity(identity)
+  }, [identity, pendingVersion])
+  const archiverProcessedTick = useMemo(() => {
+    return getArchiverProcessedTick(transactions.data?.pages)
+  }, [transactions.data])
+  const pendingHashes = useMemo(
+    () => new Set(pending.map((tx) => tx.hash.toLowerCase())),
+    [pending],
+  )
+  const pendingItems = useMemo(
+    () =>
+      pending.map((tx) => ({
+        hash: tx.hash,
+        source: tx.sourceIdentity,
+        destination: tx.destinationIdentity ?? '',
+        amount: tx.amount ?? 0n,
+        tickNumber: tx.targetTick,
+        inputType: tx.inputType ?? 0,
+        tokenKey: tx.tokenKey,
+        timestamp: BigInt(tx.createdAt),
+        status: tx.status,
+      })),
+    [pending],
+  )
+  const apiItems = useMemo(
+    () =>
+      items
+        .filter((tx) => !pendingHashes.has(tx.hash.toLowerCase()))
+        .sort((a, b) => Number(b.tickNumber) - Number(a.tickNumber)),
+    [items, pendingHashes],
+  )
+  const pendingTopItems = useMemo(
+    () => pendingItems.filter((tx) => tx.status === 'pending'),
+    [pendingItems],
+  )
+  const failedTopItems = useMemo(
+    () => pendingItems.filter((tx) => tx.status === 'failed'),
+    [pendingItems],
+  )
 
   const grouped = useMemo(() => {
     const now = new Date()
@@ -106,20 +137,14 @@ const History = () => {
     const groups: Array<{
       key: string
       label: string
-      items: typeof sorted
+      items: typeof apiItems
     }> = []
-    const groupMap = new Map<string, typeof sorted>()
+    const groupMap = new Map<string, typeof apiItems>()
 
-    for (const tx of sorted) {
-      const isPending = isTransactionPending(tx.hash, currentTick)
-      let key: string
-      if (isPending) {
-        key = '__pending__'
-      } else {
-        const ts = Number(tx.timestamp)
-        const date = new Date(ts > 1e12 ? ts : ts * 1000)
-        key = date.toDateString()
-      }
+    for (const tx of apiItems) {
+      const ts = Number(tx.timestamp)
+      const date = new Date(ts > 1e12 ? ts : ts * 1000)
+      const key = date.toDateString()
       const group = groupMap.get(key)
       if (group) {
         group.push(tx)
@@ -130,9 +155,7 @@ const History = () => {
 
     for (const [key, groupItems] of groupMap) {
       let label: string
-      if (key === '__pending__') {
-        label = t('history.pending')
-      } else if (key === todayKey) {
+      if (key === todayKey) {
         label = t('history.today')
       } else if (key === yesterdayKey) {
         label = t('history.yesterday')
@@ -148,7 +171,7 @@ const History = () => {
     }
 
     return groups
-  }, [sorted, currentTick, t])
+  }, [apiItems, t])
   const listMotion = {
     hidden: { opacity: 0, y: 10 },
     show: {
@@ -161,10 +184,121 @@ const History = () => {
     hidden: { opacity: 0, y: 8 },
     show: { opacity: 1, y: 0, transition: { duration: 0.2 } },
   }
+  const getRowPresentation = (tx: HistoryRowTransaction) => {
+    const isIncoming = tx.destination === identity
+    const isSimpleTransfer = Number(tx.inputType) === 0
+    const label = isSimpleTransfer
+      ? isIncoming
+        ? t('history.received')
+        : t('history.sent')
+      : isIncoming
+        ? t('history.incoming')
+        : t('history.outgoing')
+    const counterparty = isIncoming ? tx.source : tx.destination
+    const counterpartyLabel = isSimpleTransfer
+      ? isIncoming
+        ? t('history.from', { address: truncateString(counterparty) })
+        : t('history.to', { address: truncateString(counterparty) })
+      : truncateString(counterparty)
+    const Icon = isIncoming ? ReceiveIcon : SendIcon
+
+    return { isIncoming, label, counterpartyLabel, Icon }
+  }
+
+  const renderHistoryRow = (tx: HistoryRowTransaction, state: HistoryRowState) => {
+    const { isIncoming, label, counterpartyLabel, Icon } = getRowPresentation(tx)
+    const isPending = state === 'pending'
+    const isDefault = state === 'default'
+
+    return (
+      <motion.button
+        type="button"
+        key={tx.hash}
+        className={`w-full cursor-pointer space-y-3 rounded-xl border px-3 py-3 text-left transition-colors ${
+          isPending
+            ? 'border-amber-500/50 bg-amber-500/10'
+            : 'border-border/40 bg-background/40 hover:border-primary/30 hover:bg-background/60'
+        }`}
+        onClick={() => navigate(`/tx/${tx.hash}`)}
+        variants={itemMotion}
+      >
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div
+              className={`flex h-9 w-9 items-center justify-center rounded-full border ${
+                isPending
+                  ? 'border-amber-500/40 bg-amber-500/15 text-amber-700 dark:text-amber-300'
+                  : isIncoming
+                    ? 'border-primary/40 bg-primary/10 text-primary'
+                    : 'border-[var(--destructive)]/40 bg-[var(--destructive)]/10 text-[var(--destructive)]'
+              }`}
+            >
+              <Icon className="h-4 w-4" />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-xs font-semibold text-foreground">{label}</span>
+              <span className="text-xs text-muted-foreground">{counterpartyLabel}</span>
+            </div>
+          </div>
+          <span
+            className={`text-sm font-semibold ${
+              isPending
+                ? 'text-amber-700 dark:text-amber-300'
+                : isIncoming
+                  ? 'text-primary'
+                  : 'text-[var(--destructive)]'
+            }`}
+          >
+            {isIncoming ? '+' : '-'}
+            {formatBalanceCompact(tx.amount)}
+          </span>
+        </div>
+
+        <div className="grid grid-cols-[1fr_auto_auto] items-center gap-2 text-[11px] text-muted-foreground">
+          <div className="flex min-w-0 items-center gap-2">
+            <HashIcon className="h-3.5 w-3.5" />
+            {isDefault ? (
+              <a
+                href={buildExplorerObjectUrl('tx', tx.hash)}
+                className="truncate font-mono text-primary hover:underline"
+                target="_blank"
+                rel="noreferrer"
+                onClick={(event) => event.stopPropagation()}
+              >
+                {truncateString(tx.hash, {
+                  leading: 6,
+                  trailing: 6,
+                  minLength: 12,
+                  emptyLabel: '',
+                })}
+              </a>
+            ) : (
+              <span className="truncate font-mono">
+                {truncateString(tx.hash, {
+                  leading: 6,
+                  trailing: 6,
+                  minLength: 12,
+                  emptyLabel: '',
+                })}
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-1 font-mono">
+            <span className="text-muted-foreground/70">{t('history.tick')}</span>
+            <span>{Number(tx.tickNumber).toLocaleString()}</span>
+          </div>
+          <div className="flex items-center gap-1 font-mono">
+            <span className="text-muted-foreground/70">{t('history.type')}</span>
+            <span>{tx.inputType.toString()}</span>
+          </div>
+        </div>
+      </motion.button>
+    )
+  }
 
   useEffect(() => {
-    resolvePendingTransactions(items, currentTick)
-  }, [items, currentTick])
+    resolvePendingTransactions(items, archiverProcessedTick)
+  }, [items, archiverProcessedTick])
 
   useEffect(() => {
     const target = loadMoreRef.current
@@ -247,9 +381,116 @@ const History = () => {
             </motion.div>
           )}
 
-          {!transactions.isLoading && sorted.length === 0 && (
-            <motion.div variants={itemMotion}>
-              <HistoryEmptyState />
+          {!transactions.isLoading &&
+            pendingTopItems.length === 0 &&
+            failedTopItems.length === 0 &&
+            apiItems.length === 0 && (
+              <motion.div variants={itemMotion}>
+                <HistoryEmptyState />
+              </motion.div>
+            )}
+
+          {(pendingTopItems.length > 0 || failedTopItems.length > 0) && (
+            <motion.div className="space-y-2" variants={itemMotion}>
+              {pendingTopItems.length > 0 && (
+                <div className="space-y-2">
+                  <span className="text-[11px] font-semibold uppercase text-muted-foreground/70">
+                    {t('history.pending')}
+                  </span>
+                  {pendingTopItems.map((tx) => renderHistoryRow(tx, 'pending'))}
+                </div>
+              )}
+
+              {failedTopItems.length > 0 && (
+                <div className="space-y-2">
+                  <span className="text-[11px] font-semibold uppercase text-muted-foreground/70">
+                    {t('history.failed')}
+                  </span>
+                  {failedTopItems.map((tx) => {
+                    const { isIncoming, label, counterpartyLabel, Icon } = getRowPresentation(tx)
+                    const canResend = canResendPendingTransaction({
+                      status: tx.status,
+                      destinationIdentity: tx.destination,
+                      inputType: Number(tx.inputType),
+                      tokenKey: tx.tokenKey,
+                    })
+
+                    return (
+                      <motion.div
+                        key={tx.hash}
+                        className="w-full space-y-3 rounded-xl border border-red-500/50 bg-red-500/10 px-3 py-3 text-left transition-colors"
+                        variants={itemMotion}
+                      >
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="flex items-center gap-3">
+                            <div className="flex h-9 w-9 items-center justify-center rounded-full border border-red-500/40 bg-red-500/15 text-red-700 dark:text-red-300">
+                              <Icon className="h-4 w-4" />
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="text-xs font-semibold text-foreground">{label}</span>
+                              <span className="text-xs text-muted-foreground">
+                                {counterpartyLabel}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-semibold text-red-700 dark:text-red-300">
+                              {isIncoming ? '+' : '-'}
+                              {formatBalanceCompact(tx.amount)}
+                            </span>
+                            <div className="flex items-center gap-1">
+                              {canResend && (
+                                <button
+                                  type="button"
+                                  className="cursor-pointer text-[11px] font-semibold uppercase tracking-wide text-primary hover:underline"
+                                  onClick={() =>
+                                    navigate(
+                                      `/transfer?failedHash=${encodeURIComponent(tx.hash)}&recipient=${encodeURIComponent(tx.destination)}&amount=${encodeURIComponent(tx.amount.toString())}&token=${encodeURIComponent(tx.tokenKey ?? 'qu')}`,
+                                    )
+                                  }
+                                >
+                                  {t('history.resend')}
+                                </button>
+                              )}
+                              <button
+                                type="button"
+                                className="cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
+                                onClick={() => removePendingTransaction(tx.hash)}
+                                aria-label={t('history.deleteFailed')}
+                                title={t('history.deleteFailed')}
+                              >
+                                <XIcon className="h-3.5 w-3.5" />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-[1fr_auto_auto] items-center gap-2 text-[11px] text-muted-foreground">
+                          <div className="flex min-w-0 items-center gap-2">
+                            <HashIcon className="h-3.5 w-3.5" />
+                            <span className="truncate font-mono">
+                              {truncateString(tx.hash, {
+                                leading: 6,
+                                trailing: 6,
+                                minLength: 12,
+                                emptyLabel: '',
+                              })}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1 font-mono">
+                            <span className="text-muted-foreground/70">{t('history.tick')}</span>
+                            <span>{Number(tx.tickNumber).toLocaleString()}</span>
+                          </div>
+                          <div className="flex items-center gap-1 font-mono">
+                            <span className="text-muted-foreground/70">{t('history.type')}</span>
+                            <span>{tx.inputType.toString()}</span>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )
+                  })}
+                </div>
+              )}
             </motion.div>
           )}
 
@@ -258,99 +499,7 @@ const History = () => {
               <span className="text-[11px] font-semibold uppercase text-muted-foreground/70">
                 {group.label}
               </span>
-              {group.items.map((tx) => {
-                const isIncoming = tx.destination === identity
-                const isSimpleTransfer = Number(tx.inputType) === 0
-                const label = isSimpleTransfer
-                  ? isIncoming
-                    ? t('history.received')
-                    : t('history.sent')
-                  : isIncoming
-                    ? t('history.incoming')
-                    : t('history.outgoing')
-                const counterparty = isIncoming ? tx.source : tx.destination
-                const counterpartyLabel = isSimpleTransfer
-                  ? isIncoming
-                    ? t('history.from', { address: truncateString(counterparty) })
-                    : t('history.to', { address: truncateString(counterparty) })
-                  : truncateString(counterparty)
-                const Icon = isIncoming ? ReceiveIcon : SendIcon
-                const isPending = isTransactionPending(tx.hash, currentTick)
-
-                return (
-                  <motion.button
-                    type="button"
-                    key={tx.hash}
-                    className={`w-full cursor-pointer space-y-3 rounded-xl border px-3 py-3 text-left transition-colors ${
-                      isPending
-                        ? 'animate-pulse border-amber-500/50 bg-amber-500/10'
-                        : 'border-border/40 bg-background/40 hover:border-primary/30 hover:bg-background/60'
-                    }`}
-                    onClick={() => navigate(`/tx/${tx.hash}`)}
-                    variants={itemMotion}
-                  >
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={`flex h-9 w-9 items-center justify-center rounded-full border ${
-                            isPending
-                              ? 'border-amber-500/40 bg-amber-500/15 text-amber-700 dark:text-amber-300'
-                              : isIncoming
-                                ? 'border-primary/40 bg-primary/10 text-primary'
-                                : 'border-[var(--destructive)]/40 bg-[var(--destructive)]/10 text-[var(--destructive)]'
-                          }`}
-                        >
-                          <Icon className="h-4 w-4" />
-                        </div>
-                        <div className="flex flex-col">
-                          <span className="text-xs font-semibold text-foreground">{label}</span>
-                          <span className="text-xs text-muted-foreground">{counterpartyLabel}</span>
-                        </div>
-                      </div>
-                      <span
-                        className={`text-sm font-semibold ${
-                          isPending
-                            ? 'text-amber-700 dark:text-amber-300'
-                            : isIncoming
-                              ? 'text-primary'
-                              : 'text-[var(--destructive)]'
-                        }`}
-                      >
-                        {isIncoming ? '+' : '-'}
-                        {formatBalanceCompact(tx.amount)}
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-[1fr_auto_auto] items-center gap-2 text-[11px] text-muted-foreground">
-                      <div className="flex min-w-0 items-center gap-2">
-                        <HashIcon className="h-3.5 w-3.5" />
-                        <a
-                          href={buildExplorerObjectUrl('tx', tx.hash)}
-                          className="truncate font-mono text-primary hover:underline"
-                          target="_blank"
-                          rel="noreferrer"
-                          onClick={(event) => event.stopPropagation()}
-                        >
-                          {truncateString(tx.hash, {
-                            leading: 6,
-                            trailing: 6,
-                            minLength: 12,
-                            emptyLabel: '',
-                          })}
-                        </a>
-                      </div>
-                      <div className="flex items-center gap-1 font-mono">
-                        <span className="text-muted-foreground/70">{t('history.tick')}</span>
-                        <span>{Number(tx.tickNumber).toLocaleString()}</span>
-                      </div>
-                      <div className="flex items-center gap-1 font-mono">
-                        <span className="text-muted-foreground/70">{t('history.type')}</span>
-                        <span>{tx.inputType.toString()}</span>
-                      </div>
-                    </div>
-                  </motion.button>
-                )
-              })}
+              {group.items.map((tx) => renderHistoryRow(tx, 'default'))}
             </motion.div>
           ))}
 

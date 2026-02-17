@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { useBalance, useSdk, useSend } from '@qubic-labs/react'
@@ -42,6 +42,13 @@ const formatUsd = (value: number) =>
 const Transfer = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const initialPrefillRecipient = (searchParams.get('recipient') ?? '').trim().toUpperCase()
+  const initialPrefillAmount = (() => {
+    const value = (searchParams.get('amount') ?? '').trim()
+    return /^\d+$/.test(value) ? value : ''
+  })()
+  const initialPrefillToken = (searchParams.get('token') ?? 'qu').trim()
   usePendingTransactionsVersion()
   const [currentIdentity, setCurrentIdentity] = useState(getCurrentIdentity())
   const [isWatchOnly, setIsWatchOnly] = useState(() => isWatchOnlyIdentity(getCurrentIdentity()))
@@ -54,9 +61,9 @@ const Transfer = () => {
   const latestStats = useLatestStats('transfer', { staleTime: 5_000 })
 
   const [step, setStep] = useState<Step>('form')
-  const [selectedToken, setSelectedToken] = useState('qu')
-  const [recipient, setRecipient] = useState('')
-  const [amount, setAmount] = useState('')
+  const [selectedToken, setSelectedToken] = useState(initialPrefillToken || 'qu')
+  const [recipient, setRecipient] = useState(initialPrefillRecipient)
+  const [amount, setAmount] = useState(initialPrefillAmount)
   const [errors, setErrors] = useState<FormErrors>({})
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [sending, setSending] = useState(false)
@@ -83,9 +90,9 @@ const Transfer = () => {
       : (parsedAssets.find((a) => `${a.issuerIdentity}-${a.name}` === selectedToken) ?? null)
   const parsedAmount = parseAmount(amount)
   const currentTick = latestStats.data?.data?.currentTick
-  const pendingOutgoingDebit = getPendingOutgoingDebit(currentIdentity, currentTick)
-  const hasPendingOutgoing =
-    getPendingTransactionsForIdentity(currentIdentity, currentTick).length > 0
+  const pendingForIdentity = getPendingTransactionsForIdentity(currentIdentity)
+  const pendingOutgoingDebit = getPendingOutgoingDebit(currentIdentity)
+  const hasPendingOutgoing = pendingForIdentity.some((tx) => tx.status === 'pending')
   const onChainQuBalance = normalizeBalance(balance.data?.balance)
   const effectiveQuBalance =
     onChainQuBalance > pendingOutgoingDebit ? onChainQuBalance - pendingOutgoingDebit : 0n
@@ -302,9 +309,10 @@ const Transfer = () => {
         hash: result.txId,
         sourceIdentity: currentIdentity,
         destinationIdentity: recipient.trim(),
-        amount: selectedAsset ? QX_TRANSFER_ASSET_FEE : parsedAmount,
+        amount: parsedAmount,
         quImpact: selectedAsset ? QX_TRANSFER_ASSET_FEE : parsedAmount,
         inputType: selectedAsset ? QX_TRANSFER_ASSET_INPUT_TYPE : 0,
+        tokenKey: selectedAsset ? `${selectedAsset.issuerIdentity}-${selectedAsset.name}` : 'qu',
         targetTick: Number(result.targetTick),
       })
 
