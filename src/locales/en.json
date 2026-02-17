@@ -92,7 +92,9 @@
     "lockNow": "Lock wallet",
     "lockTimeout": {
       "label": "Auto-lock timeout (minutes)",
-      "helper": "Locks the wallet after the selected duration."
+      "helper": "Locks the wallet after the selected duration.",
+      "option": "{{minutes}} min",
+      "immediately": "Immediately"
     },
     "exportVault": {
       "button": "Export vault",

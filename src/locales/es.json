@@ -92,7 +92,9 @@
     "lockNow": "Bloquear billetera",
     "lockTimeout": {
       "label": "Tiempo de bloqueo (minutos)",
-      "helper": "Bloquea la billetera después del tiempo seleccionado."
+      "helper": "Bloquea la billetera después del tiempo seleccionado.",
+      "option": "{{minutes}} min",
+      "immediately": "Inmediatamente"
     },
     "exportVault": {
       "button": "Exportar vault",
