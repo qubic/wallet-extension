@@ -6,8 +6,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { isValidIdentity } from '@/lib/utils'
 import {
-  getCachedAccounts,
   getWatchOnlyAccounts,
+  isAccountNameTaken,
   saveWatchOnlyAccounts,
   type WatchOnlyAccount,
 } from '@/lib/accounts'
@@ -27,10 +27,7 @@ const ImportWatchOnly = () => {
       setStatus(t('accounts.manage.errors.watchOnlyRequired'))
       return
     }
-    const nameExists = [...getCachedAccounts(), ...getWatchOnlyAccounts()].some(
-      (entry) => entry.name.toLowerCase() === trimmedName.toLowerCase(),
-    )
-    if (nameExists) {
+    if (isAccountNameTaken(trimmedName)) {
       setStatus(t('accounts.manage.errors.nameDuplicate'))
       return
     }

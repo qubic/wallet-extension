@@ -15,7 +15,7 @@ import {
 import {
   getCachedAccounts,
   getSuggestedNextAccountName,
-  getWatchOnlyAccounts,
+  isAccountNameTaken,
   saveCachedAccounts,
 } from '@/lib/accounts'
 import SeedSecurityStep from '@/components/onboarding/seed-security-step'
@@ -144,12 +144,8 @@ const CreateWallet = ({
       }
     }
     if (step === 2 && variant === 'add-address') {
-      const existingNames = [
-        ...getCachedAccounts().map((entry) => entry.name.toLowerCase()),
-        ...getWatchOnlyAccounts().map((entry) => entry.name.toLowerCase()),
-      ]
-      if (existingNames.includes(name.trim().toLowerCase())) {
-        setStatus('Wallet name already exists.')
+      if (isAccountNameTaken(name)) {
+        setStatus(t('accounts.manage.errors.nameDuplicate'))
         return
       }
       const result = await validateVaultPassphrase(passphrase.trim())
@@ -209,12 +205,8 @@ const CreateWallet = ({
     }
 
     const cachedAccounts = getCachedAccounts()
-    const existingNames = [
-      ...cachedAccounts.map((entry) => entry.name.toLowerCase()),
-      ...getWatchOnlyAccounts().map((entry) => entry.name.toLowerCase()),
-    ]
-    if (existingNames.includes(name.trim().toLowerCase())) {
-      setStatus('Wallet name already exists.')
+    if (isAccountNameTaken(name)) {
+      setStatus(t('accounts.manage.errors.nameDuplicate'))
       setStep(2)
       return
     }

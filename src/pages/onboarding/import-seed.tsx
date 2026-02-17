@@ -12,7 +12,7 @@ import { isSeedLike } from '@/lib/seed'
 import {
   getCachedAccounts,
   getSuggestedNextAccountName,
-  getWatchOnlyAccounts,
+  isAccountNameTaken,
   saveCachedAccounts,
 } from '@/lib/accounts'
 import { setUnlocked } from '@/lib/lock'
@@ -107,12 +107,8 @@ const ImportSeed = ({
       return
     }
     if (step === 2 && variant === 'add-address') {
-      const existingNames = [
-        ...getCachedAccounts().map((entry) => entry.name.toLowerCase()),
-        ...getWatchOnlyAccounts().map((entry) => entry.name.toLowerCase()),
-      ]
-      if (existingNames.includes(name.trim().toLowerCase())) {
-        setStatus('Wallet name already exists.')
+      if (isAccountNameTaken(name)) {
+        setStatus(t('accounts.manage.errors.nameDuplicate'))
         return
       }
       const result = await validateVaultPassphrase(passphrase.trim())
@@ -155,12 +151,8 @@ const ImportSeed = ({
     }
 
     const cachedAccounts = getCachedAccounts()
-    const existingNames = [
-      ...cachedAccounts.map((entry) => entry.name.toLowerCase()),
-      ...getWatchOnlyAccounts().map((entry) => entry.name.toLowerCase()),
-    ]
-    if (existingNames.includes(name.trim().toLowerCase())) {
-      setStatus('Wallet name already exists.')
+    if (isAccountNameTaken(name)) {
+      setStatus(t('accounts.manage.errors.nameDuplicate'))
       setStep(2)
       return
     }
