@@ -3,7 +3,6 @@ import {
   EyeIcon,
   PanelRightOpenIcon,
   PlusIcon,
-  SquareArrowOutUpRightIcon,
   UsersIcon,
   WalletIcon,
 } from 'lucide-react'
@@ -28,17 +27,10 @@ import { useCallback } from 'react'
 
 type AppHeaderProps = {
   onOpenSidePanel: () => void
-  onOpenTab: () => void
   openSidePanelLabel: string
-  openTabLabel: string
 }
 
-const AppHeader = ({
-  onOpenSidePanel,
-  onOpenTab,
-  openSidePanelLabel,
-  openTabLabel,
-}: AppHeaderProps) => {
+const AppHeader = ({ onOpenSidePanel, openSidePanelLabel }: AppHeaderProps) => {
   const { t } = useTranslation()
   const sdk = useSdk()
   const navigate = useNavigate()
@@ -254,15 +246,6 @@ const AppHeader = ({
           className="h-9 w-9"
         >
           <PanelRightOpenIcon className="size-4" />
-        </Button>
-        <Button
-          size="icon"
-          variant="ghost"
-          onClick={onOpenTab}
-          aria-label={openTabLabel}
-          className="h-9 w-9"
-        >
-          <SquareArrowOutUpRightIcon className="size-4" />
         </Button>
       </div>
     </header>

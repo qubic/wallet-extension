@@ -156,144 +156,127 @@ const AppShell = ({
     return () => window.removeEventListener('resize', handleResize)
   }, [updateActiveIndicator])
 
-  const openTab = async () => {
-    const chromeApi = (
-      globalThis as typeof globalThis & {
-        chrome?: { tabs?: { create?: (options: { url: string }) => Promise<void> } }
-      }
-    ).chrome
-
-    if (!chromeApi?.tabs?.create) {
-      return
-    }
-
-    await chromeApi.tabs.create({ url: 'tab.html' })
-  }
-
   return (
     <div className="relative flex h-full max-h-full w-full flex-col overflow-hidden bg-background">
-      {showHeader && (
-        <motion.div
-          initial={{ opacity: 0, y: -12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <AppHeader
-            onOpenSidePanel={openSidePanel}
-            onOpenTab={openTab}
-            openSidePanelLabel={t('app.sidepanel')}
-            openTabLabel={t('app.opentab')}
-          />
-        </motion.div>
-      )}
+      <div className="flex h-full w-full flex-col">
+        {showHeader && (
+          <motion.div
+            initial={{ opacity: 0, y: -12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <AppHeader onOpenSidePanel={openSidePanel} openSidePanelLabel={t('app.sidepanel')} />
+          </motion.div>
+        )}
 
-      <motion.div
-        ref={scrollContainerRef}
-        className="app-scrollbar min-h-0 flex-1 overflow-y-auto overscroll-contain"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.22, ease: 'easeOut' }}
-        style={{
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none',
-          paddingRight: '12px',
-          marginRight: '-12px',
-        }}
-      >
-        <div
-          className={showNav ? 'h-full pb-10' : 'h-full'}
+        <motion.div
+          ref={scrollContainerRef}
+          className="app-scrollbar min-h-0 flex-1 overflow-y-auto overscroll-contain"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.22, ease: 'easeOut' }}
           style={{
-            paddingBottom: showNav ? 'calc(24px + env(safe-area-inset-bottom))' : '0',
-            scrollPaddingBottom: showNav ? '96px' : '0',
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+            paddingRight: '12px',
+            marginRight: '-12px',
           }}
         >
-          {children}
-        </div>
-      </motion.div>
+          <div
+            className={showNav ? 'h-full pb-10' : 'h-full'}
+            style={{
+              paddingBottom: showNav ? 'calc(24px + env(safe-area-inset-bottom))' : '0',
+              scrollPaddingBottom: showNav ? '96px' : '0',
+            }}
+          >
+            {children}
+          </div>
+        </motion.div>
 
-      {showNav && (
-        <motion.nav
-          ref={navRef}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1], delay: 0.03 }}
-          className={`relative z-20 grid h-[56px] shrink-0 items-center gap-0 overflow-visible rounded-t-2xl border-t border-border/60 bg-background/95 px-0 py-0 shadow-[0_-10px_25px_-18px_hsl(var(--primary)/0.45)] backdrop-blur supports-[backdrop-filter]:bg-background/82 ${
-            filteredNavItems.length === 4 ? 'grid-cols-4' : 'grid-cols-5'
-          }`}
-        >
-          <motion.div
-            aria-hidden
-            className="pointer-events-none absolute inset-y-0 z-0"
-            animate={{ x: activeIndicator.x, width: activeIndicator.width }}
-            transition={{ type: 'spring', stiffness: 560, damping: 38, mass: 0.68 }}
+        {showNav && (
+          <motion.nav
+            ref={navRef}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1], delay: 0.03 }}
+            className={`relative z-20 grid h-[56px] shrink-0 items-center gap-0 overflow-visible rounded-t-2xl border-t border-border/60 bg-background/95 px-0 py-0 shadow-[0_-10px_25px_-18px_hsl(var(--primary)/0.45)] backdrop-blur supports-[backdrop-filter]:bg-background/82 ${
+              filteredNavItems.length === 4 ? 'grid-cols-4' : 'grid-cols-5'
+            }`}
           >
             <motion.div
-              key={pathname}
-              className="absolute inset-x-[4px] inset-y-[4px] rounded-2xl border border-primary/45 bg-primary/16 shadow-[0_10px_20px_-14px_hsl(var(--primary)/0.9)]"
-              initial={{ scaleY: 0.88, scaleX: 0.94, opacity: 0.72 }}
-              animate={{ scaleY: 1, scaleX: 1, opacity: 1 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 24 }}
-            />
-          </motion.div>
-
-          {filteredNavItems.map((item, index) => (
-            <Button
-              key={item.key}
-              asChild
-              size="icon"
-              variant="ghost"
-              className="relative z-10 h-full w-full rounded-none p-0 shadow-none hover:bg-transparent dark:hover:bg-transparent"
-              aria-label={item.label}
+              aria-hidden
+              className="pointer-events-none absolute inset-y-0 z-0"
+              animate={{ x: activeIndicator.x, width: activeIndicator.width }}
+              transition={{ type: 'spring', stiffness: 560, damping: 38, mass: 0.68 }}
             >
-              <NavLink
-                ref={(element) => {
-                  navItemRefs.current[index] = element
-                }}
-                to={item.to}
-                end={item.to === '/'}
-                className="group relative flex h-full w-full items-center justify-center rounded-none transition-colors"
+              <motion.div
+                key={pathname}
+                className="absolute inset-x-[4px] inset-y-[4px] rounded-2xl border border-primary/45 bg-primary/16 shadow-[0_10px_20px_-14px_hsl(var(--primary)/0.9)]"
+                initial={{ scaleY: 0.88, scaleX: 0.94, opacity: 0.72 }}
+                animate={{ scaleY: 1, scaleX: 1, opacity: 1 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 24 }}
+              />
+            </motion.div>
+
+            {filteredNavItems.map((item, index) => (
+              <Button
+                key={item.key}
+                asChild
+                size="icon"
+                variant="ghost"
+                className="relative z-10 h-full w-full rounded-none p-0 shadow-none hover:bg-transparent dark:hover:bg-transparent"
+                aria-label={item.label}
               >
-                {({ isActive }) => (
-                  <motion.div
-                    className="relative flex h-full w-full items-center justify-center"
-                    initial={false}
-                    animate={{
-                      y: isActive ? -1 : 0,
-                    }}
-                    transition={{ type: 'spring', stiffness: 320, damping: 20 }}
-                  >
-                    {!isActive && (
-                      <span className="pointer-events-none absolute inset-[4px] rounded-2xl border border-primary/25 bg-transparent opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
-                    )}
-                    <motion.span
+                <NavLink
+                  ref={(element) => {
+                    navItemRefs.current[index] = element
+                  }}
+                  to={item.to}
+                  end={item.to === '/'}
+                  className="group relative flex h-full w-full items-center justify-center rounded-none transition-colors"
+                >
+                  {({ isActive }) => (
+                    <motion.div
+                      className="relative flex h-full w-full items-center justify-center"
                       initial={false}
                       animate={{
-                        scale:
-                          index === activeNavIndex
-                            ? 1.12
-                            : Math.abs(index - activeNavIndex) === 1
-                              ? 1.03
-                              : 1,
-                        rotate: isActive ? [0, -6, 0] : 0,
-                        opacity: isActive ? 1 : 0.7,
+                        y: isActive ? -1 : 0,
                       }}
-                      transition={{
-                        type: 'spring',
-                        stiffness: 320,
-                        damping: 18,
-                        duration: isActive ? 0.52 : 0.24,
-                      }}
-                      className={`relative transition-colors ${isActive ? 'text-primary' : 'dark:text-white/80 dark:group-hover:text-white'}`}
+                      transition={{ type: 'spring', stiffness: 320, damping: 20 }}
                     >
-                      {item.icon}
-                    </motion.span>
-                  </motion.div>
-                )}
-              </NavLink>
-            </Button>
-          ))}
-        </motion.nav>
-      )}
+                      {!isActive && (
+                        <span className="pointer-events-none absolute inset-[4px] rounded-2xl border border-primary/25 bg-transparent opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
+                      )}
+                      <motion.span
+                        initial={false}
+                        animate={{
+                          scale:
+                            index === activeNavIndex
+                              ? 1.12
+                              : Math.abs(index - activeNavIndex) === 1
+                                ? 1.03
+                                : 1,
+                          rotate: isActive ? [0, -6, 0] : 0,
+                          opacity: isActive ? 1 : 0.7,
+                        }}
+                        transition={{
+                          type: 'spring',
+                          stiffness: 320,
+                          damping: 18,
+                          duration: isActive ? 0.52 : 0.24,
+                        }}
+                        className={`relative transition-colors ${isActive ? 'text-primary' : 'dark:text-white/80 dark:group-hover:text-white'}`}
+                      >
+                        {item.icon}
+                      </motion.span>
+                    </motion.div>
+                  )}
+                </NavLink>
+              </Button>
+            ))}
+          </motion.nav>
+        )}
+      </div>
     </div>
   )
 }

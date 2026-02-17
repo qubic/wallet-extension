@@ -36,7 +36,6 @@ export default defineConfig(({ mode }) => {
           index: resolve(__dirname, 'index.html'),
           popup: resolve(__dirname, 'popup.html'),
           sidepanel: resolve(__dirname, 'sidepanel.html'),
-          tab: resolve(__dirname, 'tab.html'),
         },
       },
     },
