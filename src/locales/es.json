@@ -1,6 +1,7 @@
 {
   "app": {
-    "sidepanel": "Abrir panel lateral"
+    "sidepanel": "Abrir panel lateral",
+    "closeSidepanel": "Cerrar panel lateral"
   },
   "nav": {
     "home": "Inicio",

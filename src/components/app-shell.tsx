@@ -15,6 +15,8 @@ const AppShell = ({
 }: PropsWithChildren<{ showNav?: boolean; showHeader?: boolean }>) => {
   const { t } = useTranslation()
   const { pathname } = useLocation()
+  const isSidePanelView =
+    typeof window !== 'undefined' && window.location.pathname.endsWith('sidepanel.html')
   const scrollContainerRef = useRef<HTMLDivElement | null>(null)
   const navRef = useRef<HTMLElement | null>(null)
   const navItemRefs = useRef<Array<HTMLAnchorElement | null>>([])
@@ -82,6 +84,14 @@ const AppShell = ({
     }
 
     await chromeApi.sidePanel.open({ windowId })
+  }
+
+  const toggleSidePanel = async () => {
+    if (isSidePanelView) {
+      window.close()
+      return
+    }
+    await openSidePanel()
   }
 
   const navItems = useMemo(
@@ -165,7 +175,12 @@ const AppShell = ({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
           >
-            <AppHeader onOpenSidePanel={openSidePanel} openSidePanelLabel={t('app.sidepanel')} />
+            <AppHeader
+              onToggleSidePanel={toggleSidePanel}
+              isSidePanelView={isSidePanelView}
+              openSidePanelLabel={t('app.sidepanel')}
+              closeSidePanelLabel={t('app.closeSidepanel')}
+            />
           </motion.div>
         )}
 

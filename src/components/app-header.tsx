@@ -1,6 +1,7 @@
 import {
   CopyIcon,
   EyeIcon,
+  XIcon,
   PanelRightOpenIcon,
   PlusIcon,
   UsersIcon,
@@ -26,11 +27,18 @@ import { useNavigate } from 'react-router-dom'
 import { useCallback } from 'react'
 
 type AppHeaderProps = {
-  onOpenSidePanel: () => void
+  onToggleSidePanel: () => void
+  isSidePanelView: boolean
   openSidePanelLabel: string
+  closeSidePanelLabel: string
 }
 
-const AppHeader = ({ onOpenSidePanel, openSidePanelLabel }: AppHeaderProps) => {
+const AppHeader = ({
+  onToggleSidePanel,
+  isSidePanelView,
+  openSidePanelLabel,
+  closeSidePanelLabel,
+}: AppHeaderProps) => {
   const { t } = useTranslation()
   const sdk = useSdk()
   const navigate = useNavigate()
@@ -241,11 +249,15 @@ const AppHeader = ({ onOpenSidePanel, openSidePanelLabel }: AppHeaderProps) => {
         <Button
           size="icon"
           variant="ghost"
-          onClick={onOpenSidePanel}
-          aria-label={openSidePanelLabel}
+          onClick={onToggleSidePanel}
+          aria-label={isSidePanelView ? closeSidePanelLabel : openSidePanelLabel}
           className="h-9 w-9"
         >
-          <PanelRightOpenIcon className="size-4" />
+          {isSidePanelView ? (
+            <XIcon className="size-4" />
+          ) : (
+            <PanelRightOpenIcon className="size-4" />
+          )}
         </Button>
       </div>
     </header>
