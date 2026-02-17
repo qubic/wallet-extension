@@ -13,9 +13,3 @@ export type TxResult = {
   recipient: string
   fee: bigint
 }
-
-export type SourceAccount = {
-  name: string
-  identity: string
-  watchOnly?: boolean
-}

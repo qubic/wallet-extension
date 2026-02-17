@@ -4,24 +4,15 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { type AggregatedAsset, formatAssetUnits } from '@/lib/assets'
 import { formatBalance, truncateString } from '@/lib/utils'
-import type { FormErrors, SourceAccount } from '@/components/pages/transfer/types'
+import type { FormErrors } from '@/components/pages/transfer/types'
 
 type TransferFormProps = {
   recipient: string
   amount: string
   errors: FormErrors
   errorMessage: string
-  currentIdentity: string
-  fromAccounts: SourceAccount[]
   isWatchOnly: boolean
   assets: AggregatedAsset[]
   vaultRecipients: Array<{ name: string; identity: string }>
@@ -33,7 +24,6 @@ type TransferFormProps = {
   currentTick?: number
   hasPendingOutgoing: boolean
   onTokenChange: (value: string) => void
-  onFromAccountChange: (identity: string) => void
   onSelectVaultRecipient: (identity: string) => void
   onRecipientChange: (value: string) => void
   onAmountChange: (value: string) => void
@@ -51,8 +41,6 @@ const TransferForm = ({
   amount,
   errors,
   errorMessage,
-  currentIdentity,
-  fromAccounts,
   isWatchOnly,
   assets,
   vaultRecipients,
@@ -66,7 +54,6 @@ const TransferForm = ({
   currentTick,
   hasPendingOutgoing,
   onTokenChange,
-  onFromAccountChange,
   onSelectVaultRecipient,
   onRecipientChange,
   onAmountChange,
@@ -201,33 +188,6 @@ const TransferForm = ({
           {errors.amount && <p className="text-xs text-destructive">{errors.amount}</p>}
 
           <div className="space-y-2 border-t border-border/40 pt-4">
-            <div className="flex items-center justify-between gap-2">
-              <Label>{t('transfer.form.from')}</Label>
-              {isWatchOnly && (
-                <span className="rounded-full border border-border/60 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-                  {t('transfer.form.watchOnly')}
-                </span>
-              )}
-            </div>
-            <Select value={currentIdentity} onValueChange={onFromAccountChange}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder={t('transfer.form.fromPlaceholder')} />
-              </SelectTrigger>
-              <SelectContent>
-                {fromAccounts.map((account) => (
-                  <SelectItem
-                    key={`${account.identity}-${account.watchOnly ? 'watch' : 'vault'}`}
-                    value={account.identity}
-                  >
-                    {account.name} — {truncateString(account.identity)}{' '}
-                    {account.watchOnly ? `(${t('transfer.form.watchOnly')})` : ''}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2 border-t border-border/40 pt-4">
             <Label htmlFor="recipient">{t('transfer.form.recipient')}</Label>
             <div ref={recipientPickerRef} className="relative">
               <Input
@@ -358,7 +318,7 @@ const TransferForm = ({
                 />
                 <div className="text-[11px] text-muted-foreground">
                   {t('transfer.form.targetTickCurrentHint', {
-                    tick: typeof currentTick === 'number' ? currentTick : '--',
+                    tick: typeof currentTick === 'number' ? currentTick.toLocaleString() : '--',
                   })}
                 </div>
               </div>

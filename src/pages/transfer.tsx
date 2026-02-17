@@ -5,12 +5,7 @@ import { toast } from 'sonner'
 import { useBalance, useSdk, useSend } from '@qubic-labs/react'
 import { isValidIdentity, normalizeBalance, parseAmount } from '@/lib/utils'
 import PassphraseAuth from '@/pages/passphrase-auth'
-import {
-  getCachedAccounts,
-  getCurrentIdentity,
-  getWatchOnlyAccounts,
-  isWatchOnlyIdentity,
-} from '@/lib/accounts'
+import { getCachedAccounts, getCurrentIdentity, isWatchOnlyIdentity } from '@/lib/accounts'
 import { aggregateAssets, useOwnedAssets } from '@/lib/assets'
 import {
   QX_ADDRESS,
@@ -25,12 +20,11 @@ import {
   PENDING_SETTLED_EVENT,
   usePendingTransactionsVersion,
 } from '@/lib/pending-transactions'
-import { setOnboarded } from '@/lib/vault'
 import { useLatestStats } from '@/lib/network-stats'
 import ConfirmationDrawer from '@/components/pages/transfer/confirmation-drawer'
 import TransferForm from '@/components/pages/transfer/transfer-form'
 import TransferSuccess from '@/components/pages/transfer/transfer-success'
-import type { FormErrors, SourceAccount, TxResult } from '@/components/pages/transfer/types'
+import type { FormErrors, TxResult } from '@/components/pages/transfer/types'
 
 type Step = 'form' | 'auth' | 'success'
 
@@ -45,30 +39,12 @@ const formatUsd = (value: number) =>
     maximumFractionDigits: 2,
   }).format(value)
 
-const getSourceAccounts = (): SourceAccount[] => {
-  const cached = getCachedAccounts().map((entry) => ({
-    name: entry.name,
-    identity: entry.identity,
-    watchOnly: false,
-  }))
-  const watchOnly = getWatchOnlyAccounts().map((entry) => ({
-    name: entry.name,
-    identity: entry.identity,
-    watchOnly: true,
-  }))
-  return [...cached, ...watchOnly].filter(
-    (entry, index, list) =>
-      list.findIndex((candidate) => candidate.identity === entry.identity) === index,
-  )
-}
-
 const Transfer = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
   usePendingTransactionsVersion()
   const [currentIdentity, setCurrentIdentity] = useState(getCurrentIdentity())
   const [isWatchOnly, setIsWatchOnly] = useState(() => isWatchOnlyIdentity(getCurrentIdentity()))
-  const [fromAccounts, setFromAccounts] = useState<SourceAccount[]>(() => getSourceAccounts())
   const [vaultRecipients, setVaultRecipients] = useState(() => getCachedAccounts())
 
   const sdk = useSdk()
@@ -127,28 +103,10 @@ const Transfer = () => {
     setErrors({})
   }
 
-  const handleFromAccountChange = (identity: string) => {
-    const selectedFrom = fromAccounts.find((entry) => entry.identity === identity)
-    if (!selectedFrom) return
-
-    setCurrentIdentity(identity)
-    setIsWatchOnly(Boolean(selectedFrom.watchOnly))
-    setErrorMessage('')
-    setErrors({})
-    if (recipient.trim() === identity) {
-      setRecipient('')
-    }
-    setAmount('')
-    setSelectedToken('qu')
-    setOnboarded(identity, selectedFrom.name)
-  }
-
   useEffect(() => {
     const refreshAccount = () => {
       const nextIdentity = getCurrentIdentity()
-      const nextAccounts = getSourceAccounts()
       setCurrentIdentity(nextIdentity)
-      setFromAccounts(nextAccounts)
       setIsWatchOnly(isWatchOnlyIdentity(nextIdentity))
       setVaultRecipients(getCachedAccounts())
     }
@@ -365,7 +323,7 @@ const Transfer = () => {
 
       toast.success(t('transfer.success.title'), {
         description: t('transfer.success.description', {
-          targetTick: result.targetTick.toString(),
+          targetTick: Number(result.targetTick).toLocaleString(),
         }),
       })
 
@@ -487,8 +445,6 @@ const Transfer = () => {
         amount={amount}
         errors={errors}
         errorMessage={errorMessage}
-        currentIdentity={currentIdentity}
-        fromAccounts={fromAccounts}
         isWatchOnly={isWatchOnly}
         assets={parsedAssets}
         vaultRecipients={filteredVaultRecipients}
@@ -501,7 +457,6 @@ const Transfer = () => {
         hasPendingOutgoing={hasPendingOutgoing}
         usdEstimate={usdEstimate}
         onTokenChange={handleTokenChange}
-        onFromAccountChange={handleFromAccountChange}
         onSelectVaultRecipient={handleSelectVaultRecipient}
         onRecipientChange={handleRecipientChange}
         onAmountChange={handleAmountChange}

@@ -12,10 +12,9 @@ import {
   DrawerTitle,
 } from '@/components/ui/drawer'
 import { PasswordInput } from '@/components/ui/password-input'
-import { getCurrentVaultIdentity } from '@/lib/accounts'
+
 import { setUnlocked } from '@/lib/lock'
 import { openBrowserVault, verifyVaultAccess } from '@/lib/vault'
-import { truncateString } from '@/lib/utils'
 
 type PassphraseAuthProps = {
   open?: boolean
@@ -35,8 +34,6 @@ const PassphraseAuth = ({
   onCancel,
 }: PassphraseAuthProps) => {
   const { t } = useTranslation()
-  const currentIdentity = identity ?? getCurrentVaultIdentity()
-
   const [passphrase, setPassphrase] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -119,11 +116,6 @@ const PassphraseAuth = ({
           </div>
           <DrawerTitle>{title ?? t('passphraseAuth.title')}</DrawerTitle>
           <DrawerDescription>{subtitle ?? t('passphraseAuth.subtitle')}</DrawerDescription>
-          {currentIdentity && (
-            <div className="font-mono text-[11px] text-muted-foreground">
-              {truncateString(currentIdentity)}
-            </div>
-          )}
         </DrawerHeader>
 
         <div className="space-y-3 px-4 pb-2">

@@ -44,6 +44,10 @@ const ConfirmationDrawer = ({
         <DrawerHeader>
           <DrawerTitle>{t('transfer.confirm.title')}</DrawerTitle>
           <DrawerDescription>{t('transfer.confirm.description')}</DrawerDescription>
+          <div className="mt-2 flex items-start gap-2 text-xs text-amber-700 dark:text-amber-300">
+            <AlertTriangleIcon className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+            <span>{t('transfer.confirm.warning')}</span>
+          </div>
         </DrawerHeader>
 
         <div className="flex-1 space-y-4 overflow-y-auto px-4 pb-2">
@@ -58,11 +62,6 @@ const ConfirmationDrawer = ({
             {tokenName !== 'QU' && (
               <SummaryRow label={t('transfer.confirm.feeLabel')} value="100 QU" />
             )}
-          </div>
-
-          <div className="flex items-start gap-2 border-t border-border/40 pt-3 text-xs text-amber-700 dark:text-amber-300">
-            <AlertTriangleIcon className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-            <span>{t('transfer.confirm.warning')}</span>
           </div>
         </div>
 
