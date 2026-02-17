@@ -18,7 +18,6 @@ import {
   getPendingOutgoingDebit,
   getPendingTransactionsForIdentity,
   PENDING_SETTLED_EVENT,
-  removePendingTransaction,
   usePendingTransactionsVersion,
 } from '@/lib/pending-transactions'
 import { useLatestStats } from '@/lib/network-stats'
@@ -50,7 +49,6 @@ const Transfer = () => {
     return /^\d+$/.test(value) ? value : ''
   })()
   const initialPrefillToken = (searchParams.get('token') ?? 'qu').trim()
-  const resendFromFailedHash = (searchParams.get('failedHash') ?? '').trim()
   usePendingTransactionsVersion()
   const [currentIdentity, setCurrentIdentity] = useState(getCurrentIdentity())
   const [isWatchOnly, setIsWatchOnly] = useState(() => isWatchOnlyIdentity(getCurrentIdentity()))
@@ -317,9 +315,6 @@ const Transfer = () => {
         tokenKey: selectedAsset ? `${selectedAsset.issuerIdentity}-${selectedAsset.name}` : 'qu',
         targetTick: Number(result.targetTick),
       })
-      if (resendFromFailedHash) {
-        removePendingTransaction(resendFromFailedHash)
-      }
 
       setTxResult({
         txId: result.txId,
