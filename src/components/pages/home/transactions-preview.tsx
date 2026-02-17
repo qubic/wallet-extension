@@ -45,7 +45,7 @@ const TransactionsPreview = ({
 }: TransactionsPreviewProps) => {
   const { t } = useTranslation()
 
-  const { pendingTop, failedTop, recentChain } = useMemo(() => {
+  const { unconfirmedTop, unconfirmedOverflow, recentChain } = useMemo(() => {
     const items = transactions.data?.pages.flatMap((page) => page.transactions) ?? []
     const pendingItems: PreviewTransaction[] = pendingTransactions.map((tx) => ({
       hash: tx.hash,
@@ -59,13 +59,16 @@ const TransactionsPreview = ({
       status: tx.status,
     }))
     const pendingHashes = new Set(pendingItems.map((tx) => tx.hash.toLowerCase()))
-    const pendingTop = pendingItems.filter((tx) => tx.status === 'pending')
-    const failedTop = pendingItems.filter((tx) => tx.status === 'failed')
+    const allUnconfirmed = pendingItems.filter(
+      (tx) => tx.status === 'pending' || tx.status === 'failed',
+    )
+    const unconfirmedTop = allUnconfirmed.slice(0, 3)
+    const unconfirmedOverflow = allUnconfirmed.length - unconfirmedTop.length
     const recentChain: PreviewTransaction[] = items
       .filter((tx) => !pendingHashes.has(tx.hash.toLowerCase()))
       .slice(0, 3)
 
-    return { pendingTop, failedTop, recentChain }
+    return { unconfirmedTop, unconfirmedOverflow, recentChain }
   }, [transactions.data, pendingTransactions])
 
   const renderRow = (tx: PreviewTransaction) => {
@@ -204,7 +207,7 @@ const TransactionsPreview = ({
     return <div className="text-xs text-destructive">{transactions.error.message}</div>
   }
 
-  if (pendingTop.length === 0 && failedTop.length === 0 && recentChain.length === 0) {
+  if (unconfirmedTop.length === 0 && recentChain.length === 0) {
     return (
       <div className="flex items-center gap-3 rounded-lg border border-dashed border-border/60 bg-muted/20 px-3 py-3 text-xs text-muted-foreground">
         <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted/40 text-muted-foreground">
@@ -220,25 +223,29 @@ const TransactionsPreview = ({
 
   return (
     <div className="w-full space-y-2 text-left">
-      {pendingTop.length > 0 && (
+      {unconfirmedTop.length > 0 && (
         <div className="space-y-2">
           <div className="text-[11px] font-semibold uppercase text-muted-foreground/70">
-            {t('history.pending')}
+            {t('history.unconfirmed')}
           </div>
-          {pendingTop.map((tx) => renderRow(tx))}
+          {unconfirmedTop.map((tx) => renderRow(tx))}
+          {unconfirmedOverflow > 0 && (
+            <button
+              type="button"
+              className="w-full cursor-pointer text-center text-[11px] text-muted-foreground transition-colors hover:text-foreground"
+              onClick={onViewMore}
+            >
+              {t('history.unconfirmedMore', { count: unconfirmedOverflow })}
+            </button>
+          )}
         </div>
       )}
-      {failedTop.length > 0 && (
-        <div className="space-y-2">
-          <div className="text-[11px] font-semibold uppercase text-muted-foreground/70">
-            {t('history.failed')}
-          </div>
-          {failedTop.map((tx) => renderRow(tx))}
-        </div>
-      )}
-      {(pendingTop.length > 0 || failedTop.length > 0) && recentChain.length > 0 && (
-        <div className="pt-1">
+      {unconfirmedTop.length > 0 && recentChain.length > 0 && (
+        <div className="space-y-2 pt-1">
           <div className="h-px w-full bg-border/40" />
+          <div className="text-[11px] font-semibold uppercase text-muted-foreground/70">
+            {t('history.confirmed')}
+          </div>
         </div>
       )}
       {recentChain.map((tx) => renderRow(tx))}

@@ -8,7 +8,6 @@ export type PendingTransaction = {
   sourceIdentity: string
   destinationIdentity?: string
   amount?: bigint
-  quImpact?: bigint
   inputType?: number
   tokenKey?: string
   targetTick: number
@@ -21,7 +20,6 @@ type SerializedPendingTransaction = {
   sourceIdentity: string
   destinationIdentity?: string
   amount?: string
-  quImpact?: string
   inputType?: number
   tokenKey?: string
   targetTick: number
@@ -71,7 +69,6 @@ const toSerialized = (pending: PendingTransaction): SerializedPendingTransaction
   sourceIdentity: pending.sourceIdentity,
   destinationIdentity: pending.destinationIdentity,
   amount: pending.amount?.toString(),
-  quImpact: pending.quImpact?.toString(),
   inputType: pending.inputType,
   tokenKey: pending.tokenKey,
   targetTick: pending.targetTick,
@@ -91,7 +88,6 @@ const fromSerialized = (value: unknown): PendingTransaction | null => {
       sourceIdentity: data.sourceIdentity,
       destinationIdentity: data.destinationIdentity,
       amount: data.amount ? BigInt(data.amount) : undefined,
-      quImpact: data.quImpact ? BigInt(data.quImpact) : undefined,
       inputType: data.inputType,
       tokenKey: data.tokenKey,
       targetTick: data.targetTick,
@@ -160,7 +156,6 @@ export const addPendingTransaction = (pending: {
   sourceIdentity: string
   destinationIdentity?: string
   amount?: bigint
-  quImpact?: bigint
   inputType?: number
   tokenKey?: string
   targetTick: number
@@ -217,15 +212,6 @@ export const getPendingTransactionsForIdentity = (identity: string) => {
     if (a.status === b.status) return b.createdAt - a.createdAt
     return a.status === 'pending' ? -1 : 1
   })
-}
-
-export const getPendingOutgoingDebit = (identity: string) => {
-  const pending = getPendingTransactionsForIdentity(identity)
-  return pending.reduce((sum, tx) => {
-    if (tx.status !== 'pending') return sum
-    const debit = tx.quImpact ?? tx.amount ?? 0n
-    return sum + (debit > 0n ? debit : 0n)
-  }, 0n)
 }
 
 export const canResendPendingTransaction = (

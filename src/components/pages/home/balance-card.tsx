@@ -37,7 +37,6 @@ const setCachedBalance = (identity: string, value: bigint) => {
 type BalanceCardProps = {
   balance: ReturnType<typeof useBalance>
   identity: string
-  pendingDebit: bigint
   networkMeta: {
     tick: string | number
     epoch: string | number
@@ -45,7 +44,7 @@ type BalanceCardProps = {
   }
 }
 
-const BalanceCard = ({ balance, identity, pendingDebit, networkMeta }: BalanceCardProps) => {
+const BalanceCard = ({ balance, identity, networkMeta }: BalanceCardProps) => {
   const { t } = useTranslation()
   const [cachedBalance, setCachedBalanceState] = useState<bigint | null>(() =>
     getCachedBalance(identity),
@@ -81,9 +80,7 @@ const BalanceCard = ({ balance, identity, pendingDebit, networkMeta }: BalanceCa
     return <div className="text-sm text-destructive">{balance.error.message}</div>
   }
 
-  const effectiveBalance = normalized > pendingDebit ? normalized - pendingDebit : 0n
-  const pendingActive = pendingDebit > 0n
-  const displayValue = effectiveBalance
+  const displayValue = normalized
 
   return (
     <div className="space-y-3 text-center">
@@ -100,11 +97,6 @@ const BalanceCard = ({ balance, identity, pendingDebit, networkMeta }: BalanceCa
       <div className="text-[11px] text-muted-foreground">
         {networkMeta.price} / {networkMeta.tick} / {networkMeta.epoch}
       </div>
-      {pendingActive && (
-        <div className="text-[11px] text-amber-700 dark:text-amber-300">
-          -{formatBalanceCompact(pendingDebit)} {t('home.status.pending').toLowerCase()}
-        </div>
-      )}
     </div>
   )
 }

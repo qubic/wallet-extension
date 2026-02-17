@@ -67,8 +67,7 @@
       "description": "Sending is disabled for this address."
     },
     "status": {
-      "syncing": "Syncing",
-      "pending": "Pending"
+      "syncing": "Syncing"
     },
     "accounts": {
       "title": "Accounts",
@@ -242,6 +241,9 @@
     "tick": "Tick",
     "type": "Type",
     "pending": "Pending",
+    "unconfirmed": "Unconfirmed",
+    "unconfirmedMore": "+{{count}} more unconfirmed",
+    "confirmed": "Confirmed",
     "failed": "Failed",
     "resend": "Resend",
     "deleteFailed": "Delete failed transaction",
@@ -354,7 +356,6 @@
       "networkError": "Network error. Please retry.",
       "broadcastFailed": "Failed to broadcast transaction.",
       "watchOnly": "Watch-only accounts cannot send transfers.",
-      "pendingOutgoing": "A previous outgoing transfer is still pending. Please wait for confirmation.",
       "generic": "Transfer failed. Please retry."
     }
   },

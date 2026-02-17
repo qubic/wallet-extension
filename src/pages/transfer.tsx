@@ -13,13 +13,7 @@ import {
   QX_TRANSFER_ASSET_INPUT_TYPE,
   buildAssetTransferPayload,
 } from '@/lib/qx'
-import {
-  addPendingTransaction,
-  getPendingOutgoingDebit,
-  getPendingTransactionsForIdentity,
-  PENDING_SETTLED_EVENT,
-  usePendingTransactionsVersion,
-} from '@/lib/pending-transactions'
+import { addPendingTransaction, PENDING_SETTLED_EVENT } from '@/lib/pending-transactions'
 import { isWalletLocked } from '@/lib/lock'
 import { useLatestStats } from '@/lib/network-stats'
 import ConfirmationDrawer from '@/components/pages/transfer/confirmation-drawer'
@@ -50,7 +44,6 @@ const Transfer = () => {
     return /^\d+$/.test(value) ? value : ''
   })()
   const initialPrefillToken = (searchParams.get('token') ?? 'qu').trim()
-  usePendingTransactionsVersion()
   const [currentIdentity, setCurrentIdentity] = useState(getCurrentIdentity())
   const [isWatchOnly, setIsWatchOnly] = useState(() => isWatchOnlyIdentity(getCurrentIdentity()))
   const [vaultRecipients, setVaultRecipients] = useState(() => getCachedAccounts())
@@ -91,12 +84,7 @@ const Transfer = () => {
       : (parsedAssets.find((a) => `${a.issuerIdentity}-${a.name}` === selectedToken) ?? null)
   const parsedAmount = parseAmount(amount)
   const currentTick = latestStats.data?.data?.currentTick
-  const pendingForIdentity = getPendingTransactionsForIdentity(currentIdentity)
-  const pendingOutgoingDebit = getPendingOutgoingDebit(currentIdentity)
-  const hasPendingOutgoing = pendingForIdentity.some((tx) => tx.status === 'pending')
   const onChainQuBalance = normalizeBalance(balance.data?.balance)
-  const effectiveQuBalance =
-    onChainQuBalance > pendingOutgoingDebit ? onChainQuBalance - pendingOutgoingDebit : 0n
   const usdEstimate = useMemo(() => {
     if (selectedAsset) return '--'
     const usdPricePerQus = latestStats.data?.data?.price
@@ -137,13 +125,6 @@ const Transfer = () => {
       setSelectedToken('qu')
     }
   }, [parsedAssets, selectedToken])
-
-  useEffect(() => {
-    if (hasPendingOutgoing) return
-    if (errorMessage === t('transfer.errors.pendingOutgoing')) {
-      setErrorMessage('')
-    }
-  }, [errorMessage, hasPendingOutgoing, t])
 
   useEffect(() => {
     const handlePendingSettled = () => {
@@ -193,13 +174,13 @@ const Transfer = () => {
         if (parsedAmount > assetBalance) {
           newErrors.amount = t('transfer.validation.amountExceedsBalance')
         }
-        if (effectiveQuBalance < QX_TRANSFER_ASSET_FEE) {
+        if (onChainQuBalance < QX_TRANSFER_ASSET_FEE) {
           newErrors.amount = t('transfer.validation.insufficientQuForFee', { fee: '100' })
         }
       } else if (balance.isLoading) {
         newErrors.amount = t('transfer.validation.balanceLoading')
       } else {
-        if (parsedAmount > effectiveQuBalance) {
+        if (parsedAmount > onChainQuBalance) {
           newErrors.amount = t('transfer.validation.amountExceedsBalance')
         }
       }
@@ -227,10 +208,6 @@ const Transfer = () => {
   const handleContinue = () => {
     if (isWatchOnly) {
       setErrorMessage(t('transfer.errors.watchOnly'))
-      return
-    }
-    if (hasPendingOutgoing) {
-      setErrorMessage(t('transfer.errors.pendingOutgoing'))
       return
     }
     if (validateForm()) {
@@ -326,7 +303,6 @@ const Transfer = () => {
         sourceIdentity: currentIdentity,
         destinationIdentity: recipient.trim(),
         amount: parsedAmount,
-        quImpact: selectedAsset ? QX_TRANSFER_ASSET_FEE : parsedAmount,
         inputType: selectedAsset ? QX_TRANSFER_ASSET_INPUT_TYPE : 0,
         tokenKey: selectedAsset ? `${selectedAsset.issuerIdentity}-${selectedAsset.name}` : 'qu',
         targetTick: Number(result.targetTick),
@@ -478,7 +454,6 @@ const Transfer = () => {
         manualTargetTick={manualTargetTick}
         isManualTargetTickEnabled={isManualTargetTickEnabled}
         currentTick={currentTick}
-        hasPendingOutgoing={hasPendingOutgoing}
         usdEstimate={usdEstimate}
         onTokenChange={handleTokenChange}
         onSelectVaultRecipient={handleSelectVaultRecipient}
@@ -487,7 +462,7 @@ const Transfer = () => {
         onTargetTickOffsetChange={handleTargetTickOffsetChange}
         onManualTargetTickChange={handleManualTargetTickChange}
         onManualTargetTickToggle={handleManualTargetTickToggle}
-        quBalance={effectiveQuBalance}
+        quBalance={onChainQuBalance}
         onContinue={handleContinue}
         quickTargetTickOffsets={QUICK_TARGET_TICK_OFFSETS}
       />

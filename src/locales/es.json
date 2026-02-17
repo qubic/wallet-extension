@@ -67,8 +67,7 @@
       "description": "El envío está deshabilitado para esta dirección."
     },
     "status": {
-      "syncing": "Sincronizando",
-      "pending": "Pendiente"
+      "syncing": "Sincronizando"
     },
     "accounts": {
       "title": "Cuentas",
@@ -242,6 +241,9 @@
     "tick": "Tick",
     "type": "Tipo",
     "pending": "Pendiente",
+    "unconfirmed": "Sin confirmar",
+    "unconfirmedMore": "+{{count}} más sin confirmar",
+    "confirmed": "Confirmadas",
     "failed": "Fallida",
     "resend": "Reenviar",
     "deleteFailed": "Eliminar transacción fallida",
@@ -354,7 +356,6 @@
       "networkError": "Error de red. Intenta de nuevo.",
       "broadcastFailed": "Fallo al transmitir la transacción.",
       "watchOnly": "Las cuentas de solo lectura no pueden enviar transferencias.",
-      "pendingOutgoing": "Hay una transferencia saliente pendiente. Espera su confirmación antes de enviar otra.",
       "generic": "Transferencia fallida. Intenta de nuevo."
     }
   },
