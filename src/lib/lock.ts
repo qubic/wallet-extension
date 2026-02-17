@@ -147,24 +147,11 @@ export const isWalletLocked = () => {
 }
 
 const normalizeLockTimeoutOption = (minutes: number) => {
-  if (
-    LOCK_TIMEOUT_OPTIONS_MINUTES.includes(minutes as (typeof LOCK_TIMEOUT_OPTIONS_MINUTES)[number])
-  ) {
-    return minutes
-  }
-
-  let nearest = DEFAULT_LOCK_TIMEOUT_MINUTES
-  let nearestDistance = Number.POSITIVE_INFINITY
-
-  for (const option of LOCK_TIMEOUT_OPTIONS_MINUTES) {
-    const distance = Math.abs(option - minutes)
-    if (distance < nearestDistance) {
-      nearest = option
-      nearestDistance = distance
-    }
-  }
-
-  return nearest
+  return LOCK_TIMEOUT_OPTIONS_MINUTES.includes(
+    minutes as (typeof LOCK_TIMEOUT_OPTIONS_MINUTES)[number],
+  )
+    ? minutes
+    : DEFAULT_LOCK_TIMEOUT_MINUTES
 }
 
 const readSessionUnlockedFlag = async () => {
