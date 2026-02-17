@@ -18,7 +18,6 @@ import BalanceCard from '@/components/pages/home/balance-card'
 import TransactionsPreview from '@/components/pages/home/transactions-preview'
 import {
   getArchiverProcessedTick,
-  getPendingOutgoingDebit,
   PENDING_SETTLED_EVENT,
   getPendingTransactionsForIdentity,
   resolvePendingTransactions,
@@ -80,8 +79,6 @@ const Home = () => {
   const hasVirtualTick = virtualTick !== null
   const tickValue = virtualTick ?? currentTickFromRpc ?? '--'
   const pendingForIdentity = getPendingTransactionsForIdentity(identity)
-  const pendingOutgoingDebit = getPendingOutgoingDebit(identity)
-  const hasPendingOutgoing = pendingForIdentity.some((tx) => tx.status === 'pending')
   const epochValue = latestStats.data?.data?.epoch ?? '--'
   const pricePerBValue = latestStats.data?.data?.price
     ? `$${(latestStats.data.data.price * 1_000_000_000).toFixed(2)}`
@@ -263,7 +260,6 @@ const Home = () => {
               <BalanceCard
                 balance={balance}
                 identity={identity}
-                pendingDebit={pendingOutgoingDebit}
                 networkMeta={{ tick: tickValue, epoch: epochValue, price: pricePerBValue }}
               />
             </div>
@@ -283,8 +279,6 @@ const Home = () => {
                 size="sm"
                 className="h-12 w-full gap-2 rounded-md bg-primary/10 text-primary hover:bg-primary/20"
                 onClick={() => navigate('/transfer')}
-                disabled={hasPendingOutgoing}
-                title={hasPendingOutgoing ? t('transfer.errors.pendingOutgoing') : undefined}
               >
                 <SendIcon className="h-4 w-4" />
                 {t('home.actions.send')}

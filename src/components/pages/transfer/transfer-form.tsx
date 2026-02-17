@@ -22,7 +22,6 @@ type TransferFormProps = {
   manualTargetTick: string
   isManualTargetTickEnabled: boolean
   currentTick?: number
-  hasPendingOutgoing: boolean
   onTokenChange: (value: string) => void
   onSelectVaultRecipient: (identity: string) => void
   onRecipientChange: (value: string) => void
@@ -52,7 +51,6 @@ const TransferForm = ({
   manualTargetTick,
   isManualTargetTickEnabled,
   currentTick,
-  hasPendingOutgoing,
   onTokenChange,
   onSelectVaultRecipient,
   onRecipientChange,
@@ -124,7 +122,7 @@ const TransferForm = ({
                 placeholder="0"
                 value={amount}
                 onChange={(e) => onAmountChange(e.target.value.replace(/[^\d,]/g, ''))}
-                disabled={isWatchOnly || hasPendingOutgoing}
+                disabled={isWatchOnly}
                 className={`h-auto border-0 bg-transparent px-0 py-0 text-4xl font-semibold tracking-tight shadow-none ring-0 focus-visible:ring-0 ${errors.amount ? 'text-destructive' : ''}`}
               />
             </div>
@@ -137,7 +135,7 @@ const TransferForm = ({
                     : 'border-border/60 text-muted-foreground hover:border-primary/40 hover:text-foreground'
                 }`}
                 onClick={() => onTokenChange('qu')}
-                disabled={isWatchOnly || hasPendingOutgoing}
+                disabled={isWatchOnly}
               >
                 QU
               </button>
@@ -154,7 +152,7 @@ const TransferForm = ({
                         : 'border-border/60 text-muted-foreground hover:border-primary/40 hover:text-foreground'
                     }`}
                     onClick={() => onTokenChange(tokenValue)}
-                    disabled={isWatchOnly || hasPendingOutgoing}
+                    disabled={isWatchOnly}
                   >
                     {asset.name}
                   </button>
@@ -167,7 +165,7 @@ const TransferForm = ({
                   key={`amount-ratio-${ratio}`}
                   type="button"
                   className="cursor-pointer rounded-md border border-border/60 px-2 py-1 text-[11px] text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
-                  disabled={isWatchOnly || hasPendingOutgoing || availableUnits <= 0n}
+                  disabled={isWatchOnly || availableUnits <= 0n}
                   onClick={() => setAmountByRatio(ratio)}
                 >
                   {ratio}%
@@ -211,7 +209,7 @@ const TransferForm = ({
                   }
                 }}
                 className={`font-mono text-xs ${errors.recipient ? 'border-destructive' : ''}`}
-                disabled={isWatchOnly || hasPendingOutgoing}
+                disabled={isWatchOnly}
               />
 
               {vaultRecipients.length > 0 && isRecipientPickerOpen && (
@@ -283,7 +281,7 @@ const TransferForm = ({
                       ? 'border-primary/60 bg-primary/10 text-foreground'
                       : 'border-border/60 text-muted-foreground hover:border-primary/40 hover:text-foreground'
                   }`}
-                  disabled={isWatchOnly || hasPendingOutgoing}
+                  disabled={isWatchOnly}
                   onClick={() => onTargetTickOffsetChange(offset)}
                 >
                   +{offset}
@@ -296,7 +294,7 @@ const TransferForm = ({
                     ? 'border-primary/60 bg-primary/10 text-foreground'
                     : 'border-border/60 text-muted-foreground hover:border-primary/40 hover:text-foreground'
                 }`}
-                disabled={isWatchOnly || hasPendingOutgoing}
+                disabled={isWatchOnly}
                 onClick={onManualTargetTickToggle}
               >
                 {t('transfer.form.targetTickOffsetManual')}
@@ -313,7 +311,7 @@ const TransferForm = ({
                     onManualTargetTickChange(event.target.value)
                   }}
                   className="h-10 w-full"
-                  disabled={isWatchOnly || hasPendingOutgoing}
+                  disabled={isWatchOnly}
                   placeholder={t('transfer.form.targetTickManualPlaceholder')}
                 />
                 <div className="text-[11px] text-muted-foreground">
@@ -333,20 +331,13 @@ const TransferForm = ({
             <span>{t('transfer.errors.watchOnly')}</span>
           </div>
         )}
-        {hasPendingOutgoing && (
-          <div className="flex items-start gap-2 text-xs text-amber-700 dark:text-amber-300">
-            <RouteIcon className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-            <span>{t('transfer.errors.pendingOutgoing')}</span>
-          </div>
-        )}
-
         {errorMessage && <p className="text-sm text-destructive">{errorMessage}</p>}
 
         <Button
           onClick={onContinue}
           size="lg"
           className="w-full"
-          disabled={isWatchOnly || hasPendingOutgoing || !recipient.trim() || !amount.trim()}
+          disabled={isWatchOnly || !recipient.trim() || !amount.trim()}
         >
           <SendIcon className="mr-2 h-4 w-4" />
           {t('transfer.actions.continue')}
