@@ -3,7 +3,7 @@ import { HashIcon, RefreshCwIcon } from 'lucide-react'
 import { ReceiveIcon } from '@/components/icons/receive-icon'
 import { SendIcon } from '@/components/icons/send-icon'
 import { Button } from '@/components/ui/button'
-import { buildExplorerObjectUrl, truncateString } from '@/lib/utils'
+import { buildExplorerObjectUrl, formatBalanceCompact, truncateString } from '@/lib/utils'
 import { useTranslation } from 'react-i18next'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -18,14 +18,6 @@ import {
 import { getCurrentIdentity } from '@/lib/accounts'
 import { useLatestStats } from '@/lib/network-stats'
 import HistoryEmptyState from '@/components/pages/history/history-empty-state'
-
-const formatQus = (value: bigint) => {
-  const formatter = new Intl.NumberFormat('en', {
-    notation: 'compact',
-    maximumFractionDigits: 2,
-  })
-  return formatter.format(Number(value))
-}
 
 const HistoryRowSkeleton = () => (
   <div className="space-y-3 rounded-xl border border-border/40 bg-background/40 px-3 py-3">
@@ -316,7 +308,7 @@ const History = () => {
                         }`}
                       >
                         {isIncoming ? '+' : '-'}
-                        {formatQus(tx.amount)}
+                        {formatBalanceCompact(tx.amount)}
                       </span>
                     </div>
 
