@@ -95,3 +95,10 @@ bun run build
   rm -rf node_modules
   bun install
   ```
+
+## Releases
+- Releases are automated with Semantic Release (`.github/workflows/release.yml`).
+- `main` publishes stable releases.
+- Stable release titles use semantic version format: `v<version>`.
+- Each release includes a zipped build artifact: `dist.zip`.
+- Local dry-run: `bun run release:dry`
