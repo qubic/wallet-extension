@@ -178,7 +178,7 @@
 }
 
 @layer utilities {
-  body[data-view="sidepanel"] .w-full.max-w-sm {
+  body[data-view="sidepanel"] .max-w-sm {
     max-width: 100%;
   }
 

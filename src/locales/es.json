@@ -1,7 +1,6 @@
 {
   "app": {
-    "sidepanel": "Abrir panel lateral",
-    "opentab": "Abrir pestaña"
+    "sidepanel": "Abrir panel lateral"
   },
   "nav": {
     "home": "Inicio",
