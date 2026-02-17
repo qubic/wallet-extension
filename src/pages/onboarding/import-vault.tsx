@@ -14,6 +14,7 @@ import { getWatchOnlyAccounts, saveCachedAccounts, saveWatchOnlyAccounts } from 
 import FlowHeader from '@/components/onboarding/flow-header'
 
 const TOTAL_STEPS = 3
+const MAX_VAULT_FILE_SIZE = 102_400
 
 const ImportVault = () => {
   const navigate = useNavigate()
@@ -50,6 +51,11 @@ const ImportVault = () => {
   }
 
   const handleFileSelect = (selected: File | null) => {
+    if (selected && selected.size > MAX_VAULT_FILE_SIZE) {
+      setFile(null)
+      setStatus(t('onboarding.importVault.errors.fileTooLarge'))
+      return
+    }
     setFile(selected)
     setStatus(null)
   }
