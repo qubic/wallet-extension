@@ -9,6 +9,11 @@ export type CachedAccount = {
   identity: string
 }
 
+type AccountNameEntry = {
+  name: string
+  identity: string
+}
+
 const WATCH_ONLY_KEY = 'watchOnlyAccounts'
 const ACCOUNT_ORDER_KEY = 'accountOrder'
 const ACCOUNT_CACHE_KEY = 'accountCache'
@@ -103,4 +108,38 @@ export const getCurrentVaultIdentity = (): string => {
   const stored = getCurrentIdentity()
   if (stored && !isWatchOnlyIdentity(stored)) return stored
   return getCachedAccounts()[0]?.identity ?? ''
+}
+
+type SuggestedNameOptions = {
+  enableAutoName: boolean
+  prefix: string
+  fallbackName: string
+}
+
+export const getSuggestedNextAccountName = ({
+  enableAutoName,
+  prefix,
+  fallbackName,
+}: SuggestedNameOptions) => {
+  if (!enableAutoName) return fallbackName
+
+  const basePrefix = prefix.trim() || 'Account'
+  const totalAccounts = getCachedAccounts().length + getWatchOnlyAccounts().length
+  return `${basePrefix} ${totalAccounts + 1}`
+}
+
+type IsAccountNameTakenOptions = {
+  excludeIdentity?: string
+  entries?: AccountNameEntry[]
+}
+
+export const isAccountNameTaken = (name: string, options: IsAccountNameTakenOptions = {}) => {
+  const normalized = name.trim().toLowerCase()
+  if (!normalized) return false
+
+  const entries = options.entries ?? [...getCachedAccounts(), ...getWatchOnlyAccounts()]
+  return entries.some(
+    (entry) =>
+      entry.identity !== options.excludeIdentity && entry.name.trim().toLowerCase() === normalized,
+  )
 }

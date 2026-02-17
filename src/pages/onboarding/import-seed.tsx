@@ -9,7 +9,12 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { PasswordInput } from '@/components/ui/password-input'
 import { isSeedLike } from '@/lib/seed'
-import { getCachedAccounts, getWatchOnlyAccounts, saveCachedAccounts } from '@/lib/accounts'
+import {
+  getCachedAccounts,
+  getSuggestedNextAccountName,
+  isAccountNameTaken,
+  saveCachedAccounts,
+} from '@/lib/accounts'
 import { setUnlocked } from '@/lib/lock'
 import {
   openBrowserVault,
@@ -44,7 +49,13 @@ const ImportSeed = ({
   const [step, setStep] = useState(1)
   const [seed, setSeed] = useState('')
   const [passphrase, setPassphrase] = useState('')
-  const [name, setName] = useState('main')
+  const [name, setName] = useState(() =>
+    getSuggestedNextAccountName({
+      enableAutoName: variant === 'add-address',
+      prefix: t('accounts.manage.defaultNamePrefix'),
+      fallbackName: 'main',
+    }),
+  )
   const [status, setStatus] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [derivedIdentity, setDerivedIdentity] = useState<string | null>(null)
@@ -96,12 +107,8 @@ const ImportSeed = ({
       return
     }
     if (step === 2 && variant === 'add-address') {
-      const existingNames = [
-        ...getCachedAccounts().map((entry) => entry.name.toLowerCase()),
-        ...getWatchOnlyAccounts().map((entry) => entry.name.toLowerCase()),
-      ]
-      if (existingNames.includes(name.trim().toLowerCase())) {
-        setStatus('Wallet name already exists.')
+      if (isAccountNameTaken(name)) {
+        setStatus(t('accounts.manage.errors.nameDuplicate'))
         return
       }
       const result = await validateVaultPassphrase(passphrase.trim())
@@ -144,12 +151,8 @@ const ImportSeed = ({
     }
 
     const cachedAccounts = getCachedAccounts()
-    const existingNames = [
-      ...cachedAccounts.map((entry) => entry.name.toLowerCase()),
-      ...getWatchOnlyAccounts().map((entry) => entry.name.toLowerCase()),
-    ]
-    if (existingNames.includes(name.trim().toLowerCase())) {
-      setStatus('Wallet name already exists.')
+    if (isAccountNameTaken(name)) {
+      setStatus(t('accounts.manage.errors.nameDuplicate'))
       setStep(2)
       return
     }

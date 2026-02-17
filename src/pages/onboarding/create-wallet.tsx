@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { identityFromSeed } from '@qubic-labs/core'
 import { ArrowLeftIcon, ArrowRightIcon, CheckCircleIcon } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { generateSeed, isSeedLike } from '@/lib/seed'
 import { setUnlocked } from '@/lib/lock'
@@ -11,7 +12,12 @@ import {
   validateVaultPassphrase,
   verifyVaultAccess,
 } from '@/lib/vault'
-import { getCachedAccounts, getWatchOnlyAccounts, saveCachedAccounts } from '@/lib/accounts'
+import {
+  getCachedAccounts,
+  getSuggestedNextAccountName,
+  isAccountNameTaken,
+  saveCachedAccounts,
+} from '@/lib/accounts'
 import SeedSecurityStep from '@/components/onboarding/seed-security-step'
 import PassphraseStep from '@/components/onboarding/passphrase-step'
 import FlowHeader from '@/components/onboarding/flow-header'
@@ -29,12 +35,19 @@ const CreateWallet = ({
   onCompletePath = '/home',
   variant = 'onboarding',
 }: CreateWalletProps) => {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [step, setStep] = useState(1)
   const [seed, setSeed] = useState(() => generateSeed())
   const [passphrase, setPassphrase] = useState('')
   const [confirmPassphrase, setConfirmPassphrase] = useState('')
-  const [name, setName] = useState('main')
+  const [name, setName] = useState(() =>
+    getSuggestedNextAccountName({
+      enableAutoName: variant === 'add-address',
+      prefix: t('accounts.manage.defaultNamePrefix'),
+      fallbackName: 'main',
+    }),
+  )
   const [status, setStatus] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [identity, setIdentity] = useState<string>('')
@@ -131,12 +144,8 @@ const CreateWallet = ({
       }
     }
     if (step === 2 && variant === 'add-address') {
-      const existingNames = [
-        ...getCachedAccounts().map((entry) => entry.name.toLowerCase()),
-        ...getWatchOnlyAccounts().map((entry) => entry.name.toLowerCase()),
-      ]
-      if (existingNames.includes(name.trim().toLowerCase())) {
-        setStatus('Wallet name already exists.')
+      if (isAccountNameTaken(name)) {
+        setStatus(t('accounts.manage.errors.nameDuplicate'))
         return
       }
       const result = await validateVaultPassphrase(passphrase.trim())
@@ -196,12 +205,8 @@ const CreateWallet = ({
     }
 
     const cachedAccounts = getCachedAccounts()
-    const existingNames = [
-      ...cachedAccounts.map((entry) => entry.name.toLowerCase()),
-      ...getWatchOnlyAccounts().map((entry) => entry.name.toLowerCase()),
-    ]
-    if (existingNames.includes(name.trim().toLowerCase())) {
-      setStatus('Wallet name already exists.')
+    if (isAccountNameTaken(name)) {
+      setStatus(t('accounts.manage.errors.nameDuplicate'))
       setStep(2)
       return
     }

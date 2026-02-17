@@ -10,6 +10,7 @@ import {
   getCachedAccounts,
   getCurrentIdentity,
   getWatchOnlyAccounts,
+  isAccountNameTaken,
   saveAccountOrder,
   saveCachedAccounts,
   saveWatchOnlyAccounts,
@@ -468,12 +469,12 @@ const ManageAccounts = () => {
         onSubmit={() => {
           if (!renameTarget) return
           const name = renameValue.trim()
-          const hasNameConflict = accounts.some(
-            (entry) =>
-              entry.identity !== renameTarget.identity &&
-              entry.name.toLowerCase() === name.toLowerCase(),
-          )
-          if (hasNameConflict) {
+          if (
+            isAccountNameTaken(name, {
+              excludeIdentity: renameTarget.identity,
+              entries: accounts,
+            })
+          ) {
             setRenameError(t('accounts.manage.errors.nameDuplicate'))
             return
           }
