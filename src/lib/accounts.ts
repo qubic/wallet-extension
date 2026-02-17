@@ -104,3 +104,16 @@ export const getCurrentVaultIdentity = (): string => {
   if (stored && !isWatchOnlyIdentity(stored)) return stored
   return getCachedAccounts()[0]?.identity ?? ''
 }
+
+export const getSuggestedNextAccountName = () => {
+  const used = new Set(
+    [...getCachedAccounts(), ...getWatchOnlyAccounts()].map((entry) => entry.name.toLowerCase()),
+  )
+
+  let index = 1
+  while (used.has(`account ${index}`)) {
+    index += 1
+  }
+
+  return `Account ${index}`
+}

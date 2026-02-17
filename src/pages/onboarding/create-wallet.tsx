@@ -11,7 +11,12 @@ import {
   validateVaultPassphrase,
   verifyVaultAccess,
 } from '@/lib/vault'
-import { getCachedAccounts, getWatchOnlyAccounts, saveCachedAccounts } from '@/lib/accounts'
+import {
+  getCachedAccounts,
+  getSuggestedNextAccountName,
+  getWatchOnlyAccounts,
+  saveCachedAccounts,
+} from '@/lib/accounts'
 import SeedSecurityStep from '@/components/onboarding/seed-security-step'
 import PassphraseStep from '@/components/onboarding/passphrase-step'
 import FlowHeader from '@/components/onboarding/flow-header'
@@ -34,7 +39,9 @@ const CreateWallet = ({
   const [seed, setSeed] = useState(() => generateSeed())
   const [passphrase, setPassphrase] = useState('')
   const [confirmPassphrase, setConfirmPassphrase] = useState('')
-  const [name, setName] = useState('main')
+  const [name, setName] = useState(() =>
+    variant === 'add-address' ? getSuggestedNextAccountName() : 'main',
+  )
   const [status, setStatus] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [identity, setIdentity] = useState<string>('')

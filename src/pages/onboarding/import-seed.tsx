@@ -9,7 +9,12 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { PasswordInput } from '@/components/ui/password-input'
 import { isSeedLike } from '@/lib/seed'
-import { getCachedAccounts, getWatchOnlyAccounts, saveCachedAccounts } from '@/lib/accounts'
+import {
+  getCachedAccounts,
+  getSuggestedNextAccountName,
+  getWatchOnlyAccounts,
+  saveCachedAccounts,
+} from '@/lib/accounts'
 import { setUnlocked } from '@/lib/lock'
 import {
   openBrowserVault,
@@ -44,7 +49,9 @@ const ImportSeed = ({
   const [step, setStep] = useState(1)
   const [seed, setSeed] = useState('')
   const [passphrase, setPassphrase] = useState('')
-  const [name, setName] = useState('main')
+  const [name, setName] = useState(() =>
+    variant === 'add-address' ? getSuggestedNextAccountName() : 'main',
+  )
   const [status, setStatus] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [derivedIdentity, setDerivedIdentity] = useState<string | null>(null)
