@@ -3,9 +3,9 @@ import { HashIcon, RefreshCwIcon } from 'lucide-react'
 import { ReceiveIcon } from '@/components/icons/receive-icon'
 import { SendIcon } from '@/components/icons/send-icon'
 import { Button } from '@/components/ui/button'
-import { buildExplorerObjectUrl, truncateString } from '@/lib/utils'
+import { buildExplorerObjectUrl, formatBalanceCompact, truncateString } from '@/lib/utils'
 import { useTranslation } from 'react-i18next'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -19,24 +19,37 @@ import { getCurrentIdentity } from '@/lib/accounts'
 import { useLatestStats } from '@/lib/network-stats'
 import HistoryEmptyState from '@/components/pages/history/history-empty-state'
 
-const formatQus = (value: bigint) => {
-  const formatter = new Intl.NumberFormat('en', {
-    notation: 'compact',
-    maximumFractionDigits: 2,
-  })
-  return formatter.format(Number(value))
-}
+const HistoryRowSkeleton = () => (
+  <div className="space-y-3 rounded-xl border border-border/40 bg-background/40 px-3 py-3">
+    <div className="flex items-center justify-between gap-3">
+      <div className="flex items-center gap-3">
+        <div className="h-9 w-9 animate-pulse rounded-full bg-muted/40" />
+        <div className="space-y-1.5">
+          <div className="h-3 w-20 animate-pulse rounded bg-muted/40" />
+          <div className="h-3 w-28 animate-pulse rounded bg-muted/30" />
+        </div>
+      </div>
+      <div className="h-4 w-14 animate-pulse rounded bg-muted/40" />
+    </div>
+    <div className="grid grid-cols-[1fr_auto_auto] gap-2">
+      <div className="h-3 animate-pulse rounded bg-muted/30" />
+      <div className="h-3 w-16 animate-pulse rounded bg-muted/30" />
+      <div className="h-3 w-12 animate-pulse rounded bg-muted/30" />
+    </div>
+  </div>
+)
 
 const History = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  usePendingTransactionsVersion()
+  const pendingVersion = usePendingTransactionsVersion()
   const [identity, setIdentity] = useState(getCurrentIdentity())
+  const loadMoreRef = useRef<HTMLDivElement | null>(null)
+  const loadInFlightRef = useRef(false)
   const transactions = useTransactions(
     {
       identity,
-      pageSize: 20,
-      limit: 20,
+      pageSize: 10,
     },
     { refetchInterval: 15_000 },
   )
@@ -57,22 +70,31 @@ const History = () => {
   }, [])
 
   const currentTick = latestStats.data?.data?.currentTick
-  const items = transactions.data?.pages.flatMap((page) => page.transactions) ?? []
-  const pending = getPendingTransactionsForIdentity(identity, currentTick)
-  const pendingHashes = new Set(pending.map((tx) => tx.hash.toLowerCase()))
-  const pendingItems = pending.map((tx) => ({
-    hash: tx.hash,
-    source: tx.sourceIdentity,
-    destination: tx.destinationIdentity ?? '',
-    amount: tx.amount ?? 0n,
-    tickNumber: tx.targetTick,
-    inputType: tx.inputType ?? 0,
-    timestamp: BigInt(tx.createdAt),
-  }))
-  const sorted = [
-    ...pendingItems,
-    ...items.filter((tx) => !pendingHashes.has(tx.hash.toLowerCase())),
-  ].sort((a, b) => Number(b.tickNumber) - Number(a.tickNumber))
+  const items = useMemo(
+    () => transactions.data?.pages.flatMap((page) => page.transactions) ?? [],
+    [transactions.data],
+  )
+  const pending = useMemo(() => {
+    void pendingVersion
+    return getPendingTransactionsForIdentity(identity, currentTick)
+  }, [identity, currentTick, pendingVersion])
+  const sorted = useMemo(() => {
+    const pendingHashes = new Set(pending.map((tx) => tx.hash.toLowerCase()))
+    const pendingItems = pending.map((tx) => ({
+      hash: tx.hash,
+      source: tx.sourceIdentity,
+      destination: tx.destinationIdentity ?? '',
+      amount: tx.amount ?? 0n,
+      tickNumber: tx.targetTick,
+      inputType: tx.inputType ?? 0,
+      timestamp: BigInt(tx.createdAt),
+    }))
+
+    return [
+      ...pendingItems,
+      ...items.filter((tx) => !pendingHashes.has(tx.hash.toLowerCase())),
+    ].sort((a, b) => Number(b.tickNumber) - Number(a.tickNumber))
+  }, [items, pending])
 
   const grouped = useMemo(() => {
     const now = new Date()
@@ -145,6 +167,34 @@ const History = () => {
   }, [items, currentTick])
 
   useEffect(() => {
+    const target = loadMoreRef.current
+    if (!target) return undefined
+    if (!transactions.hasNextPage) return undefined
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries
+        if (!entry?.isIntersecting) return
+        if (transactions.isFetchingNextPage) return
+        if (loadInFlightRef.current) return
+
+        loadInFlightRef.current = true
+        observer.unobserve(target)
+        void transactions.fetchNextPage().finally(() => {
+          loadInFlightRef.current = false
+          if (transactions.hasNextPage) {
+            observer.observe(target)
+          }
+        })
+      },
+      { rootMargin: '200px 0px' },
+    )
+
+    observer.observe(target)
+    return () => observer.disconnect()
+  }, [transactions.hasNextPage, transactions.isFetchingNextPage, transactions.fetchNextPage])
+
+  useEffect(() => {
     const handlePendingSettled = () => {
       void transactions.refetch()
     }
@@ -185,9 +235,9 @@ const History = () => {
 
           {transactions.isLoading && (
             <motion.div className="space-y-2" variants={itemMotion}>
-              <div className="h-16 animate-pulse rounded-xl border border-border/40 bg-muted/20" />
-              <div className="h-16 animate-pulse rounded-xl border border-border/40 bg-muted/20" />
-              <div className="h-16 animate-pulse rounded-xl border border-border/40 bg-muted/20" />
+              <HistoryRowSkeleton />
+              <HistoryRowSkeleton />
+              <HistoryRowSkeleton />
             </motion.div>
           )}
 
@@ -267,7 +317,7 @@ const History = () => {
                         }`}
                       >
                         {isIncoming ? '+' : '-'}
-                        {formatQus(tx.amount)}
+                        {formatBalanceCompact(tx.amount)}
                       </span>
                     </div>
 
@@ -303,6 +353,17 @@ const History = () => {
               })}
             </motion.div>
           ))}
+
+          {!transactions.isLoading && transactions.isFetchingNextPage && (
+            <motion.div className="space-y-2" variants={itemMotion}>
+              <HistoryRowSkeleton />
+              <HistoryRowSkeleton />
+            </motion.div>
+          )}
+
+          {!transactions.isLoading && transactions.hasNextPage && (
+            <div ref={loadMoreRef} className="h-1" />
+          )}
         </motion.div>
       </AnimatePresence>
     </section>
