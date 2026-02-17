@@ -1,5 +1,5 @@
 import type { SeedVault } from '@qubic-labs/sdk'
-import { getWatchOnlyAccounts } from './accounts'
+import { getAccountOrder, getWatchOnlyAccounts } from './accounts'
 
 const RSA_ALG = {
   name: 'RSA-OAEP',
@@ -37,32 +37,41 @@ export async function exportVaultToWebWalletFormat(
 
   // Build seeds array by encrypting each seed with the RSA public key
   const entries = vault.list()
-  const watchOnlyIds = new Set(getWatchOnlyAccounts().map((acc) => acc.identity))
+  const watchOnlyAccounts = getWatchOnlyAccounts()
   const seeds = []
 
   for (const entry of entries) {
-    const isOnlyWatch = watchOnlyIds.has(entry.identity)
-    if (isOnlyWatch) {
-      seeds.push({
-        encryptedSeed: '',
-        alias: entry.name,
-        publicId: entry.identity,
-        isOnlyWatch: true,
-      })
-    } else {
-      const seedStr = await vault.getSeed(entry.identity)
-      const encryptedSeed = await crypto.subtle.encrypt(
-        { name: 'RSA-OAEP' },
-        keyPair.publicKey,
-        new TextEncoder().encode(seedStr),
-      )
-      seeds.push({
-        encryptedSeed: btoa(String.fromCharCode(...new Uint8Array(encryptedSeed))),
-        alias: entry.name,
-        publicId: entry.identity,
-        isOnlyWatch: false,
-      })
-    }
+    const seedStr = await vault.getSeed(entry.identity)
+    const encryptedSeed = await crypto.subtle.encrypt(
+      { name: 'RSA-OAEP' },
+      keyPair.publicKey,
+      new TextEncoder().encode(seedStr),
+    )
+    seeds.push({
+      encryptedSeed: btoa(String.fromCharCode(...new Uint8Array(encryptedSeed))),
+      alias: entry.name,
+      publicId: entry.identity,
+      isOnlyWatch: false,
+    })
+  }
+
+  for (const acc of watchOnlyAccounts) {
+    seeds.push({
+      encryptedSeed: '',
+      alias: acc.name,
+      publicId: acc.identity,
+      isOnlyWatch: true,
+    })
+  }
+
+  const savedAccountOrder = getAccountOrder()
+  if (savedAccountOrder.length > 0) {
+    const positionByIdentity = new Map(savedAccountOrder.map((id, position) => [id, position]))
+    seeds.sort((a, b) => {
+      const positionA = positionByIdentity.get(a.publicId) ?? Number.MAX_SAFE_INTEGER
+      const positionB = positionByIdentity.get(b.publicId) ?? Number.MAX_SAFE_INTEGER
+      return positionA - positionB
+    })
   }
 
   // Wrap private key with password-derived AES key (fixed salt/IV per spec)
