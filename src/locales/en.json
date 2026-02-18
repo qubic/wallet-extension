@@ -249,7 +249,9 @@
     "resend": "Resend",
     "deleteFailed": "Delete failed transaction",
     "today": "Today",
-    "yesterday": "Yesterday"
+    "yesterday": "Yesterday",
+    "fromPrefix": "From:",
+    "toPrefix": "To:"
   },
   "txDetails": {
     "title": "Transaction details",

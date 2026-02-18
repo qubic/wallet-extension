@@ -9,7 +9,8 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from '@/components/ui/drawer'
-import { formatBalance, parseAmount } from '@/lib/utils'
+import { formatAddressLabel, formatBalance, parseAmount } from '@/lib/utils'
+import { useAddressName } from '@/hooks/use-address-name'
 import SummaryRow from '@/components/pages/transfer/summary-row'
 
 type ConfirmationDrawerProps = {
@@ -37,6 +38,8 @@ const ConfirmationDrawer = ({
 }: ConfirmationDrawerProps) => {
   const { t } = useTranslation()
   const parsed = parseAmount(amount) || 0n
+  const sourceName = useAddressName(sourceIdentity)
+  const recipientName = useAddressName(recipient)
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
@@ -52,8 +55,16 @@ const ConfirmationDrawer = ({
 
         <div className="flex-1 space-y-4 overflow-y-auto px-4 pb-2">
           <div className="space-y-3">
-            <SummaryRow label={t('transfer.form.from')} value={sourceIdentity} mono />
-            <SummaryRow label={t('transfer.confirm.to')} value={recipient} mono />
+            <SummaryRow
+              label={t('transfer.form.from')}
+              value={formatAddressLabel(sourceIdentity, sourceName?.name)}
+              mono
+            />
+            <SummaryRow
+              label={t('transfer.confirm.to')}
+              value={formatAddressLabel(recipient, recipientName?.name)}
+              mono
+            />
             <SummaryRow
               label={t('transfer.confirm.amount')}
               value={`${formatBalance(parsed)} ${tokenName}`}

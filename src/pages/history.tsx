@@ -3,6 +3,8 @@ import { HashIcon, RefreshCwIcon, XIcon } from 'lucide-react'
 import { ReceiveIcon } from '@/components/icons/receive-icon'
 import { SendIcon } from '@/components/icons/send-icon'
 import { Button } from '@/components/ui/button'
+import { useProcedureName } from '@/hooks/use-procedure-name'
+import AddressLabel from '@/components/address-label'
 import { buildExplorerObjectUrl, formatBalanceCompact, truncateString } from '@/lib/utils'
 import { useTranslation } from 'react-i18next'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -51,6 +53,21 @@ type HistoryRowTransaction = {
 }
 
 type HistoryRowState = 'default' | 'pending' | 'failed'
+
+const InputTypeLabel = ({
+  destination,
+  inputType,
+}: { destination: string; inputType: number }) => {
+  const procedureName = useProcedureName(destination, inputType)
+  if (procedureName) {
+    return (
+      <span>
+        {inputType} ({procedureName})
+      </span>
+    )
+  }
+  return <span>{inputType.toString()}</span>
+}
 
 const History = () => {
   const { t } = useTranslation()
@@ -195,18 +212,13 @@ const History = () => {
         ? t('history.incoming')
         : t('history.outgoing')
     const counterparty = isIncoming ? tx.source : tx.destination
-    const counterpartyLabel = isSimpleTransfer
-      ? isIncoming
-        ? t('history.from', { address: truncateString(counterparty) })
-        : t('history.to', { address: truncateString(counterparty) })
-      : truncateString(counterparty)
     const Icon = isIncoming ? ReceiveIcon : SendIcon
 
-    return { isIncoming, label, counterpartyLabel, Icon }
+    return { isIncoming, isSimpleTransfer, label, counterparty, Icon }
   }
 
   const renderHistoryRow = (tx: HistoryRowTransaction, state: HistoryRowState) => {
-    const { isIncoming, label, counterpartyLabel, Icon } = getRowPresentation(tx)
+    const { isIncoming, isSimpleTransfer, label, counterparty, Icon } = getRowPresentation(tx)
     const isPending = state === 'pending'
     const isDefault = state === 'default'
 
@@ -237,7 +249,7 @@ const History = () => {
             </div>
             <div className="flex flex-col">
               <span className="text-xs font-semibold text-foreground">{label}</span>
-              <span className="text-xs text-muted-foreground">{counterpartyLabel}</span>
+              <AddressLabel address={counterparty} prefix={isSimpleTransfer ? (isIncoming ? t('history.fromPrefix') : t('history.toPrefix')) : undefined} className="text-xs text-muted-foreground" />
             </div>
           </div>
           <span
@@ -254,43 +266,53 @@ const History = () => {
           </span>
         </div>
 
-        <div className="grid grid-cols-[1fr_auto_auto] items-center gap-2 text-[11px] text-muted-foreground">
-          <div className="flex min-w-0 items-center gap-2">
-            <HashIcon className="h-3.5 w-3.5" />
-            {isDefault ? (
-              <a
-                href={buildExplorerObjectUrl('tx', tx.hash)}
-                className="truncate font-mono text-primary hover:underline"
-                target="_blank"
-                rel="noreferrer"
-                onClick={(event) => event.stopPropagation()}
-              >
-                {truncateString(tx.hash, {
-                  leading: 6,
-                  trailing: 6,
-                  minLength: 12,
-                  emptyLabel: '',
-                })}
-              </a>
-            ) : (
-              <span className="truncate font-mono">
-                {truncateString(tx.hash, {
-                  leading: 6,
-                  trailing: 6,
-                  minLength: 12,
-                  emptyLabel: '',
-                })}
-              </span>
+        <div className="flex flex-col gap-1 text-[11px] text-muted-foreground">
+          <div className="flex items-center gap-2">
+            <div className="flex min-w-0 items-center gap-2">
+              <HashIcon className="h-3.5 w-3.5 shrink-0" />
+              {isDefault ? (
+                <a
+                  href={buildExplorerObjectUrl('tx', tx.hash)}
+                  className="truncate font-mono text-primary hover:underline"
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={(event) => event.stopPropagation()}
+                >
+                  {truncateString(tx.hash, {
+                    leading: 6,
+                    trailing: 6,
+                    minLength: 12,
+                    emptyLabel: '',
+                  })}
+                </a>
+              ) : (
+                <span className="truncate font-mono">
+                  {truncateString(tx.hash, {
+                    leading: 6,
+                    trailing: 6,
+                    minLength: 12,
+                    emptyLabel: '',
+                  })}
+                </span>
+              )}
+            </div>
+            <div className="ml-auto flex items-center gap-1 font-mono">
+              <span className="text-muted-foreground/70">{t('history.tick')}</span>
+              <span>{Number(tx.tickNumber).toLocaleString()}</span>
+            </div>
+            {Number(tx.inputType) === 0 && (
+              <div className="flex items-center gap-1 font-mono">
+                <span className="text-muted-foreground/70">{t('history.type')}</span>
+                <span>0</span>
+              </div>
             )}
           </div>
-          <div className="flex items-center gap-1 font-mono">
-            <span className="text-muted-foreground/70">{t('history.tick')}</span>
-            <span>{Number(tx.tickNumber).toLocaleString()}</span>
-          </div>
-          <div className="flex items-center gap-1 font-mono">
-            <span className="text-muted-foreground/70">{t('history.type')}</span>
-            <span>{tx.inputType.toString()}</span>
-          </div>
+          {Number(tx.inputType) !== 0 && (
+            <div className="flex items-center gap-1 font-mono">
+              <span className="text-muted-foreground/70">{t('history.type')}</span>
+              <InputTypeLabel destination={tx.destination} inputType={Number(tx.inputType)} />
+            </div>
+          )}
         </div>
       </motion.button>
     )
@@ -407,7 +429,7 @@ const History = () => {
                     {t('history.failed')}
                   </span>
                   {failedTopItems.map((tx) => {
-                    const { isIncoming, label, counterpartyLabel, Icon } = getRowPresentation(tx)
+                    const { isIncoming, isSimpleTransfer, label, counterparty, Icon } = getRowPresentation(tx)
                     const canResend = canResendPendingTransaction({
                       status: tx.status,
                       destinationIdentity: tx.destination,
@@ -428,9 +450,7 @@ const History = () => {
                             </div>
                             <div className="flex flex-col">
                               <span className="text-xs font-semibold text-foreground">{label}</span>
-                              <span className="text-xs text-muted-foreground">
-                                {counterpartyLabel}
-                              </span>
+                              <AddressLabel address={counterparty} prefix={isSimpleTransfer ? (isIncoming ? t('history.fromPrefix') : t('history.toPrefix')) : undefined} className="text-xs text-muted-foreground" />
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
@@ -465,26 +485,36 @@ const History = () => {
                           </div>
                         </div>
 
-                        <div className="grid grid-cols-[1fr_auto_auto] items-center gap-2 text-[11px] text-muted-foreground">
-                          <div className="flex min-w-0 items-center gap-2">
-                            <HashIcon className="h-3.5 w-3.5" />
-                            <span className="truncate font-mono">
-                              {truncateString(tx.hash, {
-                                leading: 6,
-                                trailing: 6,
-                                minLength: 12,
-                                emptyLabel: '',
-                              })}
-                            </span>
+                        <div className="flex flex-col gap-1 text-[11px] text-muted-foreground">
+                          <div className="flex items-center gap-2">
+                            <div className="flex min-w-0 items-center gap-2">
+                              <HashIcon className="h-3.5 w-3.5 shrink-0" />
+                              <span className="truncate font-mono">
+                                {truncateString(tx.hash, {
+                                  leading: 6,
+                                  trailing: 6,
+                                  minLength: 12,
+                                  emptyLabel: '',
+                                })}
+                              </span>
+                            </div>
+                            <div className="ml-auto flex items-center gap-1 font-mono">
+                              <span className="text-muted-foreground/70">{t('history.tick')}</span>
+                              <span>{Number(tx.tickNumber).toLocaleString()}</span>
+                            </div>
+                            {Number(tx.inputType) === 0 && (
+                              <div className="flex items-center gap-1 font-mono">
+                                <span className="text-muted-foreground/70">{t('history.type')}</span>
+                                <span>0</span>
+                              </div>
+                            )}
                           </div>
-                          <div className="flex items-center gap-1 font-mono">
-                            <span className="text-muted-foreground/70">{t('history.tick')}</span>
-                            <span>{Number(tx.tickNumber).toLocaleString()}</span>
-                          </div>
-                          <div className="flex items-center gap-1 font-mono">
-                            <span className="text-muted-foreground/70">{t('history.type')}</span>
-                            <span>{tx.inputType.toString()}</span>
-                          </div>
+                          {Number(tx.inputType) !== 0 && (
+                            <div className="flex items-center gap-1 font-mono">
+                              <span className="text-muted-foreground/70">{t('history.type')}</span>
+                              <InputTypeLabel destination={tx.destination} inputType={Number(tx.inputType)} />
+                            </div>
+                          )}
                         </div>
                       </motion.div>
                     )

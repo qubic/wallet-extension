@@ -1,7 +1,8 @@
 import { ArrowLeftIcon, CheckCircleIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
-import { formatBalance } from '@/lib/utils'
+import { formatAddressLabel, formatBalance } from '@/lib/utils'
+import { useAddressName } from '@/hooks/use-address-name'
 import { useClipboardCopy } from '@/hooks/use-clipboard-copy'
 import SummaryRow from '@/components/pages/transfer/summary-row'
 import type { TxResult } from '@/components/pages/transfer/types'
@@ -21,6 +22,8 @@ const TransferSuccess = ({
 }: TransferSuccessProps) => {
   const { t } = useTranslation()
   const { copyText } = useClipboardCopy()
+  const sourceName = useAddressName(txResult.sourceIdentity)
+  const recipientName = useAddressName(txResult.recipient)
 
   const handleCopyTxId = async () => {
     await copyText(txResult.txId, {
@@ -60,8 +63,16 @@ const TransferSuccess = ({
           </div>
 
           <div className="w-full space-y-3 text-left">
-            <SummaryRow label={t('transfer.form.from')} value={txResult.sourceIdentity} mono />
-            <SummaryRow label={t('transfer.confirm.to')} value={txResult.recipient} mono />
+            <SummaryRow
+              label={t('transfer.form.from')}
+              value={formatAddressLabel(txResult.sourceIdentity, sourceName?.name)}
+              mono
+            />
+            <SummaryRow
+              label={t('transfer.confirm.to')}
+              value={formatAddressLabel(txResult.recipient, recipientName?.name)}
+              mono
+            />
             <SummaryRow
               label={t('transfer.success.amount')}
               value={`${formatBalance(txResult.amount)} ${txResult.tokenName}`}

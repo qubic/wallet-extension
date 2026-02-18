@@ -9,7 +9,10 @@ import {
   resolvePendingTransactions,
   usePendingTransactionsVersion,
 } from '@/lib/pending-transactions'
+import { useAddressName } from '@/hooks/use-address-name'
+import { useProcedureName } from '@/hooks/use-procedure-name'
 import { useClipboardCopy } from '@/hooks/use-clipboard-copy'
+import { formatAddressLabel } from '@/lib/utils'
 import TxDetailsHeader from '@/components/pages/transaction-details/tx-details-header'
 import TxDetailsRow, { formatValue } from '@/components/pages/transaction-details/tx-details-row'
 
@@ -70,6 +73,11 @@ const TransactionDetails = () => {
   }, [hash, archiverProcessedTick, txQuery.data])
 
   const details = txQuery.data as Record<string, unknown> | undefined
+  const sourceAddress = (details?.source as string) ?? ''
+  const destAddress = (details?.destination as string) ?? ''
+  const sourceName = useAddressName(sourceAddress)
+  const destName = useAddressName(destAddress)
+  const procedureName = useProcedureName(destAddress, Number(details?.inputType ?? 0))
 
   const formatTimestamp = (ts: unknown): string => {
     if (ts === null || ts === undefined) return '--'
@@ -86,7 +94,13 @@ const TransactionDetails = () => {
     })
   }
 
-  const rows: Array<{ key: string; label: string; value: unknown; copyable?: boolean }> = [
+  const rows: Array<{
+    key: string
+    label: string
+    value: unknown
+    copyable?: boolean
+    copyText?: string
+  }> = [
     { key: 'hash', label: t('txDetails.hash'), value: hash, copyable: true },
     {
       key: 'amount',
@@ -107,18 +121,35 @@ const TransactionDetails = () => {
         return Number(tick).toLocaleString()
       })(),
     },
-    { key: 'inputType', label: t('txDetails.inputType'), value: details?.inputType },
-    { key: 'source', label: t('txDetails.source'), value: details?.source, copyable: true },
+    {
+      key: 'inputType',
+      label: t('txDetails.inputType'),
+      value: procedureName
+        ? `${details?.inputType} (${procedureName})`
+        : details?.inputType,
+    },
+    {
+      key: 'source',
+      label: t('txDetails.source'),
+      value: sourceName
+        ? formatAddressLabel(sourceAddress, sourceName.name)
+        : details?.source,
+      copyable: true,
+      copyText: sourceAddress,
+    },
     {
       key: 'destination',
       label: t('txDetails.destination'),
-      value: details?.destination,
+      value: destName
+        ? formatAddressLabel(destAddress, destName.name)
+        : details?.destination,
       copyable: true,
+      copyText: destAddress,
     },
   ]
 
-  const copyValue = async (key: string, value: unknown) => {
-    await copyText(formatValue(value), { key })
+  const copyValue = async (key: string, value: unknown, rawText?: string) => {
+    await copyText(rawText ?? formatValue(value), { key })
   }
 
   return (
