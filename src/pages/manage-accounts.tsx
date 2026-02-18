@@ -379,6 +379,13 @@ const ManageAccounts = () => {
             <h2 className="text-base font-semibold">{t('accounts.manage.title')}</h2>
             <p className="text-xs text-muted-foreground">{t('accounts.manage.subtitle')}</p>
           </div>
+          <button
+            type="button"
+            onClick={() => setAddOpen(true)}
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary transition hover:bg-primary/20"
+          >
+            <PlusIcon className="h-4 w-4" />
+          </button>
         </div>
 
         <div className="space-y-2">
@@ -418,23 +425,6 @@ const ManageAccounts = () => {
               {t('accounts.manage.empty')}
             </div>
           )}
-          <button
-            type="button"
-            onClick={() => setAddOpen(true)}
-            className="flex w-full items-center gap-3 rounded-lg border border-dashed border-border/60 bg-muted/10 px-3 py-3 text-left text-sm text-muted-foreground transition hover:bg-muted/20"
-          >
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted/30 text-muted-foreground">
-              <PlusIcon className="h-4 w-4" />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-sm font-semibold text-foreground">
-                {t('accounts.manage.addTitle')}
-              </span>
-              <span className="text-xs text-muted-foreground">
-                {t('accounts.manage.addNewDesc')}
-              </span>
-            </div>
-          </button>
           {status && <p className="text-xs text-destructive">{status}</p>}
         </div>
       </div>
