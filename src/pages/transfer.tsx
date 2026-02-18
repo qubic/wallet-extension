@@ -68,7 +68,7 @@ const Transfer = () => {
   const [manualTargetTick, setManualTargetTick] = useState('')
   const seedRef = useRef<string | null>(null)
 
-  const parsedAssets = aggregateAssets(ownedAssets.data ?? {})
+  const parsedAssets = aggregateAssets(ownedAssets.data ?? {}, true)
   const filteredVaultRecipients = useMemo(
     () =>
       vaultRecipients.filter(
@@ -270,6 +270,10 @@ const Transfer = () => {
         }
       }
 
+      if (requestedTargetTick === undefined) {
+        throw new Error(t('transfer.errors.networkError'))
+      }
+
       if (selectedAsset) {
         const payload = buildAssetTransferPayload(
           selectedAsset.issuerIdentity,
@@ -328,6 +332,9 @@ const Transfer = () => {
       })
 
       balance.refetch()
+      if (selectedAsset) {
+        ownedAssets.refetch()
+      }
     } catch (error) {
       let message = t('transfer.errors.generic')
 
