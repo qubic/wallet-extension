@@ -11,6 +11,9 @@ const applyViewportSizing = () => {
   const root = document.getElementById('root')
   const pathname = window.location.pathname
   const isPopup = pathname.endsWith('popup.html')
+  const isSidepanel = pathname.endsWith('sidepanel.html')
+
+  body.dataset.view = isPopup ? 'popup' : isSidepanel ? 'sidepanel' : 'other'
 
   if (isPopup) {
     html.style.width = '360px'

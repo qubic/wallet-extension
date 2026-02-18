@@ -1,9 +1,9 @@
 import {
   CopyIcon,
   EyeIcon,
+  XIcon,
   PanelRightOpenIcon,
   PlusIcon,
-  SquareArrowOutUpRightIcon,
   UsersIcon,
   WalletIcon,
 } from 'lucide-react'
@@ -27,17 +27,17 @@ import { useNavigate } from 'react-router-dom'
 import { useCallback } from 'react'
 
 type AppHeaderProps = {
-  onOpenSidePanel: () => void
-  onOpenTab: () => void
+  onToggleSidePanel: () => void
+  isSidePanelView: boolean
   openSidePanelLabel: string
-  openTabLabel: string
+  closeSidePanelLabel: string
 }
 
 const AppHeader = ({
-  onOpenSidePanel,
-  onOpenTab,
+  onToggleSidePanel,
+  isSidePanelView,
   openSidePanelLabel,
-  openTabLabel,
+  closeSidePanelLabel,
 }: AppHeaderProps) => {
   const { t } = useTranslation()
   const sdk = useSdk()
@@ -249,20 +249,15 @@ const AppHeader = ({
         <Button
           size="icon"
           variant="ghost"
-          onClick={onOpenSidePanel}
-          aria-label={openSidePanelLabel}
+          onClick={onToggleSidePanel}
+          aria-label={isSidePanelView ? closeSidePanelLabel : openSidePanelLabel}
           className="h-9 w-9"
         >
-          <PanelRightOpenIcon className="size-4" />
-        </Button>
-        <Button
-          size="icon"
-          variant="ghost"
-          onClick={onOpenTab}
-          aria-label={openTabLabel}
-          className="h-9 w-9"
-        >
-          <SquareArrowOutUpRightIcon className="size-4" />
+          {isSidePanelView ? (
+            <XIcon className="size-4" />
+          ) : (
+            <PanelRightOpenIcon className="size-4" />
+          )}
         </Button>
       </div>
     </header>

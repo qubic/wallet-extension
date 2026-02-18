@@ -1,7 +1,7 @@
 {
   "app": {
     "sidepanel": "Abrir panel lateral",
-    "opentab": "Abrir pestaña"
+    "closeSidepanel": "Cerrar panel lateral"
   },
   "nav": {
     "home": "Inicio",

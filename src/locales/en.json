@@ -1,7 +1,7 @@
 {
   "app": {
     "sidepanel": "Open side panel",
-    "opentab": "Open tab"
+    "closeSidepanel": "Close side panel"
   },
   "nav": {
     "home": "Home",

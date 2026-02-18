@@ -63,7 +63,6 @@ src/
   main.tsx                   # app entry
 popup.html                   # popup entry point
 sidepanel.html               # sidepanel entry point
-tab.html                     # full-tab entry point
 ```
 
 ## Architecture notes
