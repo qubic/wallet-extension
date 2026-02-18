@@ -17,7 +17,7 @@ const App = () => {
           <HashRouter>
             <AppRouter />
           </HashRouter>
-          <Toaster richColors />
+          <Toaster richColors position="top-center" duration={2000} />
         </QubicQueryProvider>
       </SdkProvider>
     </ThemeProvider>

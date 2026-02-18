@@ -18,10 +18,9 @@ import { isWalletLocked } from '@/lib/lock'
 import { useLatestStats } from '@/lib/network-stats'
 import ConfirmationDrawer from '@/components/pages/transfer/confirmation-drawer'
 import TransferForm from '@/components/pages/transfer/transfer-form'
-import TransferSuccess from '@/components/pages/transfer/transfer-success'
-import type { FormErrors, TxResult } from '@/components/pages/transfer/types'
+import type { FormErrors } from '@/components/pages/transfer/types'
 
-type Step = 'form' | 'auth' | 'success'
+type Step = 'form' | 'auth'
 
 const TARGET_TICK_OFFSET_MIN = 1
 const TARGET_TICK_OFFSET_MAX = 40
@@ -62,7 +61,6 @@ const Transfer = () => {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [sending, setSending] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
-  const [txResult, setTxResult] = useState<TxResult | null>(null)
   const [targetTickOffset, setTargetTickOffset] = useState(10)
   const [isManualTargetTickEnabled, setIsManualTargetTickEnabled] = useState(false)
   const [manualTargetTick, setManualTargetTick] = useState('')
@@ -300,8 +298,6 @@ const Transfer = () => {
 
       seedRef.current = null
 
-      const tokenName = selectedAsset?.name ?? 'QU'
-      const fee = selectedAsset ? QX_TRANSFER_ASSET_FEE : 0n
       addPendingTransaction({
         hash: result.txId,
         sourceIdentity: currentIdentity,
@@ -312,18 +308,7 @@ const Transfer = () => {
         targetTick: Number(result.targetTick),
       })
 
-      setTxResult({
-        txId: result.txId,
-        targetTick: result.targetTick.toString(),
-        amount: parsedAmount,
-        tokenName,
-        sourceIdentity: currentIdentity,
-        recipient: recipient.trim(),
-        fee,
-      })
-
       setDrawerOpen(false)
-      setStep('success')
 
       toast.success(t('transfer.success.title'), {
         description: t('transfer.success.description', {
@@ -335,6 +320,8 @@ const Transfer = () => {
       if (selectedAsset) {
         ownedAssets.refetch()
       }
+
+      navigate('/')
     } catch (error) {
       let message = t('transfer.errors.generic')
 
@@ -364,28 +351,6 @@ const Transfer = () => {
     seedRef.current = null
     setStep('form')
     setDrawerOpen(true)
-  }
-
-  const handleSendAnother = () => {
-    setStep('form')
-    setSelectedToken('qu')
-    setRecipient('')
-    setAmount('')
-    setTargetTickOffset(10)
-    setIsManualTargetTickEnabled(false)
-    setManualTargetTick('')
-    setErrors({})
-    setErrorMessage('')
-    setTxResult(null)
-  }
-
-  const handleViewHistory = () => {
-    navigate('/history')
-  }
-
-  const handleViewDetails = () => {
-    if (!txResult?.txId) return
-    navigate(`/tx/${txResult.txId}`)
   }
 
   const handleRecipientChange = (value: string) => {
@@ -433,17 +398,6 @@ const Transfer = () => {
     if (errors.targetTick) {
       setErrors((prev) => ({ ...prev, targetTick: undefined }))
     }
-  }
-
-  if (step === 'success' && txResult) {
-    return (
-      <TransferSuccess
-        txResult={txResult}
-        onSendAnother={handleSendAnother}
-        onViewHistory={handleViewHistory}
-        onViewDetails={handleViewDetails}
-      />
-    )
   }
 
   return (
