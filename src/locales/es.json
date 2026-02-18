@@ -66,8 +66,8 @@
       "title": "Cuenta de solo lectura",
       "description": "El envío está deshabilitado para esta dirección."
     },
-    "status": {
-      "syncing": "Sincronizando"
+    "price": {
+      "label": "Precio QUBIC"
     },
     "accounts": {
       "title": "Cuentas",
