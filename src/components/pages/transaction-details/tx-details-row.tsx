@@ -25,12 +25,17 @@ const TxDetailsRow = ({ row, copiedKey, onCopy }: TxDetailsRowProps) => {
 
   return (
     <div className="py-2">
-      <div className="mb-1 flex items-center justify-between gap-2">
+      <div className="mb-1">
         <span className="text-[11px] uppercase text-muted-foreground">{row.label}</span>
+      </div>
+      <div className="flex items-start gap-1.5">
+        <div className="min-w-0 break-all font-mono text-xs text-foreground">
+          {formatValue(row.value)}
+        </div>
         {row.copyable && (
           <button
             type="button"
-            className="h-5 w-5 shrink-0 cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
+            className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
             onClick={() => onCopy(row.key, row.value)}
             aria-label={`${t('txDetails.copy')} ${row.label}`}
           >
@@ -42,7 +47,6 @@ const TxDetailsRow = ({ row, copiedKey, onCopy }: TxDetailsRowProps) => {
           </button>
         )}
       </div>
-      <div className="break-all font-mono text-xs text-foreground">{formatValue(row.value)}</div>
     </div>
   )
 }
