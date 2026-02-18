@@ -26,7 +26,6 @@ import {
 } from '@/components/ui/drawer'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Separator } from '@/components/ui/separator'
 import { lockWallet } from '@/lib/lock'
 import { openBrowserVault } from '@/lib/vault'
 import { exportVaultToWebWalletFormat } from '@/lib/vault-export'
@@ -161,9 +160,11 @@ const Settings = () => {
             ))}
           </div>
 
-          <Separator />
-
-          <Button variant="outline" onClick={handleLockNow}>
+          <Button
+            size="sm"
+            className="h-12 w-full gap-2 rounded-md bg-primary/10 text-primary hover:bg-primary/20"
+            onClick={handleLockNow}
+          >
             <LockIcon className="h-4 w-4" />
             {t('settings.lockNow')}
           </Button>
