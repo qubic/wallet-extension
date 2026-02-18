@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { NavLink, useLocation } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { motion } from 'framer-motion'
-import { ArrowLeftRightIcon, HistoryIcon, HomeIcon, SettingsIcon, UsersIcon } from 'lucide-react'
+import { ArrowLeftRightIcon, HistoryIcon, HomeIcon, SettingsIcon } from 'lucide-react'
 import AppHeader from '@/components/app-header'
 import { getWatchOnlyAccounts } from '@/lib/accounts'
 
@@ -103,12 +103,6 @@ const AppShell = ({
         to: '/transfer',
         label: t('nav.transfer'),
         icon: <ArrowLeftRightIcon className="size-5" />,
-      },
-      {
-        key: 'accounts',
-        to: '/accounts',
-        label: t('nav.accounts'),
-        icon: <UsersIcon className="size-5" />,
       },
       {
         key: 'settings',

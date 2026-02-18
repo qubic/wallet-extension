@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { useQueries } from '@tanstack/react-query'
 import { useSdk } from '@qubic-labs/react'
 import { VaultInvalidPassphraseError, VaultEntryNotFoundError } from '@qubic-labs/sdk'
-import { PlusIcon } from 'lucide-react'
+import { ArrowLeftIcon, PlusIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import {
   getAccountOrder,
@@ -366,6 +366,14 @@ const ManageAccounts = () => {
   return (
     <section className="flex min-h-full w-full justify-center pb-6 pt-4">
       <div className="flex w-full flex-col gap-4 px-4">
+        <button
+          type="button"
+          onClick={() => navigate('/settings')}
+          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeftIcon className="h-4 w-4" />
+          {t('settings.general.back')}
+        </button>
         <div className="flex items-center justify-between gap-2">
           <div>
             <h2 className="text-base font-semibold">{t('accounts.manage.title')}</h2>
