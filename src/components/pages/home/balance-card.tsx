@@ -3,10 +3,9 @@ import type { useBalance } from '@qubic-labs/react'
 import { useTranslation } from 'react-i18next'
 import { formatBalanceCompact, normalizeBalance } from '@/lib/utils'
 
-const formatUsdFromNumber = (value: number) => {
-  const usdPerBillion = 435
-  const billions = value / 1_000_000_000
-  const usdValue = billions * usdPerBillion
+const formatUsdFromNumber = (value: number, pricePerQu?: number) => {
+  if (!pricePerQu) return '--'
+  const usdValue = value * pricePerQu
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
@@ -37,14 +36,10 @@ const setCachedBalance = (identity: string, value: bigint) => {
 type BalanceCardProps = {
   balance: ReturnType<typeof useBalance>
   identity: string
-  networkMeta: {
-    tick: string | number
-    epoch: string | number
-    price: string
-  }
+  price?: number
 }
 
-const BalanceCard = ({ balance, identity, networkMeta }: BalanceCardProps) => {
+const BalanceCard = ({ balance, identity, price }: BalanceCardProps) => {
   const { t } = useTranslation()
   const [cachedBalance, setCachedBalanceState] = useState<bigint | null>(() =>
     getCachedBalance(identity),
@@ -92,10 +87,7 @@ const BalanceCard = ({ balance, identity, networkMeta }: BalanceCardProps) => {
         {formatBalanceCompact(displayValue)}
       </div>
       <div className="inline-flex items-center rounded-full border border-primary/25 bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary">
-        {`≈ ${formatUsdFromNumber(Number(displayValue))}`}
-      </div>
-      <div className="text-[11px] text-muted-foreground">
-        {networkMeta.price} / {networkMeta.tick} / {networkMeta.epoch}
+        {`≈ ${formatUsdFromNumber(Number(displayValue), price)}`}
       </div>
     </div>
   )

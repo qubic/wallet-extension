@@ -66,8 +66,8 @@
       "title": "Watch-only account",
       "description": "Sending is disabled for this address."
     },
-    "status": {
-      "syncing": "Syncing"
+    "price": {
+      "label": "QUBIC Price"
     },
     "accounts": {
       "title": "Accounts",
