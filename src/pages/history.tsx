@@ -54,10 +54,7 @@ type HistoryRowTransaction = {
 
 type HistoryRowState = 'default' | 'pending' | 'failed'
 
-const InputTypeLabel = ({
-  destination,
-  inputType,
-}: { destination: string; inputType: number }) => {
+const InputTypeLabel = ({ destination, inputType }: { destination: string; inputType: number }) => {
   const procedureName = useProcedureName(destination, inputType)
   if (procedureName) {
     return (
@@ -249,7 +246,17 @@ const History = () => {
             </div>
             <div className="flex flex-col">
               <span className="text-xs font-semibold text-foreground">{label}</span>
-              <AddressLabel address={counterparty} prefix={isSimpleTransfer ? (isIncoming ? t('history.fromPrefix') : t('history.toPrefix')) : undefined} className="text-xs text-muted-foreground" />
+              <AddressLabel
+                address={counterparty}
+                prefix={
+                  isSimpleTransfer
+                    ? isIncoming
+                      ? t('history.fromPrefix')
+                      : t('history.toPrefix')
+                    : undefined
+                }
+                className="text-xs text-muted-foreground"
+              />
             </div>
           </div>
           <span
@@ -429,7 +436,8 @@ const History = () => {
                     {t('history.failed')}
                   </span>
                   {failedTopItems.map((tx) => {
-                    const { isIncoming, isSimpleTransfer, label, counterparty, Icon } = getRowPresentation(tx)
+                    const { isIncoming, isSimpleTransfer, label, counterparty, Icon } =
+                      getRowPresentation(tx)
                     const canResend = canResendPendingTransaction({
                       status: tx.status,
                       destinationIdentity: tx.destination,
@@ -450,7 +458,17 @@ const History = () => {
                             </div>
                             <div className="flex flex-col">
                               <span className="text-xs font-semibold text-foreground">{label}</span>
-                              <AddressLabel address={counterparty} prefix={isSimpleTransfer ? (isIncoming ? t('history.fromPrefix') : t('history.toPrefix')) : undefined} className="text-xs text-muted-foreground" />
+                              <AddressLabel
+                                address={counterparty}
+                                prefix={
+                                  isSimpleTransfer
+                                    ? isIncoming
+                                      ? t('history.fromPrefix')
+                                      : t('history.toPrefix')
+                                    : undefined
+                                }
+                                className="text-xs text-muted-foreground"
+                              />
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
@@ -504,7 +522,9 @@ const History = () => {
                             </div>
                             {Number(tx.inputType) === 0 && (
                               <div className="flex items-center gap-1 font-mono">
-                                <span className="text-muted-foreground/70">{t('history.type')}</span>
+                                <span className="text-muted-foreground/70">
+                                  {t('history.type')}
+                                </span>
                                 <span>0</span>
                               </div>
                             )}
@@ -512,7 +532,10 @@ const History = () => {
                           {Number(tx.inputType) !== 0 && (
                             <div className="flex items-center gap-1 font-mono">
                               <span className="text-muted-foreground/70">{t('history.type')}</span>
-                              <InputTypeLabel destination={tx.destination} inputType={Number(tx.inputType)} />
+                              <InputTypeLabel
+                                destination={tx.destination}
+                                inputType={Number(tx.inputType)}
+                              />
                             </div>
                           )}
                         </div>

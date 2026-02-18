@@ -120,7 +120,17 @@ const TransactionsPreview = ({
           </div>
           <div className="flex flex-col">
             <span className="text-xs font-semibold text-foreground">{label}</span>
-            <AddressLabel address={counterparty} prefix={isSimpleTransfer ? (isIncoming ? t('history.fromPrefix') : t('history.toPrefix')) : undefined} className="text-xs text-muted-foreground" />
+            <AddressLabel
+              address={counterparty}
+              prefix={
+                isSimpleTransfer
+                  ? isIncoming
+                    ? t('history.fromPrefix')
+                    : t('history.toPrefix')
+                  : undefined
+              }
+              className="text-xs text-muted-foreground"
+            />
             <span className="text-[11px] text-muted-foreground/70">
               {(() => {
                 if (isFailed) return t('history.failed')

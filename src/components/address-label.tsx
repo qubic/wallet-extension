@@ -13,12 +13,18 @@ const AddressLabel = ({ address, className, prefix }: AddressLabelProps) => {
   if (resolved) {
     return (
       <span className={className}>
-        {prefix && `${prefix} `}{resolved.name} <span className="font-mono">({truncateString(address)})</span>
+        {prefix && `${prefix} `}
+        {resolved.name} <span className="font-mono">({truncateString(address)})</span>
       </span>
     )
   }
 
-  return <span className={`font-mono ${className ?? ''}`}>{prefix && `${prefix} `}{truncateString(address)}</span>
+  return (
+    <span className={`font-mono ${className ?? ''}`}>
+      {prefix && `${prefix} `}
+      {truncateString(address)}
+    </span>
+  )
 }
 
 export default AddressLabel

@@ -124,25 +124,19 @@ const TransactionDetails = () => {
     {
       key: 'inputType',
       label: t('txDetails.inputType'),
-      value: procedureName
-        ? `${details?.inputType} (${procedureName})`
-        : details?.inputType,
+      value: procedureName ? `${details?.inputType} (${procedureName})` : details?.inputType,
     },
     {
       key: 'source',
       label: t('txDetails.source'),
-      value: sourceName
-        ? formatAddressLabel(sourceAddress, sourceName.name)
-        : details?.source,
+      value: sourceName ? formatAddressLabel(sourceAddress, sourceName.name) : details?.source,
       copyable: true,
       copyText: sourceAddress,
     },
     {
       key: 'destination',
       label: t('txDetails.destination'),
-      value: destName
-        ? formatAddressLabel(destAddress, destName.name)
-        : details?.destination,
+      value: destName ? formatAddressLabel(destAddress, destName.name) : details?.destination,
       copyable: true,
       copyText: destAddress,
     },
