@@ -8,8 +8,7 @@ import {
   RefreshCwIcon,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { useAddressName } from '@/hooks/use-address-name'
-import { useProcedureName } from '@/hooks/use-procedure-name'
+import { CounterpartyLabel, InputTypeLabel } from '@/components/transaction-labels'
 import { buildExplorerObjectUrl, truncateString } from '@/lib/utils'
 import { useTranslation } from 'react-i18next'
 import { useEffect, useState } from 'react'
@@ -44,36 +43,6 @@ const fetchLatestStats = async (): Promise<LatestStatsResponse> => {
     throw new Error('Failed to load network stats.')
   }
   return response.json() as Promise<LatestStatsResponse>
-}
-
-const CounterpartyLabel = ({ address }: { address: string }) => {
-  const resolved = useAddressName(address)
-  if (resolved) {
-    return (
-      <span className="text-xs text-muted-foreground">
-        {resolved.name}{' '}
-        <span className="font-mono text-[11px]">({truncateString(address)})</span>
-      </span>
-    )
-  }
-  return (
-    <span className="font-mono text-xs text-muted-foreground">{truncateString(address)}</span>
-  )
-}
-
-const InputTypeLabel = ({
-  destination,
-  inputType,
-}: { destination: string; inputType: number }) => {
-  const procedureName = useProcedureName(destination, inputType)
-  if (procedureName) {
-    return (
-      <span>
-        {inputType} ({procedureName})
-      </span>
-    )
-  }
-  return <span>{inputType.toString()}</span>
 }
 
 const History = () => {

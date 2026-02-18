@@ -19,7 +19,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer'
 import { useTranslation } from 'react-i18next'
-import { useAddressName } from '@/hooks/use-address-name'
+import { CounterpartyLabel } from '@/components/transaction-labels'
 import { normalizeBalance, formatBalanceCompact, truncateString } from '@/lib/utils'
 import { getCurrentIdentity, isWatchOnlyIdentity } from '@/lib/accounts'
 import { aggregateAssets, formatAssetUnits, useOwnedAssets } from '@/lib/assets'
@@ -200,21 +200,6 @@ const BalanceCard = ({
         </div>
       )}
     </div>
-  )
-}
-
-const CounterpartyLabel = ({ address }: { address: string }) => {
-  const resolved = useAddressName(address)
-  if (resolved) {
-    return (
-      <span className="text-xs text-muted-foreground">
-        {resolved.name}{' '}
-        <span className="font-mono text-[11px]">({truncateString(address)})</span>
-      </span>
-    )
-  }
-  return (
-    <span className="font-mono text-xs text-muted-foreground">{truncateString(address)}</span>
   )
 }
 
