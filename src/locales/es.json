@@ -429,6 +429,7 @@
         "importing": "Importando..."
       },
       "errors": {
+        "fileTooLarge": "El archivo seleccionado es demasiado grande para ser un vault válido.",
         "selectFile": "Selecciona un archivo vault.",
         "passphraseRequired": "Se requiere contraseña.",
         "importFailed": "No se pudo importar el vault de la billetera web.",
