@@ -19,6 +19,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer'
 import { useTranslation } from 'react-i18next'
+import { useAddressName } from '@/hooks/use-address-name'
 import { normalizeBalance, formatBalanceCompact, truncateString } from '@/lib/utils'
 import { getCurrentIdentity, isWatchOnlyIdentity } from '@/lib/accounts'
 import { aggregateAssets, formatAssetUnits, useOwnedAssets } from '@/lib/assets'
@@ -202,6 +203,21 @@ const BalanceCard = ({
   )
 }
 
+const CounterpartyLabel = ({ address }: { address: string }) => {
+  const resolved = useAddressName(address)
+  if (resolved) {
+    return (
+      <span className="text-xs text-muted-foreground">
+        {resolved.name}{' '}
+        <span className="font-mono text-[11px]">({truncateString(address)})</span>
+      </span>
+    )
+  }
+  return (
+    <span className="font-mono text-xs text-muted-foreground">{truncateString(address)}</span>
+  )
+}
+
 const TransactionsPreview = ({
   identity,
   transactions,
@@ -296,9 +312,7 @@ const TransactionsPreview = ({
               </div>
               <div className="flex flex-col">
                 <span className="text-xs font-semibold text-foreground">{label}</span>
-                <span className="font-mono text-xs text-muted-foreground">
-                  {truncateString(counterparty)}
-                </span>
+                <CounterpartyLabel address={counterparty} />
                 <span className="text-[11px] text-muted-foreground/70">
                   {t('home.recent.tick', { tick: tx.tickNumber })}
                 </span>

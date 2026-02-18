@@ -32,12 +32,14 @@ import {
   DrawerFooter,
 } from '@/components/ui/drawer'
 import {
+  formatAddressLabel,
   formatBalance,
   isValidIdentity,
   normalizeBalance,
   parseAmount,
   truncateString,
 } from '@/lib/utils'
+import { useAddressName } from '@/hooks/use-address-name'
 import PassphraseAuth from '@/pages/passphrase-auth'
 import {
   getCachedAccounts,
@@ -184,6 +186,8 @@ const TransferSuccess = ({
   onViewDetails: () => void
 }) => {
   const { t } = useTranslation()
+  const sourceName = useAddressName(txResult.sourceIdentity)
+  const recipientName = useAddressName(txResult.recipient)
 
   const handleCopyTxId = async () => {
     try {
@@ -223,8 +227,16 @@ const TransferSuccess = ({
           </div>
 
           <div className="w-full space-y-3 text-left">
-            <SummaryRow label={t('transfer.form.from')} value={txResult.sourceIdentity} mono />
-            <SummaryRow label={t('transfer.confirm.to')} value={txResult.recipient} mono />
+            <SummaryRow
+              label={t('transfer.form.from')}
+              value={formatAddressLabel(txResult.sourceIdentity, sourceName?.name)}
+              mono
+            />
+            <SummaryRow
+              label={t('transfer.confirm.to')}
+              value={formatAddressLabel(txResult.recipient, recipientName?.name)}
+              mono
+            />
             <SummaryRow
               label={t('transfer.success.amount')}
               value={`${formatBalance(txResult.amount)} ${txResult.tokenName}`}
@@ -286,6 +298,8 @@ const ConfirmationDrawer = ({
 }) => {
   const { t } = useTranslation()
   const parsed = parseAmount(amount) || 0n
+  const sourceName = useAddressName(sourceIdentity)
+  const recipientName = useAddressName(recipient)
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
@@ -297,8 +311,16 @@ const ConfirmationDrawer = ({
 
         <div className="flex-1 space-y-4 overflow-y-auto px-4 pb-2">
           <div className="space-y-3">
-            <SummaryRow label={t('transfer.form.from')} value={sourceIdentity} mono />
-            <SummaryRow label={t('transfer.confirm.to')} value={recipient} mono />
+            <SummaryRow
+              label={t('transfer.form.from')}
+              value={formatAddressLabel(sourceIdentity, sourceName?.name)}
+              mono
+            />
+            <SummaryRow
+              label={t('transfer.confirm.to')}
+              value={formatAddressLabel(recipient, recipientName?.name)}
+              mono
+            />
             <SummaryRow
               label={t('transfer.confirm.amount')}
               value={`${formatBalance(parsed)} ${tokenName}`}
@@ -403,6 +425,7 @@ const TransferForm = ({
     ? formatAssetUnits(selectedAsset.numberOfUnits, selectedAsset.decimals)
     : formatBalance(currentBalance)
   const availableUnits = selectedAsset ? BigInt(selectedAsset.numberOfUnits) : currentBalance
+  const recipientResolved = useAddressName(recipient.length === 60 ? recipient : '')
   const [isRecipientPickerOpen, setRecipientPickerOpen] = useState(false)
   const recipientPickerRef = useRef<HTMLDivElement | null>(null)
   const filteredVaultRecipients = useMemo(() => {
@@ -609,6 +632,9 @@ const TransferForm = ({
               <span>{t('transfer.form.recipientHint')}</span>
               <span>{recipient.length}/60</span>
             </div>
+            {recipientResolved && (
+              <p className="text-[11px] text-primary">{recipientResolved.name}</p>
+            )}
             {errors.recipient && <p className="text-xs text-destructive">{errors.recipient}</p>}
           </div>
 

@@ -5,12 +5,14 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import { buildExplorerObjectUrl, truncateString } from '@/lib/utils'
+import { buildExplorerObjectUrl, formatAddressLabel, truncateString } from '@/lib/utils'
 import {
   getPendingTransaction,
   resolvePendingTransactions,
   usePendingTransactionsVersion,
 } from '@/lib/pending-transactions'
+import { useAddressName } from '@/hooks/use-address-name'
+import { useProcedureName } from '@/hooks/use-procedure-name'
 
 const formatValue = (value: unknown): string => {
   if (value === null || value === undefined) return '--'
@@ -71,7 +73,19 @@ const TransactionDetails = () => {
   }, [hash, currentTick])
 
   const details = txQuery.data as Record<string, unknown> | undefined
-  const rows: Array<{ key: string; label: string; value: unknown; copyable?: boolean }> = [
+  const sourceAddress = (details?.source as string) ?? ''
+  const destAddress = (details?.destination as string) ?? ''
+  const sourceName = useAddressName(sourceAddress)
+  const destName = useAddressName(destAddress)
+  const procedureName = useProcedureName(destAddress, Number(details?.inputType ?? 0))
+
+  const rows: Array<{
+    key: string
+    label: string
+    value: unknown
+    copyable?: boolean
+    copyText?: string
+  }> = [
     { key: 'hash', label: t('txDetails.hash'), value: hash, copyable: true },
     { key: 'amount', label: t('txDetails.amount'), value: details?.amount },
     {
@@ -79,19 +93,36 @@ const TransactionDetails = () => {
       label: t('txDetails.tick'),
       value: details?.tickNumber ?? details?.tick ?? pending?.targetTick ?? '--',
     },
-    { key: 'inputType', label: t('txDetails.inputType'), value: details?.inputType },
-    { key: 'source', label: t('txDetails.source'), value: details?.source, copyable: true },
+    {
+      key: 'inputType',
+      label: t('txDetails.inputType'),
+      value: procedureName
+        ? `${details?.inputType} (${procedureName})`
+        : details?.inputType,
+    },
+    {
+      key: 'source',
+      label: t('txDetails.source'),
+      value: sourceName
+        ? formatAddressLabel(sourceAddress, sourceName.name)
+        : details?.source,
+      copyable: true,
+      copyText: sourceAddress,
+    },
     {
       key: 'destination',
       label: t('txDetails.destination'),
-      value: details?.destination,
+      value: destName
+        ? formatAddressLabel(destAddress, destName.name)
+        : details?.destination,
       copyable: true,
+      copyText: destAddress,
     },
   ]
 
-  const copyValue = async (key: string, value: unknown) => {
+  const copyValue = async (key: string, value: unknown, copyText?: string) => {
     try {
-      await navigator.clipboard.writeText(formatValue(value))
+      await navigator.clipboard.writeText(copyText ?? formatValue(value))
       setCopiedKey(key)
       toast.success(t('txDetails.copied'))
       window.setTimeout(() => {
@@ -182,7 +213,7 @@ const TransactionDetails = () => {
                     <button
                       type="button"
                       className="h-5 w-5 shrink-0 cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
-                      onClick={() => copyValue(row.key, row.value)}
+                      onClick={() => copyValue(row.key, row.value, row.copyText)}
                       aria-label={`${t('txDetails.copy')} ${row.label}`}
                     >
                       {copiedKey === row.key ? (

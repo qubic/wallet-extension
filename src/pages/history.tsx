@@ -8,6 +8,8 @@ import {
   RefreshCwIcon,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useAddressName } from '@/hooks/use-address-name'
+import { useProcedureName } from '@/hooks/use-procedure-name'
 import { buildExplorerObjectUrl, truncateString } from '@/lib/utils'
 import { useTranslation } from 'react-i18next'
 import { useEffect, useState } from 'react'
@@ -42,6 +44,36 @@ const fetchLatestStats = async (): Promise<LatestStatsResponse> => {
     throw new Error('Failed to load network stats.')
   }
   return response.json() as Promise<LatestStatsResponse>
+}
+
+const CounterpartyLabel = ({ address }: { address: string }) => {
+  const resolved = useAddressName(address)
+  if (resolved) {
+    return (
+      <span className="text-xs text-muted-foreground">
+        {resolved.name}{' '}
+        <span className="font-mono text-[11px]">({truncateString(address)})</span>
+      </span>
+    )
+  }
+  return (
+    <span className="font-mono text-xs text-muted-foreground">{truncateString(address)}</span>
+  )
+}
+
+const InputTypeLabel = ({
+  destination,
+  inputType,
+}: { destination: string; inputType: number }) => {
+  const procedureName = useProcedureName(destination, inputType)
+  if (procedureName) {
+    return (
+      <span>
+        {inputType} ({procedureName})
+      </span>
+    )
+  }
+  return <span>{inputType.toString()}</span>
 }
 
 const History = () => {
@@ -212,9 +244,7 @@ const History = () => {
                       </div>
                       <div className="flex flex-col">
                         <span className="text-xs font-semibold text-foreground">{label}</span>
-                        <span className="text-xs text-muted-foreground">
-                          {truncateString(counterparty)}
-                        </span>
+                        <CounterpartyLabel address={counterparty} />
                       </div>
                     </div>
                     <span
@@ -231,32 +261,42 @@ const History = () => {
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-[1fr_auto_auto] items-center gap-2 text-[11px] text-muted-foreground">
-                    <div className="flex min-w-0 items-center gap-2">
-                      <HashIcon className="h-3.5 w-3.5" />
-                      <a
-                        href={buildExplorerObjectUrl('tx', tx.hash)}
-                        className="truncate font-mono text-primary hover:underline"
-                        target="_blank"
-                        rel="noreferrer"
-                        onClick={(event) => event.stopPropagation()}
-                      >
-                        {truncateString(tx.hash, {
-                          leading: 6,
-                          trailing: 6,
-                          minLength: 12,
-                          emptyLabel: '',
-                        })}
-                      </a>
+                  <div className="flex flex-col gap-1 text-[11px] text-muted-foreground">
+                    <div className="flex items-center gap-2">
+                      <div className="flex min-w-0 items-center gap-2">
+                        <HashIcon className="h-3.5 w-3.5 shrink-0" />
+                        <a
+                          href={buildExplorerObjectUrl('tx', tx.hash)}
+                          className="truncate font-mono text-primary hover:underline"
+                          target="_blank"
+                          rel="noreferrer"
+                          onClick={(event) => event.stopPropagation()}
+                        >
+                          {truncateString(tx.hash, {
+                            leading: 6,
+                            trailing: 6,
+                            minLength: 12,
+                            emptyLabel: '',
+                          })}
+                        </a>
+                      </div>
+                      <div className="ml-auto flex items-center gap-1 font-mono">
+                        <span className="text-muted-foreground/70">{t('history.tick')}</span>
+                        <span>{tx.tickNumber.toString()}</span>
+                      </div>
+                      {Number(tx.inputType) === 0 && (
+                        <div className="flex items-center gap-1 font-mono">
+                          <span className="text-muted-foreground/70">{t('history.type')}</span>
+                          <span>0</span>
+                        </div>
+                      )}
                     </div>
-                    <div className="flex items-center gap-1 font-mono">
-                      <span className="text-muted-foreground/70">{t('history.tick')}</span>
-                      <span>{tx.tickNumber.toString()}</span>
-                    </div>
-                    <div className="flex items-center gap-1 font-mono">
-                      <span className="text-muted-foreground/70">{t('history.type')}</span>
-                      <span>{tx.inputType.toString()}</span>
-                    </div>
+                    {Number(tx.inputType) !== 0 && (
+                      <div className="flex gap-1 font-mono">
+                        <span className="text-muted-foreground/70">{t('history.type')}</span>
+                        <InputTypeLabel destination={tx.destination} inputType={Number(tx.inputType)} />
+                      </div>
+                    )}
                   </div>
                 </motion.button>
               )
