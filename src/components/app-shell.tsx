@@ -15,6 +15,8 @@ const AppShell = ({
 }: PropsWithChildren<{ showNav?: boolean; showHeader?: boolean }>) => {
   const { t } = useTranslation()
   const { pathname } = useLocation()
+  const isPopupView =
+    typeof window !== 'undefined' && window.location.pathname.endsWith('popup.html')
   const isSidePanelView =
     typeof window !== 'undefined' && window.location.pathname.endsWith('sidepanel.html')
   const scrollContainerRef = useRef<HTMLDivElement | null>(null)
@@ -92,6 +94,9 @@ const AppShell = ({
       return
     }
     await openSidePanel()
+    if (isPopupView) {
+      window.close()
+    }
   }
 
   const navItems = useMemo(
