@@ -211,8 +211,8 @@ const Transfer = () => {
       return
     }
     if (validateForm()) {
-      setStep('auth')
       setErrorMessage('')
+      setDrawerOpen(true)
     }
   }
 
@@ -220,11 +220,11 @@ const Transfer = () => {
     seedRef.current = seed
     setErrorMessage('')
     setStep('form')
-    setDrawerOpen(true)
+    void handleConfirmSend(seed)
   }
 
-  const handleConfirmSend = async () => {
-    const seed = seedRef.current
+  const handleConfirmSend = async (seedArg?: string) => {
+    const seed = seedArg ?? seedRef.current
     if (!seed) return
 
     setSending(true)
@@ -363,6 +363,7 @@ const Transfer = () => {
   const handleAuthCancel = () => {
     seedRef.current = null
     setStep('form')
+    setDrawerOpen(true)
   }
 
   const handleSendAnother = () => {
@@ -500,7 +501,9 @@ const Transfer = () => {
           setDrawerOpen(false)
           seedRef.current = null
         }}
-        onConfirm={handleConfirmSend}
+        onConfirm={() => {
+          setStep('auth')
+        }}
       />
     </>
   )
