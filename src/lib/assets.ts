@@ -1,8 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
 
+const QX_MANAGING_CONTRACT_INDEX = 1
+
 export type OwnedAssetsResponse = {
   ownedAssets?: Array<{
     data?: {
+      managingContractIndex?: number
       numberOfUnits?: string
       issuedAsset?: {
         name?: string
@@ -32,13 +35,18 @@ export type AggregatedAsset = {
   decimals: number
 }
 
-export const aggregateAssets = (response: OwnedAssetsResponse): AggregatedAsset[] => {
+export const aggregateAssets = (
+  response: OwnedAssetsResponse,
+  filterByQxManagement = false,
+): AggregatedAsset[] => {
   const map = new Map<string, AggregatedAsset>()
 
   for (const entry of response.ownedAssets ?? []) {
     const info = entry.data
     const issued = info?.issuedAsset
     if (!issued?.name || !info?.numberOfUnits) continue
+
+    if (filterByQxManagement && info.managingContractIndex !== QX_MANAGING_CONTRACT_INDEX) continue
 
     const key = `${issued.issuerIdentity ?? ''}-${issued.name}`
     const existing = map.get(key)

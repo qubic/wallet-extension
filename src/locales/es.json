@@ -334,7 +334,6 @@
       "description": "Revisa los detalles antes de enviar.",
       "to": "Para",
       "amount": "Monto",
-      "fee": "Comisión de red: {{fee}} QU",
       "warning": "Esta acción no se puede deshacer.",
       "feeLabel": "Comisión de red",
       "feeIncluded": "Incluida"
@@ -343,17 +342,11 @@
       "continue": "Continuar",
       "confirm": "Confirmar y enviar",
       "sending": "Enviando...",
-      "cancel": "Cancelar",
-      "back": "Atrás"
+      "cancel": "Cancelar"
     },
     "success": {
       "title": "Transferencia enviada",
-      "description": "Tu transacción ha sido transmitida y está programada para el tick {{targetTick}}.",
-      "txId": "ID de transacción",
-      "targetTick": "Tick objetivo",
-      "amount": "Monto",
-      "viewHistory": "Ver historial",
-      "sendAnother": "Enviar otra"
+      "description": "Tu transacción ha sido transmitida y está programada para el tick {{targetTick}}."
     },
     "errors": {
       "networkError": "Error de red. Intenta de nuevo.",

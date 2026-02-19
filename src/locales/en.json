@@ -334,7 +334,6 @@
       "description": "Review the details before sending.",
       "to": "To",
       "amount": "Amount",
-      "fee": "Network fee: {{fee}} QU",
       "warning": "This action cannot be undone.",
       "feeLabel": "Network fee",
       "feeIncluded": "Included"
@@ -343,17 +342,11 @@
       "continue": "Continue",
       "confirm": "Confirm & send",
       "sending": "Sending...",
-      "cancel": "Cancel",
-      "back": "Back"
+      "cancel": "Cancel"
     },
     "success": {
       "title": "Transfer sent",
-      "description": "Your transaction has been broadcast and is scheduled for tick {{targetTick}}.",
-      "txId": "Transaction ID",
-      "targetTick": "Target tick",
-      "amount": "Amount",
-      "viewHistory": "View history",
-      "sendAnother": "Send another"
+      "description": "Your transaction has been broadcast and is scheduled for tick {{targetTick}}."
     },
     "errors": {
       "networkError": "Network error. Please retry.",
