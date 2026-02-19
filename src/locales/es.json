@@ -237,8 +237,8 @@
     "outgoing": "Saliente",
     "sent": "Enviado",
     "received": "Recibido",
-    "to": "A: {{address}}",
-    "from": "De: {{address}}",
+    "to": "A:",
+    "from": "De:",
     "tick": "Tick",
     "type": "Tipo",
     "pending": "Pendiente",
@@ -249,9 +249,7 @@
     "resend": "Reenviar",
     "deleteFailed": "Eliminar transacción fallida",
     "today": "Hoy",
-    "yesterday": "Ayer",
-    "fromPrefix": "De:",
-    "toPrefix": "A:"
+    "yesterday": "Ayer"
   },
   "txDetails": {
     "title": "Detalles de transacción",

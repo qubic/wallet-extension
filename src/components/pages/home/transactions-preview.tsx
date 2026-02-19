@@ -125,8 +125,8 @@ const TransactionsPreview = ({
               prefix={
                 isSimpleTransfer
                   ? isIncoming
-                    ? t('history.fromPrefix')
-                    : t('history.toPrefix')
+                    ? t('history.from')
+                    : t('history.to')
                   : undefined
               }
               className="text-xs text-muted-foreground"

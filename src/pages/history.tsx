@@ -251,8 +251,8 @@ const History = () => {
                 prefix={
                   isSimpleTransfer
                     ? isIncoming
-                      ? t('history.fromPrefix')
-                      : t('history.toPrefix')
+                      ? t('history.from')
+                      : t('history.to')
                     : undefined
                 }
                 className="text-xs text-muted-foreground"
@@ -463,8 +463,8 @@ const History = () => {
                                 prefix={
                                   isSimpleTransfer
                                     ? isIncoming
-                                      ? t('history.fromPrefix')
-                                      : t('history.toPrefix')
+                                      ? t('history.from')
+                                      : t('history.to')
                                     : undefined
                                 }
                                 className="text-xs text-muted-foreground"
