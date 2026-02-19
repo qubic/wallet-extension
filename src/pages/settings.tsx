@@ -93,6 +93,13 @@ const Settings = () => {
 
   const categories = [
     {
+      key: 'accounts',
+      icon: UsersIcon,
+      label: t('settings.categories.accounts'),
+      description: t('settings.categories.accountsDesc'),
+      action: () => navigate('/accounts'),
+    },
+    {
       key: 'general',
       icon: SlidersHorizontalIcon,
       label: t('settings.categories.general'),
@@ -112,13 +119,6 @@ const Settings = () => {
       label: t('settings.categories.backup'),
       description: t('settings.categories.backupDesc'),
       action: () => setExportDrawerOpen(true),
-    },
-    {
-      key: 'accounts',
-      icon: UsersIcon,
-      label: t('settings.categories.accounts'),
-      description: t('settings.categories.accountsDesc'),
-      action: () => navigate('/accounts'),
     },
     {
       key: 'support',

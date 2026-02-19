@@ -177,9 +177,21 @@ const AppHeader = ({
             </button>
           </PopoverTrigger>
           <PopoverContent align="start" className="w-72 p-3">
-            <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
-              <UsersIcon className="h-4 w-4" />
-              {t('home.accounts.title')}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
+                <UsersIcon className="h-4 w-4" />
+                {t('home.accounts.title')}
+              </div>
+              <button
+                type="button"
+                className="flex h-6 w-6 items-center justify-center rounded-md bg-primary/10 text-primary transition hover:bg-primary/20"
+                onClick={() => {
+                  setIsMenuOpen(false)
+                  navigate('/accounts', { state: { openAdd: true } })
+                }}
+              >
+                <PlusIcon className="h-3.5 w-3.5" />
+              </button>
             </div>
             <div className="mt-3 space-y-2">
               {accounts.length === 0 && (
@@ -219,26 +231,6 @@ const AppHeader = ({
                       </div>
                     </button>
                   ))}
-                  <button
-                    type="button"
-                    className="mt-2 flex w-full items-center gap-2 border-t border-border/40 px-2 pt-3 text-left transition hover:opacity-80"
-                    onClick={() => {
-                      setIsMenuOpen(false)
-                      navigate('/accounts', { state: { openAdd: true } })
-                    }}
-                  >
-                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-muted/30">
-                      <PlusIcon className="h-3.5 w-3.5 text-muted-foreground" />
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-xs font-semibold text-foreground">
-                        {t('accounts.manage.addTitle')}
-                      </span>
-                      <span className="text-[11px] text-muted-foreground">
-                        {t('accounts.manage.addNewDesc')}
-                      </span>
-                    </div>
-                  </button>
                 </div>
               )}
             </div>
