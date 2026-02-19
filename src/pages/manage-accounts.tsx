@@ -171,6 +171,7 @@ const ManageAccounts = () => {
 
   const setActive = (identity: string, name: string) => {
     setOnboarded(identity, name)
+    navigate('/home')
   }
 
   const persistOrder = (next: AccountEntry[]) => {
