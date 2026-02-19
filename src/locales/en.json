@@ -66,8 +66,8 @@
       "title": "Watch-only account",
       "description": "Sending is disabled for this address."
     },
-    "status": {
-      "syncing": "Syncing"
+    "price": {
+      "label": "QUBIC Price"
     },
     "accounts": {
       "title": "Accounts",
@@ -431,6 +431,7 @@
         "importing": "Importing..."
       },
       "errors": {
+        "fileTooLarge": "The selected file is too large to be a valid vault file.",
         "selectFile": "Select a vault file.",
         "passphraseRequired": "Passphrase is required.",
         "importFailed": "Failed to import web wallet vault.",

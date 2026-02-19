@@ -1,6 +1,6 @@
 import { useBalance, useTransactions } from '@qubic-labs/react'
 import { CopyIcon, EyeIcon, Loader2Icon, PackageIcon, RefreshCwIcon } from 'lucide-react'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import QRCode from 'qrcode'
 import { useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -23,9 +23,6 @@ import {
   resolvePendingTransactions,
   usePendingTransactionsVersion,
 } from '@/lib/pending-transactions'
-
-const SYNC_BADGE_SHOW_DELAY_MS = 180
-const SYNC_BADGE_MIN_VISIBLE_MS = 700
 
 const pageMotion = {
   initial: { opacity: 0, y: 14 },
@@ -57,7 +54,7 @@ const Home = () => {
   const isSidePanel = pathname.endsWith('sidepanel.html')
   const isPopup = pathname.endsWith('popup.html')
   const isConstrainedLayout = isPopup || isSidePanel
-  const assetsListMaxHeightClass = isPopup ? 'max-h-36' : isSidePanel ? 'max-h-44' : 'max-h-52'
+
   const navigate = useNavigate()
   const { copyText } = useClipboardCopy()
   const balance = useBalance(identity, { refetchInterval: 15_000 })
@@ -74,15 +71,9 @@ const Home = () => {
   )
   const [isReceiveOpen, setIsReceiveOpen] = useState(false)
   const [qrCode, setQrCode] = useState<string | null>(null)
-  const [virtualTick, setVirtualTick] = useState<number | null>(null)
-  const currentTickFromRpc = latestStats.data?.data?.currentTick
-  const hasVirtualTick = virtualTick !== null
-  const tickValue = virtualTick ?? currentTickFromRpc ?? '--'
   const pendingForIdentity = getPendingTransactionsForIdentity(identity)
-  const epochValue = latestStats.data?.data?.epoch ?? '--'
-  const pricePerBValue = latestStats.data?.data?.price
-    ? `$${(latestStats.data.data.price * 1_000_000_000).toFixed(2)}`
-    : '--'
+  const pricePerQu = latestStats.data?.data?.price
+  const pricePerBFormatted = pricePerQu ? `$${(pricePerQu * 1_000_000_000).toFixed(2)}` : '--'
   const handleRefresh = () => {
     void balance.refetch()
     void transactions.refetch()
@@ -99,10 +90,6 @@ const Home = () => {
     transactions.isFetching ||
     ownedAssets.isFetching ||
     latestStats.isFetching
-  const [isSyncingVisible, setIsSyncingVisible] = useState(false)
-  const syncingShownAtRef = useRef<number | null>(null)
-  const syncShowTimerRef = useRef<number | null>(null)
-  const syncHideTimerRef = useRef<number | null>(null)
 
   const handleCopyIdentity = async () => {
     await copyText(identity, {
@@ -134,41 +121,6 @@ const Home = () => {
   useEffect(() => {
     resolvePendingTransactions(transactionItems, archiverProcessedTick)
   }, [transactionItems, archiverProcessedTick])
-
-  useEffect(() => {
-    const clearTimers = () => {
-      if (syncShowTimerRef.current) {
-        window.clearTimeout(syncShowTimerRef.current)
-        syncShowTimerRef.current = null
-      }
-      if (syncHideTimerRef.current) {
-        window.clearTimeout(syncHideTimerRef.current)
-        syncHideTimerRef.current = null
-      }
-    }
-
-    clearTimers()
-
-    if (isSyncingRaw) {
-      if (isSyncingVisible) return undefined
-      syncShowTimerRef.current = window.setTimeout(() => {
-        syncingShownAtRef.current = Date.now()
-        setIsSyncingVisible(true)
-      }, SYNC_BADGE_SHOW_DELAY_MS)
-      return clearTimers
-    }
-
-    if (!isSyncingVisible) return undefined
-
-    const elapsed = syncingShownAtRef.current ? Date.now() - syncingShownAtRef.current : 0
-    const remaining = Math.max(0, SYNC_BADGE_MIN_VISIBLE_MS - elapsed)
-    syncHideTimerRef.current = window.setTimeout(() => {
-      syncingShownAtRef.current = null
-      setIsSyncingVisible(false)
-    }, remaining)
-
-    return clearTimers
-  }, [isSyncingRaw, isSyncingVisible])
 
   useEffect(() => {
     const handlePendingSettled = () => {
@@ -207,44 +159,24 @@ const Home = () => {
     }
   }, [identity, isReceiveOpen])
 
-  useEffect(() => {
-    if (typeof currentTickFromRpc !== 'number') return
-    setVirtualTick(currentTickFromRpc)
-  }, [currentTickFromRpc])
-
-  useEffect(() => {
-    if (!hasVirtualTick) return
-    const timer = window.setInterval(() => {
-      setVirtualTick((previous) => (previous == null ? previous : previous + 1))
-    }, 1_300)
-    return () => {
-      window.clearInterval(timer)
-    }
-  }, [hasVirtualTick])
-
   return (
     <section
-      className={`relative flex w-full pt-4 ${isConstrainedLayout ? 'justify-start' : 'justify-center'}`}
+      className={`app-scrollbar relative flex h-full w-full overflow-y-auto pt-4 ${isConstrainedLayout ? 'justify-start' : 'justify-center'}`}
     >
-      {isSyncingVisible && (
-        <div className="pointer-events-none absolute left-4 top-2 z-10">
-          <div className="inline-flex shrink-0 items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-2 py-1 text-[11px] text-primary">
-            <Loader2Icon className="h-3.5 w-3.5 animate-spin" />
-            {t('home.status.syncing')}
-          </div>
-        </div>
-      )}
       <AnimatePresence mode="wait">
         <motion.div
           key={identity || 'no-identity'}
-          className="flex w-full max-w-sm flex-col gap-5 px-4"
+          className="flex w-full max-w-sm flex-col gap-5 px-4 pb-6"
           variants={pageMotion}
           initial="initial"
           animate="animate"
           exit={{ opacity: 0, y: -8, transition: { duration: 0.16 } }}
         >
           <motion.div className="space-y-4 p-1" variants={sectionMotion}>
-            <div className="flex items-start justify-end gap-3">
+            <div className="flex items-center justify-between gap-3">
+              <div className="text-[11px] text-muted-foreground">
+                {t('home.price.label')}: {pricePerBFormatted}
+              </div>
               <Button
                 size="icon"
                 variant="ghost"
@@ -257,11 +189,7 @@ const Home = () => {
               </Button>
             </div>
             <div>
-              <BalanceCard
-                balance={balance}
-                identity={identity}
-                networkMeta={{ tick: tickValue, epoch: epochValue, price: pricePerBValue }}
-              />
+              <BalanceCard balance={balance} identity={identity} price={pricePerQu} />
             </div>
             {isWatchOnly && (
               <div className="flex items-center justify-center gap-2">
@@ -294,14 +222,23 @@ const Home = () => {
             </motion.div>
           )}
 
-          <motion.div className="space-y-3" variants={sectionMotion}>
+          <motion.div className="space-y-3 pt-2" variants={sectionMotion}>
             <div className="flex items-center justify-between">
               <div className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                 {t('home.recent.title')}
               </div>
-              {transactions.isFetching && (
-                <Loader2Icon className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
-              )}
+              <div className="flex items-center gap-2">
+                {transactions.isFetching && (
+                  <Loader2Icon className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
+                )}
+                <button
+                  type="button"
+                  className="cursor-pointer text-xs text-muted-foreground transition-colors hover:text-foreground"
+                  onClick={() => navigate('/history')}
+                >
+                  {t('home.recent.viewAll')}
+                </button>
+              </div>
             </div>
             <TransactionsPreview
               identity={identity}
@@ -338,9 +275,7 @@ const Home = () => {
               <div className="text-xs text-destructive">{t('home.assets.error')}</div>
             )}
             {ownedAssets.data && aggregatedAssets.length > 0 && (
-              <div
-                className={`app-scrollbar ${assetsListMaxHeightClass} space-y-2 overflow-y-auto pr-1`}
-              >
+              <div className="space-y-2">
                 {aggregatedAssets.map((asset) => (
                   <div
                     key={`${asset.issuerIdentity}-${asset.name}`}

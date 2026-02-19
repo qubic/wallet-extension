@@ -66,8 +66,8 @@
       "title": "Cuenta de solo lectura",
       "description": "El envío está deshabilitado para esta dirección."
     },
-    "status": {
-      "syncing": "Sincronizando"
+    "price": {
+      "label": "Precio QUBIC"
     },
     "accounts": {
       "title": "Cuentas",
@@ -431,6 +431,7 @@
         "importing": "Importando..."
       },
       "errors": {
+        "fileTooLarge": "El archivo seleccionado es demasiado grande para ser un vault válido.",
         "selectFile": "Selecciona un archivo vault.",
         "passphraseRequired": "Se requiere contraseña.",
         "importFailed": "No se pudo importar el vault de la billetera web.",

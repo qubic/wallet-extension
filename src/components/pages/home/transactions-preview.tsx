@@ -255,14 +255,6 @@ const TransactionsPreview = ({
         </div>
       )}
       {recentChain.map((tx) => renderRow(tx))}
-      <button
-        type="button"
-        className="w-full cursor-pointer pt-1 text-center text-xs text-muted-foreground transition-colors hover:text-foreground"
-        onClick={onViewMore}
-        aria-label={t('home.actions.history')}
-      >
-        {t('home.recent.viewAll')}
-      </button>
     </div>
   )
 }
