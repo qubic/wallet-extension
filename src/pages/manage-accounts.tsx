@@ -268,6 +268,9 @@ const ManageAccounts = () => {
           entry.identity === account.identity ? { ...entry, name: name.trim() } : entry,
         )
         saveWatchOnlyAccounts(watchOnly)
+        if (account.identity === currentIdentity) {
+          setOnboarded(account.identity, name.trim())
+        }
       } else {
         const vault = await openBrowserVault(passphrase, false)
         const seed = await vault.getSeed(account.identity)
