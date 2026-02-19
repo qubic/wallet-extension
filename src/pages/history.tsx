@@ -249,11 +249,7 @@ const History = () => {
               <AddressLabel
                 address={counterparty}
                 prefix={
-                  isSimpleTransfer
-                    ? isIncoming
-                      ? t('history.from')
-                      : t('history.to')
-                    : undefined
+                  isSimpleTransfer ? (isIncoming ? t('history.from') : t('history.to')) : undefined
                 }
                 className="text-xs text-muted-foreground"
               />
