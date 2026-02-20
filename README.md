@@ -77,6 +77,28 @@ sidepanel.html               # sidepanel entry point
 - App reset now clears wallet-specific keys only (scoped cleanup), not all origin storage.
 - Current RPC host permission is restricted to `https://rpc.qubic.org/*`.
 
+## dapp api (`window.qubic`)
+The extension injects `window.qubic` into regular web pages (`http/https`).
+
+Available methods:
+- `connect(): Promise<{ connected: true; origin: string }>`
+- `getAccount(): Promise<{ identity: string; name?: string } | null>`
+- `signMessage(params): Promise<{ signatureHex: string; digestHex: string }>`
+- `signTransaction(params): Promise<{ txId: string; targetTick: number; txBytesBase64: string; txBytesHex: string }>`
+- `disconnect(): Promise<{ disconnected: true }>`
+
+Behavior:
+- `connect` requires explicit user approval.
+- `signMessage` and `signTransaction` require approval + passphrase.
+- Requests from unconnected origins fail with `NOT_CONNECTED`.
+- Provider errors include `error.code` and `error.message`.
+
+Events:
+- `window.qubic.on('accountChanged', cb)`
+- `window.qubic.on('disconnect', cb)`
+
+Connected websites can be managed in `Settings -> Connected sites`.
+
 ## Quality gates
 Run these before opening a PR:
 
