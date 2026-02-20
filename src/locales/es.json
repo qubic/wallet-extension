@@ -111,6 +111,8 @@
     "categories": {
       "general": "Preferencias",
       "generalDesc": "Preferencias de idioma y tema",
+      "connectedSites": "Sitios conectados",
+      "connectedSitesDesc": "Gestiona acceso de sitios web",
       "security": "Seguridad",
       "securityDesc": "Contraseña, bloqueo automático y restablecer",
       "backup": "Respaldo",
@@ -125,6 +127,13 @@
     "general": {
       "title": "Preferencias",
       "back": "Configuración"
+    },
+    "connectedSites": {
+      "title": "Sitios conectados",
+      "back": "Ajustes",
+      "empty": "No hay sitios web conectados.",
+      "disconnect": "Desconectar",
+      "connectedAt": "Conectado: {{date}}"
     },
     "security": {
       "title": "Seguridad",
@@ -381,6 +390,28 @@
   "unlock": {
     "title": "Desbloquea tu billetera",
     "subtitle": "Tu billetera está bloqueada por seguridad. Ingresa tu contraseña para continuar."
+  },
+  "dapp": {
+    "approval": {
+      "title": "Solicitud de conexión",
+      "origin": "Sitio web",
+      "connectSubtitle": "Este sitio quiere conectarse a tu billetera.",
+      "signMessageSubtitle": "Este sitio quiere que firmes un mensaje.",
+      "signTransactionSubtitle": "Este sitio quiere que firmes una transacción.",
+      "genericSubtitle": "Revisa esta solicitud antes de continuar.",
+      "messageLabel": "Mensaje",
+      "messageEmpty": "No hay vista previa del mensaje.",
+      "txTo": "Para",
+      "txAmount": "Cantidad",
+      "txInputType": "Tipo de entrada",
+      "txTargetTick": "Tick objetivo",
+      "approve": "Aprobar",
+      "reject": "Rechazar",
+      "errors": {
+        "runtimeUnavailable": "El runtime de la extensión no está disponible.",
+        "decisionFailed": "No se pudo enviar tu decisión."
+      }
+    }
   },
   "onboarding": {
     "importSeed": {
