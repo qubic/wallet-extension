@@ -4,6 +4,7 @@ import './styles/global.css'
 import './i18n'
 import App from './app/app'
 import { startActionIconThemeSync } from './lib/extension-icons'
+import { startDappSessionSync } from './lib/dapp/session-sync'
 
 const applyViewportSizing = () => {
   const html = document.documentElement
@@ -99,6 +100,7 @@ const startExtensionReloadWatcher = () => {
 
 startExtensionReloadWatcher()
 startActionIconThemeSync()
+startDappSessionSync()
 
 const rootElement = document.getElementById('root')
 

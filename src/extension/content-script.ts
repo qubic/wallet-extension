@@ -1,0 +1,88 @@
+import {
+  CONTENT_SOURCE,
+  DAPP_CHANNEL,
+  RUNTIME_EVENT_TYPE,
+  RUNTIME_REQUEST_TYPE,
+  type DappProviderErrorCode,
+  type DappEventMessage,
+  type DappRpcFailure,
+  type DappRpcResponse,
+  isDappRpcRequest,
+} from '@/lib/dapp/protocol'
+const INPAGE_SCRIPT_PATH = 'assets/inpage-provider.js'
+
+const injectProviderScript = () => {
+  const chromeApi = (globalThis as typeof globalThis & { chrome?: typeof chrome }).chrome
+  const runtime = chromeApi?.runtime
+  if (!runtime?.getURL) return
+
+  const script = document.createElement('script')
+  script.src = runtime.getURL(INPAGE_SCRIPT_PATH)
+  script.async = false
+  script.dataset.source = 'qubic-inpage-provider'
+  const parent = document.head || document.documentElement
+  parent.appendChild(script)
+  script.remove()
+}
+
+const postToPage = (message: DappRpcResponse | DappEventMessage) => {
+  window.postMessage(message, '*')
+}
+
+const sendFailure = (
+  id: string,
+  message: string,
+  code: DappProviderErrorCode = 'INTERNAL_ERROR',
+) => {
+  const payload: DappRpcFailure = {
+    channel: DAPP_CHANNEL,
+    source: CONTENT_SOURCE,
+    id,
+    ok: false,
+    error: { code, message },
+  }
+  postToPage(payload)
+}
+
+window.addEventListener('message', (event: MessageEvent) => {
+  if (event.source !== window) return
+  const data = event.data as unknown
+  if (!isDappRpcRequest(data)) return
+
+  const chromeApi = (globalThis as typeof globalThis & { chrome?: typeof chrome }).chrome
+  const runtime = chromeApi?.runtime
+  if (!runtime?.sendMessage) {
+    sendFailure(data.id, 'Extension runtime is not available')
+    return
+  }
+
+  runtime.sendMessage(
+    { type: RUNTIME_REQUEST_TYPE, payload: data },
+    (response: DappRpcResponse) => {
+      const maybeError = chromeApi?.runtime?.lastError
+      if (maybeError) {
+        sendFailure(data.id, maybeError.message || 'Failed to reach extension runtime')
+        return
+      }
+      if (!response || response.channel !== DAPP_CHANNEL || response.source !== CONTENT_SOURCE) {
+        sendFailure(data.id, 'Invalid response from extension runtime')
+        return
+      }
+      postToPage(response)
+    },
+  )
+})
+
+const chromeApi = (globalThis as typeof globalThis & { chrome?: typeof chrome }).chrome
+chromeApi?.runtime?.onMessage?.addListener((message: unknown) => {
+  if (!message || typeof message !== 'object') return
+  const record = message as Record<string, unknown>
+  if (record.type !== RUNTIME_EVENT_TYPE) return
+  const payload = record.payload
+  if (!payload || typeof payload !== 'object') return
+  const event = payload as DappEventMessage
+  if (event.channel !== DAPP_CHANNEL || event.source !== CONTENT_SOURCE) return
+  postToPage(event)
+})
+
+injectProviderScript()
