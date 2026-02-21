@@ -51,7 +51,7 @@ const Transfer = () => {
   const balance = useBalance(currentIdentity)
   const ownedAssets = useOwnedAssets(currentIdentity)
   const sendMutation = useSend()
-  const latestStats = useLatestStats('transfer', { staleTime: 5_000 })
+  const latestStats = useLatestStats('transfer')
   const tickInfo = useTickInfo('transfer')
 
   const [step, setStep] = useState<Step>('form')
