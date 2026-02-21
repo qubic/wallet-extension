@@ -25,6 +25,7 @@ import {
 } from '@/lib/accounts'
 import { useNavigate } from 'react-router-dom'
 import { useCallback } from 'react'
+import { REFRESH_INTERVAL_BACKGROUND_BALANCE } from '@/lib/refresh-intervals'
 
 type AppHeaderProps = {
   onToggleSidePanel: () => void
@@ -88,7 +89,7 @@ const AppHeader = ({
       queryKey: ['qubic', 'balance', account.identity],
       queryFn: () => sdk.rpc.live.balance(account.identity),
       enabled: accounts.length > 0,
-      refetchInterval: 20_000,
+      refetchInterval: REFRESH_INTERVAL_BACKGROUND_BALANCE,
     })),
   })
 
@@ -121,6 +122,13 @@ const AppHeader = ({
     setAccountName(selected.name)
     setIdentity(selected.identity)
     setIsMenuOpen(false)
+
+    // Trigger immediate refresh for the selected account
+    const accountIndex = accounts.findIndex((acc) => acc.identity === selected.identity)
+    if (accountIndex !== -1) {
+      void balanceQueries[accountIndex]?.refetch()
+    }
+
     navigate('/home')
   }
 
