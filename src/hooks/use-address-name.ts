@@ -1,15 +1,14 @@
 import { useMemo } from 'react'
-import { useSmartContracts, useExchanges, useAddressLabels } from '@/lib/qubic-static'
+import { useSmartContracts, useAddressLabels } from '@/lib/qubic-static'
 import { getCachedAccounts, getWatchOnlyAccounts } from '@/lib/accounts'
 
 export type AddressNameResult = {
   name: string
-  type: 'account' | 'smartContract' | 'exchange' | 'namedAddress'
+  type: 'account' | 'smartContract' | 'namedAddress'
 }
 
 export const useAddressName = (address: string): AddressNameResult | undefined => {
   const { data: smartContracts } = useSmartContracts()
-  const { data: exchanges } = useExchanges()
   const { data: addressLabels } = useAddressLabels()
 
   return useMemo(() => {
@@ -26,16 +25,11 @@ export const useAddressName = (address: string): AddressNameResult | undefined =
       return { name: sc.name, type: 'smartContract' }
     }
 
-    const exchange = exchanges?.find((e) => e.address === address)
-    if (exchange) {
-      return { name: exchange.name, type: 'exchange' }
-    }
-
     const label = addressLabels?.find((l) => l.address === address)
     if (label) {
       return { name: label.label, type: 'namedAddress' }
     }
 
     return undefined
-  }, [address, smartContracts, exchanges, addressLabels])
+  }, [address, smartContracts, addressLabels])
 }
