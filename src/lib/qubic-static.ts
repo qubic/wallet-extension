@@ -27,8 +27,6 @@ export const useSmartContracts = () =>
     staleTime: STATIC_STALE_TIME,
   })
 
-
-
 export const useAddressLabels = () =>
   useQuery({
     queryKey: ['qubic-static', 'address-labels'],
@@ -38,4 +36,3 @@ export const useAddressLabels = () =>
     },
     staleTime: STATIC_STALE_TIME,
   })
-

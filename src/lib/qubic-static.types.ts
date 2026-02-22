@@ -15,7 +15,6 @@ export type SmartContract = {
   proposalUrl?: string
 }
 
-
 export type AddressLabel = {
   label: string
   address: string
@@ -25,8 +24,6 @@ export type GetSmartContractsResponse = {
   smart_contracts: SmartContract[]
 }
 
-
 export type GetAddressLabelsResponse = {
   address_labels: AddressLabel[]
 }
-
