@@ -48,7 +48,7 @@ const RevealSeedDrawer = ({ open, seed, onOpenChange }: RevealSeedDrawerProps) =
         <div className="flex flex-col items-center gap-4 px-4">
           {qrDataUrl && (
             <div className="flex flex-col items-center gap-1">
-              <img src={qrDataUrl} alt={t('accounts.manage.qrAlt')} className='h-48 w-48' />
+              <img src={qrDataUrl} alt={t('accounts.manage.qrAlt')} className="h-48 w-48" />
               <p className="text-muted-foreground text-xs">{t('accounts.manage.qrLabel')}</p>
             </div>
           )}
