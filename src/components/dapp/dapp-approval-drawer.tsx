@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useLocation } from 'react-router-dom'
 import { GlobeIcon, Link2OffIcon, LinkIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -18,6 +19,7 @@ import {
 import { RUNTIME_APPROVAL_DECISION_TYPE } from '@/lib/dapp/protocol'
 import { PasswordInput } from '@/components/ui/password-input'
 import { truncateString } from '@/lib/utils'
+import { isWalletLocked } from '@/lib/lock'
 
 const toMessagePreview = (params: unknown) => {
   if (typeof params === 'string') return params
@@ -49,10 +51,12 @@ const toTxSummary = (params: unknown) => {
 
 const DappApprovalDrawer = () => {
   const { t } = useTranslation()
+  const location = useLocation()
   const [requests, setRequests] = useState<DappPendingRequest[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [passphrase, setPassphrase] = useState('')
+  const [locked, setLocked] = useState(() => isWalletLocked())
 
   const loadPendingRequests = useCallback(async () => {
     const next = await getDappPendingRequests()
@@ -71,8 +75,22 @@ const DappApprovalDrawer = () => {
     return () => chromeApi?.storage?.onChanged?.removeListener(onChanged)
   }, [loadPendingRequests])
 
+  useEffect(() => {
+    const syncLockState = () => {
+      setLocked(isWalletLocked())
+    }
+
+    syncLockState()
+    window.addEventListener('wallet-lock-updated', syncLockState)
+    window.addEventListener('storage', syncLockState)
+    return () => {
+      window.removeEventListener('wallet-lock-updated', syncLockState)
+      window.removeEventListener('storage', syncLockState)
+    }
+  }, [])
+
   const current = requests[0] ?? null
-  const isOpen = Boolean(current)
+  const isOpen = Boolean(current) && !locked && location.pathname !== '/unlock'
   const requiresPassphrase =
     current?.method === 'signMessage' || current?.method === 'signTransaction'
   const messagePreview = useMemo(() => toMessagePreview(current?.params), [current?.params])

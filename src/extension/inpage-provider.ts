@@ -43,6 +43,8 @@ const pending = new Map<
     timeoutId: number
   }
 >()
+const currentScript = document.currentScript as HTMLScriptElement | null
+const providerSession = currentScript?.dataset?.qubicSession ?? ''
 
 const createRequestId = () => `${Date.now()}-${Math.random().toString(36).slice(2)}`
 
@@ -54,6 +56,10 @@ const emitEvent = (message: DappEventMessage) => {
 
 const request = <TMethod extends DappMethod>(method: TMethod, params?: unknown) =>
   new Promise<DappMethodResultMap[TMethod]>((resolve, reject) => {
+    if (!providerSession) {
+      reject(new Error('Provider session is not initialized'))
+      return
+    }
     const id = createRequestId()
     const timeoutId = window.setTimeout(() => {
       pending.delete(id)
@@ -72,6 +78,7 @@ const request = <TMethod extends DappMethod>(method: TMethod, params?: unknown) 
       id,
       method,
       params,
+      session: providerSession,
     }
     window.postMessage(payload, '*')
   })
@@ -105,6 +112,7 @@ const handleWindowMessage = (event: MessageEvent) => {
   if (!data || typeof data !== 'object') return
 
   if (isDappRpcResponse(data) && data.source === CONTENT_SOURCE) {
+    if (data.session !== providerSession) return
     const entry = pending.get(data.id)
     if (!entry) return
     pending.delete(data.id)
@@ -121,11 +129,23 @@ const handleWindowMessage = (event: MessageEvent) => {
   }
 
   if (isDappEventMessage(data) && data.source === CONTENT_SOURCE) {
+    if (data.session !== providerSession) return
     emitEvent(data)
   }
 }
 
-window.addEventListener('message', handleWindowMessage)
-
 const target = window as typeof window & { qubic?: QubicProvider }
-target.qubic = provider
+if (!target.qubic) {
+  window.addEventListener('message', handleWindowMessage)
+  const frozenProvider = Object.freeze(provider)
+  try {
+    Object.defineProperty(target, 'qubic', {
+      value: frozenProvider,
+      writable: false,
+      configurable: false,
+      enumerable: true,
+    })
+  } catch {
+    target.qubic = frozenProvider
+  }
+}

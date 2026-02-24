@@ -60,6 +60,7 @@ export type DappRpcRequest = Readonly<{
   id: string
   method: DappMethod
   params?: unknown
+  session?: string
 }>
 
 export type DappRpcSuccess = Readonly<{
@@ -68,6 +69,7 @@ export type DappRpcSuccess = Readonly<{
   id: string
   ok: true
   result: unknown
+  session?: string
 }>
 
 export type DappRpcFailure = Readonly<{
@@ -79,6 +81,7 @@ export type DappRpcFailure = Readonly<{
     code: DappProviderErrorCode
     message: string
   }
+  session?: string
 }>
 
 export type DappRpcResponse = DappRpcSuccess | DappRpcFailure
@@ -88,6 +91,7 @@ export type DappEventMessage = Readonly<{
   source: typeof CONTENT_SOURCE
   event: DappEvent
   payload?: unknown
+  session?: string
 }>
 
 export const isDappRpcRequest = (value: unknown): value is DappRpcRequest => {

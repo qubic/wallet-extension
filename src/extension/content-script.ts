@@ -10,6 +10,15 @@ import {
   isDappRpcRequest,
 } from '@/lib/dapp/protocol'
 const INPAGE_SCRIPT_PATH = 'assets/inpage-provider.js'
+const INPAGE_SESSION_DATA_ATTR = 'qubicSession'
+
+const createSessionToken = () => {
+  const bytes = new Uint8Array(16)
+  crypto.getRandomValues(bytes)
+  return Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('')
+}
+
+const inpageSession = createSessionToken()
 
 const injectProviderScript = () => {
   const chromeApi = (globalThis as typeof globalThis & { chrome?: typeof chrome }).chrome
@@ -20,13 +29,14 @@ const injectProviderScript = () => {
   script.src = runtime.getURL(INPAGE_SCRIPT_PATH)
   script.async = false
   script.dataset.source = 'qubic-inpage-provider'
+  script.dataset[INPAGE_SESSION_DATA_ATTR] = inpageSession
   const parent = document.head || document.documentElement
   parent.appendChild(script)
   script.remove()
 }
 
 const postToPage = (message: DappRpcResponse | DappEventMessage) => {
-  window.postMessage(message, '*')
+  window.postMessage({ ...message, session: inpageSession }, '*')
 }
 
 const sendFailure = (
@@ -48,6 +58,7 @@ window.addEventListener('message', (event: MessageEvent) => {
   if (event.source !== window) return
   const data = event.data as unknown
   if (!isDappRpcRequest(data)) return
+  if (data.session !== inpageSession) return
 
   const chromeApi = (globalThis as typeof globalThis & { chrome?: typeof chrome }).chrome
   const runtime = chromeApi?.runtime

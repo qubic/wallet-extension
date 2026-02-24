@@ -80,6 +80,7 @@ const ensureApprovalWindow = async () => {
 }
 
 const addPendingRequest = async (request: DappPendingRequest) => {
+  await pruneExpiredPendingRequests()
   const requests = await getDappPendingRequests()
   await setDappPendingRequests([...requests, request])
 }
@@ -87,6 +88,61 @@ const addPendingRequest = async (request: DappPendingRequest) => {
 const removePendingRequest = async (id: string) => {
   const requests = await getDappPendingRequests()
   await setDappPendingRequests(requests.filter((request) => request.id !== id))
+}
+
+const pruneExpiredPendingRequests = async () => {
+  const requests = await getDappPendingRequests()
+  const now = Date.now()
+  const next = requests.filter((request) => now - request.createdAt < APPROVAL_TIMEOUT_MS)
+  if (next.length !== requests.length) {
+    await setDappPendingRequests(next)
+  }
+}
+
+const truncatePreviewValue = (value: string, max = 280) =>
+  value.length > max ? `${value.slice(0, max - 1)}…` : value
+
+const buildApprovalParamsPreview = (
+  method: DappPendingRequest['method'],
+  params: unknown,
+): unknown => {
+  if (!params || typeof params !== 'object') {
+    if (method === 'signMessage' && typeof params === 'string') {
+      return truncatePreviewValue(params)
+    }
+    return undefined
+  }
+
+  const record = params as Record<string, unknown>
+  if (method === 'signMessage') {
+    if (typeof record.message === 'string') {
+      return { message: truncatePreviewValue(record.message) }
+    }
+    if (typeof record.hex === 'string') {
+      return { hex: truncatePreviewValue(record.hex) }
+    }
+    if (typeof record.base64 === 'string') {
+      return { base64: truncatePreviewValue(record.base64) }
+    }
+    return undefined
+  }
+
+  if (method === 'signTransaction') {
+    const preview: Record<string, unknown> = {}
+    if (typeof record.toIdentity === 'string') preview.toIdentity = record.toIdentity
+    if (typeof record.amount === 'string' || typeof record.amount === 'number') {
+      preview.amount = record.amount
+    }
+    if (typeof record.inputType === 'string' || typeof record.inputType === 'number') {
+      preview.inputType = record.inputType
+    }
+    if (typeof record.targetTick === 'string' || typeof record.targetTick === 'number') {
+      preview.targetTick = record.targetTick
+    }
+    return Object.keys(preview).length > 0 ? preview : undefined
+  }
+
+  return undefined
 }
 
 const requestApproval = async (request: DappPendingRequest): Promise<DappApprovalDecision> => {
@@ -181,7 +237,10 @@ const approveSigning = async (
     method: request.method === 'signMessage' ? 'signMessage' : 'signTransaction',
     origin,
     createdAt: Date.now(),
-    params: request.params,
+    params: buildApprovalParamsPreview(
+      request.method === 'signMessage' ? 'signMessage' : 'signTransaction',
+      request.params,
+    ),
   })
   if (!decision.approved) {
     throw new DappProviderError('USER_REJECTED', 'Request was rejected by user')
@@ -193,9 +252,13 @@ const approveSigning = async (
   return { passphrase, account }
 }
 
-const settleApprovalDecision = (decision: DappApprovalDecision) => {
+const settleApprovalDecision = async (decision: DappApprovalDecision) => {
   const waiter = approvalWaiters.get(decision.id)
-  if (!waiter) return false
+  if (!waiter) {
+    // Worker may have restarted while the approval drawer was open. Clean up stale UI state.
+    await removePendingRequest(decision.id)
+    return false
+  }
   approvalWaiters.delete(decision.id)
   void waiter.resolve(decision)
   return true
@@ -243,8 +306,14 @@ chrome.runtime.onMessage.addListener((message: unknown, sender, sendResponse) =>
       typeof payload.id === 'string' &&
       payload.id.length > 0 &&
       typeof payload.approved === 'boolean'
-    sendResponse({ ok: Boolean(isValid && settleApprovalDecision(payload)) })
-    return undefined
+    if (!isValid) {
+      sendResponse({ ok: false })
+      return undefined
+    }
+    void settleApprovalDecision(payload)
+      .then((ok) => sendResponse({ ok }))
+      .catch(() => sendResponse({ ok: false }))
+    return true
   }
 
   if (record.type !== RUNTIME_REQUEST_TYPE) return undefined
@@ -308,4 +377,4 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
   }
 })
 
-void setDappPendingRequests([])
+void pruneExpiredPendingRequests()

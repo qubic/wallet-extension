@@ -4,6 +4,9 @@ import type { BuiltTransaction, TransactionHelpers } from '@qubic-labs/sdk'
 import { DappProviderError } from '@/lib/dapp/errors'
 import { isValidIdentity, parseAmount } from '@/lib/utils'
 
+const MAX_MESSAGE_BYTES = 8 * 1024
+const MAX_INPUT_BYTES = 64 * 1024
+
 const bytesToHex = (value: Uint8Array) =>
   Array.from(value, (byte) => byte.toString(16).padStart(2, '0')).join('')
 
@@ -59,21 +62,37 @@ const toNumberOrUndefined = (value: unknown, field: string): number | undefined 
 const decodeInputBytes = (value: unknown): Uint8Array | undefined => {
   if (value === undefined || value === null) return undefined
 
-  if (value instanceof Uint8Array) return value
+  if (value instanceof Uint8Array) {
+    if (value.length > MAX_INPUT_BYTES) {
+      throw new DappProviderError('INVALID_PARAMS', 'inputBytes too large')
+    }
+    return value
+  }
   if (
     Array.isArray(value) &&
     value.every((item) => Number.isInteger(item) && item >= 0 && item <= 255)
   ) {
+    if (value.length > MAX_INPUT_BYTES) {
+      throw new DappProviderError('INVALID_PARAMS', 'inputBytes too large')
+    }
     return Uint8Array.from(value)
   }
   if (typeof value === 'string') {
     const trimmed = value.trim()
     if (!trimmed) return undefined
     if (/^0x[0-9a-fA-F]+$/.test(trimmed) && trimmed.length % 2 === 0) {
-      return hexToBytes(trimmed.slice(2))
+      const bytes = hexToBytes(trimmed.slice(2))
+      if (bytes.length > MAX_INPUT_BYTES) {
+        throw new DappProviderError('INVALID_PARAMS', 'inputBytes too large')
+      }
+      return bytes
     }
     try {
-      return base64ToBytes(trimmed)
+      const bytes = base64ToBytes(trimmed)
+      if (bytes.length > MAX_INPUT_BYTES) {
+        throw new DappProviderError('INVALID_PARAMS', 'inputBytes too large')
+      }
+      return bytes
     } catch {
       throw new DappProviderError('INVALID_PARAMS', 'Invalid inputBytes encoding')
     }
@@ -111,7 +130,11 @@ export const parseSignTransactionParams = (params: unknown): ParsedSignTransacti
 
 const parseMessageBytes = (params: unknown): Uint8Array => {
   if (typeof params === 'string') {
-    return new TextEncoder().encode(params)
+    const bytes = new TextEncoder().encode(params)
+    if (bytes.length > MAX_MESSAGE_BYTES) {
+      throw new DappProviderError('INVALID_PARAMS', 'Message too large')
+    }
+    return bytes
   }
 
   if (!params || typeof params !== 'object') {
@@ -120,17 +143,29 @@ const parseMessageBytes = (params: unknown): Uint8Array => {
 
   const record = params as Record<string, unknown>
   if (typeof record.message === 'string') {
-    return new TextEncoder().encode(record.message)
+    const bytes = new TextEncoder().encode(record.message)
+    if (bytes.length > MAX_MESSAGE_BYTES) {
+      throw new DappProviderError('INVALID_PARAMS', 'Message too large')
+    }
+    return bytes
   }
   if (
     typeof record.hex === 'string' &&
     /^0x[0-9a-fA-F]+$/.test(record.hex) &&
     record.hex.length % 2 === 0
   ) {
-    return hexToBytes(record.hex.slice(2))
+    const bytes = hexToBytes(record.hex.slice(2))
+    if (bytes.length > MAX_MESSAGE_BYTES) {
+      throw new DappProviderError('INVALID_PARAMS', 'Message too large')
+    }
+    return bytes
   }
   if (typeof record.base64 === 'string') {
-    return base64ToBytes(record.base64)
+    const bytes = base64ToBytes(record.base64)
+    if (bytes.length > MAX_MESSAGE_BYTES) {
+      throw new DappProviderError('INVALID_PARAMS', 'Message too large')
+    }
+    return bytes
   }
   throw new DappProviderError('INVALID_PARAMS', 'Invalid message payload')
 }
