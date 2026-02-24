@@ -3,12 +3,12 @@ import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { useClipboardCopy } from '@/hooks/use-clipboard-copy'
 
 type SeedSecurityStepProps = {
   variant: 'onboarding' | 'add-address'
   seed: string
   identity: string
-  hasCopiedSeed: boolean
   hasConfirmedSeedBackup: boolean
   onGenerate: () => void
   onCopy: () => void
@@ -19,12 +19,20 @@ const SeedSecurityStep = ({
   variant,
   seed,
   identity,
-  hasCopiedSeed,
   hasConfirmedSeedBackup,
   onGenerate,
   onCopy,
   onConfirmChange,
 }: SeedSecurityStepProps) => {
+  const { copyText } = useClipboardCopy()
+
+  const handleCopy = async () => {
+    await copyText(seed, {
+      messages: { successTitle: 'Seed copied' },
+    })
+    onCopy()
+  }
+
   return (
     <div className="space-y-4">
       <div className="space-y-1">
@@ -53,9 +61,9 @@ const SeedSecurityStep = ({
           <RefreshCwIcon className="h-5 w-5" />
           Generate new seed
         </Button>
-        <Button size="lg" variant="outline" className="w-full" onClick={onCopy}>
+        <Button size="lg" variant="outline" className="w-full" onClick={handleCopy}>
           <CopyIcon className="h-5 w-5" />
-          {hasCopiedSeed ? 'Seed copied' : 'Copy seed'}
+          Copy seed
         </Button>
       </div>
       <div className="flex items-start gap-2 rounded-lg border border-border/60 bg-muted/20 p-3">

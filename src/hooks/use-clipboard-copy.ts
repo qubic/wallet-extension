@@ -10,7 +10,6 @@ type CopyMessages = {
 
 type CopyOptions = {
   key?: string
-  resetMs?: number
   messages?: CopyMessages
 }
 
@@ -36,6 +35,7 @@ export const useClipboardCopy = (defaults?: CopyMessages) => {
         if (messages.successTitle) {
           toast.success(messages.successTitle, {
             description: messages.successDescription,
+            duration: 1000,
           })
         }
         if (options?.key) {
@@ -45,7 +45,7 @@ export const useClipboardCopy = (defaults?: CopyMessages) => {
           }
           timerRef.current = window.setTimeout(() => {
             setCopiedKey((current) => (current === options.key ? null : current))
-          }, options.resetMs ?? 1200)
+          }, 1200)
         }
         return true
       } catch {
@@ -60,5 +60,5 @@ export const useClipboardCopy = (defaults?: CopyMessages) => {
     [defaults],
   )
 
-  return { copiedKey, copyText, setCopiedKey }
+  return { copiedKey, copyText }
 }

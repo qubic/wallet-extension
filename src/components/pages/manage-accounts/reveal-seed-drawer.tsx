@@ -10,6 +10,7 @@ import {
   DrawerTitle,
 } from '@/components/ui/drawer'
 import { Textarea } from '@/components/ui/textarea'
+import { useClipboardCopy } from '@/hooks/use-clipboard-copy'
 
 type RevealSeedDrawerProps = {
   open: boolean
@@ -20,6 +21,14 @@ type RevealSeedDrawerProps = {
 
 const RevealSeedDrawer = ({ open, seed, onOpenChange, onCopy }: RevealSeedDrawerProps) => {
   const { t } = useTranslation()
+  const { copyText } = useClipboardCopy()
+
+  const handleCopy = async () => {
+    await copyText(seed, {
+      messages: { successTitle: t('accounts.manage.seedCopied') },
+    })
+    await onCopy()
+  }
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
@@ -31,7 +40,7 @@ const RevealSeedDrawer = ({ open, seed, onOpenChange, onCopy }: RevealSeedDrawer
           <Textarea value={seed} rows={3} readOnly className="resize-none" />
         </div>
         <DrawerFooter>
-          <Button variant="outline" onClick={onCopy}>
+          <Button variant="outline" onClick={handleCopy}>
             <CopyIcon className="h-4 w-4" />
             {t('accounts.manage.copySeed')}
           </Button>

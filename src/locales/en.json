@@ -200,6 +200,7 @@
       "reveal": "Reveal seed",
       "revealTitle": "Seed phrase",
       "copySeed": "Copy seed",
+      "seedCopied": "Seed copied",
       "done": "Done",
       "addTitle": "Add account",
       "addNewDesc": "Add another address to this wallet.",

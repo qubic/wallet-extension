@@ -51,7 +51,6 @@ const CreateWallet = ({
   const [status, setStatus] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [identity, setIdentity] = useState<string>('')
-  const [hasCopiedSeed, setHasCopiedSeed] = useState(false)
   const [hasConfirmedSeedBackup, setHasConfirmedSeedBackup] = useState(false)
 
   const progressValue = useMemo(() => (step / TOTAL_STEPS) * 100, [step])
@@ -60,7 +59,6 @@ const CreateWallet = ({
     setSeed('')
     setPassphrase('')
     setConfirmPassphrase('')
-    setHasCopiedSeed(false)
     setHasConfirmedSeedBackup(false)
   }
 
@@ -90,18 +88,11 @@ const CreateWallet = ({
   const regenerate = () => {
     setSeed(generateSeed())
     setStatus(null)
-    setHasCopiedSeed(false)
     setHasConfirmedSeedBackup(false)
   }
 
-  const handleCopySeed = async () => {
-    try {
-      await navigator.clipboard.writeText(seed)
-      setHasCopiedSeed(true)
-      setStatus(null)
-    } catch {
-      setStatus('Unable to copy seed. Please copy it manually.')
-    }
+  const handleCopySeed = () => {
+    setStatus(null)
   }
 
   const handleNext = async () => {
@@ -260,7 +251,6 @@ const CreateWallet = ({
               variant={variant}
               seed={seed}
               identity={identity}
-              hasCopiedSeed={hasCopiedSeed}
               hasConfirmedSeedBackup={hasConfirmedSeedBackup}
               onGenerate={regenerate}
               onCopy={handleCopySeed}

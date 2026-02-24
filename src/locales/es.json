@@ -200,6 +200,7 @@
       "reveal": "Mostrar semilla",
       "revealTitle": "Frase semilla",
       "copySeed": "Copiar semilla",
+      "seedCopied": "Semilla copiada",
       "done": "Listo",
       "addTitle": "Agregar cuenta",
       "addNewDesc": "Agrega otra dirección a esta billetera.",
