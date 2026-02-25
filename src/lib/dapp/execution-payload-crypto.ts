@@ -6,7 +6,14 @@ type EncryptedJsonPayload = Readonly<{
   ciphertextBase64: string
 }>
 
-const toBase64 = (bytes: Uint8Array) => btoa(String.fromCharCode(...bytes))
+const toBase64 = (bytes: Uint8Array) => {
+  let binary = ''
+  const chunkSize = 0x8000
+  for (let index = 0; index < bytes.length; index += chunkSize) {
+    binary += String.fromCharCode(...bytes.subarray(index, index + chunkSize))
+  }
+  return btoa(binary)
+}
 const fromBase64 = (value: string) => Uint8Array.from(atob(value), (char) => char.charCodeAt(0))
 
 const getSessionStorage = () => {

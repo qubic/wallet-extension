@@ -2,6 +2,7 @@ import type { DappRpcResponse } from '@/lib/dapp/protocol'
 import {
   type DappExecutionRequest,
   type DappPendingRequest,
+  type DappRequestResultRecord,
   getDappExecutionRequestById,
   getDappExecutionRequests,
   getDappPendingRequests,
@@ -15,11 +16,7 @@ import {
   upsertDappExecutionRequest,
   upsertDappRequestResult,
 } from '@/lib/dapp/storage'
-import {
-  dappExecutionRequestSchema,
-  dappPendingRequestSchema,
-  dappRequestResultSchema,
-} from '@/lib/dapp/schemas'
+import { dappExecutionRequestSchema, dappRequestResultSchema } from '@/lib/dapp/schemas'
 import { DAPP_APPROVAL_TIMEOUT_MS, DAPP_REQUEST_RESULT_TTL_MS } from '@/lib/dapp/timing'
 import {
   decryptExecutionPayload,
@@ -35,9 +32,7 @@ const parseExecutionRequest = (value: DappExecutionRequest | null) => {
 export const pruneExpiredDappArtifacts = async () => {
   const now = Date.now()
 
-  const pendingRequests = (await getDappPendingRequests()).filter(
-    (entry) => dappPendingRequestSchema.safeParse(entry).success,
-  )
+  const pendingRequests = await getDappPendingRequests()
   const nextPendingRequests = pendingRequests.filter(
     (request) => now - request.createdAt < DAPP_APPROVAL_TIMEOUT_MS,
   )
@@ -45,9 +40,7 @@ export const pruneExpiredDappArtifacts = async () => {
     await setDappPendingRequests(nextPendingRequests)
   }
 
-  const executionRequests = (await getDappExecutionRequests()).filter(
-    (entry) => dappExecutionRequestSchema.safeParse(entry).success,
-  )
+  const executionRequests = await getDappExecutionRequests()
   const nextExecutionRequests = executionRequests.filter(
     (request) => now - request.createdAt < DAPP_APPROVAL_TIMEOUT_MS,
   )
@@ -55,9 +48,7 @@ export const pruneExpiredDappArtifacts = async () => {
     await setDappExecutionRequests(nextExecutionRequests)
   }
 
-  const requestResults = (await getDappRequestResults()).filter(
-    (entry) => dappRequestResultSchema.safeParse(entry).success,
-  )
+  const requestResults = await getDappRequestResults()
   const nextRequestResults = requestResults.filter(
     (result) => now - result.createdAt < DAPP_REQUEST_RESULT_TTL_MS,
   )
@@ -120,7 +111,7 @@ export const storeRequestResult = async (
   request: Pick<DappExecutionRequest, 'id' | 'origin' | 'session'>,
   response: DappRpcResponse,
 ) => {
-  const result = dappRequestResultSchema.parse({
+  const result: DappRequestResultRecord = dappRequestResultSchema.parse({
     id: response.id,
     createdAt: Date.now(),
     origin: request.origin,
@@ -128,16 +119,7 @@ export const storeRequestResult = async (
     state: 'ready',
     response,
   })
-  await upsertDappRequestResult(
-    result as {
-      id: string
-      createdAt: number
-      origin: string
-      session: string
-      state: 'ready'
-      response: DappRpcResponse
-    },
-  )
+  await upsertDappRequestResult(result)
 }
 
 export const getRequestResultById = async (id: string) => {
@@ -145,14 +127,7 @@ export const getRequestResultById = async (id: string) => {
   if (!result) return null
   const parsed = dappRequestResultSchema.safeParse(result)
   if (!parsed.success) return null
-  return parsed.data as {
-    id: string
-    createdAt: number
-    origin: string
-    session: string
-    state: 'ready'
-    response: DappRpcResponse
-  }
+  return parsed.data as DappRequestResultRecord
 }
 
 export const consumeRequestResultById = async (id: string) => {

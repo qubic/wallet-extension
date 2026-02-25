@@ -3,9 +3,6 @@ import {
   handleDappApprovalDecision,
   handleDappRequestStatus,
   handleDappRpcRequest,
-  isRuntimePendingAck,
-  asDappFailure,
-  asDappSuccess,
   startupDappController,
 } from '@/lib/dapp/controller'
 import {
@@ -20,6 +17,7 @@ import {
   type DappRuntimeRequestStatusPayload,
   isDappRpcRequest,
 } from '@/lib/dapp/protocol'
+import { asDappFailure, asDappSuccess, isRuntimePendingAck } from '@/lib/dapp/responses'
 import { DAPP_CURRENT_ACCOUNT_KEY, DAPP_PERMISSIONS_KEY } from '@/lib/dapp/storage'
 
 chrome.runtime.onMessage.addListener((message: unknown, sender, sendResponse) => {
@@ -54,7 +52,7 @@ chrome.runtime.onMessage.addListener((message: unknown, sender, sendResponse) =>
       typeof payload.session !== 'string' ||
       !payload.session
     ) {
-      sendResponse({ ok: false, pending: false, error: 'Invalid status payload' })
+      sendResponse(asDappFailure('unknown', 'INVALID_REQUEST', 'Invalid status payload'))
       return undefined
     }
 

@@ -1,18 +1,18 @@
 import { createSdk } from '@qubic-labs/sdk'
+import { buildApprovalParamsPreview } from '@/lib/dapp/approval-preview'
 import { DappProviderError, asProviderError } from '@/lib/dapp/errors'
 import { getOriginFromUrl, normalizeOrigin } from '@/lib/dapp/origin'
 import type {
   DappApprovalDecision,
-  DappProviderErrorCode,
   DappRpcRequest,
   DappRpcResponse,
   DappRuntimePendingAck,
   DappRuntimeRequestStatusPayload,
 } from '@/lib/dapp/protocol'
+import { asDappFailure, asDappSuccess, asRuntimePendingAck } from '@/lib/dapp/responses'
 import {
   type DappCurrentAccount,
   type DappExecutionRequest,
-  type DappPendingRequest,
   type DappPermissionsState,
   getDappCurrentAccount,
   getDappPermissions,
@@ -22,7 +22,7 @@ import {
 import {
   appendPendingApprovalRequest,
   completeExecutionRequest,
-  discardRequestResult,
+  consumeRequestResultById,
   getExecutionRequestById,
   getRequestResultById,
   markExecutionRequestExecuting,
@@ -36,32 +36,6 @@ import { signMessageFromSeed, signTransactionFromSeed } from '@/lib/dapp/signing
 import { openBrowserVault, verifyVaultAccess } from '@/lib/vault'
 
 const sdk = createSdk()
-
-export const asDappSuccess = (id: string, result: unknown): DappRpcResponse => ({
-  channel: 'qubic:dapp',
-  source: 'qubic:content',
-  id,
-  ok: true,
-  result,
-})
-
-export const asDappFailure = (
-  id: string,
-  code: DappProviderErrorCode,
-  message: string,
-): DappRpcResponse => ({
-  channel: 'qubic:dapp',
-  source: 'qubic:content',
-  id,
-  ok: false,
-  error: { code, message },
-})
-
-export const isRuntimePendingAck = (value: unknown): value is DappRuntimePendingAck => {
-  if (!value || typeof value !== 'object') return false
-  const record = value as Record<string, unknown>
-  return record.pending === true && typeof record.id === 'string' && Boolean(record.id)
-}
 
 const ensureConnected = (origin: string, permissions: DappPermissionsState) => {
   if (!permissions[origin]) {
@@ -83,47 +57,6 @@ const ensureApprovalWindow = async () => {
     // Ignore window creation failures, the request stays pending.
   }
 }
-
-const truncatePreviewValue = (value: string, max = 280) =>
-  value.length > max ? `${value.slice(0, max - 1)}…` : value
-
-const buildApprovalParamsPreview = (
-  method: DappPendingRequest['method'],
-  params: unknown,
-): unknown => {
-  if (!params || typeof params !== 'object') {
-    if (method === 'signMessage' && typeof params === 'string') {
-      return truncatePreviewValue(params)
-    }
-    return undefined
-  }
-
-  const record = params as Record<string, unknown>
-  if (method === 'signMessage') {
-    if (typeof record.message === 'string') return { message: truncatePreviewValue(record.message) }
-    if (typeof record.hex === 'string') return { hex: truncatePreviewValue(record.hex) }
-    if (typeof record.base64 === 'string') return { base64: truncatePreviewValue(record.base64) }
-    return undefined
-  }
-
-  if (method === 'signTransaction') {
-    const preview: Record<string, unknown> = {}
-    if (typeof record.toIdentity === 'string') preview.toIdentity = record.toIdentity
-    if (typeof record.amount === 'string' || typeof record.amount === 'number')
-      preview.amount = record.amount
-    if (typeof record.inputType === 'string' || typeof record.inputType === 'number') {
-      preview.inputType = record.inputType
-    }
-    if (typeof record.targetTick === 'string' || typeof record.targetTick === 'number') {
-      preview.targetTick = record.targetTick
-    }
-    return Object.keys(preview).length > 0 ? preview : undefined
-  }
-
-  return undefined
-}
-
-const asPendingAck = (id: string): DappRuntimePendingAck => ({ pending: true, id })
 
 const enqueueApprovalRequest = async (request: DappExecutionRequest) => {
   await persistExecutionRequest(request)
@@ -148,7 +81,7 @@ const connectOrigin = async (origin: string, requestId: string, session: string)
       session,
       state: 'awaitingApproval',
     })
-    return asPendingAck(requestId)
+    return asRuntimePendingAck(requestId)
   }
 
   permissions[origin] = { origin, connectedAt: Date.now() }
@@ -202,7 +135,7 @@ const queueSigningApproval = async (
     params: request.params,
     account,
   })
-  return asPendingAck(request.id)
+  return asRuntimePendingAck(request.id)
 }
 
 const executeApprovedRequest = async (
@@ -347,7 +280,7 @@ export const handleDappRequestStatus = async (
     if (result.origin !== normalizedSenderOrigin || result.session !== payload.session) {
       return asDappFailure(payload.id, 'NOT_CONNECTED', 'Request does not belong to this origin')
     }
-    await discardRequestResult(payload.id)
+    await consumeRequestResultById(payload.id)
     return result.response
   }
 
@@ -356,7 +289,7 @@ export const handleDappRequestStatus = async (
     if (execution.origin !== normalizedSenderOrigin || execution.session !== payload.session) {
       return asDappFailure(payload.id, 'NOT_CONNECTED', 'Request does not belong to this origin')
     }
-    return asPendingAck(payload.id)
+    return asRuntimePendingAck(payload.id)
   }
 
   return asDappFailure(payload.id, 'INTERNAL_ERROR', 'Request state was lost')

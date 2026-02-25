@@ -17,37 +17,10 @@ import {
   getDappPendingRequests,
 } from '@/lib/dapp/storage'
 import { RUNTIME_APPROVAL_DECISION_TYPE } from '@/lib/dapp/protocol'
+import { getApprovalMessagePreview, getApprovalTxSummary } from '@/lib/dapp/approval-preview'
 import { PasswordInput } from '@/components/ui/password-input'
 import { truncateString } from '@/lib/utils'
 import { isWalletLocked } from '@/lib/lock'
-
-const toMessagePreview = (params: unknown) => {
-  if (typeof params === 'string') return params
-  if (!params || typeof params !== 'object') return ''
-  const record = params as Record<string, unknown>
-  if (typeof record.message === 'string') return record.message
-  if (typeof record.hex === 'string') return record.hex
-  if (typeof record.base64 === 'string') return record.base64
-  return ''
-}
-
-const toTxSummary = (params: unknown) => {
-  if (!params || typeof params !== 'object') return null
-  const record = params as Record<string, unknown>
-  const toIdentity = typeof record.toIdentity === 'string' ? record.toIdentity : ''
-  const amount =
-    typeof record.amount === 'string' || typeof record.amount === 'number' ? `${record.amount}` : ''
-  const inputType =
-    typeof record.inputType === 'string' || typeof record.inputType === 'number'
-      ? `${record.inputType}`
-      : ''
-  const targetTick =
-    typeof record.targetTick === 'string' || typeof record.targetTick === 'number'
-      ? `${record.targetTick}`
-      : ''
-  if (!toIdentity && !amount && !inputType && !targetTick) return null
-  return { toIdentity, amount, inputType, targetTick }
-}
 
 const DappApprovalDrawer = () => {
   const { t } = useTranslation()
@@ -93,8 +66,11 @@ const DappApprovalDrawer = () => {
   const isOpen = Boolean(current) && !locked && location.pathname !== '/unlock'
   const requiresPassphrase =
     current?.method === 'signMessage' || current?.method === 'signTransaction'
-  const messagePreview = useMemo(() => toMessagePreview(current?.params), [current?.params])
-  const txSummary = useMemo(() => toTxSummary(current?.params), [current?.params])
+  const messagePreview = useMemo(
+    () => getApprovalMessagePreview(current?.params),
+    [current?.params],
+  )
+  const txSummary = useMemo(() => getApprovalTxSummary(current?.params), [current?.params])
 
   const subtitle = useMemo(() => {
     if (!current) return ''

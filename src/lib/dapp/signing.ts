@@ -13,7 +13,14 @@ const bytesToHex = (value: Uint8Array) =>
 const hexToBytes = (hex: string) =>
   Uint8Array.from(hex.match(/.{1,2}/g)?.map((pair) => Number.parseInt(pair, 16)) ?? [])
 
-const bytesToBase64 = (value: Uint8Array) => btoa(String.fromCharCode(...value))
+const bytesToBase64 = (value: Uint8Array) => {
+  let binary = ''
+  const chunkSize = 0x8000
+  for (let index = 0; index < value.length; index += chunkSize) {
+    binary += String.fromCharCode(...value.subarray(index, index + chunkSize))
+  }
+  return btoa(binary)
+}
 
 const base64ToBytes = (value: string) => Uint8Array.from(atob(value), (char) => char.charCodeAt(0))
 
@@ -161,11 +168,15 @@ const parseMessageBytes = (params: unknown): Uint8Array => {
     return bytes
   }
   if (typeof record.base64 === 'string') {
-    const bytes = base64ToBytes(record.base64)
-    if (bytes.length > MAX_MESSAGE_BYTES) {
-      throw new DappProviderError('INVALID_PARAMS', 'Message too large')
+    try {
+      const bytes = base64ToBytes(record.base64)
+      if (bytes.length > MAX_MESSAGE_BYTES) {
+        throw new DappProviderError('INVALID_PARAMS', 'Message too large')
+      }
+      return bytes
+    } catch {
+      throw new DappProviderError('INVALID_PARAMS', 'Invalid message payload')
     }
-    return bytes
   }
   throw new DappProviderError('INVALID_PARAMS', 'Invalid message payload')
 }

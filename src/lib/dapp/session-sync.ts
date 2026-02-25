@@ -1,5 +1,7 @@
 import { DAPP_CURRENT_ACCOUNT_KEY } from '@/lib/dapp/storage'
 
+let dappSessionSyncStarted = false
+
 const getChromeStorage = () => {
   const chromeApi = (globalThis as typeof globalThis & { chrome?: typeof chrome }).chrome
   return chromeApi?.storage?.local ?? null
@@ -26,6 +28,8 @@ const syncCurrentAccount = async () => {
 export const startDappSessionSync = () => {
   if (typeof window === 'undefined') return
   if (typeof localStorage === 'undefined') return
+  if (dappSessionSyncStarted) return
+  dappSessionSyncStarted = true
 
   void syncCurrentAccount()
 
