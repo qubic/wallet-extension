@@ -1,4 +1,9 @@
-import { isDappRpcResponse, type DappRpcResponse } from '@/lib/dapp/protocol'
+import type { DappRpcResponse } from '@/lib/dapp/protocol'
+import {
+  dappExecutionRequestSchema,
+  dappPendingRequestSchema,
+  dappRequestResultSchema,
+} from '@/lib/dapp/schemas'
 
 export const DAPP_PERMISSIONS_KEY = 'dapp.permissions.v1'
 export const DAPP_CURRENT_ACCOUNT_KEY = 'dapp.currentAccount.v1'
@@ -106,20 +111,9 @@ export const getDappPendingRequests = async (): Promise<DappPendingRequest[]> =>
   const result = await storage.get(DAPP_PENDING_REQUESTS_KEY)
   const raw = result[DAPP_PENDING_REQUESTS_KEY]
   if (!Array.isArray(raw)) return []
-  return raw.filter((entry): entry is DappPendingRequest => {
-    if (!entry || typeof entry !== 'object') return false
-    const record = entry as Record<string, unknown>
-    return (
-      typeof record.id === 'string' &&
-      Boolean(record.id) &&
-      typeof record.origin === 'string' &&
-      Boolean(record.origin) &&
-      typeof record.createdAt === 'number' &&
-      (record.method === 'connect' ||
-        record.method === 'signMessage' ||
-        record.method === 'signTransaction')
-    )
-  })
+  return raw.filter(
+    (entry): entry is DappPendingRequest => dappPendingRequestSchema.safeParse(entry).success,
+  )
 }
 
 export const setDappPendingRequests = async (requests: DappPendingRequest[]) => {
@@ -134,24 +128,9 @@ export const getDappExecutionRequests = async (): Promise<DappExecutionRequest[]
   const result = await storage.get(DAPP_EXECUTION_REQUESTS_KEY)
   const raw = result[DAPP_EXECUTION_REQUESTS_KEY]
   if (!Array.isArray(raw)) return []
-  return raw.filter((entry): entry is DappExecutionRequest => {
-    if (!entry || typeof entry !== 'object') return false
-    const record = entry as Record<string, unknown>
-    return (
-      typeof record.id === 'string' &&
-      Boolean(record.id) &&
-      typeof record.origin === 'string' &&
-      Boolean(record.origin) &&
-      typeof record.createdAt === 'number' &&
-      typeof record.session === 'string' &&
-      Boolean(record.session) &&
-      (record.state === 'awaitingApproval' || record.state === 'executing') &&
-      (record.executionStartedAt === undefined || typeof record.executionStartedAt === 'number') &&
-      (record.method === 'connect' ||
-        record.method === 'signMessage' ||
-        record.method === 'signTransaction')
-    )
-  })
+  return raw.filter(
+    (entry): entry is DappExecutionRequest => dappExecutionRequestSchema.safeParse(entry).success,
+  )
 }
 
 export const setDappExecutionRequests = async (requests: DappExecutionRequest[]) => {
@@ -186,21 +165,9 @@ export const getDappRequestResults = async (): Promise<DappRequestResultRecord[]
   const result = await storage.get(DAPP_REQUEST_RESULTS_KEY)
   const raw = result[DAPP_REQUEST_RESULTS_KEY]
   if (!Array.isArray(raw)) return []
-  return raw.filter((entry): entry is DappRequestResultRecord => {
-    if (!entry || typeof entry !== 'object') return false
-    const record = entry as Record<string, unknown>
-    return (
-      typeof record.id === 'string' &&
-      Boolean(record.id) &&
-      typeof record.createdAt === 'number' &&
-      typeof record.origin === 'string' &&
-      Boolean(record.origin) &&
-      typeof record.session === 'string' &&
-      Boolean(record.session) &&
-      record.state === 'ready' &&
-      isDappRpcResponse(record.response)
-    )
-  })
+  return raw.filter(
+    (entry): entry is DappRequestResultRecord => dappRequestResultSchema.safeParse(entry).success,
+  )
 }
 
 export const setDappRequestResults = async (results: DappRequestResultRecord[]) => {
