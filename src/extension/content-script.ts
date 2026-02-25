@@ -11,6 +11,7 @@ import {
   type DappRuntimePendingAck,
   isDappRpcRequest,
 } from '@/lib/dapp/protocol'
+import { DAPP_APPROVAL_TIMEOUT_MS, DAPP_STATUS_POLL_INTERVAL_MS } from '@/lib/dapp/timing'
 const INPAGE_SCRIPT_PATH = 'assets/inpage-provider.js'
 const INPAGE_SESSION_DATA_ATTR = 'qubicSession'
 
@@ -69,7 +70,7 @@ const pollRuntimeResult = (
   chromeApi: typeof chrome,
   startedAt = Date.now(),
 ) => {
-  if (Date.now() - startedAt > 2 * 60 * 1000) {
+  if (Date.now() - startedAt > DAPP_APPROVAL_TIMEOUT_MS) {
     sendFailure(id, 'Provider request timed out')
     return
   }
@@ -79,11 +80,17 @@ const pollRuntimeResult = (
     (response: unknown) => {
       const maybeError = chromeApi.runtime?.lastError
       if (maybeError) {
-        window.setTimeout(() => pollRuntimeResult(id, session, runtime, chromeApi, startedAt), 500)
+        window.setTimeout(
+          () => pollRuntimeResult(id, session, runtime, chromeApi, startedAt),
+          DAPP_STATUS_POLL_INTERVAL_MS,
+        )
         return
       }
       if (isRuntimePendingAck(response)) {
-        window.setTimeout(() => pollRuntimeResult(id, session, runtime, chromeApi, startedAt), 500)
+        window.setTimeout(
+          () => pollRuntimeResult(id, session, runtime, chromeApi, startedAt),
+          DAPP_STATUS_POLL_INTERVAL_MS,
+        )
         return
       }
       if (

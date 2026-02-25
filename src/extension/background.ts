@@ -25,28 +25,24 @@ import {
   type DappPendingRequest,
   type DappPermissionsState,
   getDappCurrentAccount,
-  getDappExecutionRequestById,
-  getDappExecutionRequests,
-  getDappPendingRequests,
   getDappPermissions,
-  getDappRequestResultById,
-  getDappRequestResults,
   removeDappPermission,
-  removeDappExecutionRequest,
-  removeDappRequestResult,
-  setDappPendingRequests,
   setDappPermissions,
-  setDappExecutionRequests,
-  setDappRequestResults,
-  upsertDappExecutionRequest,
-  upsertDappRequestResult,
 } from '@/lib/dapp/storage'
+import {
+  appendPendingApprovalRequest,
+  completeExecutionRequest,
+  discardRequestResult,
+  getExecutionRequestById,
+  getRequestResultById,
+  persistExecutionRequest,
+  pruneExpiredDappArtifacts,
+  removePendingApprovalRequest,
+  storeRequestResult,
+} from '@/lib/dapp/request-store'
 import { validateDappMethodParams } from '@/lib/dapp/validators'
 import { signMessageFromSeed, signTransactionFromSeed } from '@/lib/dapp/signing'
 import { openBrowserVault, verifyVaultAccess } from '@/lib/vault'
-
-const APPROVAL_TIMEOUT_MS = 2 * 60 * 1000
-const REQUEST_RESULT_TTL_MS = 2 * 60 * 1000
 const sdk = createSdk()
 
 const asResponse = (id: string, result: unknown): DappRpcResponse => ({
@@ -83,45 +79,6 @@ const ensureApprovalWindow = async () => {
     })
   } catch {
     // Ignore window creation failures, the request stays pending.
-  }
-}
-
-const addPendingRequest = async (request: DappPendingRequest) => {
-  await pruneExpiredDappArtifacts()
-  const requests = await getDappPendingRequests()
-  await setDappPendingRequests([...requests, request])
-}
-
-const removePendingRequest = async (id: string) => {
-  const requests = await getDappPendingRequests()
-  await setDappPendingRequests(requests.filter((request) => request.id !== id))
-}
-
-const pruneExpiredDappArtifacts = async () => {
-  const now = Date.now()
-
-  const pendingRequests = await getDappPendingRequests()
-  const nextPendingRequests = pendingRequests.filter(
-    (request) => now - request.createdAt < APPROVAL_TIMEOUT_MS,
-  )
-  if (nextPendingRequests.length !== pendingRequests.length) {
-    await setDappPendingRequests(nextPendingRequests)
-  }
-
-  const executionRequests = await getDappExecutionRequests()
-  const nextExecutionRequests = executionRequests.filter(
-    (request) => now - request.createdAt < APPROVAL_TIMEOUT_MS,
-  )
-  if (nextExecutionRequests.length !== executionRequests.length) {
-    await setDappExecutionRequests(nextExecutionRequests)
-  }
-
-  const requestResults = await getDappRequestResults()
-  const nextRequestResults = requestResults.filter(
-    (result) => now - result.createdAt < REQUEST_RESULT_TTL_MS,
-  )
-  if (nextRequestResults.length !== requestResults.length) {
-    await setDappRequestResults(nextRequestResults)
   }
 }
 
@@ -176,23 +133,9 @@ const asPendingAck = (id: string): DappRuntimePendingAck => ({
   id,
 })
 
-const storeRequestResult = async (
-  request: Pick<DappExecutionRequest, 'id' | 'origin' | 'session'>,
-  response: DappRpcResponse,
-) => {
-  await upsertDappRequestResult({
-    id: response.id,
-    createdAt: Date.now(),
-    origin: request.origin,
-    session: request.session,
-    response,
-  })
-}
-
 const enqueueApprovalRequest = async (request: DappExecutionRequest) => {
-  await pruneExpiredDappArtifacts()
-  await upsertDappExecutionRequest(request)
-  await addPendingRequest({
+  await persistExecutionRequest(request)
+  await appendPendingApprovalRequest({
     id: request.id,
     method: request.method,
     origin: request.origin,
@@ -275,10 +218,6 @@ const queueSigningApproval = async (
   return asPendingAck(request.id)
 }
 
-const completeExecutionRequest = async (id: string) => {
-  await Promise.all([removePendingRequest(id), removeDappExecutionRequest(id)])
-}
-
 const executeApprovedRequest = async (
   request: DappExecutionRequest,
   decision: DappApprovalDecision,
@@ -326,9 +265,9 @@ const executeApprovedRequest = async (
 }
 
 const settleApprovalDecision = async (decision: DappApprovalDecision) => {
-  const request = await getDappExecutionRequestById(decision.id)
+  const request = await getExecutionRequestById(decision.id)
   if (!request) {
-    await removePendingRequest(decision.id)
+    await removePendingApprovalRequest(decision.id)
     return false
   }
 
@@ -400,16 +339,16 @@ const getRequestStatus = async (
   }
   const normalizedSenderOrigin = normalizeOrigin(senderOrigin)
 
-  const result = await getDappRequestResultById(payload.id)
+  const result = await getRequestResultById(payload.id)
   if (result) {
     if (result.origin !== normalizedSenderOrigin || result.session !== payload.session) {
       return asFailure(payload.id, 'NOT_CONNECTED', 'Request does not belong to this origin')
     }
-    await removeDappRequestResult(payload.id)
+    await discardRequestResult(payload.id)
     return result.response
   }
 
-  const execution = await getDappExecutionRequestById(payload.id)
+  const execution = await getExecutionRequestById(payload.id)
   if (execution) {
     if (execution.origin !== normalizedSenderOrigin || execution.session !== payload.session) {
       return asFailure(payload.id, 'NOT_CONNECTED', 'Request does not belong to this origin')
