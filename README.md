@@ -124,6 +124,7 @@ The dApp integration stores its state in `chrome.storage.local`:
 - `dapp.pendingRequests.v1`: pending approval requests shown in the drawer (preview-only payloads for UI)
 - `dapp.executionRequests.v1`: persisted full requests waiting for approval execution
 - `dapp.requestResults.v1`: short-lived finalized responses polled by content script
+- Executable approval payload params are encrypted before writing to local storage (key stored in `chrome.storage.session` for same-browser-session recovery).
 
 The active account snapshot is synced from extension UI state by `src/lib/dapp/session-sync.ts`.
 
@@ -142,6 +143,7 @@ The active account snapshot is synced from extension UI state by `src/lib/dapp/s
 - The provider is injected only on `http/https` pages (not `chrome://`, extension pages, file URLs, etc.).
 - Approval requests no longer depend on an in-memory waiter map. Approval state and executable request payloads are persisted, and content script polls for finalized results.
 - If the page/content script reloads while a request is in-flight, the original page promise is lost (browser page lifecycle), but the approval request itself remains recoverable and can still be completed.
+- If the browser session fully restarts, the session-scoped encryption key is lost, so old pending signing payloads may no longer be executable (the request will fail safely instead of using plaintext-at-rest).
 - Pending dApp approval requests are persisted with preview-only payloads so the approval drawer can render request details after popup reloads without storing full signing payloads.
 - The current connect flow is wallet-level (one active account exposed via `getAccount`), not per-origin account selection.
 - Signing requires the active account to be vault-backed (watch-only accounts cannot sign).

@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import type { DappRpcResponse } from '@/lib/dapp/protocol'
+import { isDappRpcResponse, type DappRpcResponse } from '@/lib/dapp/protocol'
 import {
   type DappExecutionRequest,
   type DappPendingRequest,
@@ -17,6 +17,10 @@ import {
   upsertDappRequestResult,
 } from '@/lib/dapp/storage'
 import { DAPP_APPROVAL_TIMEOUT_MS, DAPP_REQUEST_RESULT_TTL_MS } from '@/lib/dapp/timing'
+import {
+  decryptExecutionPayload,
+  encryptExecutionPayload,
+} from '@/lib/dapp/execution-payload-crypto'
 
 const executionRequestSchema = z.object({
   id: z.string().min(1),
@@ -24,7 +28,9 @@ const executionRequestSchema = z.object({
   origin: z.string().min(1),
   createdAt: z.number().finite(),
   session: z.string().min(1),
-  params: z.unknown().optional(),
+  state: z.enum(['awaitingApproval', 'executing']),
+  executionStartedAt: z.number().finite().optional(),
+  encryptedParams: z.unknown().optional(),
   account: z
     .object({
       identity: z.string().min(1),
@@ -38,7 +44,8 @@ const requestResultSchema = z.object({
   createdAt: z.number().finite(),
   origin: z.string().min(1),
   session: z.string().min(1),
-  response: z.object({}).passthrough(),
+  state: z.literal('ready'),
+  response: z.custom<DappRpcResponse>((value) => isDappRpcResponse(value)),
 })
 
 const pendingRequestSchema = z.object({
@@ -101,13 +108,38 @@ export const removePendingApprovalRequest = async (id: string) => {
 }
 
 export const persistExecutionRequest = async (request: DappExecutionRequest) => {
-  const parsed = executionRequestSchema.parse(request)
+  const encryptedParams = await encryptExecutionPayload(request.params)
+  const parsed = executionRequestSchema.parse({
+    ...request,
+    params: undefined,
+    encryptedParams,
+  })
   await pruneExpiredDappArtifacts()
   await upsertDappExecutionRequest(parsed)
 }
 
 export const getExecutionRequestById = async (id: string) => {
-  return parseExecutionRequest(await getDappExecutionRequestById(id))
+  const stored = parseExecutionRequest(await getDappExecutionRequestById(id))
+  if (!stored) return null
+  const decryptedParams = await decryptExecutionPayload(stored.encryptedParams)
+  return {
+    ...stored,
+    params: decryptedParams,
+  } as DappExecutionRequest
+}
+
+export const markExecutionRequestExecuting = async (id: string) => {
+  const request = await getExecutionRequestById(id)
+  if (!request) return null
+  if (request.state !== 'awaitingApproval') return null
+
+  const next: DappExecutionRequest = {
+    ...request,
+    state: 'executing',
+    executionStartedAt: Date.now(),
+  }
+  await upsertDappExecutionRequest(executionRequestSchema.parse(next))
+  return next
 }
 
 export const completeExecutionRequest = async (id: string) => {
@@ -123,6 +155,7 @@ export const storeRequestResult = async (
     createdAt: Date.now(),
     origin: request.origin,
     session: request.session,
+    state: 'ready',
     response,
   })
   await upsertDappRequestResult(
@@ -131,6 +164,7 @@ export const storeRequestResult = async (
       createdAt: number
       origin: string
       session: string
+      state: 'ready'
       response: DappRpcResponse
     },
   )
@@ -146,6 +180,7 @@ export const getRequestResultById = async (id: string) => {
     createdAt: number
     origin: string
     session: string
+    state: 'ready'
     response: DappRpcResponse
   }
 }

@@ -1,4 +1,4 @@
-import type { DappRpcResponse } from '@/lib/dapp/protocol'
+import { isDappRpcResponse, type DappRpcResponse } from '@/lib/dapp/protocol'
 
 export const DAPP_PERMISSIONS_KEY = 'dapp.permissions.v1'
 export const DAPP_CURRENT_ACCOUNT_KEY = 'dapp.currentAccount.v1'
@@ -32,7 +32,10 @@ export type DappExecutionRequest = Readonly<{
   origin: string
   createdAt: number
   session: string
+  state: 'awaitingApproval' | 'executing'
+  executionStartedAt?: number
   params?: unknown
+  encryptedParams?: unknown
   account?: DappCurrentAccount
 }>
 
@@ -41,6 +44,7 @@ export type DappRequestResultRecord = Readonly<{
   createdAt: number
   origin: string
   session: string
+  state: 'ready'
   response: DappRpcResponse
 }>
 
@@ -141,6 +145,8 @@ export const getDappExecutionRequests = async (): Promise<DappExecutionRequest[]
       typeof record.createdAt === 'number' &&
       typeof record.session === 'string' &&
       Boolean(record.session) &&
+      (record.state === 'awaitingApproval' || record.state === 'executing') &&
+      (record.executionStartedAt === undefined || typeof record.executionStartedAt === 'number') &&
       (record.method === 'connect' ||
         record.method === 'signMessage' ||
         record.method === 'signTransaction')
@@ -191,8 +197,8 @@ export const getDappRequestResults = async (): Promise<DappRequestResultRecord[]
       Boolean(record.origin) &&
       typeof record.session === 'string' &&
       Boolean(record.session) &&
-      record.response !== null &&
-      typeof record.response === 'object'
+      record.state === 'ready' &&
+      isDappRpcResponse(record.response)
     )
   })
 }

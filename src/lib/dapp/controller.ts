@@ -25,6 +25,7 @@ import {
   discardRequestResult,
   getExecutionRequestById,
   getRequestResultById,
+  markExecutionRequestExecuting,
   persistExecutionRequest,
   pruneExpiredDappArtifacts,
   removePendingApprovalRequest,
@@ -145,6 +146,7 @@ const connectOrigin = async (origin: string, requestId: string, session: string)
       origin,
       createdAt: Date.now(),
       session,
+      state: 'awaitingApproval',
     })
     return asPendingAck(requestId)
   }
@@ -196,6 +198,7 @@ const queueSigningApproval = async (
     origin,
     createdAt: Date.now(),
     session: request.session ?? '',
+    state: 'awaitingApproval',
     params: request.params,
     account,
   })
@@ -236,6 +239,13 @@ const executeApprovedRequest = async (
       if (!account?.identity) {
         throw new DappProviderError('NO_ACCOUNT', 'No active account is selected')
       }
+      if (request.encryptedParams && request.params === undefined) {
+        return asDappFailure(
+          request.id,
+          'INTERNAL_ERROR',
+          'Request payload is no longer available in this browser session',
+        )
+      }
       const seed = await getSeedForSigning(passphrase, account.identity)
       const result =
         request.method === 'signMessage'
@@ -253,16 +263,30 @@ const executeApprovedRequest = async (
 }
 
 export const handleDappApprovalDecision = async (decision: DappApprovalDecision) => {
+  const existingResult = await getRequestResultById(decision.id)
+  if (existingResult) {
+    // Idempotent ack for duplicate/late approval submissions after a result was already produced.
+    return true
+  }
+
   const request = await getExecutionRequestById(decision.id)
   if (!request) {
     await removePendingApprovalRequest(decision.id)
     return false
   }
+  if (request.state !== 'awaitingApproval') {
+    return true
+  }
+
+  const claimedRequest = await markExecutionRequestExecuting(decision.id)
+  if (!claimedRequest) {
+    return true
+  }
 
   try {
-    const response = await executeApprovedRequest(request, decision)
-    await storeRequestResult(request, response)
-    await completeExecutionRequest(request.id)
+    const response = await executeApprovedRequest(claimedRequest, decision)
+    await storeRequestResult(claimedRequest, response)
+    await completeExecutionRequest(claimedRequest.id)
     return true
   } catch (error) {
     const normalized = asProviderError(error, {
@@ -270,10 +294,10 @@ export const handleDappApprovalDecision = async (decision: DappApprovalDecision)
       message: 'Unhandled provider error',
     })
     await storeRequestResult(
-      request,
-      asDappFailure(request.id, normalized.code, normalized.message),
+      claimedRequest,
+      asDappFailure(claimedRequest.id, normalized.code, normalized.message),
     )
-    await completeExecutionRequest(request.id)
+    await completeExecutionRequest(claimedRequest.id)
     return true
   }
 }
