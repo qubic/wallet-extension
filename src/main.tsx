@@ -5,6 +5,7 @@ import './i18n'
 import App from './app/app'
 import { startActionIconThemeSync } from './lib/extension-icons'
 import { startDappSessionSync } from './lib/dapp/session-sync'
+import { syncVaultStorageMirror } from './lib/vault'
 
 const applyViewportSizing = () => {
   const html = document.documentElement
@@ -101,6 +102,7 @@ const startExtensionReloadWatcher = () => {
 startExtensionReloadWatcher()
 startActionIconThemeSync()
 startDappSessionSync()
+void syncVaultStorageMirror()
 
 const rootElement = document.getElementById('root')
 

@@ -1,5 +1,6 @@
 import {
   type SeedVault,
+  type VaultStore,
   createLocalStorageVaultStore,
   openSeedVaultBrowser,
   VaultEntryNotFoundError,
@@ -9,9 +10,80 @@ import { emitAccountUpdated } from '@/lib/accounts'
 
 export const VAULT_STORAGE_KEY = 'qubic.vault'
 
+const CHROME_VAULT_STORAGE_KEY = `${VAULT_STORAGE_KEY}:chrome`
+
+const getChromeLocalStorageArea = () =>
+  (globalThis as typeof globalThis & { chrome?: typeof chrome }).chrome?.storage?.local ?? null
+
+const getSafeLocalStorage = () => {
+  try {
+    return typeof localStorage === 'undefined' ? null : localStorage
+  } catch {
+    return null
+  }
+}
+
+const createChromeVaultStore = (key: string): VaultStore | null => {
+  const storage = getChromeLocalStorageArea()
+  if (!storage) return null
+
+  return {
+    label: key,
+    async read() {
+      const result = await storage.get(key)
+      const value = result[key]
+      return typeof value === 'string' ? value : null
+    },
+    async write(value) {
+      await storage.set({ [key]: value })
+    },
+    async remove() {
+      await storage.remove(key)
+    },
+  }
+}
+
+const createHybridVaultStore = (localKey: string, chromeKey: string): VaultStore => {
+  const local = getSafeLocalStorage()
+  const chromeStore = createChromeVaultStore(chromeKey)
+  const localStore = local ? createLocalStorageVaultStore(localKey, local) : null
+
+  if (!chromeStore && !localStore) {
+    throw new Error('No supported vault storage is available')
+  }
+
+  return {
+    label: chromeStore?.label ?? localStore?.label ?? localKey,
+    async read() {
+      const chromeValue = chromeStore ? await chromeStore.read() : null
+      if (chromeValue) return chromeValue
+
+      const localValue = localStore ? await localStore.read() : null
+      if (localValue && chromeStore) {
+        await chromeStore.write(localValue)
+      }
+      return localValue
+    },
+    async write(value) {
+      await Promise.all([chromeStore?.write(value), localStore?.write(value)])
+    },
+    async remove() {
+      await Promise.all([chromeStore?.remove?.(), localStore?.remove?.()])
+    },
+  }
+}
+
+const createExtensionVaultStore = () =>
+  createHybridVaultStore(VAULT_STORAGE_KEY, CHROME_VAULT_STORAGE_KEY)
+
 export const openBrowserVault = async (passphrase: string, create = false) => {
-  const store = createLocalStorageVaultStore(VAULT_STORAGE_KEY)
+  const store = createExtensionVaultStore()
   return openSeedVaultBrowser({ store, passphrase, create })
+}
+
+export const syncVaultStorageMirror = async () => {
+  const store = createExtensionVaultStore()
+  void (await store.read())
 }
 
 /**
