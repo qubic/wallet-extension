@@ -1,11 +1,26 @@
 type DappApprovalMethod = 'connect' | 'signMessage' | 'signTransaction'
 
+export type DappConnectApprovalSummary = Readonly<{
+  accountIdentity: string
+  accountName?: string
+}>
+
 export type DappTxApprovalSummary = Readonly<{
   toIdentity: string
   amount: string
   inputType: string
   targetTick: string
+  fee: string
 }>
+
+export type DappMessageWarning = 'encoded' | 'url' | 'sensitiveTerms' | 'long'
+
+type ApprovalPreviewOptions = {
+  account?: {
+    identity: string
+    name?: string
+  }
+}
 
 const truncatePreviewValue = (value: string, max = 280) =>
   value.length > max ? `${value.slice(0, max - 1)}…` : value
@@ -13,7 +28,16 @@ const truncatePreviewValue = (value: string, max = 280) =>
 export const buildApprovalParamsPreview = (
   method: DappApprovalMethod,
   params: unknown,
+  options: ApprovalPreviewOptions = {},
 ): unknown => {
+  if (method === 'connect') {
+    if (!options.account?.identity) return undefined
+    return {
+      accountIdentity: options.account.identity,
+      accountName: options.account.name,
+    }
+  }
+
   if (!params || typeof params !== 'object') {
     if (method === 'signMessage' && typeof params === 'string') {
       return truncatePreviewValue(params)
@@ -57,6 +81,39 @@ export const getApprovalMessagePreview = (params: unknown): string => {
   return ''
 }
 
+export const getApprovalMessageWarnings = (params: unknown): DappMessageWarning[] => {
+  const warnings = new Set<DappMessageWarning>()
+  const message = getApprovalMessagePreview(params)
+
+  if (message.length > 180) warnings.add('long')
+  if (/(https?:\/\/|www\.)/i.test(message)) warnings.add('url')
+  if (
+    /\b(seed|mnemonic|recovery|private key|passphrase|authorize|approval|transaction|transfer)\b/i.test(
+      message,
+    )
+  ) {
+    warnings.add('sensitiveTerms')
+  }
+
+  if (params && typeof params === 'object') {
+    const record = params as Record<string, unknown>
+    if (typeof record.hex === 'string' || typeof record.base64 === 'string') {
+      warnings.add('encoded')
+    }
+  }
+
+  return Array.from(warnings)
+}
+
+export const getApprovalConnectSummary = (params: unknown): DappConnectApprovalSummary | null => {
+  if (!params || typeof params !== 'object') return null
+  const record = params as Record<string, unknown>
+  const accountIdentity = typeof record.accountIdentity === 'string' ? record.accountIdentity : ''
+  const accountName = typeof record.accountName === 'string' ? record.accountName : undefined
+  if (!accountIdentity) return null
+  return { accountIdentity, accountName }
+}
+
 export const getApprovalTxSummary = (params: unknown): DappTxApprovalSummary | null => {
   if (!params || typeof params !== 'object') return null
   const record = params as Record<string, unknown>
@@ -71,6 +128,11 @@ export const getApprovalTxSummary = (params: unknown): DappTxApprovalSummary | n
     typeof record.targetTick === 'string' || typeof record.targetTick === 'number'
       ? `${record.targetTick}`
       : ''
+  const inputTypeNumber =
+    typeof record.inputType === 'string' || typeof record.inputType === 'number'
+      ? Number(record.inputType)
+      : Number.NaN
+  const fee = Number.isFinite(inputTypeNumber) && inputTypeNumber === 0 ? '0' : 'may-apply'
   if (!toIdentity && !amount && !inputType && !targetTick) return null
-  return { toIdentity, amount, inputType, targetTick }
+  return { toIdentity, amount, inputType, targetTick, fee }
 }

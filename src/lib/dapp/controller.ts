@@ -83,7 +83,9 @@ const enqueueApprovalRequest = async (request: DappExecutionRequest) => {
     method: request.method,
     origin: request.origin,
     createdAt: request.createdAt,
-    params: buildApprovalParamsPreview(request.method, request.params),
+    params: buildApprovalParamsPreview(request.method, request.params, {
+      account: request.account,
+    }),
   })
   await ensureApprovalWindow()
 }
@@ -91,6 +93,7 @@ const enqueueApprovalRequest = async (request: DappExecutionRequest) => {
 const connectOrigin = async (origin: string, requestId: string, session: string) => {
   const permissions = await getDappPermissions()
   if (!permissions[origin]) {
+    const account = await getDappCurrentAccount()
     await enqueueApprovalRequest({
       id: requestId,
       method: 'connect',
@@ -98,6 +101,7 @@ const connectOrigin = async (origin: string, requestId: string, session: string)
       createdAt: Date.now(),
       session,
       state: 'awaitingApproval',
+      account: account ?? undefined,
     })
     return asRuntimePendingAck(requestId)
   }

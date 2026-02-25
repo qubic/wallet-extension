@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router-dom'
-import { GlobeIcon, Link2OffIcon, LinkIcon } from 'lucide-react'
+import { AlertTriangleIcon, GlobeIcon, Link2OffIcon, LinkIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Drawer,
@@ -17,7 +17,12 @@ import {
   getDappPendingRequests,
 } from '@/lib/dapp/storage'
 import { RUNTIME_APPROVAL_DECISION_TYPE } from '@/lib/dapp/protocol'
-import { getApprovalMessagePreview, getApprovalTxSummary } from '@/lib/dapp/approval-preview'
+import {
+  getApprovalConnectSummary,
+  getApprovalMessagePreview,
+  getApprovalMessageWarnings,
+  getApprovalTxSummary,
+} from '@/lib/dapp/approval-preview'
 import { PasswordInput } from '@/components/ui/password-input'
 import { truncateString } from '@/lib/utils'
 import { isWalletLocked } from '@/lib/lock'
@@ -68,6 +73,14 @@ const DappApprovalDrawer = () => {
     current?.method === 'signMessage' || current?.method === 'signTransaction'
   const messagePreview = useMemo(
     () => getApprovalMessagePreview(current?.params),
+    [current?.params],
+  )
+  const messageWarnings = useMemo(
+    () => getApprovalMessageWarnings(current?.params),
+    [current?.params],
+  )
+  const connectSummary = useMemo(
+    () => getApprovalConnectSummary(current?.params),
     [current?.params],
   )
   const txSummary = useMemo(() => getApprovalTxSummary(current?.params), [current?.params])
@@ -149,16 +162,51 @@ const DappApprovalDrawer = () => {
               </p>
               <p className="truncate text-sm font-medium text-foreground">{current.origin}</p>
             </div>
-            {current.method === 'signMessage' && (
+            {current.method === 'connect' && connectSummary && (
               <div className="rounded-xl border border-border/60 bg-background/40 p-3">
                 <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
-                  {t('dapp.approval.messageLabel')}
+                  {t('dapp.approval.sharedAccount')}
                 </p>
-                <p className="break-all text-sm font-medium text-foreground">
-                  {messagePreview
-                    ? truncateString(messagePreview, { leading: 42, trailing: 18, minLength: 80 })
-                    : t('dapp.approval.messageEmpty')}
+                <p className="truncate text-sm font-medium text-foreground">
+                  {connectSummary.accountName || t('dapp.approval.sharedAccountFallback')}
                 </p>
+                <p className="truncate font-mono text-xs text-muted-foreground">
+                  {truncateString(connectSummary.accountIdentity)}
+                </p>
+              </div>
+            )}
+            {current.method === 'signMessage' && (
+              <div className="space-y-2">
+                <div className="rounded-xl border border-border/60 bg-background/40 p-3">
+                  <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                    {t('dapp.approval.messageLabel')}
+                  </p>
+                  <p className="break-all text-sm font-medium text-foreground">
+                    {messagePreview
+                      ? truncateString(messagePreview, { leading: 42, trailing: 18, minLength: 80 })
+                      : t('dapp.approval.messageEmpty')}
+                  </p>
+                </div>
+                {messageWarnings.length > 0 && (
+                  <div className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-3">
+                    <div className="mb-1 flex items-center gap-2 text-amber-700 dark:text-amber-300">
+                      <AlertTriangleIcon className="h-4 w-4" />
+                      <p className="text-xs font-semibold">
+                        {t('dapp.approval.messageWarningTitle')}
+                      </p>
+                    </div>
+                    <div className="space-y-1">
+                      {messageWarnings.map((warning) => (
+                        <p
+                          key={warning}
+                          className="text-xs text-amber-800/90 dark:text-amber-200/90"
+                        >
+                          {t(`dapp.approval.messageWarnings.${warning}`)}
+                        </p>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
             {current.method === 'signTransaction' && txSummary && (
@@ -187,6 +235,14 @@ const DappApprovalDrawer = () => {
                     <span className="font-mono text-foreground">{txSummary.targetTick}</span>
                   </p>
                 )}
+                <p className="text-xs text-muted-foreground">
+                  {t('dapp.approval.txFee')}:{' '}
+                  <span className="font-mono text-foreground">
+                    {txSummary.fee === '0'
+                      ? t('dapp.approval.txFeeNone')
+                      : t('dapp.approval.txFeeMayApply')}
+                  </span>
+                </p>
               </div>
             )}
             {requiresPassphrase && (

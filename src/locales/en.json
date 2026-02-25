@@ -395,16 +395,28 @@
     "approval": {
       "title": "Connection request",
       "origin": "Website",
+      "sharedAccount": "Shared account",
+      "sharedAccountFallback": "Selected account",
       "connectSubtitle": "This website wants to connect to your wallet.",
       "signMessageSubtitle": "This website wants you to sign a message.",
       "signTransactionSubtitle": "This website wants you to sign a transaction.",
       "genericSubtitle": "Review this request before continuing.",
       "messageLabel": "Message",
       "messageEmpty": "No message preview available.",
+      "messageWarningTitle": "Review message carefully",
+      "messageWarnings": {
+        "encoded": "The dApp is asking you to sign encoded data (hex/base64), which may not be human-readable.",
+        "url": "The message contains a URL. Make sure it matches the website you trust.",
+        "sensitiveTerms": "The message includes sensitive approval/transaction wording. Confirm what you are authorizing.",
+        "long": "The message is long and may hide important details."
+      },
       "txTo": "To",
       "txAmount": "Amount",
       "txInputType": "Input type",
       "txTargetTick": "Target tick",
+      "txFee": "Fee",
+      "txFeeNone": "0",
+      "txFeeMayApply": "May apply",
       "approve": "Approve",
       "reject": "Reject",
       "errors": {
