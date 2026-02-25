@@ -1,5 +1,20 @@
 import { z } from 'zod'
-import { isDappRpcResponse, type DappRpcResponse } from '@/lib/dapp/protocol'
+import {
+  RUNTIME_APPROVAL_DECISION_TYPE,
+  RUNTIME_EVENT_TYPE,
+  RUNTIME_REQUEST_STATUS_TYPE,
+  RUNTIME_REQUEST_TYPE,
+  isDappApprovalDecision,
+  isDappEventMessage,
+  isDappRpcRequest,
+  isDappRpcResponse,
+  isDappRuntimeRequestStatusPayload,
+  type DappApprovalDecision,
+  type DappEventMessage,
+  type DappRpcRequest,
+  type DappRpcResponse,
+  type DappRuntimeRequestStatusPayload,
+} from '@/lib/dapp/protocol'
 
 export const dappPendingRequestSchema = z.object({
   id: z.string().min(1),
@@ -15,6 +30,33 @@ export const dappPermissionRecordSchema = z.object({
 })
 
 export const dappPermissionsStateSchema = z.record(z.string(), dappPermissionRecordSchema)
+
+export const dappRuntimeEnvelopeBaseSchema = z.object({
+  type: z.enum([RUNTIME_REQUEST_TYPE, RUNTIME_REQUEST_STATUS_TYPE, RUNTIME_APPROVAL_DECISION_TYPE]),
+  payload: z.unknown(),
+})
+
+export const dappRuntimeRequestEnvelopeSchema = z.object({
+  type: z.literal(RUNTIME_REQUEST_TYPE),
+  payload: z.custom<DappRpcRequest>((value) => isDappRpcRequest(value)),
+})
+
+export const dappRuntimeRequestStatusEnvelopeSchema = z.object({
+  type: z.literal(RUNTIME_REQUEST_STATUS_TYPE),
+  payload: z.custom<DappRuntimeRequestStatusPayload>((value) =>
+    isDappRuntimeRequestStatusPayload(value),
+  ),
+})
+
+export const dappRuntimeApprovalDecisionEnvelopeSchema = z.object({
+  type: z.literal(RUNTIME_APPROVAL_DECISION_TYPE),
+  payload: z.custom<DappApprovalDecision>((value) => isDappApprovalDecision(value)),
+})
+
+export const dappRuntimeEventEnvelopeSchema = z.object({
+  type: z.literal(RUNTIME_EVENT_TYPE),
+  payload: z.custom<DappEventMessage>((value) => isDappEventMessage(value)),
+})
 
 export const dappExecutionRequestSchema = z.object({
   id: z.string().min(1),

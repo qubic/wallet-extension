@@ -9,10 +9,10 @@ import {
   type DappRpcFailure,
   type DappRpcResponse,
   type DappRuntimePendingAck,
-  isDappRuntimeEventEnvelope,
   isDappRpcRequest,
 } from '@/lib/dapp/protocol'
 import { isRuntimePendingAck } from '@/lib/dapp/responses'
+import { dappRuntimeEventEnvelopeSchema } from '@/lib/dapp/schemas'
 import { DAPP_APPROVAL_TIMEOUT_MS, DAPP_STATUS_POLL_INTERVAL_MS } from '@/lib/dapp/timing'
 const INPAGE_SCRIPT_PATH = 'assets/inpage-provider.js'
 const INPAGE_SESSION_DATA_ATTR = 'qubicSession'
@@ -138,8 +138,9 @@ window.addEventListener('message', (event: MessageEvent) => {
 
 const chromeApi = getChromeApi()
 chromeApi?.runtime?.onMessage?.addListener((message: unknown) => {
-  if (!isDappRuntimeEventEnvelope(message)) return
-  postToPage(message.payload)
+  const parsed = dappRuntimeEventEnvelopeSchema.safeParse(message)
+  if (!parsed.success) return
+  postToPage(parsed.data.payload)
 })
 
 injectProviderScript()

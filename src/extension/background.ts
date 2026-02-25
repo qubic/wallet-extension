@@ -14,11 +14,14 @@ import {
   RUNTIME_REQUEST_STATUS_TYPE,
   RUNTIME_REQUEST_TYPE,
   type DappEventMessage,
-  isDappApprovalDecision,
-  isDappRpcRequest,
-  isDappRuntimeRequestStatusPayload,
 } from '@/lib/dapp/protocol'
 import { asDappFailure, asDappSuccess, isRuntimePendingAck } from '@/lib/dapp/responses'
+import {
+  dappRuntimeApprovalDecisionEnvelopeSchema,
+  dappRuntimeEnvelopeBaseSchema,
+  dappRuntimeRequestEnvelopeSchema,
+  dappRuntimeRequestStatusEnvelopeSchema,
+} from '@/lib/dapp/schemas'
 import {
   DAPP_CURRENT_ACCOUNT_KEY,
   DAPP_PERMISSIONS_KEY,
@@ -26,15 +29,16 @@ import {
 } from '@/lib/dapp/storage'
 
 chrome.runtime.onMessage.addListener((message: unknown, sender, sendResponse) => {
-  if (!message || typeof message !== 'object') return undefined
-  const record = message as Record<string, unknown>
+  const baseEnvelope = dappRuntimeEnvelopeBaseSchema.safeParse(message)
+  if (!baseEnvelope.success) return undefined
 
-  if (record.type === RUNTIME_APPROVAL_DECISION_TYPE) {
-    const payload = record.payload
-    if (!isDappApprovalDecision(payload)) {
+  if (baseEnvelope.data.type === RUNTIME_APPROVAL_DECISION_TYPE) {
+    const parsed = dappRuntimeApprovalDecisionEnvelopeSchema.safeParse(message)
+    if (!parsed.success) {
       sendResponse({ ok: false })
       return undefined
     }
+    const payload = parsed.data.payload
 
     void handleDappApprovalDecision(payload)
       .then((ok) => sendResponse({ ok }))
@@ -42,12 +46,13 @@ chrome.runtime.onMessage.addListener((message: unknown, sender, sendResponse) =>
     return true
   }
 
-  if (record.type === RUNTIME_REQUEST_STATUS_TYPE) {
-    const payload = record.payload
-    if (!isDappRuntimeRequestStatusPayload(payload)) {
+  if (baseEnvelope.data.type === RUNTIME_REQUEST_STATUS_TYPE) {
+    const parsed = dappRuntimeRequestStatusEnvelopeSchema.safeParse(message)
+    if (!parsed.success) {
       sendResponse(asDappFailure('unknown', 'INVALID_REQUEST', 'Invalid status payload'))
       return undefined
     }
+    const payload = parsed.data.payload
 
     void handleDappRequestStatus(payload, sender)
       .then((response) => sendResponse(response))
@@ -55,13 +60,13 @@ chrome.runtime.onMessage.addListener((message: unknown, sender, sendResponse) =>
     return true
   }
 
-  if (record.type !== RUNTIME_REQUEST_TYPE) return undefined
-
-  const payload = record.payload
-  if (!isDappRpcRequest(payload)) {
+  if (baseEnvelope.data.type !== RUNTIME_REQUEST_TYPE) return undefined
+  const parsed = dappRuntimeRequestEnvelopeSchema.safeParse(message)
+  if (!parsed.success) {
     sendResponse(asDappFailure('unknown', 'INVALID_REQUEST', 'Invalid provider request payload'))
     return undefined
   }
+  const payload = parsed.data.payload
 
   void handleDappRpcRequest(payload, sender)
     .then((result) => {
