@@ -10,7 +10,7 @@ const readCurrentAccount = () => {
   return { identity, name }
 }
 
-const syncCurrentAccount = async () => {
+export const syncDappCurrentAccountSnapshotFromLocalState = async () => {
   const storage = getChromeLocalStorage()
   if (!storage) return
   const account = readCurrentAccount()
@@ -27,10 +27,10 @@ export const startDappSessionSync = () => {
   if (dappSessionSyncStarted) return
   dappSessionSyncStarted = true
 
-  void syncCurrentAccount()
+  void syncDappCurrentAccountSnapshotFromLocalState()
 
   const refresh = () => {
-    void syncCurrentAccount()
+    void syncDappCurrentAccountSnapshotFromLocalState()
   }
 
   window.addEventListener('storage', refresh)

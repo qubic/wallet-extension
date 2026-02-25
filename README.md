@@ -80,86 +80,84 @@ sidepanel.html               # sidepanel entry point
 ## dapp api (`window.qubic`)
 The extension injects `window.qubic` into regular web pages (`http/https`).
 
-Available methods:
+### provider methods
 - `connect(): Promise<{ connected: true; origin: string }>`
+- `disconnect(): Promise<{ disconnected: true }>`
 - `getAccount(): Promise<{ identity: string; name?: string } | null>`
 - `signMessage(params): Promise<{ signatureHex: string; digestHex: string }>`
 - `signTransaction(params): Promise<{ txId: string; targetTick: number; txBytesBase64: string; txBytesHex: string }>`
-- `disconnect(): Promise<{ disconnected: true }>`
 
-Behavior:
-- `connect` requires explicit user approval.
-- `signMessage` and `signTransaction` require approval + passphrase.
-- Requests from unconnected origins fail with `NOT_CONNECTED`.
-- Provider errors include `error.code` and `error.message`.
-
-Events:
+### events
 - `window.qubic.on('accountChanged', cb)`
 - `window.qubic.on('disconnect', cb)`
 
-Connected websites can be managed in `Settings -> Connected sites`.
+### dapp integration (for app developers)
+Basic usage:
 
-### dapp implementation (internal flow)
-High-level request path:
+```ts
+const provider = (window as Window & { qubic?: any }).qubic
 
-1. Page calls `window.qubic.<method>()` from the injected in-page provider (`src/extension/inpage-provider.ts`).
-2. In-page provider posts a `window.postMessage(...)` request.
-3. Content script (`src/extension/content-script.ts`) validates the request shape and forwards it to the extension runtime (`chrome.runtime.sendMessage`).
-4. Background service worker (`src/extension/background.ts`) validates params, checks permissions, and either:
-   - responds immediately (`getAccount`, `disconnect`), or
-   - creates a persisted pending approval request (`connect`, `signMessage`, `signTransaction`) and returns a pending ack.
-5. Approval UI (`src/components/dapp/dapp-approval-drawer.tsx`) reads pending requests from `chrome.storage.local`, lets the user approve/reject, and sends the decision back to the background worker.
-6. Background resolves the persisted request, stores the final result in extension storage, and clears the pending approval.
-7. Content script polls request status and forwards the final response to the in-page provider.
+if (!provider?.isQubic) {
+  throw new Error('Qubic Wallet extension not found')
+}
 
-Message hardening:
-- The content script injects a per-page session token into the in-page provider.
-- Provider requests/events/responses must include that session token to be accepted by the provider/content-script bridge.
+await provider.connect()
+const account = await provider.getAccount()
 
-### dapp storage keys
-The dApp integration stores its state in `chrome.storage.local`:
+const signedMessage = await provider.signMessage({ message: 'hello qubic' })
 
-- `dapp.permissions.v1`: connected origins + timestamps
-- `dapp.currentAccount.v1`: active wallet account snapshot exposed to dApps
-- `dapp.pendingRequests.v1`: pending approval requests shown in the drawer (preview-only payloads for UI)
-- `dapp.executionRequests.v1`: persisted full requests waiting for approval execution
-- `dapp.requestResults.v1`: short-lived finalized responses polled by content script
-- Executable approval payload params are encrypted before writing to local storage (key stored in `chrome.storage.session` for same-browser-session recovery).
+const signedTx = await provider.signTransaction({
+  toIdentity: 'DESTINATION_IDENTITY',
+  amount: '1',
+  // optional
+  targetTick: 123456,
+  inputType: 0,
+  // optional bytes: Uint8Array | number[] | hex string | base64 string
+  // inputBytes: new Uint8Array([...]),
+})
+```
 
-The active account snapshot is synced from extension UI state by `src/lib/dapp/session-sync.ts`.
+Error handling:
 
-### supported provider methods
-`window.qubic` currently supports:
+```ts
+try {
+  await window.qubic.signMessage({ message: 'hello' })
+} catch (error: any) {
+  console.error(error.code, error.message)
+}
+```
 
-- `connect`
-- `disconnect`
-- `getAccount`
-- `signMessage`
-- `signTransaction`
+Common provider error codes:
+- `NOT_CONNECTED`
+- `USER_REJECTED`
+- `INVALID_PARAMS`
+- `INVALID_PASSPHRASE`
+- `WATCH_ONLY_ACCOUNT`
+- `NO_ACCOUNT`
 
-`signTransaction` returns a signed payload only (serialized bytes + tx metadata). Broadcasting is still handled by the dApp/backend using its own network flow.
+Notes for dApp developers:
+- `connect`, `signMessage`, and `signTransaction` require user approval in the extension.
+- `signMessage` and `signTransaction` also require wallet passphrase confirmation.
+- `signTransaction` returns signed bytes only. Broadcasting is handled by your app/backend.
+- The current integration exposes the wallet's active account (wallet-level connect), not per-origin account selection.
 
-### implementation notes / current limitations
-- The provider is injected only on `http/https` pages (not `chrome://`, extension pages, file URLs, etc.).
-- Approval requests no longer depend on an in-memory waiter map. Approval state and executable request payloads are persisted, and content script polls for finalized results.
-- If the page/content script reloads while a request is in-flight, the original page promise is lost (browser page lifecycle), but the approval request itself remains recoverable and can still be completed.
-- If the browser session fully restarts, the session-scoped encryption key is lost, so old pending signing payloads may no longer be executable (the request will fail safely instead of using plaintext-at-rest).
-- Pending dApp approval requests are persisted with preview-only payloads so the approval drawer can render request details after popup reloads without storing full signing payloads.
-- The current connect flow is wallet-level (one active account exposed via `getAccount`), not per-origin account selection.
-- Signing requires the active account to be vault-backed (watch-only accounts cannot sign).
+### implementation notes (extension developers)
+- Requests requiring approval are persisted so they survive MV3 service worker restarts.
+- Final results are stored short-term and polled by the content script.
+- Pending signing payloads are encrypted at rest in `chrome.storage.local` using a key stored in `chrome.storage.session`.
+- The page/content-script bridge is scoped with a per-page session token to reduce `window.postMessage` spoofing risk.
 
-### local testing (dapp feature)
+### local test smoke (dapp feature)
 1. `bun run build`
-2. Load/reload the extension in `chrome://extensions`
-3. Open a test dApp on `http://localhost:*` or `https://...`
-4. Check provider injection:
+2. Reload extension in `chrome://extensions`
+3. Open a dApp page on `http://localhost:*` or `https://...`
+4. Run:
    - `window.qubic`
    - `await window.qubic.connect()`
    - `await window.qubic.getAccount()`
-5. Test signing flows:
    - `await window.qubic.signMessage({ message: 'hello' })`
-   - `await window.qubic.signTransaction({...})`
-6. Validate connected sites management in `Settings -> Connected sites`
+
+Connected websites can be managed in `Settings -> Connected sites`.
 
 ## Quality gates
 Run these before opening a PR:

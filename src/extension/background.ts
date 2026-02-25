@@ -1,4 +1,5 @@
 import { asProviderError } from '@/lib/dapp/errors'
+import { getOriginFromUrl, normalizeOrigin } from '@/lib/dapp/origin'
 import {
   handleDappApprovalDecision,
   handleDappRequestStatus,
@@ -18,7 +19,11 @@ import {
   isDappRpcRequest,
 } from '@/lib/dapp/protocol'
 import { asDappFailure, asDappSuccess, isRuntimePendingAck } from '@/lib/dapp/responses'
-import { DAPP_CURRENT_ACCOUNT_KEY, DAPP_PERMISSIONS_KEY } from '@/lib/dapp/storage'
+import {
+  DAPP_CURRENT_ACCOUNT_KEY,
+  DAPP_PERMISSIONS_KEY,
+  getDappPermissions,
+} from '@/lib/dapp/storage'
 
 chrome.runtime.onMessage.addListener((message: unknown, sender, sendResponse) => {
   if (!message || typeof message !== 'object') return undefined
@@ -89,10 +94,31 @@ chrome.runtime.onMessage.addListener((message: unknown, sender, sendResponse) =>
   return true
 })
 
-const broadcastEvent = async (event: DappEventMessage) => {
+type BroadcastEventOptions = {
+  targetOrigin?: string
+  onlyConnectedOrigins?: boolean
+}
+
+const broadcastEvent = async (event: DappEventMessage, options: BroadcastEventOptions = {}) => {
   const tabs = await chrome.tabs.query({})
+  const connectedOrigins = options.onlyConnectedOrigins ? await getDappPermissions() : null
+  const normalizedTargetOrigin = options.targetOrigin ? normalizeOrigin(options.targetOrigin) : null
+
   for (const tab of tabs) {
-    if (!tab.id) continue
+    if (!tab.id || !tab.url) continue
+
+    const tabOrigin = getOriginFromUrl(tab.url)
+    if (!tabOrigin) continue
+    const normalizedTabOrigin = normalizeOrigin(tabOrigin)
+
+    if (normalizedTargetOrigin && normalizedTabOrigin !== normalizedTargetOrigin) {
+      continue
+    }
+
+    if (connectedOrigins && !connectedOrigins[normalizedTabOrigin]) {
+      continue
+    }
+
     try {
       await chrome.tabs.sendMessage(tab.id, {
         type: RUNTIME_EVENT_TYPE,
@@ -109,12 +135,15 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
 
   if (changes[DAPP_CURRENT_ACCOUNT_KEY]) {
     const payload = changes[DAPP_CURRENT_ACCOUNT_KEY].newValue
-    void broadcastEvent({
-      channel: DAPP_CHANNEL,
-      source: CONTENT_SOURCE,
-      event: 'accountChanged',
-      payload,
-    })
+    void broadcastEvent(
+      {
+        channel: DAPP_CHANNEL,
+        source: CONTENT_SOURCE,
+        event: 'accountChanged',
+        payload,
+      },
+      { onlyConnectedOrigins: true },
+    )
   }
 
   if (changes[DAPP_PERMISSIONS_KEY]) {
@@ -122,12 +151,15 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
     const newValue = (changes[DAPP_PERMISSIONS_KEY].newValue ?? {}) as Record<string, unknown>
     const removedOrigins = Object.keys(oldValue).filter((origin) => !(origin in newValue))
     for (const origin of removedOrigins) {
-      void broadcastEvent({
-        channel: DAPP_CHANNEL,
-        source: CONTENT_SOURCE,
-        event: 'disconnect',
-        payload: { origin },
-      })
+      void broadcastEvent(
+        {
+          channel: DAPP_CHANNEL,
+          source: CONTENT_SOURCE,
+          event: 'disconnect',
+          payload: { origin },
+        },
+        { targetOrigin: origin },
+      )
     }
   }
 })
