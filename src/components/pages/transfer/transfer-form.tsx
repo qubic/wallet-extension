@@ -14,15 +14,12 @@ type TransferFormProps = {
   errors: FormErrors
   errorMessage: string
   isWatchOnly: boolean
-  assets: AggregatedAsset[]
   vaultRecipients: Array<{ name: string; identity: string }>
-  selectedToken: string
   selectedAsset: AggregatedAsset | null
   targetTickOffset: number
   manualTargetTick: string
   isManualTargetTickEnabled: boolean
   currentTick?: number
-  onTokenChange: (value: string) => void
   onSelectVaultRecipient: (identity: string) => void
   onRecipientChange: (value: string) => void
   onAmountChange: (value: string) => void
@@ -41,9 +38,7 @@ const TransferForm = ({
   errors,
   errorMessage,
   isWatchOnly,
-  assets,
   vaultRecipients,
-  selectedToken,
   selectedAsset,
   quBalance,
   usdEstimate,
@@ -51,7 +46,6 @@ const TransferForm = ({
   manualTargetTick,
   isManualTargetTickEnabled,
   currentTick,
-  onTokenChange,
   onSelectVaultRecipient,
   onRecipientChange,
   onAmountChange,
@@ -125,39 +119,6 @@ const TransferForm = ({
                 disabled={isWatchOnly}
                 className={`h-auto border-0 bg-transparent px-0 py-0 text-4xl font-semibold tracking-tight shadow-none ring-0 focus-visible:ring-0 ${errors.amount ? 'text-destructive' : ''}`}
               />
-            </div>
-            <div className="flex gap-2 overflow-x-auto pb-1">
-              <button
-                type="button"
-                className={`cursor-pointer whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
-                  selectedToken === 'qu'
-                    ? 'border-primary/60 bg-primary/10 text-foreground'
-                    : 'border-border/60 text-muted-foreground hover:border-primary/40 hover:text-foreground'
-                }`}
-                onClick={() => onTokenChange('qu')}
-                disabled={isWatchOnly}
-              >
-                QU
-              </button>
-              {assets.map((asset) => {
-                const tokenValue = `${asset.issuerIdentity}-${asset.name}`
-                const isSelected = selectedToken === tokenValue
-                return (
-                  <button
-                    key={tokenValue}
-                    type="button"
-                    className={`cursor-pointer whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
-                      isSelected
-                        ? 'border-primary/60 bg-primary/10 text-foreground'
-                        : 'border-border/60 text-muted-foreground hover:border-primary/40 hover:text-foreground'
-                    }`}
-                    onClick={() => onTokenChange(tokenValue)}
-                    disabled={isWatchOnly}
-                  >
-                    {asset.name}
-                  </button>
-                )
-              })}
             </div>
             <div className="flex gap-2">
               {[25, 50, 100].map((ratio) => (

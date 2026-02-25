@@ -1,0 +1,119 @@
+import { useEffect, useState } from 'react'
+import { ChevronRightIcon } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
+import { useBalance } from '@qubic-labs/react'
+import {
+  type AggregatedAsset,
+  aggregateAssets,
+  formatAssetUnits,
+  useOwnedAssets,
+} from '@/lib/assets'
+import { getCurrentIdentity, isWatchOnlyIdentity } from '@/lib/accounts'
+import { formatBalance, normalizeBalance } from '@/lib/utils'
+
+const SelectToken = () => {
+  const { t } = useTranslation()
+  const navigate = useNavigate()
+  const [currentIdentity, setCurrentIdentity] = useState(getCurrentIdentity())
+  const [isWatchOnly] = useState(() => isWatchOnlyIdentity(getCurrentIdentity()))
+  const balance = useBalance(currentIdentity)
+  const ownedAssets = useOwnedAssets(currentIdentity)
+  const parsedAssets = aggregateAssets(ownedAssets.data ?? {}, true)
+  const onChainQuBalance = normalizeBalance(balance.data?.balance)
+
+  useEffect(() => {
+    const refreshAccount = () => {
+      setCurrentIdentity(getCurrentIdentity())
+    }
+    window.addEventListener('storage', refreshAccount)
+    window.addEventListener('wallet-account-updated', refreshAccount)
+    return () => {
+      window.removeEventListener('storage', refreshAccount)
+      window.removeEventListener('wallet-account-updated', refreshAccount)
+    }
+  }, [])
+
+  const handleSelectQu = () => {
+    navigate('/transfer/send?token=qu')
+  }
+
+  const handleSelectAsset = (asset: AggregatedAsset) => {
+    const tokenKey = `${asset.issuerIdentity}-${asset.name}`
+    navigate(`/transfer/send?token=${encodeURIComponent(tokenKey)}`)
+  }
+
+  return (
+    <section className="flex w-full justify-center pt-4">
+      <div className="flex w-full max-w-sm flex-col gap-4 px-4 pb-2">
+        <div className="space-y-1">
+          <h2 className="text-lg font-semibold">{t('transfer.title')}</h2>
+          <p className="text-xs text-muted-foreground">{t('transfer.selectToken.subtitle')}</p>
+        </div>
+
+        {isWatchOnly && (
+          <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-200">
+            {t('transfer.errors.watchOnly')}
+          </div>
+        )}
+
+        <div className="space-y-2">
+          <button
+            type="button"
+            className="flex w-full cursor-pointer items-center gap-3 rounded-lg border border-border/60 bg-card/50 px-4 py-3 text-left transition-colors hover:border-primary/40 hover:bg-card disabled:cursor-not-allowed disabled:opacity-50"
+            onClick={handleSelectQu}
+            disabled={isWatchOnly}
+          >
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
+              <span className="text-sm font-bold text-primary">QU</span>
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="font-medium text-foreground">QUBIC</div>
+              <div className="text-xs text-muted-foreground">
+                {balance.isLoading
+                  ? t('transfer.balance.loading')
+                  : `${formatBalance(onChainQuBalance)} QU`}
+              </div>
+            </div>
+            <ChevronRightIcon className="h-4 w-4 shrink-0 text-muted-foreground" />
+          </button>
+
+          {parsedAssets.map((asset) => (
+            <button
+              key={`${asset.issuerIdentity}-${asset.name}`}
+              type="button"
+              className="flex w-full cursor-pointer items-center gap-3 rounded-lg border border-border/60 bg-card/50 px-4 py-3 text-left transition-colors hover:border-primary/40 hover:bg-card disabled:cursor-not-allowed disabled:opacity-50"
+              onClick={() => handleSelectAsset(asset)}
+              disabled={isWatchOnly}
+            >
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
+                <span className="text-xs font-bold text-primary">{asset.name.slice(0, 3)}</span>
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="font-medium text-foreground">{asset.name}</div>
+                <div className="text-xs text-muted-foreground">
+                  {formatAssetUnits(asset.numberOfUnits, asset.decimals)} {asset.name}
+                </div>
+              </div>
+              <ChevronRightIcon className="h-4 w-4 shrink-0 text-muted-foreground" />
+            </button>
+          ))}
+
+          {!ownedAssets.isLoading && parsedAssets.length === 0 && (
+            <div className="py-2 text-center text-xs text-muted-foreground">
+              {t('home.assets.empty')}
+            </div>
+          )}
+
+          {ownedAssets.isLoading && (
+            <div className="py-2 text-center text-xs text-muted-foreground">
+              {t('home.assets.loading')}
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+export default SelectToken

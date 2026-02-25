@@ -42,7 +42,7 @@ const Transfer = () => {
     const value = (searchParams.get('amount') ?? '').trim()
     return /^\d+$/.test(value) ? value : ''
   })()
-  const initialPrefillToken = (searchParams.get('token') ?? 'qu').trim()
+  const selectedToken = (searchParams.get('token') ?? 'qu').trim()
   const [currentIdentity, setCurrentIdentity] = useState(getCurrentIdentity())
   const [isWatchOnly, setIsWatchOnly] = useState(() => isWatchOnlyIdentity(getCurrentIdentity()))
   const [vaultRecipients, setVaultRecipients] = useState(() => getCachedAccounts())
@@ -54,7 +54,6 @@ const Transfer = () => {
   const latestStats = useLatestStats('transfer', { staleTime: 5_000 })
 
   const [step, setStep] = useState<Step>('form')
-  const [selectedToken, setSelectedToken] = useState(initialPrefillToken || 'qu')
   const [recipient, setRecipient] = useState(initialPrefillRecipient)
   const [amount, setAmount] = useState(initialPrefillAmount)
   const [errors, setErrors] = useState<FormErrors>({})
@@ -91,12 +90,6 @@ const Transfer = () => {
     return formatUsd(Number(parsedAmount) * usdPricePerQus)
   }, [latestStats.data?.data?.price, parsedAmount, selectedAsset])
 
-  const handleTokenChange = (value: string) => {
-    setSelectedToken(value)
-    setAmount('')
-    setErrors({})
-  }
-
   useEffect(() => {
     const refreshAccount = () => {
       const nextIdentity = getCurrentIdentity()
@@ -113,16 +106,6 @@ const Transfer = () => {
       window.removeEventListener('wallet-account-updated', refreshAccount)
     }
   }, [])
-
-  useEffect(() => {
-    if (selectedToken === 'qu') return
-    const exists = parsedAssets.some(
-      (asset) => `${asset.issuerIdentity}-${asset.name}` === selectedToken,
-    )
-    if (!exists) {
-      setSelectedToken('qu')
-    }
-  }, [parsedAssets, selectedToken])
 
   useEffect(() => {
     const handlePendingSettled = () => {
@@ -408,16 +391,13 @@ const Transfer = () => {
         errors={errors}
         errorMessage={errorMessage}
         isWatchOnly={isWatchOnly}
-        assets={parsedAssets}
         vaultRecipients={filteredVaultRecipients}
-        selectedToken={selectedToken}
         selectedAsset={selectedAsset}
         targetTickOffset={targetTickOffset}
         manualTargetTick={manualTargetTick}
         isManualTargetTickEnabled={isManualTargetTickEnabled}
         currentTick={currentTick}
         usdEstimate={usdEstimate}
-        onTokenChange={handleTokenChange}
         onSelectVaultRecipient={handleSelectVaultRecipient}
         onRecipientChange={handleRecipientChange}
         onAmountChange={handleAmountChange}

@@ -248,7 +248,7 @@ const Home = () => {
               onOpenTx={(hash) => navigate(`/tx/${hash}`)}
               onResend={(failedHash, recipient, amount, tokenKey) =>
                 navigate(
-                  `/transfer?failedHash=${encodeURIComponent(failedHash)}&recipient=${encodeURIComponent(recipient)}&amount=${encodeURIComponent(amount.toString())}&token=${encodeURIComponent(tokenKey ?? 'qu')}`,
+                  `/transfer/send?failedHash=${encodeURIComponent(failedHash)}&recipient=${encodeURIComponent(recipient)}&amount=${encodeURIComponent(amount.toString())}&token=${encodeURIComponent(tokenKey ?? 'qu')}`,
                 )
               }
             />
