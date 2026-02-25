@@ -45,8 +45,14 @@ const pending = new Map<
 >()
 const currentScript = document.currentScript as HTMLScriptElement | null
 const providerSession = currentScript?.dataset?.qubicSession ?? ''
+const REQUEST_TIMEOUT_DEFAULT_MS = 15_000
+const REQUEST_TIMEOUT_APPROVAL_MS = 150_000
 
 const createRequestId = () => `${Date.now()}-${Math.random().toString(36).slice(2)}`
+const getRequestTimeoutMs = (method: DappMethod) =>
+  method === 'connect' || method === 'signMessage' || method === 'signTransaction'
+    ? REQUEST_TIMEOUT_APPROVAL_MS
+    : REQUEST_TIMEOUT_DEFAULT_MS
 
 const emitEvent = (message: DappEventMessage) => {
   const listeners = eventListeners.get(message.event)
@@ -64,7 +70,7 @@ const request = <TMethod extends DappMethod>(method: TMethod, params?: unknown) 
     const timeoutId = window.setTimeout(() => {
       pending.delete(id)
       reject(new Error('Provider request timed out'))
-    }, 15_000)
+    }, getRequestTimeoutMs(method))
 
     pending.set(id, {
       resolve: resolve as (value: unknown) => void,

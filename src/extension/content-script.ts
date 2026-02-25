@@ -3,10 +3,12 @@ import {
   DAPP_CHANNEL,
   RUNTIME_EVENT_TYPE,
   RUNTIME_REQUEST_TYPE,
+  RUNTIME_REQUEST_STATUS_TYPE,
   type DappProviderErrorCode,
   type DappEventMessage,
   type DappRpcFailure,
   type DappRpcResponse,
+  type DappRuntimePendingAck,
   isDappRpcRequest,
 } from '@/lib/dapp/protocol'
 const INPAGE_SCRIPT_PATH = 'assets/inpage-provider.js'
@@ -54,6 +56,50 @@ const sendFailure = (
   postToPage(payload)
 }
 
+const isRuntimePendingAck = (value: unknown): value is DappRuntimePendingAck => {
+  if (!value || typeof value !== 'object') return false
+  const record = value as Record<string, unknown>
+  return record.pending === true && typeof record.id === 'string' && Boolean(record.id)
+}
+
+const pollRuntimeResult = (
+  id: string,
+  session: string,
+  runtime: NonNullable<typeof chrome.runtime>,
+  chromeApi: typeof chrome,
+  startedAt = Date.now(),
+) => {
+  if (Date.now() - startedAt > 2 * 60 * 1000) {
+    sendFailure(id, 'Provider request timed out')
+    return
+  }
+
+  runtime.sendMessage(
+    { type: RUNTIME_REQUEST_STATUS_TYPE, payload: { id, session } },
+    (response: unknown) => {
+      const maybeError = chromeApi.runtime?.lastError
+      if (maybeError) {
+        window.setTimeout(() => pollRuntimeResult(id, session, runtime, chromeApi, startedAt), 500)
+        return
+      }
+      if (isRuntimePendingAck(response)) {
+        window.setTimeout(() => pollRuntimeResult(id, session, runtime, chromeApi, startedAt), 500)
+        return
+      }
+      if (
+        !response ||
+        typeof response !== 'object' ||
+        (response as DappRpcResponse).channel !== DAPP_CHANNEL ||
+        (response as DappRpcResponse).source !== CONTENT_SOURCE
+      ) {
+        sendFailure(id, 'Invalid response from extension runtime')
+        return
+      }
+      postToPage(response as DappRpcResponse)
+    },
+  )
+}
+
 window.addEventListener('message', (event: MessageEvent) => {
   if (event.source !== window) return
   const data = event.data as unknown
@@ -69,10 +115,14 @@ window.addEventListener('message', (event: MessageEvent) => {
 
   runtime.sendMessage(
     { type: RUNTIME_REQUEST_TYPE, payload: data },
-    (response: DappRpcResponse) => {
+    (response: DappRpcResponse | DappRuntimePendingAck) => {
       const maybeError = chromeApi?.runtime?.lastError
       if (maybeError) {
         sendFailure(data.id, maybeError.message || 'Failed to reach extension runtime')
+        return
+      }
+      if (isRuntimePendingAck(response)) {
+        pollRuntimeResult(data.id, inpageSession, runtime, chromeApi)
         return
       }
       if (!response || response.channel !== DAPP_CHANNEL || response.source !== CONTENT_SOURCE) {

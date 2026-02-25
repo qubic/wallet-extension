@@ -107,9 +107,10 @@ High-level request path:
 3. Content script (`src/extension/content-script.ts`) validates the request shape and forwards it to the extension runtime (`chrome.runtime.sendMessage`).
 4. Background service worker (`src/extension/background.ts`) validates params, checks permissions, and either:
    - responds immediately (`getAccount`, `disconnect`), or
-   - creates a pending approval request (`connect`, `signMessage`, `signTransaction`).
+   - creates a persisted pending approval request (`connect`, `signMessage`, `signTransaction`) and returns a pending ack.
 5. Approval UI (`src/components/dapp/dapp-approval-drawer.tsx`) reads pending requests from `chrome.storage.local`, lets the user approve/reject, and sends the decision back to the background worker.
-6. Background resolves the pending request, signs if needed, and sends the result back through content script to the in-page provider.
+6. Background resolves the persisted request, stores the final result in extension storage, and clears the pending approval.
+7. Content script polls request status and forwards the final response to the in-page provider.
 
 Message hardening:
 - The content script injects a per-page session token into the in-page provider.
@@ -121,6 +122,8 @@ The dApp integration stores its state in `chrome.storage.local`:
 - `dapp.permissions.v1`: connected origins + timestamps
 - `dapp.currentAccount.v1`: active wallet account snapshot exposed to dApps
 - `dapp.pendingRequests.v1`: pending approval requests shown in the drawer (preview-only payloads for UI)
+- `dapp.executionRequests.v1`: persisted full requests waiting for approval execution
+- `dapp.requestResults.v1`: short-lived finalized responses polled by content script
 
 The active account snapshot is synced from extension UI state by `src/lib/dapp/session-sync.ts`.
 
@@ -137,7 +140,8 @@ The active account snapshot is synced from extension UI state by `src/lib/dapp/s
 
 ### implementation notes / current limitations
 - The provider is injected only on `http/https` pages (not `chrome://`, extension pages, file URLs, etc.).
-- Approval requests depend on the background service worker in-memory waiter map. If the service worker is restarted while an approval is pending, the page request can time out and must be retried.
+- Approval requests no longer depend on an in-memory waiter map. Approval state and executable request payloads are persisted, and content script polls for finalized results.
+- If the page/content script reloads while a request is in-flight, the original page promise is lost (browser page lifecycle), but the approval request itself remains recoverable and can still be completed.
 - Pending dApp approval requests are persisted with preview-only payloads so the approval drawer can render request details after popup reloads without storing full signing payloads.
 - The current connect flow is wallet-level (one active account exposed via `getAccount`), not per-origin account selection.
 - Signing requires the active account to be vault-backed (watch-only accounts cannot sign).

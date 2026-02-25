@@ -4,6 +4,7 @@ export const CONTENT_SOURCE = 'qubic:content'
 export const RUNTIME_REQUEST_TYPE = 'qubic:dapp:request'
 export const RUNTIME_EVENT_TYPE = 'qubic:dapp:event'
 export const RUNTIME_APPROVAL_DECISION_TYPE = 'qubic:dapp:approval-decision'
+export const RUNTIME_REQUEST_STATUS_TYPE = 'qubic:dapp:request-status'
 
 export type DappMethod = 'connect' | 'getAccount' | 'signTransaction' | 'signMessage' | 'disconnect'
 
@@ -85,6 +86,16 @@ export type DappRpcFailure = Readonly<{
 }>
 
 export type DappRpcResponse = DappRpcSuccess | DappRpcFailure
+
+export type DappRuntimePendingAck = Readonly<{
+  pending: true
+  id: string
+}>
+
+export type DappRuntimeRequestStatusPayload = Readonly<{
+  id: string
+  session: string
+}>
 
 export type DappEventMessage = Readonly<{
   channel: typeof DAPP_CHANNEL

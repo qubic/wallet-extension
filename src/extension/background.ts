@@ -7,40 +7,47 @@ import {
   RUNTIME_APPROVAL_DECISION_TYPE,
   RUNTIME_EVENT_TYPE,
   RUNTIME_REQUEST_TYPE,
+  RUNTIME_REQUEST_STATUS_TYPE,
   type DappApprovalDecision,
   type DappEventMessage,
   type DappProviderErrorCode,
   type DappRpcRequest,
   type DappRpcResponse,
+  type DappRuntimePendingAck,
+  type DappRuntimeRequestStatusPayload,
   isDappRpcRequest,
 } from '@/lib/dapp/protocol'
 import {
   DAPP_CURRENT_ACCOUNT_KEY,
   DAPP_PERMISSIONS_KEY,
   type DappCurrentAccount,
+  type DappExecutionRequest,
   type DappPendingRequest,
   type DappPermissionsState,
   getDappCurrentAccount,
+  getDappExecutionRequestById,
+  getDappExecutionRequests,
   getDappPendingRequests,
   getDappPermissions,
+  getDappRequestResultById,
+  getDappRequestResults,
   removeDappPermission,
+  removeDappExecutionRequest,
+  removeDappRequestResult,
   setDappPendingRequests,
   setDappPermissions,
+  setDappExecutionRequests,
+  setDappRequestResults,
+  upsertDappExecutionRequest,
+  upsertDappRequestResult,
 } from '@/lib/dapp/storage'
 import { validateDappMethodParams } from '@/lib/dapp/validators'
 import { signMessageFromSeed, signTransactionFromSeed } from '@/lib/dapp/signing'
 import { openBrowserVault, verifyVaultAccess } from '@/lib/vault'
 
 const APPROVAL_TIMEOUT_MS = 2 * 60 * 1000
+const REQUEST_RESULT_TTL_MS = 2 * 60 * 1000
 const sdk = createSdk()
-
-const approvalWaiters = new Map<
-  string,
-  {
-    resolve: (decision: DappApprovalDecision) => void | Promise<void>
-    timeoutId: number
-  }
->()
 
 const asResponse = (id: string, result: unknown): DappRpcResponse => ({
   channel: DAPP_CHANNEL,
@@ -80,7 +87,7 @@ const ensureApprovalWindow = async () => {
 }
 
 const addPendingRequest = async (request: DappPendingRequest) => {
-  await pruneExpiredPendingRequests()
+  await pruneExpiredDappArtifacts()
   const requests = await getDappPendingRequests()
   await setDappPendingRequests([...requests, request])
 }
@@ -90,12 +97,31 @@ const removePendingRequest = async (id: string) => {
   await setDappPendingRequests(requests.filter((request) => request.id !== id))
 }
 
-const pruneExpiredPendingRequests = async () => {
-  const requests = await getDappPendingRequests()
+const pruneExpiredDappArtifacts = async () => {
   const now = Date.now()
-  const next = requests.filter((request) => now - request.createdAt < APPROVAL_TIMEOUT_MS)
-  if (next.length !== requests.length) {
-    await setDappPendingRequests(next)
+
+  const pendingRequests = await getDappPendingRequests()
+  const nextPendingRequests = pendingRequests.filter(
+    (request) => now - request.createdAt < APPROVAL_TIMEOUT_MS,
+  )
+  if (nextPendingRequests.length !== pendingRequests.length) {
+    await setDappPendingRequests(nextPendingRequests)
+  }
+
+  const executionRequests = await getDappExecutionRequests()
+  const nextExecutionRequests = executionRequests.filter(
+    (request) => now - request.createdAt < APPROVAL_TIMEOUT_MS,
+  )
+  if (nextExecutionRequests.length !== executionRequests.length) {
+    await setDappExecutionRequests(nextExecutionRequests)
+  }
+
+  const requestResults = await getDappRequestResults()
+  const nextRequestResults = requestResults.filter(
+    (result) => now - result.createdAt < REQUEST_RESULT_TTL_MS,
+  )
+  if (nextRequestResults.length !== requestResults.length) {
+    await setDappRequestResults(nextRequestResults)
   }
 }
 
@@ -145,43 +171,48 @@ const buildApprovalParamsPreview = (
   return undefined
 }
 
-const requestApproval = async (request: DappPendingRequest): Promise<DappApprovalDecision> => {
-  await addPendingRequest(request)
-  await ensureApprovalWindow()
+const asPendingAck = (id: string): DappRuntimePendingAck => ({
+  pending: true,
+  id,
+})
 
-  return new Promise<DappApprovalDecision>((resolve) => {
-    const timeoutId = self.setTimeout(async () => {
-      approvalWaiters.delete(request.id)
-      await removePendingRequest(request.id)
-      resolve({
-        id: request.id,
-        approved: false,
-      })
-    }, APPROVAL_TIMEOUT_MS)
-
-    approvalWaiters.set(request.id, {
-      resolve: async (decision) => {
-        self.clearTimeout(timeoutId)
-        await removePendingRequest(request.id)
-        resolve(decision)
-      },
-      timeoutId,
-    })
+const storeRequestResult = async (
+  request: Pick<DappExecutionRequest, 'id' | 'origin' | 'session'>,
+  response: DappRpcResponse,
+) => {
+  await upsertDappRequestResult({
+    id: response.id,
+    createdAt: Date.now(),
+    origin: request.origin,
+    session: request.session,
+    response,
   })
 }
 
-const connectOrigin = async (origin: string, requestId: string) => {
+const enqueueApprovalRequest = async (request: DappExecutionRequest) => {
+  await pruneExpiredDappArtifacts()
+  await upsertDappExecutionRequest(request)
+  await addPendingRequest({
+    id: request.id,
+    method: request.method,
+    origin: request.origin,
+    createdAt: request.createdAt,
+    params: buildApprovalParamsPreview(request.method, request.params),
+  })
+  await ensureApprovalWindow()
+}
+
+const connectOrigin = async (origin: string, requestId: string, session: string) => {
   const permissions = await getDappPermissions()
   if (!permissions[origin]) {
-    const decision = await requestApproval({
+    await enqueueApprovalRequest({
       id: requestId,
       method: 'connect',
       origin,
       createdAt: Date.now(),
+      session,
     })
-    if (!decision.approved) {
-      throw new DappProviderError('USER_REJECTED', 'Connection request was rejected')
-    }
+    return asPendingAck(requestId)
   }
 
   permissions[origin] = {
@@ -224,44 +255,97 @@ const getSeedForSigning = async (passphrase: string, identity: string): Promise<
   }
 }
 
-const approveSigning = async (
+const queueSigningApproval = async (
   origin: string,
   request: DappRpcRequest,
-): Promise<{ passphrase: string; account: DappCurrentAccount }> => {
+): Promise<DappRuntimePendingAck> => {
   const permissions = await getDappPermissions()
   ensureConnected(origin, permissions)
 
   const account = await requireCurrentAccount()
-  const decision = await requestApproval({
+  await enqueueApprovalRequest({
     id: request.id,
     method: request.method === 'signMessage' ? 'signMessage' : 'signTransaction',
     origin,
     createdAt: Date.now(),
-    params: buildApprovalParamsPreview(
-      request.method === 'signMessage' ? 'signMessage' : 'signTransaction',
-      request.params,
-    ),
+    session: request.session ?? '',
+    params: request.params,
+    account,
   })
-  if (!decision.approved) {
-    throw new DappProviderError('USER_REJECTED', 'Request was rejected by user')
+  return asPendingAck(request.id)
+}
+
+const completeExecutionRequest = async (id: string) => {
+  await Promise.all([removePendingRequest(id), removeDappExecutionRequest(id)])
+}
+
+const executeApprovedRequest = async (
+  request: DappExecutionRequest,
+  decision: DappApprovalDecision,
+) => {
+  const normalizedOrigin = normalizeOrigin(request.origin)
+
+  switch (request.method) {
+    case 'connect': {
+      if (!decision.approved) {
+        return asFailure(request.id, 'USER_REJECTED', 'Connection request was rejected')
+      }
+      const permissions = await getDappPermissions()
+      permissions[normalizedOrigin] = {
+        origin: normalizedOrigin,
+        connectedAt: Date.now(),
+      }
+      await setDappPermissions(permissions)
+      return asResponse(request.id, { connected: true as const, origin: normalizedOrigin })
+    }
+    case 'signMessage':
+    case 'signTransaction': {
+      if (!decision.approved) {
+        return asFailure(request.id, 'USER_REJECTED', 'Request was rejected by user')
+      }
+      const passphrase = decision.passphrase?.trim()
+      if (!passphrase) {
+        return asFailure(request.id, 'INVALID_PASSPHRASE', 'Passphrase is required')
+      }
+      const permissions = await getDappPermissions()
+      ensureConnected(normalizedOrigin, permissions)
+      const account = request.account
+      if (!account?.identity) {
+        throw new DappProviderError('NO_ACCOUNT', 'No active account is selected')
+      }
+      const seed = await getSeedForSigning(passphrase, account.identity)
+      const result =
+        request.method === 'signMessage'
+          ? await signMessageFromSeed(seed, request.params)
+          : await signTransactionFromSeed(seed, request.params, sdk.transactions)
+      return asResponse(request.id, result)
+    }
+    default:
+      return asFailure(request.id, 'METHOD_NOT_SUPPORTED', `Unsupported method: ${request.method}`)
   }
-  const passphrase = decision.passphrase?.trim()
-  if (!passphrase) {
-    throw new DappProviderError('INVALID_PASSPHRASE', 'Passphrase is required')
-  }
-  return { passphrase, account }
 }
 
 const settleApprovalDecision = async (decision: DappApprovalDecision) => {
-  const waiter = approvalWaiters.get(decision.id)
-  if (!waiter) {
-    // Worker may have restarted while the approval drawer was open. Clean up stale UI state.
+  const request = await getDappExecutionRequestById(decision.id)
+  if (!request) {
     await removePendingRequest(decision.id)
     return false
   }
-  approvalWaiters.delete(decision.id)
-  void waiter.resolve(decision)
-  return true
+
+  try {
+    const response = await executeApprovedRequest(request, decision)
+    await storeRequestResult(request, response)
+    await completeExecutionRequest(request.id)
+    return true
+  } catch (error) {
+    const normalized = asProviderError(error, {
+      code: 'INTERNAL_ERROR',
+      message: 'Unhandled provider error',
+    })
+    await storeRequestResult(request, asFailure(request.id, normalized.code, normalized.message))
+    await completeExecutionRequest(request.id)
+    return true
+  }
 }
 
 const handleRequest = async (request: DappRpcRequest, sender: chrome.runtime.MessageSender) => {
@@ -270,29 +354,70 @@ const handleRequest = async (request: DappRpcRequest, sender: chrome.runtime.Mes
     throw new DappProviderError('UNSUPPORTED_ORIGIN', 'Unsupported sender origin')
   }
   const normalizedOrigin = normalizeOrigin(origin)
+  const requestSession = typeof request.session === 'string' ? request.session.trim() : ''
 
   validateDappMethodParams(request.method, request.params)
 
   switch (request.method) {
     case 'connect':
-      return connectOrigin(normalizedOrigin, request.id)
+      if (!requestSession) {
+        throw new DappProviderError('INVALID_REQUEST', 'Missing request session')
+      }
+      return connectOrigin(normalizedOrigin, request.id, requestSession)
     case 'disconnect':
       return disconnectOrigin(normalizedOrigin)
     case 'getAccount':
       return getAccountForOrigin(normalizedOrigin)
-    case 'signMessage': {
-      const { passphrase, account } = await approveSigning(normalizedOrigin, request)
-      const seed = await getSeedForSigning(passphrase, account.identity)
-      return signMessageFromSeed(seed, request.params)
-    }
-    case 'signTransaction': {
-      const { passphrase, account } = await approveSigning(normalizedOrigin, request)
-      const seed = await getSeedForSigning(passphrase, account.identity)
-      return signTransactionFromSeed(seed, request.params, sdk.transactions)
-    }
+    case 'signMessage':
+      if (!requestSession) {
+        throw new DappProviderError('INVALID_REQUEST', 'Missing request session')
+      }
+      return queueSigningApproval(normalizedOrigin, request)
+    case 'signTransaction':
+      if (!requestSession) {
+        throw new DappProviderError('INVALID_REQUEST', 'Missing request session')
+      }
+      return queueSigningApproval(normalizedOrigin, request)
     default:
       throw new DappProviderError('METHOD_NOT_SUPPORTED', `Unsupported method: ${request.method}`)
   }
+}
+
+const isRuntimePendingAck = (value: unknown): value is DappRuntimePendingAck => {
+  if (!value || typeof value !== 'object') return false
+  const record = value as Record<string, unknown>
+  return record.pending === true && typeof record.id === 'string' && Boolean(record.id)
+}
+
+const getRequestStatus = async (
+  payload: DappRuntimeRequestStatusPayload,
+  sender: chrome.runtime.MessageSender,
+): Promise<DappRpcResponse | DappRuntimePendingAck> => {
+  await pruneExpiredDappArtifacts()
+  const senderOrigin = sender.url ? getOriginFromUrl(sender.url) : null
+  if (!senderOrigin) {
+    return asFailure(payload.id, 'UNSUPPORTED_ORIGIN', 'Unsupported sender origin')
+  }
+  const normalizedSenderOrigin = normalizeOrigin(senderOrigin)
+
+  const result = await getDappRequestResultById(payload.id)
+  if (result) {
+    if (result.origin !== normalizedSenderOrigin || result.session !== payload.session) {
+      return asFailure(payload.id, 'NOT_CONNECTED', 'Request does not belong to this origin')
+    }
+    await removeDappRequestResult(payload.id)
+    return result.response
+  }
+
+  const execution = await getDappExecutionRequestById(payload.id)
+  if (execution) {
+    if (execution.origin !== normalizedSenderOrigin || execution.session !== payload.session) {
+      return asFailure(payload.id, 'NOT_CONNECTED', 'Request does not belong to this origin')
+    }
+    return asPendingAck(payload.id)
+  }
+
+  return asFailure(payload.id, 'INTERNAL_ERROR', 'Request state was lost')
 }
 
 chrome.runtime.onMessage.addListener((message: unknown, sender, sendResponse) => {
@@ -316,6 +441,24 @@ chrome.runtime.onMessage.addListener((message: unknown, sender, sendResponse) =>
     return true
   }
 
+  if (record.type === RUNTIME_REQUEST_STATUS_TYPE) {
+    const payload = record.payload as DappRuntimeRequestStatusPayload | undefined
+    if (
+      !payload ||
+      typeof payload.id !== 'string' ||
+      !payload.id ||
+      typeof payload.session !== 'string' ||
+      !payload.session
+    ) {
+      sendResponse({ ok: false, pending: false, error: 'Invalid status payload' })
+      return undefined
+    }
+    void getRequestStatus(payload, sender)
+      .then((response) => sendResponse(response))
+      .catch(() => sendResponse(asFailure(payload.id, 'INTERNAL_ERROR', 'Status check failed')))
+    return true
+  }
+
   if (record.type !== RUNTIME_REQUEST_TYPE) return undefined
   const payload = record.payload
   if (!isDappRpcRequest(payload)) {
@@ -324,7 +467,13 @@ chrome.runtime.onMessage.addListener((message: unknown, sender, sendResponse) =>
   }
 
   void handleRequest(payload, sender)
-    .then((result) => sendResponse(asResponse(payload.id, result)))
+    .then((result) => {
+      if (isRuntimePendingAck(result)) {
+        sendResponse(result)
+        return
+      }
+      sendResponse(asResponse(payload.id, result))
+    })
     .catch((error) => {
       const normalized = asProviderError(error, {
         code: 'INTERNAL_ERROR',
@@ -377,4 +526,4 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
   }
 })
 
-void pruneExpiredPendingRequests()
+void pruneExpiredDappArtifacts()
