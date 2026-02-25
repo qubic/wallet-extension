@@ -48,7 +48,31 @@ const ensureConnected = (origin: string, permissions: DappPermissionsState) => {
   }
 }
 
+const hasOpenSidePanel = async () => {
+  const runtimeWithContexts = chrome.runtime as typeof chrome.runtime & {
+    getContexts?: (
+      filter?: unknown,
+    ) => Promise<Array<{ contextType?: string; documentUrl?: string }>>
+  }
+
+  if (!runtimeWithContexts.getContexts) return false
+
+  try {
+    const sidePanelUrl = chrome.runtime.getURL('sidepanel.html')
+    const contexts = await runtimeWithContexts.getContexts({
+      contextTypes: ['SIDE_PANEL'],
+      documentUrls: [sidePanelUrl],
+    })
+
+    return contexts.some((context) => context.contextType === 'SIDE_PANEL')
+  } catch {
+    return false
+  }
+}
+
 const ensureApprovalWindow = async () => {
+  if (await hasOpenSidePanel()) return
+
   const popupUrl = chrome.runtime.getURL('popup.html?dapp=1')
   try {
     await chrome.windows.create({
@@ -56,7 +80,7 @@ const ensureApprovalWindow = async () => {
       type: 'popup',
       focused: true,
       width: 380,
-      height: 680,
+      height: 600,
     })
   } catch {
     // Ignore window creation failures, the request stays pending.

@@ -35,6 +35,9 @@ const DappApprovalDrawer = () => {
   const [error, setError] = useState('')
   const [passphrase, setPassphrase] = useState('')
   const [locked, setLocked] = useState(() => isWalletLocked())
+  const isDappApprovalPopup =
+    window.location.pathname.endsWith('popup.html') &&
+    new URLSearchParams(window.location.search).get('dapp') === '1'
 
   const loadPendingRequests = useCallback(async () => {
     const next = await getDappPendingRequests()
@@ -137,6 +140,13 @@ const DappApprovalDrawer = () => {
       }
       setRequests((prev) => prev.filter((request) => request.id !== current.id))
       setPassphrase('')
+
+      const isDappApprovalPopup =
+        window.location.pathname.endsWith('popup.html') &&
+        new URLSearchParams(window.location.search).get('dapp') === '1'
+      if (isDappApprovalPopup) {
+        window.close()
+      }
     } finally {
       setPassphrase('')
       setLoading(false)
@@ -144,8 +154,21 @@ const DappApprovalDrawer = () => {
   }
 
   return (
-    <Drawer open={isOpen}>
-      <DrawerContent className="border-none bg-background">
+    <Drawer
+      open={isOpen}
+      onOpenChange={(nextOpen) => {
+        if (nextOpen) return
+        if (!current || loading) return
+        void submitDecision(false)
+      }}
+    >
+      <DrawerContent
+        className={
+          isDappApprovalPopup
+            ? 'inset-0 h-full max-h-none rounded-none border-none bg-background data-[vaul-drawer-direction=bottom]:mt-0 data-[vaul-drawer-direction=bottom]:max-h-none data-[vaul-drawer-direction=bottom]:rounded-none data-[vaul-drawer-direction=bottom]:border-none'
+            : 'border-none bg-background'
+        }
+      >
         <DrawerHeader className="space-y-2 text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
             <GlobeIcon className="h-6 w-6 shrink-0 text-primary" />
