@@ -1,4 +1,5 @@
 import type { DappRpcResponse } from '@/lib/dapp/protocol'
+import { getChromeLocalStorage } from '@/lib/dapp/chrome-api'
 import {
   dappExecutionRequestSchema,
   dappPendingRequestSchema,
@@ -53,24 +54,75 @@ export type DappRequestResultRecord = Readonly<{
   response: DappRpcResponse
 }>
 
-const getChromeStorage = () => {
-  const chromeApi = (globalThis as typeof globalThis & { chrome?: typeof chrome }).chrome
-  return chromeApi?.storage?.local ?? null
+const getStorage = () => getChromeLocalStorage()
+
+const getLocalValue = async (key: string): Promise<unknown> => {
+  const storage = getStorage()
+  if (!storage) return undefined
+  const result = await storage.get(key)
+  return result[key]
+}
+
+const setLocalValue = async (key: string, value: unknown) => {
+  const storage = getStorage()
+  if (!storage) return
+  await storage.set({ [key]: value })
+}
+
+const removeLocalValue = async (key: string) => {
+  const storage = getStorage()
+  if (!storage) return
+  await storage.remove(key)
+}
+
+const readValidatedArray = async <T>(
+  key: string,
+  isEntry: (value: unknown) => value is T,
+): Promise<T[]> => {
+  const raw = await getLocalValue(key)
+  if (!Array.isArray(raw)) return []
+  return raw.filter(isEntry)
+}
+
+const getArrayEntryById = async <T extends { id: string }>(
+  getter: () => Promise<T[]>,
+  id: string,
+): Promise<T | null> => {
+  const entries = await getter()
+  return entries.find((entry) => entry.id === id) ?? null
+}
+
+const upsertArrayEntry = async <T extends { id: string }>(
+  getter: () => Promise<T[]>,
+  setter: (entries: T[]) => Promise<void>,
+  entry: T,
+) => {
+  const entries = await getter()
+  const next = entries.filter((item) => item.id !== entry.id)
+  next.push(entry)
+  await setter(next)
+}
+
+const removeArrayEntryById = async <T extends { id: string }>(
+  getter: () => Promise<T[]>,
+  setter: (entries: T[]) => Promise<void>,
+  id: string,
+) => {
+  const entries = await getter()
+  const next = entries.filter((entry) => entry.id !== id)
+  if (next.length === entries.length) return false
+  await setter(next)
+  return true
 }
 
 export const getDappPermissions = async (): Promise<DappPermissionsState> => {
-  const storage = getChromeStorage()
-  if (!storage) return {}
-  const result = await storage.get(DAPP_PERMISSIONS_KEY)
-  const raw = result[DAPP_PERMISSIONS_KEY]
+  const raw = await getLocalValue(DAPP_PERMISSIONS_KEY)
   if (!raw || typeof raw !== 'object') return {}
   return raw as DappPermissionsState
 }
 
 export const setDappPermissions = async (state: DappPermissionsState) => {
-  const storage = getChromeStorage()
-  if (!storage) return
-  await storage.set({ [DAPP_PERMISSIONS_KEY]: state })
+  await setLocalValue(DAPP_PERMISSIONS_KEY, state)
 }
 
 export const removeDappPermission = async (origin: string) => {
@@ -82,10 +134,7 @@ export const removeDappPermission = async (origin: string) => {
 }
 
 export const getDappCurrentAccount = async (): Promise<DappCurrentAccount | null> => {
-  const storage = getChromeStorage()
-  if (!storage) return null
-  const result = await storage.get(DAPP_CURRENT_ACCOUNT_KEY)
-  const raw = result[DAPP_CURRENT_ACCOUNT_KEY]
+  const raw = await getLocalValue(DAPP_CURRENT_ACCOUNT_KEY)
   if (!raw || typeof raw !== 'object') return null
   const entry = raw as { identity?: unknown; name?: unknown }
   if (typeof entry.identity !== 'string' || !entry.identity) return null
@@ -96,102 +145,66 @@ export const getDappCurrentAccount = async (): Promise<DappCurrentAccount | null
 }
 
 export const setDappCurrentAccount = async (account: DappCurrentAccount | null) => {
-  const storage = getChromeStorage()
-  if (!storage) return
   if (!account) {
-    await storage.remove(DAPP_CURRENT_ACCOUNT_KEY)
+    await removeLocalValue(DAPP_CURRENT_ACCOUNT_KEY)
     return
   }
-  await storage.set({ [DAPP_CURRENT_ACCOUNT_KEY]: account })
+  await setLocalValue(DAPP_CURRENT_ACCOUNT_KEY, account)
 }
 
 export const getDappPendingRequests = async (): Promise<DappPendingRequest[]> => {
-  const storage = getChromeStorage()
-  if (!storage) return []
-  const result = await storage.get(DAPP_PENDING_REQUESTS_KEY)
-  const raw = result[DAPP_PENDING_REQUESTS_KEY]
-  if (!Array.isArray(raw)) return []
-  return raw.filter(
+  return readValidatedArray(
+    DAPP_PENDING_REQUESTS_KEY,
     (entry): entry is DappPendingRequest => dappPendingRequestSchema.safeParse(entry).success,
   )
 }
 
 export const setDappPendingRequests = async (requests: DappPendingRequest[]) => {
-  const storage = getChromeStorage()
-  if (!storage) return
-  await storage.set({ [DAPP_PENDING_REQUESTS_KEY]: requests })
+  await setLocalValue(DAPP_PENDING_REQUESTS_KEY, requests)
 }
 
 export const getDappExecutionRequests = async (): Promise<DappExecutionRequest[]> => {
-  const storage = getChromeStorage()
-  if (!storage) return []
-  const result = await storage.get(DAPP_EXECUTION_REQUESTS_KEY)
-  const raw = result[DAPP_EXECUTION_REQUESTS_KEY]
-  if (!Array.isArray(raw)) return []
-  return raw.filter(
+  return readValidatedArray(
+    DAPP_EXECUTION_REQUESTS_KEY,
     (entry): entry is DappExecutionRequest => dappExecutionRequestSchema.safeParse(entry).success,
   )
 }
 
 export const setDappExecutionRequests = async (requests: DappExecutionRequest[]) => {
-  const storage = getChromeStorage()
-  if (!storage) return
-  await storage.set({ [DAPP_EXECUTION_REQUESTS_KEY]: requests })
+  await setLocalValue(DAPP_EXECUTION_REQUESTS_KEY, requests)
 }
 
 export const upsertDappExecutionRequest = async (request: DappExecutionRequest) => {
-  const requests = await getDappExecutionRequests()
-  const next = requests.filter((entry) => entry.id !== request.id)
-  next.push(request)
-  await setDappExecutionRequests(next)
+  await upsertArrayEntry(getDappExecutionRequests, setDappExecutionRequests, request)
 }
 
 export const getDappExecutionRequestById = async (id: string) => {
-  const requests = await getDappExecutionRequests()
-  return requests.find((entry) => entry.id === id) ?? null
+  return getArrayEntryById(getDappExecutionRequests, id)
 }
 
 export const removeDappExecutionRequest = async (id: string) => {
-  const requests = await getDappExecutionRequests()
-  const next = requests.filter((entry) => entry.id !== id)
-  if (next.length === requests.length) return false
-  await setDappExecutionRequests(next)
-  return true
+  return removeArrayEntryById(getDappExecutionRequests, setDappExecutionRequests, id)
 }
 
 export const getDappRequestResults = async (): Promise<DappRequestResultRecord[]> => {
-  const storage = getChromeStorage()
-  if (!storage) return []
-  const result = await storage.get(DAPP_REQUEST_RESULTS_KEY)
-  const raw = result[DAPP_REQUEST_RESULTS_KEY]
-  if (!Array.isArray(raw)) return []
-  return raw.filter(
+  return readValidatedArray(
+    DAPP_REQUEST_RESULTS_KEY,
     (entry): entry is DappRequestResultRecord => dappRequestResultSchema.safeParse(entry).success,
   )
 }
 
 export const setDappRequestResults = async (results: DappRequestResultRecord[]) => {
-  const storage = getChromeStorage()
-  if (!storage) return
-  await storage.set({ [DAPP_REQUEST_RESULTS_KEY]: results })
+  await setLocalValue(DAPP_REQUEST_RESULTS_KEY, results)
 }
 
 export const upsertDappRequestResult = async (result: DappRequestResultRecord) => {
-  const results = await getDappRequestResults()
-  const next = results.filter((entry) => entry.id !== result.id)
-  next.push(result)
-  await setDappRequestResults(next)
+  await upsertArrayEntry(getDappRequestResults, setDappRequestResults, result)
 }
 
 export const getDappRequestResultById = async (id: string) => {
-  const results = await getDappRequestResults()
-  return results.find((entry) => entry.id === id) ?? null
+  return getArrayEntryById(getDappRequestResults, id)
 }
 
 export const removeDappRequestResult = async (id: string) => {
-  const results = await getDappRequestResults()
-  const next = results.filter((entry) => entry.id !== id)
-  if (next.length === results.length) return false
-  await setDappRequestResults(next)
-  return true
+  return removeArrayEntryById(getDappRequestResults, setDappRequestResults, id)
 }

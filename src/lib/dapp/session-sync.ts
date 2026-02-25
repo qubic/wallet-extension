@@ -1,11 +1,7 @@
+import { getChromeLocalStorage } from '@/lib/dapp/chrome-api'
 import { DAPP_CURRENT_ACCOUNT_KEY } from '@/lib/dapp/storage'
 
 let dappSessionSyncStarted = false
-
-const getChromeStorage = () => {
-  const chromeApi = (globalThis as typeof globalThis & { chrome?: typeof chrome }).chrome
-  return chromeApi?.storage?.local ?? null
-}
 
 const readCurrentAccount = () => {
   const identity = localStorage.getItem('currentIdentity') ?? ''
@@ -15,7 +11,7 @@ const readCurrentAccount = () => {
 }
 
 const syncCurrentAccount = async () => {
-  const storage = getChromeStorage()
+  const storage = getChromeLocalStorage()
   if (!storage) return
   const account = readCurrentAccount()
   if (!account) {

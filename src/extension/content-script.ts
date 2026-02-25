@@ -1,3 +1,4 @@
+import { getChromeApi, getChromeRuntime } from '@/lib/dapp/chrome-api'
 import {
   CONTENT_SOURCE,
   DAPP_CHANNEL,
@@ -24,8 +25,7 @@ const createSessionToken = () => {
 const inpageSession = createSessionToken()
 
 const injectProviderScript = () => {
-  const chromeApi = (globalThis as typeof globalThis & { chrome?: typeof chrome }).chrome
-  const runtime = chromeApi?.runtime
+  const runtime = getChromeRuntime()
   if (!runtime?.getURL) return
 
   const script = document.createElement('script')
@@ -113,8 +113,8 @@ window.addEventListener('message', (event: MessageEvent) => {
   if (!isDappRpcRequest(data)) return
   if (data.session !== inpageSession) return
 
-  const chromeApi = (globalThis as typeof globalThis & { chrome?: typeof chrome }).chrome
-  const runtime = chromeApi?.runtime
+  const chromeApi = getChromeApi()
+  const runtime = getChromeRuntime()
   if (!runtime?.sendMessage) {
     sendFailure(data.id, 'Extension runtime is not available')
     return
@@ -141,7 +141,7 @@ window.addEventListener('message', (event: MessageEvent) => {
   )
 })
 
-const chromeApi = (globalThis as typeof globalThis & { chrome?: typeof chrome }).chrome
+const chromeApi = getChromeApi()
 chromeApi?.runtime?.onMessage?.addListener((message: unknown) => {
   if (!message || typeof message !== 'object') return
   const record = message as Record<string, unknown>

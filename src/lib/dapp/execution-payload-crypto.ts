@@ -1,3 +1,5 @@
+import { getChromeSessionStorage } from '@/lib/dapp/chrome-api'
+
 const DAPP_EXECUTION_KEY_STORAGE_KEY = 'dapp.executionPayloadKey.v1'
 
 type EncryptedJsonPayload = Readonly<{
@@ -16,13 +18,8 @@ const toBase64 = (bytes: Uint8Array) => {
 }
 const fromBase64 = (value: string) => Uint8Array.from(atob(value), (char) => char.charCodeAt(0))
 
-const getSessionStorage = () => {
-  const chromeApi = (globalThis as typeof globalThis & { chrome?: typeof chrome }).chrome
-  return chromeApi?.storage?.session ?? null
-}
-
 const getOrCreateRawKey = async (): Promise<Uint8Array | null> => {
-  const sessionStorage = getSessionStorage()
+  const sessionStorage = getChromeSessionStorage()
   if (!sessionStorage) return null
 
   const existing = await sessionStorage.get(DAPP_EXECUTION_KEY_STORAGE_KEY)
