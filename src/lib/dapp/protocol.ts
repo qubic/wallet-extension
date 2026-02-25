@@ -105,6 +105,16 @@ export type DappEventMessage = Readonly<{
   session?: string
 }>
 
+export type DappRuntimeRequestEnvelope = Readonly<{
+  type: typeof RUNTIME_REQUEST_TYPE
+  payload: DappRpcRequest
+}>
+
+export type DappRuntimeEventEnvelope = Readonly<{
+  type: typeof RUNTIME_EVENT_TYPE
+  payload: DappEventMessage
+}>
+
 export const isDappRpcRequest = (value: unknown): value is DappRpcRequest => {
   if (!value || typeof value !== 'object') return false
   const record = value as Record<string, unknown>
@@ -132,4 +142,33 @@ export const isDappEventMessage = (value: unknown): value is DappEventMessage =>
   if (record.source !== CONTENT_SOURCE) return false
   if (typeof record.event !== 'string' || !record.event) return false
   return true
+}
+
+export const isDappApprovalDecision = (value: unknown): value is DappApprovalDecision => {
+  if (!value || typeof value !== 'object') return false
+  const record = value as Record<string, unknown>
+  if (typeof record.id !== 'string' || !record.id) return false
+  if (typeof record.approved !== 'boolean') return false
+  if (record.passphrase !== undefined && typeof record.passphrase !== 'string') return false
+  return true
+}
+
+export const isDappRuntimeRequestStatusPayload = (
+  value: unknown,
+): value is DappRuntimeRequestStatusPayload => {
+  if (!value || typeof value !== 'object') return false
+  const record = value as Record<string, unknown>
+  return (
+    typeof record.id === 'string' &&
+    Boolean(record.id) &&
+    typeof record.session === 'string' &&
+    Boolean(record.session)
+  )
+}
+
+export const isDappRuntimeEventEnvelope = (value: unknown): value is DappRuntimeEventEnvelope => {
+  if (!value || typeof value !== 'object') return false
+  const record = value as Record<string, unknown>
+  if (record.type !== RUNTIME_EVENT_TYPE) return false
+  return isDappEventMessage(record.payload)
 }

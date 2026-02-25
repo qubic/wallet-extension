@@ -2,7 +2,6 @@ import { getChromeApi, getChromeRuntime } from '@/lib/dapp/chrome-api'
 import {
   CONTENT_SOURCE,
   DAPP_CHANNEL,
-  RUNTIME_EVENT_TYPE,
   RUNTIME_REQUEST_TYPE,
   RUNTIME_REQUEST_STATUS_TYPE,
   type DappProviderErrorCode,
@@ -10,8 +9,10 @@ import {
   type DappRpcFailure,
   type DappRpcResponse,
   type DappRuntimePendingAck,
+  isDappRuntimeEventEnvelope,
   isDappRpcRequest,
 } from '@/lib/dapp/protocol'
+import { isRuntimePendingAck } from '@/lib/dapp/responses'
 import { DAPP_APPROVAL_TIMEOUT_MS, DAPP_STATUS_POLL_INTERVAL_MS } from '@/lib/dapp/timing'
 const INPAGE_SCRIPT_PATH = 'assets/inpage-provider.js'
 const INPAGE_SESSION_DATA_ATTR = 'qubicSession'
@@ -55,12 +56,6 @@ const sendFailure = (
     error: { code, message },
   }
   postToPage(payload)
-}
-
-const isRuntimePendingAck = (value: unknown): value is DappRuntimePendingAck => {
-  if (!value || typeof value !== 'object') return false
-  const record = value as Record<string, unknown>
-  return record.pending === true && typeof record.id === 'string' && Boolean(record.id)
 }
 
 const pollRuntimeResult = (
@@ -143,14 +138,8 @@ window.addEventListener('message', (event: MessageEvent) => {
 
 const chromeApi = getChromeApi()
 chromeApi?.runtime?.onMessage?.addListener((message: unknown) => {
-  if (!message || typeof message !== 'object') return
-  const record = message as Record<string, unknown>
-  if (record.type !== RUNTIME_EVENT_TYPE) return
-  const payload = record.payload
-  if (!payload || typeof payload !== 'object') return
-  const event = payload as DappEventMessage
-  if (event.channel !== DAPP_CHANNEL || event.source !== CONTENT_SOURCE) return
-  postToPage(event)
+  if (!isDappRuntimeEventEnvelope(message)) return
+  postToPage(message.payload)
 })
 
 injectProviderScript()

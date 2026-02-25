@@ -13,10 +13,10 @@ import {
   RUNTIME_EVENT_TYPE,
   RUNTIME_REQUEST_STATUS_TYPE,
   RUNTIME_REQUEST_TYPE,
-  type DappApprovalDecision,
   type DappEventMessage,
-  type DappRuntimeRequestStatusPayload,
+  isDappApprovalDecision,
   isDappRpcRequest,
+  isDappRuntimeRequestStatusPayload,
 } from '@/lib/dapp/protocol'
 import { asDappFailure, asDappSuccess, isRuntimePendingAck } from '@/lib/dapp/responses'
 import {
@@ -30,14 +30,8 @@ chrome.runtime.onMessage.addListener((message: unknown, sender, sendResponse) =>
   const record = message as Record<string, unknown>
 
   if (record.type === RUNTIME_APPROVAL_DECISION_TYPE) {
-    const payload = record.payload as DappApprovalDecision | undefined
-    const isValid =
-      payload &&
-      typeof payload.id === 'string' &&
-      payload.id.length > 0 &&
-      typeof payload.approved === 'boolean'
-
-    if (!isValid) {
+    const payload = record.payload
+    if (!isDappApprovalDecision(payload)) {
       sendResponse({ ok: false })
       return undefined
     }
@@ -49,14 +43,8 @@ chrome.runtime.onMessage.addListener((message: unknown, sender, sendResponse) =>
   }
 
   if (record.type === RUNTIME_REQUEST_STATUS_TYPE) {
-    const payload = record.payload as DappRuntimeRequestStatusPayload | undefined
-    if (
-      !payload ||
-      typeof payload.id !== 'string' ||
-      !payload.id ||
-      typeof payload.session !== 'string' ||
-      !payload.session
-    ) {
+    const payload = record.payload
+    if (!isDappRuntimeRequestStatusPayload(payload)) {
       sendResponse(asDappFailure('unknown', 'INVALID_REQUEST', 'Invalid status payload'))
       return undefined
     }

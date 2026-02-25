@@ -9,6 +9,13 @@ export const dappPendingRequestSchema = z.object({
   params: z.unknown().optional(),
 })
 
+export const dappPermissionRecordSchema = z.object({
+  origin: z.string().min(1),
+  connectedAt: z.number().finite(),
+})
+
+export const dappPermissionsStateSchema = z.record(z.string(), dappPermissionRecordSchema)
+
 export const dappExecutionRequestSchema = z.object({
   id: z.string().min(1),
   method: z.enum(['connect', 'signMessage', 'signTransaction']),

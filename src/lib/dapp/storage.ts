@@ -3,6 +3,7 @@ import { getChromeLocalStorage } from '@/lib/dapp/chrome-api'
 import {
   dappExecutionRequestSchema,
   dappPendingRequestSchema,
+  dappPermissionsStateSchema,
   dappRequestResultSchema,
 } from '@/lib/dapp/schemas'
 
@@ -118,7 +119,8 @@ const removeArrayEntryById = async <T extends { id: string }>(
 export const getDappPermissions = async (): Promise<DappPermissionsState> => {
   const raw = await getLocalValue(DAPP_PERMISSIONS_KEY)
   if (!raw || typeof raw !== 'object') return {}
-  return raw as DappPermissionsState
+  const parsed = dappPermissionsStateSchema.safeParse(raw)
+  return parsed.success ? (parsed.data as DappPermissionsState) : {}
 }
 
 export const setDappPermissions = async (state: DappPermissionsState) => {

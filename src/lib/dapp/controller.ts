@@ -15,6 +15,7 @@ import {
   type DappExecutionRequest,
   type DappPermissionsState,
   getDappCurrentAccount,
+  getDappPendingRequests,
   getDappPermissions,
   removeDappPermission,
   setDappPermissions,
@@ -31,6 +32,10 @@ import {
   removePendingApprovalRequest,
   storeRequestResult,
 } from '@/lib/dapp/request-store'
+import {
+  DAPP_PENDING_REQUESTS_MAX_PER_ORIGIN,
+  DAPP_PENDING_REQUESTS_MAX_TOTAL,
+} from '@/lib/dapp/timing'
 import { validateDappMethodParams } from '@/lib/dapp/validators'
 import { signMessageFromSeed, signTransactionFromSeed } from '@/lib/dapp/signing'
 import { openBrowserVault, verifyVaultAccess } from '@/lib/vault'
@@ -58,7 +63,20 @@ const ensureApprovalWindow = async () => {
   }
 }
 
+const ensurePendingApprovalCapacity = async (origin: string) => {
+  const pendingRequests = await getDappPendingRequests()
+  if (pendingRequests.length >= DAPP_PENDING_REQUESTS_MAX_TOTAL) {
+    throw new DappProviderError('INVALID_REQUEST', 'Too many pending wallet requests')
+  }
+
+  const originPendingCount = pendingRequests.filter((request) => request.origin === origin).length
+  if (originPendingCount >= DAPP_PENDING_REQUESTS_MAX_PER_ORIGIN) {
+    throw new DappProviderError('INVALID_REQUEST', 'Too many pending requests for this origin')
+  }
+}
+
 const enqueueApprovalRequest = async (request: DappExecutionRequest) => {
+  await ensurePendingApprovalCapacity(request.origin)
   await persistExecutionRequest(request)
   await appendPendingApprovalRequest({
     id: request.id,
