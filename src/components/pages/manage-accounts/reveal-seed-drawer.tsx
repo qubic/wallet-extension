@@ -26,10 +26,20 @@ const RevealSeedDrawer = ({ open, seed, onOpenChange }: RevealSeedDrawerProps) =
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null)
 
   useEffect(() => {
+    let cancelled = false
     if (open && seed) {
-      QRCode.toDataURL(seed, { width: 200, margin: 2 }).then(setQrDataUrl)
+      QRCode.toDataURL(seed, { width: 200, margin: 2 })
+        .then((url) => {
+          if (!cancelled) setQrDataUrl(url)
+        })
+        .catch(() => {
+          if (!cancelled) setQrDataUrl(null)
+        })
     } else {
       setQrDataUrl(null)
+    }
+    return () => {
+      cancelled = true
     }
   }, [open, seed])
 
