@@ -33,6 +33,11 @@ chrome.runtime.onMessage.addListener((message: unknown, sender, sendResponse) =>
   if (!baseEnvelope.success) return undefined
 
   if (baseEnvelope.data.type === RUNTIME_APPROVAL_DECISION_TYPE) {
+    if (sender.id !== chrome.runtime.id || sender.tab) {
+      sendResponse({ ok: false })
+      return undefined
+    }
+
     const parsed = dappRuntimeApprovalDecisionEnvelopeSchema.safeParse(message)
     if (!parsed.success) {
       sendResponse({ ok: false })

@@ -100,7 +100,8 @@ const decodeInputBytes = (value: unknown): Uint8Array | undefined => {
         throw new DappProviderError('INVALID_PARAMS', 'inputBytes too large')
       }
       return bytes
-    } catch {
+    } catch (error) {
+      if (error instanceof DappProviderError) throw error
       throw new DappProviderError('INVALID_PARAMS', 'Invalid inputBytes encoding')
     }
   }
@@ -116,14 +117,20 @@ export const parseSignTransactionParams = (params: unknown): ParsedSignTransacti
     throw new DappProviderError('INVALID_PARAMS', 'Invalid toIdentity')
   }
 
+  const inputType = toNumberOrUndefined(input.inputType, 'inputType')
   const parsedAmount =
     typeof input.amount === 'string' ? parseAmount(input.amount) : toBigInt(input.amount, 'amount')
-  if (!parsedAmount || parsedAmount < 0n) {
+  if (parsedAmount === null || parsedAmount < 0n) {
     throw new DappProviderError('INVALID_PARAMS', 'Invalid amount')
+  }
+  if ((inputType === undefined || inputType === 0) && parsedAmount <= 0n) {
+    throw new DappProviderError(
+      'INVALID_PARAMS',
+      'Amount must be greater than 0 for simple transfers',
+    )
   }
 
   const targetTick = toNumberOrUndefined(input.targetTick, 'targetTick')
-  const inputType = toNumberOrUndefined(input.inputType, 'inputType')
   const inputBytes = decodeInputBytes(input.inputBytes)
 
   return {
@@ -174,7 +181,8 @@ const parseMessageBytes = (params: unknown): Uint8Array => {
         throw new DappProviderError('INVALID_PARAMS', 'Message too large')
       }
       return bytes
-    } catch {
+    } catch (error) {
+      if (error instanceof DappProviderError) throw error
       throw new DappProviderError('INVALID_PARAMS', 'Invalid message payload')
     }
   }

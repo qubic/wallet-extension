@@ -118,7 +118,12 @@ const pending = new Map<
 >()
 const currentScript = document.currentScript as HTMLScriptElement | null
 const providerSession = currentScript?.dataset?.qubicSession ?? ''
-const createRequestId = () => `${Date.now()}-${Math.random().toString(36).slice(2)}`
+const createRequestId = () => {
+  const bytes = new Uint8Array(8)
+  crypto.getRandomValues(bytes)
+  const random = Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('')
+  return `${Date.now()}-${random}`
+}
 const getRequestTimeoutMs = (method: DappMethod) =>
   method === 'connect' || method === 'signMessage' || method === 'signTransaction'
     ? DAPP_PROVIDER_REQUEST_TIMEOUT_APPROVAL_MS

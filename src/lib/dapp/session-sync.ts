@@ -4,6 +4,9 @@ import { DAPP_CURRENT_ACCOUNT_KEY } from '@/lib/dapp/storage'
 let dappSessionSyncStarted = false
 
 const readCurrentAccount = () => {
+  // Intentionally mirrors the currently selected account from UI state (including watch-only).
+  // dApp connect/events should reflect the active account, while signing is rejected later
+  // in the controller if the active account does not exist in the encrypted vault.
   const identity = localStorage.getItem('currentIdentity') ?? ''
   const name = localStorage.getItem('currentAccountName') ?? undefined
   if (!identity) return null

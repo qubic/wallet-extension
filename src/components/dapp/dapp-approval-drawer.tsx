@@ -23,6 +23,7 @@ import {
   getApprovalMessageWarnings,
   getApprovalTxSummary,
 } from '@/lib/dapp/approval-preview'
+import { getChromeApi } from '@/lib/dapp/chrome-api'
 import { PasswordInput } from '@/components/ui/password-input'
 import { truncateString } from '@/lib/utils'
 import { isWalletLocked } from '@/lib/lock'
@@ -46,7 +47,7 @@ const DappApprovalDrawer = () => {
 
   useEffect(() => {
     void loadPendingRequests()
-    const chromeApi = (globalThis as typeof globalThis & { chrome?: typeof chrome }).chrome
+    const chromeApi = getChromeApi()
     const onChanged = (changes: Record<string, chrome.storage.StorageChange>, areaName: string) => {
       if (areaName !== 'local') return
       if (!changes[DAPP_PENDING_REQUESTS_KEY]) return
@@ -108,7 +109,7 @@ const DappApprovalDrawer = () => {
 
   const submitDecision = async (approved: boolean) => {
     if (!current) return
-    const chromeApi = (globalThis as typeof globalThis & { chrome?: typeof chrome }).chrome
+    const chromeApi = getChromeApi()
     const runtime = chromeApi?.runtime
     if (!runtime?.sendMessage) {
       setError(t('dapp.approval.errors.runtimeUnavailable'))
@@ -145,10 +146,7 @@ const DappApprovalDrawer = () => {
       setRequests((prev) => prev.filter((request) => request.id !== current.id))
       setPassphrase('')
 
-      const isDappApprovalPopup =
-        window.location.pathname.endsWith('popup.html') &&
-        new URLSearchParams(window.location.search).get('dapp') === '1'
-      if (isDappApprovalPopup) {
+      if (isDappApprovalPopup && requests.length <= 1) {
         window.close()
       }
     } finally {

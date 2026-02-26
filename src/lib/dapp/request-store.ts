@@ -26,7 +26,7 @@ import {
 const parseExecutionRequest = (value: DappExecutionRequest | null) => {
   if (!value) return null
   const parsed = dappExecutionRequestSchema.safeParse(value)
-  return parsed.success ? (parsed.data as DappExecutionRequest) : null
+  return parsed.success ? parsed.data : null
 }
 
 export const pruneExpiredDappArtifacts = async () => {
@@ -86,7 +86,7 @@ export const getExecutionRequestById = async (id: string) => {
   return {
     ...stored,
     params: decryptedParams,
-  } as DappExecutionRequest
+  }
 }
 
 export const markExecutionRequestExecuting = async (id: string) => {
@@ -127,7 +127,7 @@ export const getRequestResultById = async (id: string) => {
   if (!result) return null
   const parsed = dappRequestResultSchema.safeParse(result)
   if (!parsed.success) return null
-  return parsed.data as DappRequestResultRecord
+  return parsed.data
 }
 
 export const consumeRequestResultById = async (id: string) => {
@@ -135,8 +135,4 @@ export const consumeRequestResultById = async (id: string) => {
   if (!result) return null
   await removeDappRequestResult(id)
   return result
-}
-
-export const discardRequestResult = async (id: string) => {
-  await removeDappRequestResult(id)
 }

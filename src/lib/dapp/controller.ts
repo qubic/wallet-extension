@@ -48,6 +48,9 @@ import {
 import { openBrowserVault, verifyVaultAccess } from '@/lib/vault'
 
 const sdk = createSdk()
+const DAPP_APPROVAL_WINDOW_WIDTH = 380
+const DAPP_APPROVAL_WINDOW_HEIGHT = 600
+const processingApprovalDecisionIds = new Set<string>()
 
 type DappSendTransactionParams = {
   toIdentity?: unknown
@@ -95,8 +98,8 @@ const ensureApprovalWindow = async () => {
       url: popupUrl,
       type: 'popup',
       focused: true,
-      width: 380,
-      height: 600,
+      width: DAPP_APPROVAL_WINDOW_WIDTH,
+      height: DAPP_APPROVAL_WINDOW_HEIGHT,
     })
   } catch {
     // Ignore window creation failures, the request stays pending.
@@ -349,42 +352,51 @@ const executeApprovedRequest = async (
 }
 
 export const handleDappApprovalDecision = async (decision: DappApprovalDecision) => {
-  const existingResult = await getRequestResultById(decision.id)
-  if (existingResult) {
-    // Idempotent ack for duplicate/late approval submissions after a result was already produced.
+  if (processingApprovalDecisionIds.has(decision.id)) {
     return true
   }
-
-  const request = await getExecutionRequestById(decision.id)
-  if (!request) {
-    await removePendingApprovalRequest(decision.id)
-    return false
-  }
-  if (request.state !== 'awaitingApproval') {
-    return true
-  }
-
-  const claimedRequest = await markExecutionRequestExecuting(decision.id)
-  if (!claimedRequest) {
-    return true
-  }
+  processingApprovalDecisionIds.add(decision.id)
 
   try {
-    const response = await executeApprovedRequest(claimedRequest, decision)
-    await storeRequestResult(claimedRequest, response)
-    await completeExecutionRequest(claimedRequest.id)
-    return true
-  } catch (error) {
-    const normalized = asProviderError(error, {
-      code: 'INTERNAL_ERROR',
-      message: 'Unhandled provider error',
-    })
-    await storeRequestResult(
-      claimedRequest,
-      asDappFailure(claimedRequest.id, normalized.code, normalized.message),
-    )
-    await completeExecutionRequest(claimedRequest.id)
-    return true
+    const existingResult = await getRequestResultById(decision.id)
+    if (existingResult) {
+      // Idempotent ack for duplicate/late approval submissions after a result was already produced.
+      return true
+    }
+
+    const request = await getExecutionRequestById(decision.id)
+    if (!request) {
+      await removePendingApprovalRequest(decision.id)
+      return false
+    }
+    if (request.state !== 'awaitingApproval') {
+      return true
+    }
+
+    const claimedRequest = await markExecutionRequestExecuting(decision.id)
+    if (!claimedRequest) {
+      return true
+    }
+
+    try {
+      const response = await executeApprovedRequest(claimedRequest, decision)
+      await storeRequestResult(claimedRequest, response)
+      await completeExecutionRequest(claimedRequest.id)
+      return true
+    } catch (error) {
+      const normalized = asProviderError(error, {
+        code: 'INTERNAL_ERROR',
+        message: 'Unhandled provider error',
+      })
+      await storeRequestResult(
+        claimedRequest,
+        asDappFailure(claimedRequest.id, normalized.code, normalized.message),
+      )
+      await completeExecutionRequest(claimedRequest.id)
+      return true
+    }
+  } finally {
+    processingApprovalDecisionIds.delete(decision.id)
   }
 }
 
