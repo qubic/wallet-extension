@@ -240,7 +240,9 @@ const DappApprovalDrawer = () => {
                   {txSummary.toIdentity && (
                     <p className="text-xs text-muted-foreground">
                       {t('dapp.approval.txTo')}:{' '}
-                      <span className="font-mono text-foreground">{txSummary.toIdentity}</span>
+                      <span className="font-mono text-foreground" title={txSummary.toIdentity}>
+                        {truncateString(txSummary.toIdentity)}
+                      </span>
                     </p>
                   )}
                   {txSummary.amount && (

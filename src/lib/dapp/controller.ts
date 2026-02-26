@@ -224,7 +224,7 @@ const toOptionalInteger = (value: unknown): number | undefined => {
   return Math.trunc(numeric)
 }
 
-const resolveSendTransactionParams = async (params: unknown) => {
+const normalizeQueuedSendTransactionParams = (params: unknown) => {
   const input = (params && typeof params === 'object' ? params : {}) as DappSendTransactionParams
   const explicitTargetTick = toOptionalInteger(input.targetTick)
   const rawOffset = toOptionalInteger(input.targetTickOffset)
@@ -252,7 +252,22 @@ const resolveSendTransactionParams = async (params: unknown) => {
     }
   }
 
-  const offset = rawOffset ?? DAPP_SEND_TRANSACTION_TARGET_TICK_OFFSET_DEFAULT
+  return {
+    ...(input as Record<string, unknown>),
+    targetTickOffset: rawOffset ?? DAPP_SEND_TRANSACTION_TARGET_TICK_OFFSET_DEFAULT,
+  }
+}
+
+const resolveSendTransactionParams = async (params: unknown) => {
+  const normalized = normalizeQueuedSendTransactionParams(params)
+  const input = normalized as Record<string, unknown>
+  const explicitTargetTick = toOptionalInteger(input.targetTick)
+  if (explicitTargetTick !== undefined) {
+    return normalized
+  }
+
+  const offset =
+    toOptionalInteger(input.targetTickOffset) ?? DAPP_SEND_TRANSACTION_TARGET_TICK_OFFSET_DEFAULT
   let targetTick: number | undefined
 
   try {
@@ -270,7 +285,7 @@ const resolveSendTransactionParams = async (params: unknown) => {
   }
 
   return {
-    ...(input as Record<string, unknown>),
+    ...input,
     targetTick,
     targetTickOffset: offset,
   }
@@ -283,7 +298,7 @@ const queueSendTransactionApproval = async (
   const permissions = await getDappPermissions()
   ensureConnected(origin, permissions)
   const account = await requireCurrentAccount()
-  const resolvedParams = await resolveSendTransactionParams(request.params)
+  const queuedParams = normalizeQueuedSendTransactionParams(request.params)
 
   await enqueueApprovalRequest({
     id: request.id,
@@ -292,7 +307,7 @@ const queueSendTransactionApproval = async (
     createdAt: Date.now(),
     session: request.session ?? '',
     state: 'awaitingApproval',
-    params: resolvedParams,
+    params: queuedParams,
     account,
   })
   return asRuntimePendingAck(request.id)
@@ -342,12 +357,13 @@ const executeApprovedRequest = async (
       }
       const seed = await getSeedForSigning(passphrase, account.identity)
       if (request.method === 'sendTransaction') {
-        const result = await sendTransactionFromSeed(seed, request.params, sdk.transactions)
+        const resolvedSendParams = await resolveSendTransactionParams(request.params)
+        const result = await sendTransactionFromSeed(seed, resolvedSendParams, sdk.transactions)
         try {
-          const parsed = parseSignTransactionParams(request.params)
+          const parsed = parseSignTransactionParams(resolvedSendParams)
           const rawParams =
-            request.params && typeof request.params === 'object'
-              ? (request.params as Record<string, unknown>)
+            resolvedSendParams && typeof resolvedSendParams === 'object'
+              ? (resolvedSendParams as Record<string, unknown>)
               : null
           const tokenKey =
             typeof rawParams?.tokenKey === 'string'
