@@ -290,7 +290,7 @@
       "recipientPlaceholder": "Identidad de 60 caracteres (A-Z)",
       "amount": "Monto ({{token}})",
       "amountPlaceholder": "Ingresa el monto",
-      "max": "MAX",
+      "max": "Máximo",
       "fee": "Comisión",
       "feeValue": "{{fee}} QUBIC",
       "quBalance": "Saldo: {{balance}} QUBIC",
