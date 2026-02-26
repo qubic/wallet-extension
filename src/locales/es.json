@@ -292,7 +292,7 @@
       "amountPlaceholder": "Ingresa el monto",
       "max": "Máximo",
       "fee": "Comisión",
-      "feeValue": "{{fee}} QUBIC",
+      "feeValue": "Comisión: {{fee}} QUBIC",
       "quBalance": "Saldo: {{balance}} QUBIC",
       "from": "Desde",
       "watchOnly": "Solo lectura",

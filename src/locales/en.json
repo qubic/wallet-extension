@@ -292,7 +292,7 @@
       "amountPlaceholder": "Enter amount",
       "max": "Max",
       "fee": "Fee",
-      "feeValue": "{{fee}} QUBIC",
+      "feeValue": "Fee: {{fee}} QUBIC",
       "quBalance": "Balance: {{balance}} QUBIC",
       "from": "From",
       "watchOnly": "Watch-only",
