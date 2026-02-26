@@ -42,9 +42,11 @@ import {
 import { validateDappMethodParams } from '@/lib/dapp/validators'
 import {
   sendTransactionFromSeed,
+  parseSignTransactionParams,
   signMessageFromSeed,
   signTransactionFromSeed,
 } from '@/lib/dapp/signing'
+import { upsertPendingTransactionInChromeStorage } from '@/lib/pending-transactions-storage'
 import { openBrowserVault, verifyVaultAccess } from '@/lib/vault'
 
 const sdk = createSdk()
@@ -334,12 +336,42 @@ const executeApprovedRequest = async (
         )
       }
       const seed = await getSeedForSigning(passphrase, account.identity)
+      if (request.method === 'sendTransaction') {
+        const result = await sendTransactionFromSeed(seed, request.params, sdk.transactions)
+        try {
+          const parsed = parseSignTransactionParams(request.params)
+          const rawParams =
+            request.params && typeof request.params === 'object'
+              ? (request.params as Record<string, unknown>)
+              : null
+          const tokenKey =
+            typeof rawParams?.tokenKey === 'string'
+              ? rawParams.tokenKey
+              : parsed.inputType === 0 || parsed.inputType === undefined
+                ? 'qu'
+                : undefined
+
+          await upsertPendingTransactionInChromeStorage({
+            hash: result.txId,
+            sourceIdentity: account.identity,
+            destinationIdentity: parsed.toIdentity,
+            amount: parsed.amount,
+            inputType: parsed.inputType ?? 0,
+            tokenKey,
+            targetTick: Number(result.targetTick),
+            createdAt: Date.now(),
+            status: 'pending',
+          })
+        } catch {
+          // Pending tracking is best-effort and must not fail a successfully broadcast dApp tx.
+        }
+        return asDappSuccess(request.id, result)
+      }
+
       const result =
         request.method === 'signMessage'
           ? await signMessageFromSeed(seed, request.params)
-          : request.method === 'signTransaction'
-            ? await signTransactionFromSeed(seed, request.params, sdk.transactions)
-            : await sendTransactionFromSeed(seed, request.params, sdk.transactions)
+          : await signTransactionFromSeed(seed, request.params, sdk.transactions)
       return asDappSuccess(request.id, result)
     }
     default:
