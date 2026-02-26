@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeftIcon, Link2OffIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { getChromeApi } from '@/lib/dapp/chrome-api'
 import { DAPP_PERMISSIONS_KEY, getDappPermissions, removeDappPermission } from '@/lib/dapp/storage'
 
 type ConnectedSite = {
@@ -26,7 +27,7 @@ const ConnectedSites = () => {
 
   useEffect(() => {
     void loadSites()
-    const chromeApi = (globalThis as typeof globalThis & { chrome?: typeof chrome }).chrome
+    const chromeApi = getChromeApi()
     const onChanged = (changes: Record<string, chrome.storage.StorageChange>, areaName: string) => {
       if (areaName !== 'local') return
       if (!changes[DAPP_PERMISSIONS_KEY]) return

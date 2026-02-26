@@ -1,4 +1,5 @@
 import { getChromeSessionStorage } from '@/lib/dapp/chrome-api'
+import { base64ToBytes, bytesToBase64 } from '@/lib/encoding'
 
 const DAPP_EXECUTION_KEY_STORAGE_KEY = 'dapp.executionPayloadKey.v1'
 
@@ -8,16 +9,6 @@ type EncryptedJsonPayload = Readonly<{
   ciphertextBase64: string
 }>
 
-const toBase64 = (bytes: Uint8Array) => {
-  let binary = ''
-  const chunkSize = 0x8000
-  for (let index = 0; index < bytes.length; index += chunkSize) {
-    binary += String.fromCharCode(...bytes.subarray(index, index + chunkSize))
-  }
-  return btoa(binary)
-}
-const fromBase64 = (value: string) => Uint8Array.from(atob(value), (char) => char.charCodeAt(0))
-
 const getOrCreateRawKey = async (): Promise<Uint8Array | null> => {
   const sessionStorage = getChromeSessionStorage()
   if (!sessionStorage) return null
@@ -26,7 +17,7 @@ const getOrCreateRawKey = async (): Promise<Uint8Array | null> => {
   const encoded = existing[DAPP_EXECUTION_KEY_STORAGE_KEY]
   if (typeof encoded === 'string' && encoded) {
     try {
-      return fromBase64(encoded)
+      return base64ToBytes(encoded)
     } catch {
       // fall through and rotate key
     }
@@ -34,7 +25,7 @@ const getOrCreateRawKey = async (): Promise<Uint8Array | null> => {
 
   const raw = new Uint8Array(32)
   crypto.getRandomValues(raw)
-  await sessionStorage.set({ [DAPP_EXECUTION_KEY_STORAGE_KEY]: toBase64(raw) })
+  await sessionStorage.set({ [DAPP_EXECUTION_KEY_STORAGE_KEY]: bytesToBase64(raw) })
   return raw
 }
 
@@ -50,7 +41,7 @@ const importAesKey = async () => {
 const serializeJson = (value: unknown) =>
   JSON.stringify(value, (_key, current) => {
     if (current instanceof Uint8Array) {
-      return { __qubicType: 'u8', base64: toBase64(current) }
+      return { __qubicType: 'u8', base64: bytesToBase64(current) }
     }
     if (typeof current === 'bigint') {
       return { __qubicType: 'bigint', value: current.toString() }
@@ -63,7 +54,7 @@ const deserializeJson = (value: string): unknown =>
     if (!current || typeof current !== 'object') return current
     const record = current as Record<string, unknown>
     if (record.__qubicType === 'u8' && typeof record.base64 === 'string') {
-      return fromBase64(record.base64)
+      return base64ToBytes(record.base64)
     }
     if (record.__qubicType === 'bigint' && typeof record.value === 'string') {
       return BigInt(record.value)
@@ -85,8 +76,8 @@ export const encryptExecutionPayload = async (
   const encrypted = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, plaintext)
   return {
     alg: 'AES-GCM',
-    ivBase64: toBase64(iv),
-    ciphertextBase64: toBase64(new Uint8Array(encrypted)),
+    ivBase64: bytesToBase64(iv),
+    ciphertextBase64: bytesToBase64(new Uint8Array(encrypted)),
   }
 }
 
@@ -106,9 +97,9 @@ export const decryptExecutionPayload = async (payload: unknown): Promise<unknown
 
   try {
     const decrypted = await crypto.subtle.decrypt(
-      { name: 'AES-GCM', iv: fromBase64(record.ivBase64) },
+      { name: 'AES-GCM', iv: base64ToBytes(record.ivBase64) },
       key,
-      fromBase64(record.ciphertextBase64),
+      base64ToBytes(record.ciphertextBase64),
     )
     return deserializeJson(new TextDecoder().decode(decrypted))
   } catch {
