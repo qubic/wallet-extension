@@ -35,12 +35,28 @@ import {
 import {
   DAPP_PENDING_REQUESTS_MAX_PER_ORIGIN,
   DAPP_PENDING_REQUESTS_MAX_TOTAL,
+  DAPP_SEND_TRANSACTION_TARGET_TICK_OFFSET_DEFAULT,
+  DAPP_SEND_TRANSACTION_TARGET_TICK_OFFSET_MAX,
+  DAPP_SEND_TRANSACTION_TARGET_TICK_OFFSET_MIN,
 } from '@/lib/dapp/timing'
 import { validateDappMethodParams } from '@/lib/dapp/validators'
-import { signMessageFromSeed, signTransactionFromSeed } from '@/lib/dapp/signing'
+import {
+  sendTransactionFromSeed,
+  signMessageFromSeed,
+  signTransactionFromSeed,
+} from '@/lib/dapp/signing'
 import { openBrowserVault, verifyVaultAccess } from '@/lib/vault'
 
 const sdk = createSdk()
+
+type DappSendTransactionParams = {
+  toIdentity?: unknown
+  amount?: unknown
+  targetTick?: unknown
+  targetTickOffset?: unknown
+  inputType?: unknown
+  inputBytes?: unknown
+}
 
 const ensureConnected = (origin: string, permissions: DappPermissionsState) => {
   if (!permissions[origin]) {
@@ -184,6 +200,94 @@ const queueSigningApproval = async (
   return asRuntimePendingAck(request.id)
 }
 
+const toOptionalInteger = (value: unknown): number | undefined => {
+  if (value === undefined || value === null) return undefined
+  const numeric =
+    typeof value === 'number'
+      ? value
+      : typeof value === 'bigint'
+        ? Number(value)
+        : typeof value === 'string'
+          ? Number.parseInt(value.trim(), 10)
+          : Number.NaN
+  if (!Number.isFinite(numeric)) return undefined
+  return Math.trunc(numeric)
+}
+
+const resolveSendTransactionParams = async (params: unknown) => {
+  const input = (params && typeof params === 'object' ? params : {}) as DappSendTransactionParams
+  const explicitTargetTick = toOptionalInteger(input.targetTick)
+  const rawOffset = toOptionalInteger(input.targetTickOffset)
+
+  if (explicitTargetTick !== undefined && explicitTargetTick < 1) {
+    throw new DappProviderError('INVALID_PARAMS', 'Invalid targetTick')
+  }
+  if (rawOffset !== undefined) {
+    if (
+      rawOffset < DAPP_SEND_TRANSACTION_TARGET_TICK_OFFSET_MIN ||
+      rawOffset > DAPP_SEND_TRANSACTION_TARGET_TICK_OFFSET_MAX
+    ) {
+      throw new DappProviderError(
+        'INVALID_PARAMS',
+        `targetTickOffset must be between ${DAPP_SEND_TRANSACTION_TARGET_TICK_OFFSET_MIN} and ${DAPP_SEND_TRANSACTION_TARGET_TICK_OFFSET_MAX}`,
+      )
+    }
+  }
+
+  if (explicitTargetTick !== undefined) {
+    const { targetTickOffset: _ignoredOffset, ...rest } = input as Record<string, unknown>
+    return {
+      ...rest,
+      targetTick: explicitTargetTick,
+    }
+  }
+
+  const offset = rawOffset ?? DAPP_SEND_TRANSACTION_TARGET_TICK_OFFSET_DEFAULT
+  let targetTick: number | undefined
+
+  try {
+    targetTick = Number(await sdk.tick.getSuggestedTargetTick({ offset }))
+  } catch {
+    try {
+      targetTick = Number((await sdk.rpc.live.tickInfo()).tick) + offset
+    } catch {
+      targetTick = undefined
+    }
+  }
+
+  if (!targetTick || !Number.isFinite(targetTick) || targetTick < 1) {
+    throw new DappProviderError('INTERNAL_ERROR', 'Unable to resolve target tick')
+  }
+
+  return {
+    ...(input as Record<string, unknown>),
+    targetTick,
+    targetTickOffset: offset,
+  }
+}
+
+const queueSendTransactionApproval = async (
+  origin: string,
+  request: DappRpcRequest,
+): Promise<DappRuntimePendingAck> => {
+  const permissions = await getDappPermissions()
+  ensureConnected(origin, permissions)
+  const account = await requireCurrentAccount()
+  const resolvedParams = await resolveSendTransactionParams(request.params)
+
+  await enqueueApprovalRequest({
+    id: request.id,
+    method: 'sendTransaction',
+    origin,
+    createdAt: Date.now(),
+    session: request.session ?? '',
+    state: 'awaitingApproval',
+    params: resolvedParams,
+    account,
+  })
+  return asRuntimePendingAck(request.id)
+}
+
 const executeApprovedRequest = async (
   request: DappExecutionRequest,
   decision: DappApprovalDecision,
@@ -204,7 +308,8 @@ const executeApprovedRequest = async (
       return asDappSuccess(request.id, { connected: true as const, origin: normalizedOrigin })
     }
     case 'signMessage':
-    case 'signTransaction': {
+    case 'signTransaction':
+    case 'sendTransaction': {
       if (!decision.approved) {
         return asDappFailure(request.id, 'USER_REJECTED', 'Request was rejected by user')
       }
@@ -229,7 +334,9 @@ const executeApprovedRequest = async (
       const result =
         request.method === 'signMessage'
           ? await signMessageFromSeed(seed, request.params)
-          : await signTransactionFromSeed(seed, request.params, sdk.transactions)
+          : request.method === 'signTransaction'
+            ? await signTransactionFromSeed(seed, request.params, sdk.transactions)
+            : await sendTransactionFromSeed(seed, request.params, sdk.transactions)
       return asDappSuccess(request.id, result)
     }
     default:
@@ -304,6 +411,9 @@ export const handleDappRpcRequest = async (
     case 'signTransaction':
       if (!requestSession) throw new DappProviderError('INVALID_REQUEST', 'Missing request session')
       return queueSigningApproval(normalizedOrigin, request)
+    case 'sendTransaction':
+      if (!requestSession) throw new DappProviderError('INVALID_REQUEST', 'Missing request session')
+      return queueSendTransactionApproval(normalizedOrigin, request)
     default:
       throw new DappProviderError('METHOD_NOT_SUPPORTED', `Unsupported method: ${request.method}`)
   }

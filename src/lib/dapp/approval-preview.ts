@@ -1,4 +1,4 @@
-type DappApprovalMethod = 'connect' | 'signMessage' | 'signTransaction'
+type DappApprovalMethod = 'connect' | 'signMessage' | 'signTransaction' | 'sendTransaction'
 
 export type DappConnectApprovalSummary = Readonly<{
   accountIdentity: string
@@ -10,6 +10,7 @@ export type DappTxApprovalSummary = Readonly<{
   amount: string
   inputType: string
   targetTick: string
+  targetTickOffset?: string
   fee: string
 }>
 
@@ -53,7 +54,7 @@ export const buildApprovalParamsPreview = (
     return undefined
   }
 
-  if (method === 'signTransaction') {
+  if (method === 'signTransaction' || method === 'sendTransaction') {
     const preview: Record<string, string | number> = {}
     if (typeof record.toIdentity === 'string') preview.toIdentity = record.toIdentity
     if (typeof record.amount === 'string' || typeof record.amount === 'number') {
@@ -64,6 +65,12 @@ export const buildApprovalParamsPreview = (
     }
     if (typeof record.targetTick === 'string' || typeof record.targetTick === 'number') {
       preview.targetTick = record.targetTick
+    }
+    if (
+      typeof record.targetTickOffset === 'string' ||
+      typeof record.targetTickOffset === 'number'
+    ) {
+      preview.targetTickOffset = record.targetTickOffset
     }
     return Object.keys(preview).length > 0 ? preview : undefined
   }
@@ -128,11 +135,15 @@ export const getApprovalTxSummary = (params: unknown): DappTxApprovalSummary | n
     typeof record.targetTick === 'string' || typeof record.targetTick === 'number'
       ? `${record.targetTick}`
       : ''
+  const targetTickOffset =
+    typeof record.targetTickOffset === 'string' || typeof record.targetTickOffset === 'number'
+      ? `${record.targetTickOffset}`
+      : undefined
   const inputTypeNumber =
     typeof record.inputType === 'string' || typeof record.inputType === 'number'
       ? Number(record.inputType)
       : Number.NaN
   const fee = Number.isFinite(inputTypeNumber) && inputTypeNumber === 0 ? '0' : 'may-apply'
   if (!toIdentity && !amount && !inputType && !targetTick) return null
-  return { toIdentity, amount, inputType, targetTick, fee }
+  return { toIdentity, amount, inputType, targetTick, targetTickOffset, fee }
 }

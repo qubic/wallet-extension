@@ -6,7 +6,13 @@ export const RUNTIME_EVENT_TYPE = 'qubic:dapp:event'
 export const RUNTIME_APPROVAL_DECISION_TYPE = 'qubic:dapp:approval-decision'
 export const RUNTIME_REQUEST_STATUS_TYPE = 'qubic:dapp:request-status'
 
-export type DappMethod = 'connect' | 'getAccount' | 'signTransaction' | 'signMessage' | 'disconnect'
+export type DappMethod =
+  | 'connect'
+  | 'getAccount'
+  | 'signTransaction'
+  | 'sendTransaction'
+  | 'signMessage'
+  | 'disconnect'
 
 export type DappEvent = 'accountChanged' | 'disconnect'
 export type DappProviderErrorCode =
@@ -47,10 +53,16 @@ export type DappSignTransactionResult = Readonly<{
   txBytesBase64: string
   txBytesHex: string
 }>
+export type DappSendTransactionResult = DappSignTransactionResult &
+  Readonly<{
+    networkTxId: string
+    broadcast: unknown
+  }>
 export type DappMethodResultMap = {
   connect: DappConnectResult
   getAccount: DappProviderAccount | null
   signTransaction: DappSignTransactionResult
+  sendTransaction: DappSendTransactionResult
   signMessage: DappSignMessageResult
   disconnect: DappDisconnectResult
 }

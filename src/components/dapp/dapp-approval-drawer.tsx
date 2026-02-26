@@ -73,7 +73,9 @@ const DappApprovalDrawer = () => {
   const current = requests[0] ?? null
   const isOpen = Boolean(current) && !locked && location.pathname !== '/unlock'
   const requiresPassphrase =
-    current?.method === 'signMessage' || current?.method === 'signTransaction'
+    current?.method === 'signMessage' ||
+    current?.method === 'signTransaction' ||
+    current?.method === 'sendTransaction'
   const messagePreview = useMemo(
     () => getApprovalMessagePreview(current?.params),
     [current?.params],
@@ -97,6 +99,8 @@ const DappApprovalDrawer = () => {
         return t('dapp.approval.signMessageSubtitle')
       case 'signTransaction':
         return t('dapp.approval.signTransactionSubtitle')
+      case 'sendTransaction':
+        return t('dapp.approval.sendTransactionSubtitle')
       default:
         return t('dapp.approval.genericSubtitle')
     }
@@ -232,42 +236,51 @@ const DappApprovalDrawer = () => {
                 )}
               </div>
             )}
-            {current.method === 'signTransaction' && txSummary && (
-              <div className="space-y-2 rounded-xl border border-border/60 bg-background/40 p-3">
-                {txSummary.toIdentity && (
+            {(current.method === 'signTransaction' || current.method === 'sendTransaction') &&
+              txSummary && (
+                <div className="space-y-2 rounded-xl border border-border/60 bg-background/40 p-3">
+                  {txSummary.toIdentity && (
+                    <p className="text-xs text-muted-foreground">
+                      {t('dapp.approval.txTo')}:{' '}
+                      <span className="font-mono text-foreground">{txSummary.toIdentity}</span>
+                    </p>
+                  )}
+                  {txSummary.amount && (
+                    <p className="text-xs text-muted-foreground">
+                      {t('dapp.approval.txAmount')}:{' '}
+                      <span className="font-mono text-foreground">{txSummary.amount}</span>
+                    </p>
+                  )}
+                  {txSummary.inputType && (
+                    <p className="text-xs text-muted-foreground">
+                      {t('dapp.approval.txInputType')}:{' '}
+                      <span className="font-mono text-foreground">{txSummary.inputType}</span>
+                    </p>
+                  )}
+                  {txSummary.targetTick && (
+                    <p className="text-xs text-muted-foreground">
+                      {t('dapp.approval.txTargetTick')}:{' '}
+                      <span className="font-mono text-foreground">{txSummary.targetTick}</span>
+                    </p>
+                  )}
+                  {txSummary.targetTickOffset && (
+                    <p className="text-xs text-muted-foreground">
+                      {t('dapp.approval.txTargetTickOffset')}:{' '}
+                      <span className="font-mono text-foreground">
+                        +{txSummary.targetTickOffset}
+                      </span>
+                    </p>
+                  )}
                   <p className="text-xs text-muted-foreground">
-                    {t('dapp.approval.txTo')}:{' '}
-                    <span className="font-mono text-foreground">{txSummary.toIdentity}</span>
+                    {t('dapp.approval.txFee')}:{' '}
+                    <span className="font-mono text-foreground">
+                      {txSummary.fee === '0'
+                        ? t('dapp.approval.txFeeNone')
+                        : t('dapp.approval.txFeeMayApply')}
+                    </span>
                   </p>
-                )}
-                {txSummary.amount && (
-                  <p className="text-xs text-muted-foreground">
-                    {t('dapp.approval.txAmount')}:{' '}
-                    <span className="font-mono text-foreground">{txSummary.amount}</span>
-                  </p>
-                )}
-                {txSummary.inputType && (
-                  <p className="text-xs text-muted-foreground">
-                    {t('dapp.approval.txInputType')}:{' '}
-                    <span className="font-mono text-foreground">{txSummary.inputType}</span>
-                  </p>
-                )}
-                {txSummary.targetTick && (
-                  <p className="text-xs text-muted-foreground">
-                    {t('dapp.approval.txTargetTick')}:{' '}
-                    <span className="font-mono text-foreground">{txSummary.targetTick}</span>
-                  </p>
-                )}
-                <p className="text-xs text-muted-foreground">
-                  {t('dapp.approval.txFee')}:{' '}
-                  <span className="font-mono text-foreground">
-                    {txSummary.fee === '0'
-                      ? t('dapp.approval.txFeeNone')
-                      : t('dapp.approval.txFeeMayApply')}
-                  </span>
-                </p>
-              </div>
-            )}
+                </div>
+              )}
             {requiresPassphrase && (
               <PasswordInput
                 id="dapp-passphrase"
@@ -301,7 +314,9 @@ const DappApprovalDrawer = () => {
             className="w-full gap-2"
           >
             <LinkIcon className="h-4 w-4" />
-            {t('dapp.approval.approve')}
+            {current?.method === 'sendTransaction'
+              ? t('dapp.approval.approveAndSend')
+              : t('dapp.approval.approve')}
           </Button>
         </DrawerFooter>
       </DrawerContent>

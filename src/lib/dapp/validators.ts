@@ -11,6 +11,7 @@ export const validateDappMethodParams = (method: DappMethod, params: unknown) =>
     case 'getAccount':
       return undefined
     case 'signTransaction':
+    case 'sendTransaction':
       return signTransactionSchema.parse(params ?? {})
     case 'signMessage':
       return signMessageSchema.parse(params ?? '')

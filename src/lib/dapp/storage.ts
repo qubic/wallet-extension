@@ -27,7 +27,7 @@ export type DappCurrentAccount = Readonly<{
 
 export type DappPendingRequest = Readonly<{
   id: string
-  method: 'connect' | 'signMessage' | 'signTransaction'
+  method: 'connect' | 'signMessage' | 'signTransaction' | 'sendTransaction'
   origin: string
   createdAt: number
   params?: unknown
@@ -35,7 +35,7 @@ export type DappPendingRequest = Readonly<{
 
 export type DappExecutionRequest = Readonly<{
   id: string
-  method: 'connect' | 'signMessage' | 'signTransaction'
+  method: 'connect' | 'signMessage' | 'signTransaction' | 'sendTransaction'
   origin: string
   createdAt: number
   session: string

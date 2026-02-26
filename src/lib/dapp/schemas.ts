@@ -18,7 +18,7 @@ import {
 
 export const dappPendingRequestSchema = z.object({
   id: z.string().min(1),
-  method: z.enum(['connect', 'signMessage', 'signTransaction']),
+  method: z.enum(['connect', 'signMessage', 'signTransaction', 'sendTransaction']),
   origin: z.string().min(1),
   createdAt: z.number().finite(),
   params: z.unknown().optional(),
@@ -60,7 +60,7 @@ export const dappRuntimeEventEnvelopeSchema = z.object({
 
 export const dappExecutionRequestSchema = z.object({
   id: z.string().min(1),
-  method: z.enum(['connect', 'signMessage', 'signTransaction']),
+  method: z.enum(['connect', 'signMessage', 'signTransaction', 'sendTransaction']),
   origin: z.string().min(1),
   createdAt: z.number().finite(),
   session: z.string().min(1),

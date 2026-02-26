@@ -6,7 +6,13 @@ const DAPP_PROVIDER_REQUEST_TIMEOUT_DEFAULT_MS = 15_000
 const DAPP_PROVIDER_REQUEST_TIMEOUT_APPROVAL_MS = 150_000
 
 type DappEvent = 'accountChanged' | 'disconnect'
-type DappMethod = 'connect' | 'getAccount' | 'signTransaction' | 'signMessage' | 'disconnect'
+type DappMethod =
+  | 'connect'
+  | 'getAccount'
+  | 'signTransaction'
+  | 'sendTransaction'
+  | 'signMessage'
+  | 'disconnect'
 
 type DappProviderAccount = { identity: string; name?: string }
 type DappConnectResult = { connected: true; origin: string }
@@ -18,11 +24,16 @@ type DappSignTransactionResult = {
   txBytesBase64: string
   txBytesHex: string
 }
+type DappSendTransactionResult = DappSignTransactionResult & {
+  networkTxId: string
+  broadcast: unknown
+}
 
 type DappMethodResultMap = {
   connect: DappConnectResult
   getAccount: DappProviderAccount | null
   signTransaction: DappSignTransactionResult
+  sendTransaction: DappSendTransactionResult
   signMessage: DappSignMessageResult
   disconnect: DappDisconnectResult
 }
@@ -66,6 +77,7 @@ type QubicProvider = {
   connect: () => Promise<DappConnectResult>
   getAccount: () => Promise<DappProviderAccount | null>
   signTransaction: (tx: unknown) => Promise<DappSignTransactionResult>
+  sendTransaction: (tx: unknown) => Promise<DappSendTransactionResult>
   signMessage: (message: unknown) => Promise<DappSignMessageResult>
   disconnect: () => Promise<DappDisconnectResult>
   on: (event: DappEvent, callback: ProviderEventCallback) => () => void
@@ -154,6 +166,7 @@ const provider: QubicProvider = {
   connect: async () => request('connect'),
   getAccount: async () => request('getAccount'),
   signTransaction: async (tx) => request('signTransaction', tx),
+  sendTransaction: async (tx) => request('sendTransaction', tx),
   signMessage: async (message) => request('signMessage', message),
   disconnect: async () => request('disconnect'),
   on: (event, callback) => {

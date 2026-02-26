@@ -217,3 +217,31 @@ export const signTransactionFromSeed = async (
     txBytesHex: bytesToHex(built.txBytes),
   }
 }
+
+export const sendTransactionFromSeed = async (
+  seed: string,
+  params: unknown,
+  transactions: TransactionHelpers,
+): Promise<{
+  txId: string
+  targetTick: number
+  txBytesBase64: string
+  txBytesHex: string
+  networkTxId: string
+  broadcast: unknown
+}> => {
+  const parsed = parseSignTransactionParams(params)
+  const sent = await transactions.send({
+    fromSeed: seed,
+    ...parsed,
+  })
+
+  return {
+    txId: sent.txId,
+    targetTick: Number(sent.targetTick),
+    txBytesBase64: bytesToBase64(sent.txBytes),
+    txBytesHex: bytesToHex(sent.txBytes),
+    networkTxId: sent.networkTxId,
+    broadcast: sent.broadcast,
+  }
+}
