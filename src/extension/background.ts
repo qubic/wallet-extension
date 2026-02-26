@@ -33,7 +33,11 @@ chrome.runtime.onMessage.addListener((message: unknown, sender, sendResponse) =>
   if (!baseEnvelope.success) return undefined
 
   if (baseEnvelope.data.type === RUNTIME_APPROVAL_DECISION_TYPE) {
-    if (sender.id !== chrome.runtime.id || sender.tab) {
+    const isExtensionUiSender =
+      sender.id === chrome.runtime.id &&
+      typeof sender.url === 'string' &&
+      sender.url.startsWith(chrome.runtime.getURL(''))
+    if (!isExtensionUiSender) {
       sendResponse({ ok: false })
       return undefined
     }

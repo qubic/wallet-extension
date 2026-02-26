@@ -1,5 +1,6 @@
 import { createSdk } from '@qubic-labs/sdk'
 import { buildApprovalParamsPreview } from '@/lib/dapp/approval-preview'
+import { isSidepanelPresenceFresh } from '@/lib/dapp/sidepanel-presence'
 import { DappProviderError, asProviderError } from '@/lib/dapp/errors'
 import { getOriginFromUrl, normalizeOrigin } from '@/lib/dapp/origin'
 import type {
@@ -70,6 +71,8 @@ const ensureConnected = (origin: string, permissions: DappPermissionsState) => {
 }
 
 const hasOpenSidePanel = async () => {
+  if (await isSidepanelPresenceFresh()) return true
+
   const runtimeWithContexts = chrome.runtime as typeof chrome.runtime & {
     getContexts?: (
       filter?: unknown,
@@ -80,12 +83,14 @@ const hasOpenSidePanel = async () => {
 
   try {
     const sidePanelUrl = chrome.runtime.getURL('sidepanel.html')
-    const contexts = await runtimeWithContexts.getContexts({
-      contextTypes: ['SIDE_PANEL'],
-      documentUrls: [sidePanelUrl],
-    })
+    const contexts = await runtimeWithContexts.getContexts({ contextTypes: ['SIDE_PANEL'] })
 
-    return contexts.some((context) => context.contextType === 'SIDE_PANEL')
+    return contexts.some(
+      (context) =>
+        context.contextType === 'SIDE_PANEL' &&
+        typeof context.documentUrl === 'string' &&
+        context.documentUrl.startsWith(sidePanelUrl),
+    )
   } catch {
     return false
   }
