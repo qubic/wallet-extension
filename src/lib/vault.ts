@@ -7,13 +7,13 @@ import {
   VaultInvalidPassphraseError,
 } from '@qubic-labs/sdk'
 import { emitAccountUpdated } from '@/lib/accounts'
+import { getChromeLocalStorage } from '@/lib/dapp/chrome-api'
 
 export const VAULT_STORAGE_KEY = 'qubic.vault'
 
-const CHROME_VAULT_STORAGE_KEY = `${VAULT_STORAGE_KEY}:chrome`
+export const CHROME_VAULT_STORAGE_KEY = `${VAULT_STORAGE_KEY}:chrome`
 
-const getChromeLocalStorageArea = () =>
-  (globalThis as typeof globalThis & { chrome?: typeof chrome }).chrome?.storage?.local ?? null
+const getChromeLocalStorageArea = () => getChromeLocalStorage()
 
 const getSafeLocalStorage = () => {
   try {
