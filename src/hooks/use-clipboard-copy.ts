@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
+const COPY_TOAST_DURATION_MS = 1000
+
 type CopyMessages = {
   successTitle?: string
   successDescription?: string
@@ -35,7 +37,7 @@ export const useClipboardCopy = (defaults?: CopyMessages) => {
         if (messages.successTitle) {
           toast.success(messages.successTitle, {
             description: messages.successDescription,
-            duration: 1000,
+            duration: COPY_TOAST_DURATION_MS,
           })
         }
         if (options?.key) {
