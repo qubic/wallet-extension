@@ -430,6 +430,19 @@
         "noEntries": "Vault importado pero no se encontraron entradas.",
         "generic": "No se pudo importar el vault."
       }
+    },
+    "seedSecurity": {
+      "title": "Asegura tu semilla",
+      "subtitle": "Guarda esta semilla de 55 letras en un lugar seguro. La necesitarás para restaurar tu billetera.",
+      "subtitleAddAddress": "Guarda esta semilla de 55 letras en un lugar seguro. La necesitarás para restaurar esta dirección.",
+      "warningTitle": "Guarda esta semilla de forma segura.",
+      "seedLabel": "Semilla",
+      "publicIdentityLabel": "Identidad pública",
+      "deriving": "Derivando...",
+      "generateNew": "Generar nueva semilla",
+      "copySeed": "Copiar semilla",
+      "seedCopied": "Semilla copiada",
+      "confirmationLabel": "Guardé esta semilla de forma segura y entiendo que es necesaria para recuperar esta billetera."
     }
   }
 }
