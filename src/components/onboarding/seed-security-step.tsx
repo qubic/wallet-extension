@@ -11,7 +11,6 @@ type SeedSecurityStepProps = {
   identity: string
   hasConfirmedSeedBackup: boolean
   onGenerate: () => void
-  onCopy: () => void
   onConfirmChange: (checked: boolean) => void
 }
 
@@ -21,16 +20,14 @@ const SeedSecurityStep = ({
   identity,
   hasConfirmedSeedBackup,
   onGenerate,
-  onCopy,
   onConfirmChange,
 }: SeedSecurityStepProps) => {
   const { copyText } = useClipboardCopy()
 
-  const handleCopy = async () => {
-    await copyText(seed, {
+  const handleCopy = () => {
+    copyText(seed, {
       messages: { successTitle: 'Seed copied' },
     })
-    onCopy()
   }
 
   return (

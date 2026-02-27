@@ -499,10 +499,6 @@ const ManageAccounts = () => {
             setRevealedSeed('')
           }
         }}
-        onCopy={async () => {
-          if (!revealedSeed) return
-          await navigator.clipboard.writeText(revealedSeed)
-        }}
       />
 
       <RemoveAccountDrawer

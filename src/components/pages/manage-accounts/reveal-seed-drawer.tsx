@@ -16,18 +16,16 @@ type RevealSeedDrawerProps = {
   open: boolean
   seed: string
   onOpenChange: (open: boolean) => void
-  onCopy: () => Promise<void>
 }
 
-const RevealSeedDrawer = ({ open, seed, onOpenChange, onCopy }: RevealSeedDrawerProps) => {
+const RevealSeedDrawer = ({ open, seed, onOpenChange }: RevealSeedDrawerProps) => {
   const { t } = useTranslation()
   const { copyText } = useClipboardCopy()
 
-  const handleCopy = async () => {
-    await copyText(seed, {
+  const handleCopy = () => {
+    copyText(seed, {
       messages: { successTitle: t('accounts.manage.seedCopied') },
     })
-    await onCopy()
   }
 
   return (

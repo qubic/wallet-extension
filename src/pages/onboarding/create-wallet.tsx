@@ -91,10 +91,6 @@ const CreateWallet = ({
     setHasConfirmedSeedBackup(false)
   }
 
-  const handleCopySeed = () => {
-    setStatus(null)
-  }
-
   const handleNext = async () => {
     setStatus(null)
 
@@ -253,7 +249,6 @@ const CreateWallet = ({
               identity={identity}
               hasConfirmedSeedBackup={hasConfirmedSeedBackup}
               onGenerate={regenerate}
-              onCopy={handleCopySeed}
               onConfirmChange={setHasConfirmedSeedBackup}
             />
           )}
