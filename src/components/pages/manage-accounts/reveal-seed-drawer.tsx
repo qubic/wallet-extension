@@ -1,4 +1,6 @@
 import { CheckIcon, CopyIcon } from 'lucide-react'
+import QRCode from 'qrcode'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import {
@@ -21,6 +23,25 @@ type RevealSeedDrawerProps = {
 const RevealSeedDrawer = ({ open, seed, onOpenChange }: RevealSeedDrawerProps) => {
   const { t } = useTranslation()
   const { copyText } = useClipboardCopy()
+  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    if (open && seed) {
+      QRCode.toDataURL(seed, { width: 200, margin: 2 })
+        .then((url) => {
+          if (!cancelled) setQrDataUrl(url)
+        })
+        .catch(() => {
+          if (!cancelled) setQrDataUrl(null)
+        })
+    } else {
+      setQrDataUrl(null)
+    }
+    return () => {
+      cancelled = true
+    }
+  }, [open, seed])
 
   const handleCopy = () => {
     copyText(seed, {
@@ -34,7 +55,13 @@ const RevealSeedDrawer = ({ open, seed, onOpenChange }: RevealSeedDrawerProps) =
         <DrawerHeader>
           <DrawerTitle>{t('accounts.manage.revealTitle')}</DrawerTitle>
         </DrawerHeader>
-        <div className="px-4">
+        <div className="flex flex-col items-center gap-4 px-4">
+          {qrDataUrl && (
+            <div className="flex flex-col items-center gap-1">
+              <img src={qrDataUrl} alt={t('accounts.manage.qrAlt')} className="h-48 w-48" />
+              <p className="text-muted-foreground text-xs">{t('accounts.manage.qrLabel')}</p>
+            </div>
+          )}
           <Textarea value={seed} rows={3} readOnly className="resize-none" />
         </div>
         <DrawerFooter>

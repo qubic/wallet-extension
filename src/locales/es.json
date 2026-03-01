@@ -201,6 +201,8 @@
       "revealTitle": "Frase semilla",
       "copySeed": "Copiar semilla",
       "seedCopied": "Semilla copiada",
+      "qrAlt": "Código QR de la semilla",
+      "qrLabel": "Escanear para importar semilla",
       "done": "Listo",
       "addTitle": "Agregar cuenta",
       "addNewDesc": "Agrega otra dirección a esta billetera.",
