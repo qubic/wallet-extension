@@ -23,6 +23,10 @@ import {
   resolvePendingTransactions,
   usePendingTransactionsVersion,
 } from '@/lib/pending-transactions'
+import {
+  REFRESH_INTERVAL_ACTIVE_BALANCE,
+  REFRESH_INTERVAL_ACTIVE_TRANSACTIONS,
+} from '@/lib/config/refresh-intervals'
 
 const pageMotion = {
   initial: { opacity: 0, y: 14 },
@@ -57,7 +61,7 @@ const Home = () => {
 
   const navigate = useNavigate()
   const { copyText } = useClipboardCopy()
-  const balance = useBalance(identity, { refetchInterval: 15_000 })
+  const balance = useBalance(identity, { refetchInterval: REFRESH_INTERVAL_ACTIVE_BALANCE })
   const latestStats = useLatestStats('home')
   const ownedAssets = useOwnedAssets(identity)
   const aggregatedAssets = ownedAssets.data ? aggregateAssets(ownedAssets.data) : []
@@ -67,7 +71,7 @@ const Home = () => {
       pageSize: 5,
       limit: 5,
     },
-    { refetchInterval: 15_000 },
+    { refetchInterval: REFRESH_INTERVAL_ACTIVE_TRANSACTIONS },
   )
   const [isReceiveOpen, setIsReceiveOpen] = useState(false)
   const [qrCode, setQrCode] = useState<string | null>(null)

@@ -12,8 +12,8 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { truncateString } from '@/lib/utils'
 import { setOnboarded } from '@/lib/vault'
 import { useEffect, useMemo, useState } from 'react'
-import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
+import { useClipboardCopy } from '@/hooks/use-clipboard-copy'
 import { useQueries } from '@tanstack/react-query'
 import { useSdk } from '@qubic-labs/react'
 import { formatBalanceCompact } from '@/lib/utils'
@@ -25,6 +25,7 @@ import {
 } from '@/lib/accounts'
 import { useNavigate } from 'react-router-dom'
 import { useCallback } from 'react'
+import { REFRESH_INTERVAL_BACKGROUND_BALANCE } from '@/lib/config/refresh-intervals'
 
 type AppHeaderProps = {
   onToggleSidePanel: () => void
@@ -42,6 +43,12 @@ const AppHeader = ({
   const { t } = useTranslation()
   const sdk = useSdk()
   const navigate = useNavigate()
+  const { copyText } = useClipboardCopy({
+    successTitle: t('home.toast.copySuccess'),
+    successDescription: t('home.toast.copySuccessDesc'),
+    errorTitle: t('home.toast.copyFail'),
+    errorDescription: t('home.toast.copyFailDesc'),
+  })
   const [accountName, setAccountName] = useState(
     localStorage.getItem('currentAccountName') ?? 'Main account',
   )
@@ -88,7 +95,7 @@ const AppHeader = ({
       queryKey: ['qubic', 'balance', account.identity],
       queryFn: () => sdk.rpc.live.balance(account.identity),
       enabled: accounts.length > 0,
-      refetchInterval: 20_000,
+      refetchInterval: REFRESH_INTERVAL_BACKGROUND_BALANCE,
     })),
   })
 
@@ -104,16 +111,7 @@ const AppHeader = ({
   }, [accounts, balanceQueries])
 
   const handleCopyIdentity = async () => {
-    try {
-      await navigator.clipboard.writeText(identity)
-      toast.success(t('home.toast.copySuccess'), {
-        description: t('home.toast.copySuccessDesc'),
-      })
-    } catch {
-      toast.error(t('home.toast.copyFail'), {
-        description: t('home.toast.copyFailDesc'),
-      })
-    }
+    await copyText(identity)
   }
 
   const handleSelectAccount = (selected: { name: string; identity: string }) => {
@@ -121,6 +119,13 @@ const AppHeader = ({
     setAccountName(selected.name)
     setIdentity(selected.identity)
     setIsMenuOpen(false)
+
+    // Trigger immediate refresh for the selected account
+    const accountIndex = accounts.findIndex((acc) => acc.identity === selected.identity)
+    if (accountIndex !== -1) {
+      void balanceQueries[accountIndex]?.refetch()
+    }
+
     navigate('/home')
   }
 

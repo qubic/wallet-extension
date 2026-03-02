@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { QUBIC_RPC_BASE_URL } from './config/constants'
 
 const QX_MANAGING_CONTRACT_INDEX = 1
 
@@ -19,7 +20,7 @@ export type OwnedAssetsResponse = {
 }
 
 export const fetchOwnedAssets = async (identity: string): Promise<OwnedAssetsResponse> => {
-  const response = await fetch(`https://rpc.qubic.org/live/v1/assets/${identity}/owned`, {
+  const response = await fetch(`${QUBIC_RPC_BASE_URL}/live/v1/assets/${identity}/owned`, {
     headers: { accept: 'application/json' },
   })
   if (!response.ok) {
