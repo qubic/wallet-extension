@@ -12,8 +12,8 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { truncateString } from '@/lib/utils'
 import { setOnboarded } from '@/lib/vault'
 import { useEffect, useMemo, useState } from 'react'
-import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
+import { useClipboardCopy } from '@/hooks/use-clipboard-copy'
 import { useQueries } from '@tanstack/react-query'
 import { useSdk } from '@qubic-labs/react'
 import { formatBalanceCompact } from '@/lib/utils'
@@ -43,6 +43,12 @@ const AppHeader = ({
   const { t } = useTranslation()
   const sdk = useSdk()
   const navigate = useNavigate()
+  const { copyText } = useClipboardCopy({
+    successTitle: t('home.toast.copySuccess'),
+    successDescription: t('home.toast.copySuccessDesc'),
+    errorTitle: t('home.toast.copyFail'),
+    errorDescription: t('home.toast.copyFailDesc'),
+  })
   const [accountName, setAccountName] = useState(
     localStorage.getItem('currentAccountName') ?? 'Main account',
   )
@@ -105,16 +111,7 @@ const AppHeader = ({
   }, [accounts, balanceQueries])
 
   const handleCopyIdentity = async () => {
-    try {
-      await navigator.clipboard.writeText(identity)
-      toast.success(t('home.toast.copySuccess'), {
-        description: t('home.toast.copySuccessDesc'),
-      })
-    } catch {
-      toast.error(t('home.toast.copyFail'), {
-        description: t('home.toast.copyFailDesc'),
-      })
-    }
+    await copyText(identity)
   }
 
   const handleSelectAccount = (selected: { name: string; identity: string }) => {
