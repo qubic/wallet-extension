@@ -26,7 +26,7 @@ import {
 import {
   REFRESH_INTERVAL_ACTIVE_BALANCE,
   REFRESH_INTERVAL_ACTIVE_TRANSACTIONS,
-} from '@/lib/refresh-intervals'
+} from '@/lib/config/refresh-intervals'
 
 const pageMotion = {
   initial: { opacity: 0, y: 14 },

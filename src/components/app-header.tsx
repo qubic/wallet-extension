@@ -25,7 +25,7 @@ import {
 } from '@/lib/accounts'
 import { useNavigate } from 'react-router-dom'
 import { useCallback } from 'react'
-import { REFRESH_INTERVAL_BACKGROUND_BALANCE } from '@/lib/refresh-intervals'
+import { REFRESH_INTERVAL_BACKGROUND_BALANCE } from '@/lib/config/refresh-intervals'
 
 type AppHeaderProps = {
   onToggleSidePanel: () => void

@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { QUBIC_RPC_BASE_URL } from './constants'
+import { QUBIC_RPC_BASE_URL } from './config/constants'
 
 const QX_MANAGING_CONTRACT_INDEX = 1
 

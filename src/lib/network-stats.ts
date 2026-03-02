@@ -6,8 +6,8 @@ import {
   STALE_TIME_TICK_INFO,
   GC_TIME_LATEST_STATS,
   GC_TIME_TICK_INFO,
-} from './refresh-intervals'
-import { QUBIC_RPC_BASE_URL } from './constants'
+} from './config/refresh-intervals'
+import { QUBIC_RPC_BASE_URL } from './config/constants'
 
 export type LatestStatsResponse = {
   data?: {
