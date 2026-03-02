@@ -7,6 +7,7 @@ import {
   GC_TIME_LATEST_STATS,
   GC_TIME_TICK_INFO,
 } from './refresh-intervals'
+import { QUBIC_RPC_BASE_URL } from './constants'
 
 export type LatestStatsResponse = {
   data?: {
@@ -34,7 +35,7 @@ export type TickInfoResponse = {
 }
 
 export const fetchLatestStats = async (): Promise<LatestStatsResponse> => {
-  const response = await fetch('https://rpc.qubic.org/v1/latest-stats')
+  const response = await fetch(`${QUBIC_RPC_BASE_URL}/v1/latest-stats`)
   if (!response.ok) {
     throw new Error('Failed to load network stats.')
   }
@@ -42,7 +43,7 @@ export const fetchLatestStats = async (): Promise<LatestStatsResponse> => {
 }
 
 export const fetchTickInfo = async (): Promise<TickInfoResponse> => {
-  const response = await fetch('https://rpc.qubic.org/v1/tick-info')
+  const response = await fetch(`${QUBIC_RPC_BASE_URL}/v1/live/tick-info`)
   if (!response.ok) {
     throw new Error('Failed to load tick info.')
   }
