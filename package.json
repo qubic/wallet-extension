@@ -101,7 +101,7 @@
     "vite": "^7.2.4"
   },
   "lint-staged": {
-    "*.{ts,tsx,json}": [
+    "*.{ts,tsx,json,css}": [
       "biome check --write"
     ]
   }
