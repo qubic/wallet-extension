@@ -43,7 +43,7 @@ export const fetchLatestStats = async (): Promise<LatestStatsResponse> => {
 }
 
 export const fetchTickInfo = async (): Promise<TickInfoResponse> => {
-  const response = await fetch(`${QUBIC_RPC_BASE_URL}/v1/live/tick-info`)
+  const response = await fetch(`${QUBIC_RPC_BASE_URL}/v1/tick-info`)
   if (!response.ok) {
     throw new Error('Failed to load tick info.')
   }

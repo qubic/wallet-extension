@@ -2,8 +2,7 @@ import { useMemo } from 'react'
 import { useSmartContracts, useAddressLabels, useExchanges } from '@/lib/qubic-static'
 import { useAssetIssuances } from '@/lib/assets'
 import { getCachedAccounts, getWatchOnlyAccounts } from '@/lib/accounts'
-
-const EMPTY_ADDRESS = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFXIB'
+import { EMPTY_ADDRESS } from '@/lib/config/constants'
 
 export type AddressNameResult = {
   name: string

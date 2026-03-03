@@ -28,3 +28,7 @@ export const STALE_TIME_TICK_INFO = 30_000 // 30 seconds
 // Garbage collection time (how long to keep unused data in cache)
 export const GC_TIME_LATEST_STATS = 360_000 // 6 minutes
 export const GC_TIME_TICK_INFO = 180_000 // 3 minutes
+
+// Static/infrequent data stale times
+export const STALE_TIME_STATIC_DATA = 86_400_000 // 24 hours
+export const STALE_TIME_ASSET_ISSUANCES = 86_400_000 // 24 hours
