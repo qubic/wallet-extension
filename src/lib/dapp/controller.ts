@@ -48,9 +48,10 @@ import {
   signTransactionFromSeed,
 } from '@/lib/dapp/signing'
 import { upsertPendingTransactionInChromeStorage } from '@/lib/pending-transactions-storage'
+import { RPC_BASE_URL } from '@/lib/rpc'
 import { openBrowserVault, verifyVaultAccess } from '@/lib/vault'
 
-const sdk = createSdk()
+const sdk = createSdk({ baseUrl: RPC_BASE_URL })
 const DAPP_APPROVAL_WINDOW_WIDTH = 380
 const DAPP_APPROVAL_WINDOW_HEIGHT = 600
 const processingApprovalDecisionIds = new Set<string>()
