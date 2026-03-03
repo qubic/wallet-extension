@@ -42,8 +42,17 @@ export default defineConfig(({ mode }) => {
         },
         output: {
           entryFileNames: 'assets/[name].js',
-          chunkFileNames: 'assets/[name]-[hash].js',
+          chunkFileNames: ({ name }) =>
+            name === 'dapp-protocol' || name === 'dapp-timing'
+              ? 'assets/[name].js'
+              : 'assets/[name]-[hash].js',
           assetFileNames: 'assets/[name]-[hash][extname]',
+          manualChunks: (id) => {
+            const normalized = id.replaceAll('\\', '/')
+            if (normalized.endsWith('/src/lib/dapp/protocol.ts')) return 'dapp-protocol'
+            if (normalized.endsWith('/src/lib/dapp/timing.ts')) return 'dapp-timing'
+            return undefined
+          },
         },
       },
     },
