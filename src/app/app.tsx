@@ -4,11 +4,11 @@ import { QubicQueryProvider, SdkProvider } from '@qubic-labs/react'
 import { HashRouter } from 'react-router-dom'
 import { ThemeProvider } from 'next-themes'
 import { Toaster } from '@/components/ui/sonner'
-import { RPC_BASE_URL } from '@/lib/rpc'
+import { QUBIC_RPC_BASE_URL } from '@/lib/config/constants'
 import AppRouter from '../router/app-router'
 
 const queryClient = new QueryClient()
-const sdk = createSdk({ baseUrl: RPC_BASE_URL })
+const sdk = createSdk({ baseUrl: QUBIC_RPC_BASE_URL })
 
 const App = () => {
   return (

@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
+import { QUBIC_EXPLORER_BASE_URL } from './config/constants'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -69,8 +70,6 @@ export function truncateString(value: string, options: TruncateStringOptions = {
   return `${value.slice(0, leading)}…${value.slice(-trailing)}`
 }
 
-export const EXPLORER_BASE_URL = 'https://explorer.qubic.org'
-
 export type ExplorerObject = 'tx'
 
 export function buildExplorerObjectUrl(object: ExplorerObject, id: string) {
@@ -78,5 +77,5 @@ export function buildExplorerObjectUrl(object: ExplorerObject, id: string) {
     tx: 'network/tx',
   }
 
-  return `${EXPLORER_BASE_URL}/${pathMap[object]}/${id}`
+  return `${QUBIC_EXPLORER_BASE_URL}/${pathMap[object]}/${id}`
 }

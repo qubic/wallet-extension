@@ -209,6 +209,9 @@
       "reveal": "Reveal seed",
       "revealTitle": "Seed phrase",
       "copySeed": "Copy seed",
+      "seedCopied": "Seed copied",
+      "qrAlt": "Seed QR code",
+      "qrLabel": "Scan to import seed",
       "done": "Done",
       "addTitle": "Add account",
       "addNewDesc": "Add another address to this wallet.",
@@ -475,6 +478,19 @@
         "noEntries": "Vault imported but no entries were found.",
         "generic": "Failed to import vault."
       }
+    },
+    "seedSecurity": {
+      "title": "Secure your seed",
+      "subtitle": "Save this 55-letter seed in a safe place. You will need it to restore your wallet.",
+      "subtitleAddAddress": "Save this 55-letter seed in a safe place. You will need it to restore this address.",
+      "warningTitle": "Save this seed securely.",
+      "seedLabel": "Seed",
+      "publicIdentityLabel": "Public identity",
+      "deriving": "Deriving...",
+      "generateNew": "Generate new seed",
+      "copySeed": "Copy seed",
+      "seedCopied": "Seed copied",
+      "confirmationLabel": "I saved this seed securely and understand it is required to recover this wallet."
     }
   }
 }

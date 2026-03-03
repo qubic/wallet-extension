@@ -47,11 +47,11 @@ import {
   signMessageFromSeed,
   signTransactionFromSeed,
 } from '@/lib/dapp/signing'
+import { QUBIC_RPC_BASE_URL } from '@/lib/config/constants'
 import { upsertPendingTransactionInChromeStorage } from '@/lib/pending-transactions-storage'
-import { RPC_BASE_URL } from '@/lib/rpc'
 import { openBrowserVault, verifyVaultAccess } from '@/lib/vault'
 
-const sdk = createSdk({ baseUrl: RPC_BASE_URL })
+const sdk = createSdk({ baseUrl: QUBIC_RPC_BASE_URL })
 const DAPP_APPROVAL_WINDOW_WIDTH = 380
 const DAPP_APPROVAL_WINDOW_HEIGHT = 600
 const processingApprovalDecisionIds = new Set<string>()
