@@ -85,3 +85,37 @@ export const useOwnedAssets = (identity: string) => {
     staleTime: 60_000,
   })
 }
+
+export type AssetIssuance = {
+  data: {
+    issuerIdentity: string
+    type: number
+    name: string
+    numberOfDecimalPlaces: number
+    unitOfMeasurement: number[]
+  }
+  tick: number
+  universeIndex: number
+}
+
+export type AssetIssuancesResponse = {
+  assets: AssetIssuance[]
+}
+
+const fetchAssetIssuances = async (): Promise<AssetIssuancesResponse> => {
+  const response = await fetch('https://rpc.qubic.org/live/v1/assets/issuances', {
+    headers: { accept: 'application/json' },
+  })
+  if (!response.ok) {
+    throw new Error('Failed to load asset issuances.')
+  }
+  return response.json() as Promise<AssetIssuancesResponse>
+}
+
+export const useAssetIssuances = () => {
+  return useQuery({
+    queryKey: ['qubic', 'asset-issuances'],
+    queryFn: fetchAssetIssuances,
+    staleTime: 86_400_000, // 24 hours
+  })
+}

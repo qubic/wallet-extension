@@ -3,11 +3,9 @@ import type {
   SmartContract,
   AddressLabel,
   Exchange,
-  Token,
   GetSmartContractsResponse,
   GetAddressLabelsResponse,
   GetExchangesResponse,
-  GetTokensResponse,
 } from './qubic-static.types'
 
 const STATIC_BASE_URL = 'https://static.qubic.org'
@@ -47,16 +45,6 @@ export const useExchanges = () =>
     queryFn: async (): Promise<Exchange[]> => {
       const data = await fetchJson<GetExchangesResponse>('/exchanges.json')
       return data.exchanges
-    },
-    staleTime: STATIC_STALE_TIME,
-  })
-
-export const useTokens = () =>
-  useQuery({
-    queryKey: ['qubic-static', 'tokens'],
-    queryFn: async (): Promise<Token[]> => {
-      const data = await fetchJson<GetTokensResponse>('/tokens.json')
-      return data.tokens
     },
     staleTime: STATIC_STALE_TIME,
   })

@@ -36,13 +36,3 @@ export type Exchange = {
 export type GetExchangesResponse = {
   exchanges: Exchange[]
 }
-
-export type Token = {
-  name: string
-  issuer: string
-  website: string
-}
-
-export type GetTokensResponse = {
-  tokens: Token[]
-}
