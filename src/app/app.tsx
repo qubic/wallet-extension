@@ -5,9 +5,10 @@ import { HashRouter } from 'react-router-dom'
 import { ThemeProvider } from 'next-themes'
 import { Toaster } from '@/components/ui/sonner'
 import AppRouter from '../router/app-router'
+import { QUBIC_RPC_BASE_URL } from '@/lib/config/constants'
 
 const queryClient = new QueryClient()
-const sdk = createSdk({ baseUrl: 'https://rpc.qubic.org' })
+const sdk = createSdk({ baseUrl: QUBIC_RPC_BASE_URL })
 
 const App = () => {
   return (

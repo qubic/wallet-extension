@@ -21,6 +21,7 @@ import {
 } from '@/lib/pending-transactions'
 import { getCurrentIdentity } from '@/lib/accounts'
 import HistoryEmptyState from '@/components/pages/history/history-empty-state'
+import { REFRESH_INTERVAL_ACTIVE_TRANSACTIONS } from '@/lib/config/refresh-intervals'
 
 const HistoryRowSkeleton = () => (
   <div className="space-y-3 rounded-xl border border-border/40 bg-background/40 px-3 py-3">
@@ -78,7 +79,7 @@ const History = () => {
       identity,
       pageSize: 10,
     },
-    { refetchInterval: 15_000 },
+    { refetchInterval: REFRESH_INTERVAL_ACTIVE_TRANSACTIONS },
   )
 
   useEffect(() => {
