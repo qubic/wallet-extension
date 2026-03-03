@@ -2,8 +2,12 @@ import { useQuery } from '@tanstack/react-query'
 import type {
   SmartContract,
   AddressLabel,
+  Exchange,
+  Token,
   GetSmartContractsResponse,
   GetAddressLabelsResponse,
+  GetExchangesResponse,
+  GetTokensResponse,
 } from './qubic-static.types'
 
 const STATIC_BASE_URL = 'https://static.qubic.org'
@@ -33,6 +37,26 @@ export const useAddressLabels = () =>
     queryFn: async (): Promise<AddressLabel[]> => {
       const data = await fetchJson<GetAddressLabelsResponse>('/address_labels.json')
       return data.address_labels
+    },
+    staleTime: STATIC_STALE_TIME,
+  })
+
+export const useExchanges = () =>
+  useQuery({
+    queryKey: ['qubic-static', 'exchanges'],
+    queryFn: async (): Promise<Exchange[]> => {
+      const data = await fetchJson<GetExchangesResponse>('/exchanges.json')
+      return data.exchanges
+    },
+    staleTime: STATIC_STALE_TIME,
+  })
+
+export const useTokens = () =>
+  useQuery({
+    queryKey: ['qubic-static', 'tokens'],
+    queryFn: async (): Promise<Token[]> => {
+      const data = await fetchJson<GetTokensResponse>('/tokens.json')
+      return data.tokens
     },
     staleTime: STATIC_STALE_TIME,
   })

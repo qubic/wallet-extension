@@ -27,3 +27,22 @@ export type GetSmartContractsResponse = {
 export type GetAddressLabelsResponse = {
   address_labels: AddressLabel[]
 }
+
+export type Exchange = {
+  name: string
+  address: string
+}
+
+export type GetExchangesResponse = {
+  exchanges: Exchange[]
+}
+
+export type Token = {
+  name: string
+  issuer: string
+  website: string
+}
+
+export type GetTokensResponse = {
+  tokens: Token[]
+}
