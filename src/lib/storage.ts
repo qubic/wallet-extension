@@ -1,4 +1,11 @@
 import { getChromeLocalStorage } from '@/lib/dapp/chrome-api'
+import {
+  DAPP_CURRENT_ACCOUNT_KEY,
+  DAPP_EXECUTION_REQUESTS_KEY,
+  DAPP_PENDING_REQUESTS_KEY,
+  DAPP_PERMISSIONS_KEY,
+  DAPP_REQUEST_RESULTS_KEY,
+} from '@/lib/dapp/storage'
 import { CHROME_VAULT_STORAGE_KEY, VAULT_STORAGE_KEY } from '@/lib/vault'
 
 const EXPLICIT_WALLET_KEYS = [
@@ -17,11 +24,11 @@ const EXPLICIT_WALLET_KEYS = [
 const WALLET_KEY_PREFIXES = ['wallet:balance:', 'wallet:pending-transactions:'] as const
 const CHROME_WALLET_KEYS = [
   CHROME_VAULT_STORAGE_KEY,
-  'dapp.permissions.v1',
-  'dapp.currentAccount.v1',
-  'dapp.pendingRequests.v1',
-  'dapp.executionRequests.v1',
-  'dapp.requestResults.v1',
+  DAPP_PERMISSIONS_KEY,
+  DAPP_CURRENT_ACCOUNT_KEY,
+  DAPP_PENDING_REQUESTS_KEY,
+  DAPP_EXECUTION_REQUESTS_KEY,
+  DAPP_REQUEST_RESULTS_KEY,
 ] as const
 
 export const clearWalletStorage = () => {

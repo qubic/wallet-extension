@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import {
+  DAPP_APPROVAL_METHODS,
   RUNTIME_APPROVAL_DECISION_TYPE,
   RUNTIME_EVENT_TYPE,
   RUNTIME_REQUEST_STATUS_TYPE,
@@ -16,9 +17,11 @@ import {
   type DappRuntimeRequestStatusPayload,
 } from '@/lib/dapp/protocol'
 
+export const dappApprovalMethodSchema = z.enum(DAPP_APPROVAL_METHODS)
+
 export const dappPendingRequestSchema = z.object({
   id: z.string().min(1),
-  method: z.enum(['connect', 'signMessage', 'signTransaction', 'sendTransaction']),
+  method: dappApprovalMethodSchema,
   origin: z.string().min(1),
   createdAt: z.number().finite(),
   params: z.unknown().optional(),
@@ -60,7 +63,7 @@ export const dappRuntimeEventEnvelopeSchema = z.object({
 
 export const dappExecutionRequestSchema = z.object({
   id: z.string().min(1),
-  method: z.enum(['connect', 'signMessage', 'signTransaction', 'sendTransaction']),
+  method: dappApprovalMethodSchema,
   origin: z.string().min(1),
   createdAt: z.number().finite(),
   session: z.string().min(1),

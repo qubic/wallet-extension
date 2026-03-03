@@ -2,17 +2,11 @@ import { privateKeyFromSeed, publicKeyFromSeed } from '@qubic-labs/core'
 import { sign as signSchnorr, k12 } from '@qubic-labs/schnorrq'
 import type { BuiltTransaction, TransactionHelpers } from '@qubic-labs/sdk'
 import { DappProviderError } from '@/lib/dapp/errors'
-import { base64ToBytes, bytesToBase64 } from '@/lib/encoding'
+import { base64ToBytes, bytesToBase64, bytesToHex, hexToBytes } from '@/lib/encoding'
 import { isValidIdentity, parseAmount } from '@/lib/utils'
 
 const MAX_MESSAGE_BYTES = 8 * 1024
 const MAX_INPUT_BYTES = 64 * 1024
-
-const bytesToHex = (value: Uint8Array) =>
-  Array.from(value, (byte) => byte.toString(16).padStart(2, '0')).join('')
-
-const hexToBytes = (hex: string) =>
-  Uint8Array.from(hex.match(/.{1,2}/g)?.map((pair) => Number.parseInt(pair, 16)) ?? [])
 
 type RawSignTransactionParams = {
   toIdentity?: unknown

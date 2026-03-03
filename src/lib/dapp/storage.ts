@@ -1,4 +1,4 @@
-import type { DappRpcResponse } from '@/lib/dapp/protocol'
+import type { DappApprovalMethod, DappRpcResponse } from '@/lib/dapp/protocol'
 import { getChromeLocalStorage } from '@/lib/dapp/chrome-api'
 import {
   dappExecutionRequestSchema,
@@ -27,7 +27,7 @@ export type DappCurrentAccount = Readonly<{
 
 export type DappPendingRequest = Readonly<{
   id: string
-  method: 'connect' | 'signMessage' | 'signTransaction' | 'sendTransaction'
+  method: DappApprovalMethod
   origin: string
   createdAt: number
   params?: unknown
@@ -35,7 +35,7 @@ export type DappPendingRequest = Readonly<{
 
 export type DappExecutionRequest = Readonly<{
   id: string
-  method: 'connect' | 'signMessage' | 'signTransaction' | 'sendTransaction'
+  method: DappApprovalMethod
   origin: string
   createdAt: number
   session: string

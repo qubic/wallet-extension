@@ -5,6 +5,14 @@ export const RUNTIME_REQUEST_TYPE = 'qubic:dapp:request'
 export const RUNTIME_EVENT_TYPE = 'qubic:dapp:event'
 export const RUNTIME_APPROVAL_DECISION_TYPE = 'qubic:dapp:approval-decision'
 export const RUNTIME_REQUEST_STATUS_TYPE = 'qubic:dapp:request-status'
+export const DAPP_APPROVAL_METHODS = [
+  'connect',
+  'signMessage',
+  'signTransaction',
+  'sendTransaction',
+] as const
+
+export type DappApprovalMethod = (typeof DAPP_APPROVAL_METHODS)[number]
 
 export type DappMethod =
   | 'connect'
@@ -183,4 +191,10 @@ export const isDappRuntimeEventEnvelope = (value: unknown): value is DappRuntime
   const record = value as Record<string, unknown>
   if (record.type !== RUNTIME_EVENT_TYPE) return false
   return isDappEventMessage(record.payload)
+}
+
+export const isRuntimePendingAck = (value: unknown): value is DappRuntimePendingAck => {
+  if (!value || typeof value !== 'object') return false
+  const record = value as Record<string, unknown>
+  return record.pending === true && typeof record.id === 'string' && Boolean(record.id)
 }

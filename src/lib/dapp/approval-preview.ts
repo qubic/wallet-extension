@@ -1,4 +1,4 @@
-type DappApprovalMethod = 'connect' | 'signMessage' | 'signTransaction' | 'sendTransaction'
+import type { DappApprovalMethod } from '@/lib/dapp/protocol'
 
 export type DappConnectApprovalSummary = Readonly<{
   accountIdentity: string

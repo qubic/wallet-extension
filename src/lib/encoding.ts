@@ -12,3 +12,9 @@ export const base64ToBytes = (value: string): Uint8Array<ArrayBuffer> =>
 
 export const arrayBufferToBase64 = (buffer: ArrayBuffer): string =>
   bytesToBase64(new Uint8Array(buffer))
+
+export const bytesToHex = (value: Uint8Array): string =>
+  Array.from(value, (byte) => byte.toString(16).padStart(2, '0')).join('')
+
+export const hexToBytes = (hex: string): Uint8Array =>
+  Uint8Array.from(hex.match(/.{1,2}/g)?.map((pair) => Number.parseInt(pair, 16)) ?? [])
