@@ -1,103 +1,26 @@
-const DAPP_CHANNEL = 'qubic:dapp'
-const CONTENT_SOURCE = 'qubic:content'
-const RUNTIME_REQUEST_TYPE = 'qubic:dapp:request'
-const RUNTIME_REQUEST_STATUS_TYPE = 'qubic:dapp:request-status'
-const RUNTIME_EVENT_TYPE = 'qubic:dapp:event'
-
-const DAPP_APPROVAL_TIMEOUT_MS = 2 * 60 * 1000
-const DAPP_STATUS_POLL_INTERVAL_MS = 500
+import {
+  CONTENT_SOURCE,
+  DAPP_CHANNEL,
+  RUNTIME_EVENT_TYPE,
+  RUNTIME_REQUEST_STATUS_TYPE,
+  RUNTIME_REQUEST_TYPE,
+  isDappRpcRequest,
+  isDappRpcResponse,
+  isDappRuntimeEventEnvelope,
+  isRuntimePendingAck,
+  type DappEventMessage,
+  type DappProviderErrorCode,
+  type DappRpcResponse,
+} from '@/lib/dapp/protocol'
+import { DAPP_APPROVAL_TIMEOUT_MS, DAPP_STATUS_POLL_INTERVAL_MS } from '@/lib/dapp/timing'
 
 const INPAGE_SCRIPT_PATH = 'assets/inpage-provider.js'
 const INPAGE_SESSION_DATA_ATTR = 'qubicSession'
-
-type DappProviderErrorCode =
-  | 'INVALID_REQUEST'
-  | 'INVALID_PARAMS'
-  | 'UNSUPPORTED_ORIGIN'
-  | 'NOT_CONNECTED'
-  | 'METHOD_NOT_SUPPORTED'
-  | 'USER_REJECTED'
-  | 'INVALID_PASSPHRASE'
-  | 'WATCH_ONLY_ACCOUNT'
-  | 'NO_ACCOUNT'
-  | 'NOT_IMPLEMENTED'
-  | 'INTERNAL_ERROR'
-
-type DappRpcRequest = {
-  channel: typeof DAPP_CHANNEL
-  source: 'qubic:inpage'
-  id: string
-  method: string
-  params?: unknown
-  session?: string
-}
-
-type DappRpcResponse = {
-  channel: typeof DAPP_CHANNEL
-  source: typeof CONTENT_SOURCE
-  id: string
-  ok: boolean
-  result?: unknown
-  error?: { code: DappProviderErrorCode; message: string }
-}
-
-type DappEventMessage = {
-  channel: typeof DAPP_CHANNEL
-  source: typeof CONTENT_SOURCE
-  event: 'accountChanged' | 'disconnect'
-  payload?: unknown
-}
-
-type DappRuntimePendingAck = { pending: true; id: string }
 
 const getChromeApi = () =>
   (globalThis as typeof globalThis & { chrome?: typeof chrome }).chrome ?? null
 
 const getChromeRuntime = () => getChromeApi()?.runtime ?? null
-
-const isObject = (value: unknown): value is Record<string, unknown> =>
-  typeof value === 'object' && value !== null
-
-const isDappRpcRequest = (value: unknown): value is DappRpcRequest => {
-  if (!isObject(value)) return false
-  return (
-    value.channel === DAPP_CHANNEL &&
-    value.source === 'qubic:inpage' &&
-    typeof value.id === 'string' &&
-    value.id.length > 0 &&
-    typeof value.method === 'string' &&
-    value.method.length > 0
-  )
-}
-
-const isDappRpcResponse = (value: unknown): value is DappRpcResponse => {
-  if (!isObject(value)) return false
-  return (
-    value.channel === DAPP_CHANNEL &&
-    value.source === CONTENT_SOURCE &&
-    typeof value.id === 'string' &&
-    value.id.length > 0 &&
-    typeof value.ok === 'boolean'
-  )
-}
-
-const isDappRuntimeEventEnvelope = (
-  value: unknown,
-): value is { type: typeof RUNTIME_EVENT_TYPE; payload: DappEventMessage } => {
-  if (!isObject(value) || value.type !== RUNTIME_EVENT_TYPE || !isObject(value.payload))
-    return false
-  const payload = value.payload
-  return (
-    payload.channel === DAPP_CHANNEL &&
-    payload.source === CONTENT_SOURCE &&
-    (payload.event === 'accountChanged' || payload.event === 'disconnect')
-  )
-}
-
-const isRuntimePendingAck = (value: unknown): value is DappRuntimePendingAck => {
-  if (!isObject(value)) return false
-  return value.pending === true && typeof value.id === 'string' && value.id.length > 0
-}
 
 const createSessionToken = () => {
   const bytes = new Uint8Array(16)
@@ -210,7 +133,7 @@ window.addEventListener('message', (event: MessageEvent) => {
 })
 
 getChromeApi()?.runtime?.onMessage?.addListener((message: unknown) => {
-  if (!isDappRuntimeEventEnvelope(message)) return
+  if (!isDappRuntimeEventEnvelope(message) || message.type !== RUNTIME_EVENT_TYPE) return
   postToPage(message.payload)
 })
 

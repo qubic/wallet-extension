@@ -13,9 +13,10 @@ import {
   RUNTIME_EVENT_TYPE,
   RUNTIME_REQUEST_STATUS_TYPE,
   RUNTIME_REQUEST_TYPE,
+  isRuntimePendingAck,
   type DappEventMessage,
 } from '@/lib/dapp/protocol'
-import { asDappFailure, asDappSuccess, isRuntimePendingAck } from '@/lib/dapp/responses'
+import { asDappFailure, asDappSuccess } from '@/lib/dapp/responses'
 import {
   dappRuntimeApprovalDecisionEnvelopeSchema,
   dappRuntimeEnvelopeBaseSchema,

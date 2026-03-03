@@ -1,111 +1,23 @@
-const DAPP_CHANNEL = 'qubic:dapp'
-const INPAGE_SOURCE = 'qubic:inpage'
-const CONTENT_SOURCE = 'qubic:content'
-
-const DAPP_PROVIDER_REQUEST_TIMEOUT_DEFAULT_MS = 15_000
-const DAPP_PROVIDER_REQUEST_TIMEOUT_APPROVAL_MS = 150_000
-
-type DappEvent = 'accountChanged' | 'disconnect'
-type DappMethod =
-  | 'connect'
-  | 'getAccount'
-  | 'signTransaction'
-  | 'sendTransaction'
-  | 'signMessage'
-  | 'disconnect'
-
-type DappProviderAccount = { identity: string; name?: string }
-type DappConnectResult = { connected: true; origin: string }
-type DappDisconnectResult = { disconnected: true }
-type DappSignMessageResult = { signatureHex: string; digestHex: string }
-type DappSignTransactionResult = {
-  txId: string
-  targetTick: number
-  txBytesBase64: string
-  txBytesHex: string
-}
-type DappSendTransactionResult = DappSignTransactionResult & {
-  networkTxId: string
-  broadcast: unknown
-}
-
-type DappMethodResultMap = {
-  connect: DappConnectResult
-  getAccount: DappProviderAccount | null
-  signTransaction: DappSignTransactionResult
-  sendTransaction: DappSendTransactionResult
-  signMessage: DappSignMessageResult
-  disconnect: DappDisconnectResult
-}
-
-type DappRpcRequest = {
-  channel: typeof DAPP_CHANNEL
-  source: typeof INPAGE_SOURCE
-  id: string
-  method: DappMethod
-  params?: unknown
-  session?: string
-}
-
-type DappRpcResponse = {
-  channel: typeof DAPP_CHANNEL
-  source: typeof CONTENT_SOURCE
-  id: string
-  ok: boolean
-  result?: unknown
-  error?: { code: string; message: string }
-  session?: string
-}
-
-type DappEventMessage = {
-  channel: typeof DAPP_CHANNEL
-  source: typeof CONTENT_SOURCE
-  event: DappEvent
-  payload?: unknown
-  session?: string
-}
-
-type ProviderEventCallback = (payload: unknown) => void
-
-type QubicProvider = {
-  isQubic: true
-  version: string
-  request: <TMethod extends DappMethod>(
-    method: TMethod,
-    params?: unknown,
-  ) => Promise<DappMethodResultMap[TMethod]>
-  connect: () => Promise<DappConnectResult>
-  getAccount: () => Promise<DappProviderAccount | null>
-  signTransaction: (tx: unknown) => Promise<DappSignTransactionResult>
-  sendTransaction: (tx: unknown) => Promise<DappSendTransactionResult>
-  signMessage: (message: unknown) => Promise<DappSignMessageResult>
-  disconnect: () => Promise<DappDisconnectResult>
-  on: (event: DappEvent, callback: ProviderEventCallback) => () => void
-  off: (event: DappEvent, callback: ProviderEventCallback) => void
-}
+import {
+  CONTENT_SOURCE,
+  DAPP_CHANNEL,
+  INPAGE_SOURCE,
+  isDappEventMessage,
+  isDappRpcResponse,
+  type DappEvent,
+  type DappEventMessage,
+  type DappMethod,
+  type DappMethodResultMap,
+  type DappRpcRequest,
+} from '@/lib/dapp/protocol'
+import type { ProviderEventCallback, QubicProvider } from '@/lib/dapp/provider'
+import {
+  DAPP_PROVIDER_REQUEST_TIMEOUT_APPROVAL_MS,
+  DAPP_PROVIDER_REQUEST_TIMEOUT_DEFAULT_MS,
+} from '@/lib/dapp/timing'
 
 const isObject = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null
-
-const isDappRpcResponse = (value: unknown): value is DappRpcResponse => {
-  if (!isObject(value)) return false
-  return (
-    value.channel === DAPP_CHANNEL &&
-    value.source === CONTENT_SOURCE &&
-    typeof value.id === 'string' &&
-    value.id.length > 0 &&
-    typeof value.ok === 'boolean'
-  )
-}
-
-const isDappEventMessage = (value: unknown): value is DappEventMessage => {
-  if (!isObject(value)) return false
-  return (
-    value.channel === DAPP_CHANNEL &&
-    value.source === CONTENT_SOURCE &&
-    (value.event === 'accountChanged' || value.event === 'disconnect')
-  )
-}
 
 const eventListeners = new Map<DappEvent, Set<ProviderEventCallback>>()
 const pending = new Map<
@@ -125,7 +37,10 @@ const createRequestId = () => {
   return `${Date.now()}-${random}`
 }
 const getRequestTimeoutMs = (method: DappMethod) =>
-  method === 'connect' || method === 'signMessage' || method === 'signTransaction'
+  method === 'connect' ||
+  method === 'signMessage' ||
+  method === 'signTransaction' ||
+  method === 'sendTransaction'
     ? DAPP_PROVIDER_REQUEST_TIMEOUT_APPROVAL_MS
     : DAPP_PROVIDER_REQUEST_TIMEOUT_DEFAULT_MS
 
