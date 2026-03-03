@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 
 const QX_MANAGING_CONTRACT_INDEX = 1
+const ASSET_ISSUANCES_STALE_TIME = 86_400_000 // 24 hours
 
 export type OwnedAssetsResponse = {
   ownedAssets?: Array<{
@@ -101,7 +102,7 @@ export type AssetIssuance = {
 export type AssetIssuancesResponse = {
   assets: AssetIssuance[]
 }
-
+ //TODO: Use constant for API base URL and handle errors more gracefully in the UI 
 const fetchAssetIssuances = async (): Promise<AssetIssuancesResponse> => {
   const response = await fetch('https://rpc.qubic.org/live/v1/assets/issuances', {
     headers: { accept: 'application/json' },
@@ -116,6 +117,6 @@ export const useAssetIssuances = () => {
   return useQuery({
     queryKey: ['qubic', 'asset-issuances'],
     queryFn: fetchAssetIssuances,
-    staleTime: 86_400_000, // 24 hours
+    staleTime: ASSET_ISSUANCES_STALE_TIME,
   })
 }
