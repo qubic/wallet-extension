@@ -15,7 +15,7 @@ import {
 } from '@/lib/qx'
 import { addPendingTransaction, PENDING_SETTLED_EVENT } from '@/lib/pending-transactions'
 import { isWalletLocked } from '@/lib/lock'
-import { useLatestStats } from '@/lib/network-stats'
+import { useLatestStats, useTickInfo, fetchTickInfo } from '@/lib/network-stats'
 import ConfirmationDrawer from '@/components/pages/transfer/confirmation-drawer'
 import TransferForm from '@/components/pages/transfer/transfer-form'
 import type { FormErrors } from '@/components/pages/transfer/types'
@@ -51,7 +51,8 @@ const Transfer = () => {
   const balance = useBalance(currentIdentity)
   const ownedAssets = useOwnedAssets(currentIdentity)
   const sendMutation = useSend()
-  const latestStats = useLatestStats('transfer', { staleTime: 5_000 })
+  const latestStats = useLatestStats('transfer')
+  const tickInfo = useTickInfo('transfer')
 
   const [step, setStep] = useState<Step>('form')
   const [recipient, setRecipient] = useState(initialPrefillRecipient)
@@ -80,7 +81,7 @@ const Transfer = () => {
       ? null
       : (parsedAssets.find((a) => `${a.issuerIdentity}-${a.name}` === selectedToken) ?? null)
   const parsedAmount = parseAmount(amount)
-  const currentTick = latestStats.data?.data?.currentTick
+  const currentTick = tickInfo.data?.tickInfo?.tick
   const onChainQuBalance = normalizeBalance(balance.data?.balance)
   const usdEstimate = useMemo(() => {
     if (selectedAsset) return '--'
@@ -109,14 +110,14 @@ const Transfer = () => {
 
   useEffect(() => {
     const handlePendingSettled = () => {
-      void latestStats.refetch()
+      void tickInfo.refetch()
       void balance.refetch()
     }
     window.addEventListener(PENDING_SETTLED_EVENT, handlePendingSettled)
     return () => {
       window.removeEventListener(PENDING_SETTLED_EVENT, handlePendingSettled)
     }
-  }, [balance, latestStats])
+  }, [balance, tickInfo])
 
   useEffect(() => {
     const handleLockUpdate = () => {
@@ -220,14 +221,15 @@ const Transfer = () => {
       let result: { txId: string; targetTick: bigint }
       let requestedTargetTick: bigint | number | undefined
 
+      // Fetch fresh tick info at send time
+      const freshTickInfo = await fetchTickInfo()
+      const sendCurrentTick = freshTickInfo.tickInfo?.tick
+
       if (isManualTargetTickEnabled) {
         const parsedManualTick = Number.parseInt(manualTargetTick.trim(), 10)
         if (!Number.isFinite(parsedManualTick) || parsedManualTick < 1) {
           throw new Error(t('transfer.validation.targetTickManualInvalid'))
         }
-        const latestStatsSnapshot = await latestStats.refetch()
-        const sendCurrentTick =
-          latestStatsSnapshot.data?.data?.currentTick ?? latestStats.data?.data?.currentTick
         if (typeof sendCurrentTick === 'number' && parsedManualTick <= sendCurrentTick) {
           throw new Error(t('transfer.validation.targetTickManualPast'))
         }
@@ -242,9 +244,6 @@ const Transfer = () => {
             offset: effectiveOffset,
           })
         } catch {
-          const latestStatsSnapshot = await latestStats.refetch()
-          const sendCurrentTick =
-            latestStatsSnapshot.data?.data?.currentTick ?? latestStats.data?.data?.currentTick
           if (typeof sendCurrentTick === 'number') {
             requestedTargetTick = sendCurrentTick + effectiveOffset
           }
