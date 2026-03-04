@@ -9,14 +9,13 @@ import {
   formatAssetUnits,
   useOwnedAssets,
 } from '@/lib/assets'
-import { getCurrentIdentity, isWatchOnlyIdentity } from '@/lib/accounts'
+import { getCurrentIdentity } from '@/lib/accounts'
 import { formatBalance, normalizeBalance } from '@/lib/utils'
 
 const SelectToken = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const [currentIdentity, setCurrentIdentity] = useState(getCurrentIdentity())
-  const [isWatchOnly] = useState(() => isWatchOnlyIdentity(getCurrentIdentity()))
   const balance = useBalance(currentIdentity)
   const ownedAssets = useOwnedAssets(currentIdentity)
   const parsedAssets = aggregateAssets(ownedAssets.data ?? {}, true)
@@ -51,18 +50,11 @@ const SelectToken = () => {
           <p className="text-xs text-muted-foreground">{t('transfer.selectToken.subtitle')}</p>
         </div>
 
-        {isWatchOnly && (
-          <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-200">
-            {t('transfer.errors.watchOnly')}
-          </div>
-        )}
-
         <div className="space-y-2">
           <button
             type="button"
-            className="flex w-full cursor-pointer items-center gap-3 rounded-lg border border-border/60 bg-card/50 px-4 py-3 text-left transition-colors hover:border-primary/40 hover:bg-card disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex w-full cursor-pointer items-center gap-3 rounded-lg border border-border/60 bg-card/50 px-4 py-3 text-left transition-colors hover:border-primary/40 hover:bg-card"
             onClick={handleSelectQu}
-            disabled={isWatchOnly}
           >
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
               <span className="text-sm font-bold text-primary">QU</span>
@@ -82,9 +74,8 @@ const SelectToken = () => {
             <button
               key={`${asset.issuerIdentity}-${asset.name}`}
               type="button"
-              className="flex w-full cursor-pointer items-center gap-3 rounded-lg border border-border/60 bg-card/50 px-4 py-3 text-left transition-colors hover:border-primary/40 hover:bg-card disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex w-full cursor-pointer items-center gap-3 rounded-lg border border-border/60 bg-card/50 px-4 py-3 text-left transition-colors hover:border-primary/40 hover:bg-card"
               onClick={() => handleSelectAsset(asset)}
-              disabled={isWatchOnly}
             >
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
                 <span className="text-xs font-bold text-primary">{asset.name.slice(0, 3)}</span>
