@@ -30,6 +30,7 @@ export const dappPendingRequestSchema = z.object({
 export const dappPermissionRecordSchema = z.object({
   origin: z.string().min(1),
   connectedAt: z.number().finite(),
+  approvedIdentities: z.array(z.string().min(1)).optional(),
 })
 
 export const dappPermissionsStateSchema = z.record(z.string(), dappPermissionRecordSchema)

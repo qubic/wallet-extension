@@ -18,6 +18,7 @@ import {
   getDappCurrentAccount,
   getDappPendingRequests,
   getDappPermissions,
+  isAccountApprovedForOrigin,
   removeDappPermission,
   setDappPermissions,
 } from '@/lib/dapp/storage'
@@ -68,6 +69,19 @@ type DappSendTransactionParams = {
 const ensureConnected = (origin: string, permissions: DappPermissionsState) => {
   if (!permissions[origin]) {
     throw new DappProviderError('NOT_CONNECTED', 'Origin is not connected to wallet')
+  }
+}
+
+const ensureAccountApproved = (
+  origin: string,
+  permissions: DappPermissionsState,
+  account: DappCurrentAccount,
+) => {
+  if (!isAccountApprovedForOrigin(origin, permissions, account.identity)) {
+    throw new DappProviderError(
+      'NOT_CONNECTED',
+      'Active account is not approved for this origin. Call connect() first.',
+    )
   }
 }
 
@@ -143,8 +157,14 @@ const enqueueApprovalRequest = async (request: DappExecutionRequest) => {
 
 const connectOrigin = async (origin: string, requestId: string, session: string) => {
   const permissions = await getDappPermissions()
-  if (!permissions[origin]) {
-    const account = await getDappCurrentAccount()
+  const account = await getDappCurrentAccount()
+  const existingPermission = permissions[origin]
+
+  const needsApproval = account
+    ? !existingPermission || !isAccountApprovedForOrigin(origin, permissions, account.identity)
+    : !existingPermission
+
+  if (needsApproval) {
     await enqueueApprovalRequest({
       id: requestId,
       method: 'connect',
@@ -157,8 +177,6 @@ const connectOrigin = async (origin: string, requestId: string, session: string)
     return asRuntimePendingAck(requestId)
   }
 
-  permissions[origin] = { origin, connectedAt: Date.now() }
-  await setDappPermissions(permissions)
   return { connected: true as const, origin }
 }
 
@@ -170,7 +188,11 @@ const disconnectOrigin = async (origin: string) => {
 const getAccountForOrigin = async (origin: string) => {
   const permissions = await getDappPermissions()
   ensureConnected(origin, permissions)
-  return getDappCurrentAccount()
+  const account = await getDappCurrentAccount()
+  if (account && !isAccountApprovedForOrigin(origin, permissions, account.identity)) {
+    return null
+  }
+  return account
 }
 
 const requireCurrentAccount = async (): Promise<DappCurrentAccount> => {
@@ -196,8 +218,8 @@ const queueSigningApproval = async (
 ): Promise<DappRuntimePendingAck> => {
   const permissions = await getDappPermissions()
   ensureConnected(origin, permissions)
-
   const account = await requireCurrentAccount()
+  ensureAccountApproved(origin, permissions, account)
   await enqueueApprovalRequest({
     id: request.id,
     method: request.method === 'signMessage' ? 'signMessage' : 'signTransaction',
@@ -299,6 +321,7 @@ const queueSendTransactionApproval = async (
   const permissions = await getDappPermissions()
   ensureConnected(origin, permissions)
   const account = await requireCurrentAccount()
+  ensureAccountApproved(origin, permissions, account)
   const queuedParams = normalizeQueuedSendTransactionParams(request.params)
 
   await enqueueApprovalRequest({
@@ -326,9 +349,18 @@ const executeApprovedRequest = async (
         return asDappFailure(request.id, 'USER_REJECTED', 'Connection request was rejected')
       }
       const permissions = await getDappPermissions()
+      const currentAccount = await getDappCurrentAccount()
+      const existing = permissions[normalizedOrigin]
+      const previousIdentities = existing?.approvedIdentities ?? []
+      const identityToApprove = currentAccount?.identity
+      const approvedIdentities =
+        identityToApprove && !previousIdentities.includes(identityToApprove)
+          ? [...previousIdentities, identityToApprove]
+          : previousIdentities
       permissions[normalizedOrigin] = {
         origin: normalizedOrigin,
         connectedAt: Date.now(),
+        approvedIdentities,
       }
       await setDappPermissions(permissions)
       return asDappSuccess(request.id, { connected: true as const, origin: normalizedOrigin })
@@ -346,6 +378,7 @@ const executeApprovedRequest = async (
       const permissions = await getDappPermissions()
       ensureConnected(normalizedOrigin, permissions)
       const account = request.account
+      if (account) ensureAccountApproved(normalizedOrigin, permissions, account)
       if (!account?.identity) {
         throw new DappProviderError('NO_ACCOUNT', 'No active account is selected')
       }
