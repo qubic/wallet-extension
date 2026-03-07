@@ -1,21 +1,121 @@
-import {
-  CONTENT_SOURCE,
-  DAPP_CHANNEL,
-  RUNTIME_EVENT_TYPE,
-  RUNTIME_REQUEST_STATUS_TYPE,
-  RUNTIME_REQUEST_TYPE,
-  isDappRpcRequest,
-  isDappRpcResponse,
-  isDappRuntimeEventEnvelope,
-  isRuntimePendingAck,
-  type DappEventMessage,
-  type DappProviderErrorCode,
-  type DappRpcResponse,
-} from '@/lib/dapp/protocol'
-import { DAPP_APPROVAL_TIMEOUT_MS, DAPP_STATUS_POLL_INTERVAL_MS } from '@/lib/dapp/timing'
+type DappProviderErrorCode =
+  | 'INVALID_REQUEST'
+  | 'INVALID_PARAMS'
+  | 'UNSUPPORTED_ORIGIN'
+  | 'NOT_CONNECTED'
+  | 'METHOD_NOT_SUPPORTED'
+  | 'USER_REJECTED'
+  | 'INVALID_PASSPHRASE'
+  | 'WATCH_ONLY_ACCOUNT'
+  | 'NO_ACCOUNT'
+  | 'NOT_IMPLEMENTED'
+  | 'INTERNAL_ERROR'
+
+type DappRpcRequest = Readonly<{
+  channel: string
+  source: string
+  id: string
+  method: string
+  params?: unknown
+  session?: string
+}>
+
+type DappRpcResponse =
+  | Readonly<{
+      channel: string
+      source: string
+      id: string
+      ok: true
+      result: unknown
+      session?: string
+    }>
+  | Readonly<{
+      channel: string
+      source: string
+      id: string
+      ok: false
+      error: {
+        code: DappProviderErrorCode
+        message: string
+      }
+      session?: string
+    }>
+
+type DappEventMessage = Readonly<{
+  channel: string
+  source: string
+  event: string
+  payload?: unknown
+  session?: string
+}>
+
+type DappRuntimeEventEnvelope = Readonly<{
+  type: string
+  payload: DappEventMessage
+}>
+
+type DappRuntimePendingAck = Readonly<{
+  pending: true
+  id: string
+}>
+
+const DAPP_CHANNEL = 'qubic:dapp'
+const INPAGE_SOURCE = 'qubic:inpage'
+const CONTENT_SOURCE = 'qubic:content'
+const RUNTIME_REQUEST_TYPE = 'qubic:dapp:request'
+const RUNTIME_EVENT_TYPE = 'qubic:dapp:event'
+const RUNTIME_REQUEST_STATUS_TYPE = 'qubic:dapp:request-status'
+const DAPP_APPROVAL_TIMEOUT_MS = 2 * 60 * 1000
+const DAPP_STATUS_POLL_INTERVAL_MS = 500
 
 const INPAGE_SCRIPT_PATH = 'assets/inpage-provider.js'
 const INPAGE_SESSION_DATA_ATTR = 'qubicSession'
+
+const isObject = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null
+
+const isDappRpcRequest = (value: unknown): value is DappRpcRequest => {
+  if (!isObject(value)) return false
+  return (
+    value.channel === DAPP_CHANNEL &&
+    value.source === INPAGE_SOURCE &&
+    typeof value.id === 'string' &&
+    Boolean(value.id) &&
+    typeof value.method === 'string' &&
+    Boolean(value.method)
+  )
+}
+
+const isDappRpcResponse = (value: unknown): value is DappRpcResponse => {
+  if (!isObject(value)) return false
+  return (
+    value.channel === DAPP_CHANNEL &&
+    value.source === CONTENT_SOURCE &&
+    typeof value.id === 'string' &&
+    Boolean(value.id) &&
+    typeof value.ok === 'boolean'
+  )
+}
+
+const isDappEventMessage = (value: unknown): value is DappEventMessage => {
+  if (!isObject(value)) return false
+  return (
+    value.channel === DAPP_CHANNEL &&
+    value.source === CONTENT_SOURCE &&
+    typeof value.event === 'string' &&
+    Boolean(value.event)
+  )
+}
+
+const isDappRuntimeEventEnvelope = (value: unknown): value is DappRuntimeEventEnvelope => {
+  if (!isObject(value)) return false
+  return value.type === RUNTIME_EVENT_TYPE && isDappEventMessage(value.payload)
+}
+
+const isRuntimePendingAck = (value: unknown): value is DappRuntimePendingAck => {
+  if (!isObject(value)) return false
+  return value.pending === true && typeof value.id === 'string' && Boolean(value.id)
+}
 
 const getChromeApi = () =>
   (globalThis as typeof globalThis & { chrome?: typeof chrome }).chrome ?? null
