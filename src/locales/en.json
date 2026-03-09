@@ -111,6 +111,8 @@
     "categories": {
       "general": "Preferences",
       "generalDesc": "Language and theme preferences",
+      "connectedSites": "Connected sites",
+      "connectedSitesDesc": "Manage website wallet access",
       "security": "Security",
       "securityDesc": "Password, auto-lock, and app reset",
       "backup": "Backup",
@@ -125,6 +127,13 @@
     "general": {
       "title": "Preferences",
       "back": "Settings"
+    },
+    "connectedSites": {
+      "title": "Connected sites",
+      "back": "Settings",
+      "empty": "No websites are connected.",
+      "disconnect": "Disconnect",
+      "connectedAt": "Connected: {{date}}"
     },
     "security": {
       "title": "Security",
@@ -384,6 +393,43 @@
   "unlock": {
     "title": "Unlock Your Wallet",
     "subtitle": "Your wallet is locked for safety. Enter your passphrase to proceed."
+  },
+  "dapp": {
+    "approval": {
+      "title": "Connection request",
+      "origin": "Website",
+      "sharedAccount": "Shared account",
+      "sharedAccountFallback": "Selected account",
+      "connectSubtitle": "This website wants to connect to your wallet.",
+      "signMessageSubtitle": "This website wants you to sign a message.",
+      "signTransactionSubtitle": "This website wants you to sign a transaction.",
+      "sendTransactionSubtitle": "This website wants you to sign and broadcast a transaction.",
+      "genericSubtitle": "Review this request before continuing.",
+      "messageLabel": "Message",
+      "messageEmpty": "No message preview available.",
+      "messageWarningTitle": "Review message carefully",
+      "messageWarnings": {
+        "encoded": "The dApp is asking you to sign encoded data (hex/base64), which may not be human-readable.",
+        "url": "The message contains a URL. Make sure it matches the website you trust.",
+        "sensitiveTerms": "The message includes sensitive approval/transaction wording. Confirm what you are authorizing.",
+        "long": "The message is long and may hide important details."
+      },
+      "txTo": "To",
+      "txAmount": "Amount",
+      "txInputType": "Input type",
+      "txTargetTick": "Target tick",
+      "txTargetTickOffset": "Target tick offset",
+      "txFee": "Fee",
+      "txFeeNone": "0",
+      "txFeeMayApply": "May apply",
+      "approve": "Approve",
+      "approveAndSend": "Approve & Send",
+      "reject": "Reject",
+      "errors": {
+        "runtimeUnavailable": "Extension runtime is unavailable.",
+        "decisionFailed": "Could not submit your decision."
+      }
+    }
   },
   "onboarding": {
     "importSeed": {

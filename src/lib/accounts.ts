@@ -1,3 +1,5 @@
+import { syncDappCurrentAccountSnapshotFromLocalState } from '@/lib/dapp/session-sync'
+
 export type WatchOnlyAccount = {
   name: string
   identity: string
@@ -21,6 +23,7 @@ export const ACCOUNT_UPDATED_EVENT = 'wallet-account-updated'
 
 export const emitAccountUpdated = () => {
   if (typeof window !== 'undefined') {
+    void syncDappCurrentAccountSnapshotFromLocalState()
     window.dispatchEvent(new Event(ACCOUNT_UPDATED_EVENT))
   }
 }

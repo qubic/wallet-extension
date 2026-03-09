@@ -4,6 +4,9 @@ import './styles/global.css'
 import './i18n'
 import App from './app/app'
 import { startActionIconThemeSync } from './lib/extension-icons'
+import { startDappSidepanelPresenceHeartbeat } from './lib/dapp/sidepanel-presence'
+import { startDappSessionSync } from './lib/dapp/session-sync'
+import { syncVaultStorageMirror } from './lib/vault'
 
 const applyViewportSizing = () => {
   const html = document.documentElement
@@ -99,6 +102,11 @@ const startExtensionReloadWatcher = () => {
 
 startExtensionReloadWatcher()
 startActionIconThemeSync()
+startDappSessionSync()
+if (window.location.pathname.endsWith('sidepanel.html')) {
+  startDappSidepanelPresenceHeartbeat()
+}
+void syncVaultStorageMirror()
 
 const rootElement = document.getElementById('root')
 

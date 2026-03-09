@@ -10,6 +10,7 @@ import {
   ExternalLinkIcon,
   InfoIcon,
   LifeBuoyIcon,
+  Link2Icon,
   LockIcon,
   ShieldIcon,
   SlidersHorizontalIcon,
@@ -98,6 +99,13 @@ const Settings = () => {
       label: t('settings.categories.accounts'),
       description: t('settings.categories.accountsDesc'),
       action: () => navigate('/accounts'),
+    },
+    {
+      key: 'connectedSites',
+      icon: Link2Icon,
+      label: t('settings.categories.connectedSites'),
+      description: t('settings.categories.connectedSitesDesc'),
+      action: () => navigate('/settings/connected-sites'),
     },
     {
       key: 'general',

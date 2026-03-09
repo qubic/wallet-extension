@@ -12,6 +12,7 @@ import ImportVault from '../pages/onboarding/import-vault'
 import SelectToken from '../pages/select-token'
 import Transfer from '../pages/transfer'
 import Settings from '../pages/settings'
+import ConnectedSites from '../pages/settings/connected-sites'
 import General from '../pages/settings/general'
 import Security from '../pages/settings/security'
 import TransactionDetails from '../pages/transaction-details'
@@ -279,6 +280,14 @@ const AppRouter = () => {
             element={
               <AnimatedRoute>
                 <Settings />
+              </AnimatedRoute>
+            }
+          />
+          <Route
+            path="/settings/connected-sites"
+            element={
+              <AnimatedRoute>
+                <ConnectedSites />
               </AnimatedRoute>
             }
           />

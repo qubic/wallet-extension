@@ -26,6 +26,7 @@ dist-ssr
 
 # Temporary scaffolding
 tmp
+.temp
 
 # local audit outputs
 audit/

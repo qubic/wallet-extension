@@ -1,33 +1,19 @@
 import { useSyncExternalStore } from 'react'
 import { QX_TRANSFER_ASSET_INPUT_TYPE } from '@/lib/qx'
+import {
+  type PendingTransaction,
+  normalizePendingTransactionHash,
+  readPendingTransactionsFromChromeStorage,
+  readPendingTransactionsFromLocalStorage,
+  subscribePendingChromeStorageChanges,
+  writePendingTransactionsToChromeStorage,
+  writePendingTransactionsToLocalStorage,
+} from '@/lib/pending-transactions-storage'
+export type {
+  PendingTransaction,
+  PendingTransactionStatus,
+} from '@/lib/pending-transactions-storage'
 
-export type PendingTransactionStatus = 'pending' | 'failed'
-
-export type PendingTransaction = {
-  hash: string
-  sourceIdentity: string
-  destinationIdentity?: string
-  amount?: bigint
-  inputType?: number
-  tokenKey?: string
-  targetTick: number
-  createdAt: number
-  status: PendingTransactionStatus
-}
-
-type SerializedPendingTransaction = {
-  hash: string
-  sourceIdentity: string
-  destinationIdentity?: string
-  amount?: string
-  inputType?: number
-  tokenKey?: string
-  targetTick: number
-  createdAt: number
-  status?: PendingTransactionStatus
-}
-
-const PENDING_STORAGE_KEY = 'wallet:pending-transactions:v1'
 export const PENDING_SETTLED_EVENT = 'wallet-pending-settled'
 const PENDING_SETTLED_REFETCH_DELAY_MS = 2_500
 
@@ -36,13 +22,11 @@ const listeners = new Set<() => void>()
 const settledEventTimers = new Map<string, number>()
 let pendingVersion = 0
 
-const normalizeHash = (hash: string) => hash.trim().toLowerCase()
-const hasStorage = () => typeof localStorage !== 'undefined'
 const hasWindow = () => typeof window !== 'undefined'
 
 const schedulePendingSettledEvent = (pending: PendingTransaction) => {
   if (!hasWindow()) return
-  const key = normalizeHash(pending.hash)
+  const key = normalizePendingTransactionHash(pending.hash)
   const existing = settledEventTimers.get(key)
   if (existing) {
     window.clearTimeout(existing)
@@ -64,67 +48,46 @@ const schedulePendingSettledEvent = (pending: PendingTransaction) => {
   settledEventTimers.set(key, timeoutId)
 }
 
-const toSerialized = (pending: PendingTransaction): SerializedPendingTransaction => ({
-  hash: pending.hash,
-  sourceIdentity: pending.sourceIdentity,
-  destinationIdentity: pending.destinationIdentity,
-  amount: pending.amount?.toString(),
-  inputType: pending.inputType,
-  tokenKey: pending.tokenKey,
-  targetTick: pending.targetTick,
-  createdAt: pending.createdAt,
-  status: pending.status,
-})
-
-const fromSerialized = (value: unknown): PendingTransaction | null => {
-  if (!value || typeof value !== 'object') return null
-  const data = value as Partial<SerializedPendingTransaction>
-  if (!data.hash || !data.sourceIdentity) return null
-  if (typeof data.targetTick !== 'number' || !Number.isFinite(data.targetTick)) return null
-
-  try {
-    return {
-      hash: data.hash,
-      sourceIdentity: data.sourceIdentity,
-      destinationIdentity: data.destinationIdentity,
-      amount: data.amount ? BigInt(data.amount) : undefined,
-      inputType: data.inputType,
-      tokenKey: data.tokenKey,
-      targetTick: data.targetTick,
-      createdAt: typeof data.createdAt === 'number' ? data.createdAt : Date.now(),
-      status: data.status === 'failed' ? 'failed' : 'pending',
-    }
-  } catch {
-    return null
-  }
+const persistPending = () => {
+  writePendingTransactionsToLocalStorage(pendingByHash.values())
+  void writePendingTransactionsToChromeStorage(pendingByHash.values())
 }
 
-const persistPending = () => {
-  if (!hasStorage()) return
-  try {
-    const payload = Array.from(pendingByHash.values()).map(toSerialized)
-    localStorage.setItem(PENDING_STORAGE_KEY, JSON.stringify(payload))
-  } catch {
-    // ignore persistence failures
+const mergePendingEntries = (items: PendingTransaction[]) => {
+  for (const pending of items) {
+    const key = normalizePendingTransactionHash(pending.hash)
+    const existing = pendingByHash.get(key)
+    if (!existing) {
+      pendingByHash.set(key, pending)
+      continue
+    }
+
+    if (pending.createdAt > existing.createdAt) {
+      pendingByHash.set(key, pending)
+      continue
+    }
+    if (pending.createdAt === existing.createdAt && pending.status === 'failed') {
+      pendingByHash.set(key, pending)
+    }
   }
 }
 
 const loadPending = () => {
-  if (!hasStorage()) return
-  try {
-    const raw = localStorage.getItem(PENDING_STORAGE_KEY)
-    if (!raw) return
-    const parsed = JSON.parse(raw) as unknown
-    if (!Array.isArray(parsed)) return
-    for (const item of parsed) {
-      const pending = fromSerialized(item)
-      if (!pending) continue
-      pendingByHash.set(normalizeHash(pending.hash), pending)
-    }
-  } catch {
-    // ignore malformed persisted state
-  }
+  mergePendingEntries(readPendingTransactionsFromLocalStorage())
 }
+
+const getPendingStateSignature = () =>
+  JSON.stringify(
+    Array.from(pendingByHash.entries())
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([key, pending]) => [
+        key,
+        pending.status,
+        pending.createdAt,
+        pending.targetTick,
+        pending.amount?.toString() ?? '',
+      ]),
+  )
 
 const notify = () => {
   listeners.forEach((listener) => {
@@ -150,6 +113,27 @@ export const usePendingTransactionsVersion = () =>
   useSyncExternalStore(subscribe, getSnapshot, getSnapshot)
 
 loadPending()
+void readPendingTransactionsFromChromeStorage().then((items) => {
+  if (items.length === 0) return
+  const before = getPendingStateSignature()
+  mergePendingEntries(items)
+  if (before !== getPendingStateSignature()) {
+    writePendingTransactionsToLocalStorage(pendingByHash.values())
+    notifyPendingChanged()
+  }
+})
+subscribePendingChromeStorageChanges(() => {
+  void readPendingTransactionsFromChromeStorage().then((items) => {
+    const before = getPendingStateSignature()
+    pendingByHash.clear()
+    mergePendingEntries(readPendingTransactionsFromLocalStorage())
+    mergePendingEntries(items)
+    if (before !== getPendingStateSignature()) {
+      writePendingTransactionsToLocalStorage(pendingByHash.values())
+      notifyPendingChanged()
+    }
+  })
+})
 
 export const addPendingTransaction = (pending: {
   hash: string
@@ -160,7 +144,7 @@ export const addPendingTransaction = (pending: {
   tokenKey?: string
   targetTick: number
 }) => {
-  const key = normalizeHash(pending.hash)
+  const key = normalizePendingTransactionHash(pending.hash)
   if (!key) return
   pendingByHash.set(key, {
     ...pending,
@@ -173,7 +157,7 @@ export const addPendingTransaction = (pending: {
 }
 
 export const removePendingTransaction = (hash: string) => {
-  const key = normalizeHash(hash)
+  const key = normalizePendingTransactionHash(hash)
   if (!key) return
   if (pendingByHash.delete(key)) {
     persistPending()
@@ -182,21 +166,21 @@ export const removePendingTransaction = (hash: string) => {
 }
 
 export const isTransactionPending = (hash: string) => {
-  const key = normalizeHash(hash)
+  const key = normalizePendingTransactionHash(hash)
   if (!key) return false
   const pending = pendingByHash.get(key)
   return Boolean(pending && pending.status === 'pending')
 }
 
 export const isTransactionFailed = (hash: string) => {
-  const key = normalizeHash(hash)
+  const key = normalizePendingTransactionHash(hash)
   if (!key) return false
   const pending = pendingByHash.get(key)
   return Boolean(pending && pending.status === 'failed')
 }
 
 export const getPendingTransaction = (hash: string) => {
-  const key = normalizeHash(hash)
+  const key = normalizePendingTransactionHash(hash)
   if (!key) return null
   return pendingByHash.get(key) ?? null
 }
@@ -254,7 +238,9 @@ export const resolvePendingTransactions = (
 ) => {
   if (pendingByHash.size === 0) return
   let changed = false
-  const confirmedHashes = new Set(transactions.map((tx) => normalizeHash(tx.hash)))
+  const confirmedHashes = new Set(
+    transactions.map((tx) => normalizePendingTransactionHash(tx.hash)),
+  )
 
   for (const key of confirmedHashes) {
     if (pendingByHash.has(key)) {
