@@ -165,13 +165,16 @@ const sendFailure = (
   code: DappProviderErrorCode = 'INTERNAL_ERROR',
   session = inpageSession,
 ) => {
-  postToPage({
-    channel: DAPP_CHANNEL,
-    source: CONTENT_SOURCE,
-    id,
-    ok: false,
-    error: { code, message },
-  }, session)
+  postToPage(
+    {
+      channel: DAPP_CHANNEL,
+      source: CONTENT_SOURCE,
+      id,
+      ok: false,
+      error: { code, message },
+    },
+    session,
+  )
 }
 
 const pollRuntimeResult = (
@@ -242,7 +245,12 @@ window.addEventListener('message', (event: MessageEvent) => {
       return
     }
     if (!isDappRpcResponse(response) || response.source !== CONTENT_SOURCE) {
-      sendFailure(data.id, 'Invalid response from extension runtime', 'INTERNAL_ERROR', inpageSession)
+      sendFailure(
+        data.id,
+        'Invalid response from extension runtime',
+        'INTERNAL_ERROR',
+        inpageSession,
+      )
       return
     }
     postToPage(response, inpageSession)
