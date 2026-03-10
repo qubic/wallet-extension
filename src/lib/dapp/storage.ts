@@ -16,9 +16,20 @@ export const DAPP_REQUEST_RESULTS_KEY = 'dapp.requestResults.v1'
 export type DappPermissionRecord = Readonly<{
   origin: string
   connectedAt: number
+  approvedIdentities?: readonly string[]
 }>
 
 export type DappPermissionsState = Record<string, DappPermissionRecord>
+
+export const isAccountApprovedForOrigin = (
+  origin: string,
+  permissions: DappPermissionsState,
+  identity: string,
+): boolean => {
+  const permission = permissions[origin]
+  if (!permission?.approvedIdentities?.length) return true
+  return permission.approvedIdentities.includes(identity)
+}
 
 export type DappCurrentAccount = Readonly<{
   identity: string

@@ -26,7 +26,9 @@ import {
 import {
   DAPP_CURRENT_ACCOUNT_KEY,
   DAPP_PERMISSIONS_KEY,
+  getDappCurrentAccount,
   getDappPermissions,
+  isAccountApprovedForOrigin,
 } from '@/lib/dapp/storage'
 
 chrome.runtime.onMessage.addListener((message: unknown, sender, sendResponse) => {
@@ -97,30 +99,17 @@ chrome.runtime.onMessage.addListener((message: unknown, sender, sendResponse) =>
   return true
 })
 
-type BroadcastEventOptions = {
-  targetOrigin?: string
-  onlyConnectedOrigins?: boolean
-}
-
-const broadcastEvent = async (event: DappEventMessage, options: BroadcastEventOptions = {}) => {
+const broadcastEvent = async (event: DappEventMessage, targetOrigin: string) => {
   const tabs = await chrome.tabs.query({})
-  const connectedOrigins = options.onlyConnectedOrigins ? await getDappPermissions() : null
-  const normalizedTargetOrigin = options.targetOrigin ? normalizeOrigin(options.targetOrigin) : null
+  const normalizedTargetOrigin = normalizeOrigin(targetOrigin)
 
   for (const tab of tabs) {
     if (!tab.id || !tab.url) continue
 
     const tabOrigin = getOriginFromUrl(tab.url)
     if (!tabOrigin) continue
-    const normalizedTabOrigin = normalizeOrigin(tabOrigin)
 
-    if (normalizedTargetOrigin && normalizedTabOrigin !== normalizedTargetOrigin) {
-      continue
-    }
-
-    if (connectedOrigins && !connectedOrigins[normalizedTabOrigin]) {
-      continue
-    }
+    if (normalizeOrigin(tabOrigin) !== normalizedTargetOrigin) continue
 
     try {
       await chrome.tabs.sendMessage(tab.id, {
@@ -133,20 +122,47 @@ const broadcastEvent = async (event: DappEventMessage, options: BroadcastEventOp
   }
 }
 
+const broadcastAccountChangedPerOrigin = async () => {
+  const newAccount = await getDappCurrentAccount()
+  const permissions = await getDappPermissions()
+  const tabs = await chrome.tabs.query({})
+
+  for (const tab of tabs) {
+    if (!tab.id || !tab.url) continue
+
+    const tabOrigin = getOriginFromUrl(tab.url)
+    if (!tabOrigin) continue
+    const normalizedTabOrigin = normalizeOrigin(tabOrigin)
+
+    const permission = permissions[normalizedTabOrigin]
+    if (!permission) continue
+
+    const isApproved =
+      newAccount &&
+      isAccountApprovedForOrigin(normalizedTabOrigin, permissions, newAccount.identity)
+    const eventPayload = isApproved ? newAccount : null
+
+    try {
+      await chrome.tabs.sendMessage(tab.id, {
+        type: RUNTIME_EVENT_TYPE,
+        payload: {
+          channel: DAPP_CHANNEL,
+          source: CONTENT_SOURCE,
+          event: 'accountChanged',
+          payload: eventPayload,
+        },
+      })
+    } catch {
+      // Ignore tabs without content script.
+    }
+  }
+}
+
 chrome.storage.onChanged.addListener((changes, areaName) => {
   if (areaName !== 'local') return
 
   if (changes[DAPP_CURRENT_ACCOUNT_KEY]) {
-    const payload = changes[DAPP_CURRENT_ACCOUNT_KEY].newValue
-    void broadcastEvent(
-      {
-        channel: DAPP_CHANNEL,
-        source: CONTENT_SOURCE,
-        event: 'accountChanged',
-        payload,
-      },
-      { onlyConnectedOrigins: true },
-    )
+    void broadcastAccountChangedPerOrigin()
   }
 
   if (changes[DAPP_PERMISSIONS_KEY]) {
@@ -161,7 +177,7 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
           event: 'disconnect',
           payload: { origin },
         },
-        { targetOrigin: origin },
+        origin,
       )
     }
   }
