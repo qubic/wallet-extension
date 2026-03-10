@@ -70,6 +70,7 @@ const DAPP_STATUS_POLL_INTERVAL_MS = 500
 
 const INPAGE_SCRIPT_PATH = 'assets/inpage-provider.js'
 const INPAGE_SESSION_DATA_ATTR = 'qubicSession'
+const INPAGE_SESSION_DOM_ATTR = 'data-qubic-inpage-session'
 
 const isObject = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null
@@ -128,7 +129,17 @@ const createSessionToken = () => {
   return Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('')
 }
 
-const inpageSession = createSessionToken()
+const getOrCreateSessionToken = () => {
+  const root = document.documentElement
+  const existing = root?.getAttribute(INPAGE_SESSION_DOM_ATTR)?.trim()
+  if (existing && /^[0-9a-f]{32}$/i.test(existing)) return existing
+
+  const created = createSessionToken()
+  root?.setAttribute(INPAGE_SESSION_DOM_ATTR, created)
+  return created
+}
+
+const inpageSession = getOrCreateSessionToken()
 
 const injectProviderScript = () => {
   const runtime = getChromeRuntime()
@@ -144,14 +155,15 @@ const injectProviderScript = () => {
   script.remove()
 }
 
-const postToPage = (message: DappRpcResponse | DappEventMessage) => {
-  window.postMessage({ ...message, session: inpageSession }, '*')
+const postToPage = (message: DappRpcResponse | DappEventMessage, session = inpageSession) => {
+  window.postMessage({ ...message, session }, '*')
 }
 
 const sendFailure = (
   id: string,
   message: string,
   code: DappProviderErrorCode = 'INTERNAL_ERROR',
+  session = inpageSession,
 ) => {
   postToPage({
     channel: DAPP_CHANNEL,
@@ -159,7 +171,7 @@ const sendFailure = (
     id,
     ok: false,
     error: { code, message },
-  })
+  }, session)
 }
 
 const pollRuntimeResult = (
@@ -170,7 +182,7 @@ const pollRuntimeResult = (
   startedAt = Date.now(),
 ) => {
   if (Date.now() - startedAt > DAPP_APPROVAL_TIMEOUT_MS) {
-    sendFailure(id, 'Provider request timed out')
+    sendFailure(id, 'Provider request timed out', 'INTERNAL_ERROR', session)
     return
   }
 
@@ -193,10 +205,10 @@ const pollRuntimeResult = (
         return
       }
       if (!isDappRpcResponse(response) || response.source !== CONTENT_SOURCE) {
-        sendFailure(id, 'Invalid response from extension runtime')
+        sendFailure(id, 'Invalid response from extension runtime', 'INTERNAL_ERROR', session)
         return
       }
-      postToPage(response)
+      postToPage(response, session)
     },
   )
 }
@@ -210,14 +222,19 @@ window.addEventListener('message', (event: MessageEvent) => {
   const chromeApi = getChromeApi()
   const runtime = getChromeRuntime()
   if (!runtime?.sendMessage) {
-    sendFailure(data.id, 'Extension runtime is not available')
+    sendFailure(data.id, 'Extension runtime is not available', 'INTERNAL_ERROR', inpageSession)
     return
   }
 
   runtime.sendMessage({ type: RUNTIME_REQUEST_TYPE, payload: data }, (response: unknown) => {
     const maybeError = chromeApi?.runtime?.lastError
     if (maybeError) {
-      sendFailure(data.id, maybeError.message || 'Failed to reach extension runtime')
+      sendFailure(
+        data.id,
+        maybeError.message || 'Failed to reach extension runtime',
+        'INTERNAL_ERROR',
+        inpageSession,
+      )
       return
     }
     if (isRuntimePendingAck(response)) {
@@ -225,10 +242,10 @@ window.addEventListener('message', (event: MessageEvent) => {
       return
     }
     if (!isDappRpcResponse(response) || response.source !== CONTENT_SOURCE) {
-      sendFailure(data.id, 'Invalid response from extension runtime')
+      sendFailure(data.id, 'Invalid response from extension runtime', 'INTERNAL_ERROR', inpageSession)
       return
     }
-    postToPage(response)
+    postToPage(response, inpageSession)
   })
 })
 
