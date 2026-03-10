@@ -1,7 +1,7 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useSmartContracts, useAddressLabels, useExchanges } from '@/lib/qubic-static'
 import { useAssetIssuances } from '@/lib/assets'
-import { getCachedAccounts, getWatchOnlyAccounts } from '@/lib/accounts'
+import { ACCOUNT_UPDATED_EVENT, getCachedAccounts, getWatchOnlyAccounts } from '@/lib/accounts'
 import { EMPTY_ADDRESS } from '@/lib/config/constants'
 
 export type AddressNameResult = {
@@ -9,16 +9,24 @@ export type AddressNameResult = {
   type: 'account' | 'smartContract' | 'exchange' | 'token' | 'namedAddress'
 }
 
+const readAllAccounts = () => [...getCachedAccounts(), ...getWatchOnlyAccounts()]
+
 export const useAddressName = (address: string): AddressNameResult | undefined => {
   const { data: smartContracts } = useSmartContracts()
   const { data: exchanges } = useExchanges()
   const { data: assetIssuances } = useAssetIssuances()
   const { data: addressLabels } = useAddressLabels()
+  const [allAccounts, setAllAccounts] = useState(readAllAccounts)
+
+  useEffect(() => {
+    const refresh = () => setAllAccounts(readAllAccounts())
+    window.addEventListener(ACCOUNT_UPDATED_EVENT, refresh)
+    return () => window.removeEventListener(ACCOUNT_UPDATED_EVENT, refresh)
+  }, [])
 
   return useMemo(() => {
     if (!address) return undefined
 
-    const allAccounts = [...getCachedAccounts(), ...getWatchOnlyAccounts()]
     const ownAccount = allAccounts.find((a) => a.identity === address)
     if (ownAccount) {
       return { name: ownAccount.name, type: 'account' }
@@ -50,5 +58,5 @@ export const useAddressName = (address: string): AddressNameResult | undefined =
     }
 
     return undefined
-  }, [address, smartContracts, exchanges, assetIssuances, addressLabels])
+  }, [address, allAccounts, smartContracts, exchanges, assetIssuances, addressLabels])
 }
