@@ -15,9 +15,9 @@ const formatValue = (value: unknown): string => {
 }
 
 type TxDetailsRowProps = {
-  row: { key: string; label: string; value: unknown; copyable?: boolean }
+  row: { key: string; label: string; value: unknown; copyable?: boolean; copyText?: string }
   copiedKey: string | null
-  onCopy: (key: string, value: unknown) => void
+  onCopy: (key: string, value: unknown, copyText?: string) => void
 }
 
 const TxDetailsRow = ({ row, copiedKey, onCopy }: TxDetailsRowProps) => {
@@ -36,7 +36,7 @@ const TxDetailsRow = ({ row, copiedKey, onCopy }: TxDetailsRowProps) => {
           <button
             type="button"
             className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
-            onClick={() => onCopy(row.key, row.value)}
+            onClick={() => onCopy(row.key, row.value, row.copyText)}
             aria-label={`${t('txDetails.copy')} ${row.label}`}
           >
             {copiedKey === row.key ? (
