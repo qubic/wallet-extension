@@ -3,7 +3,8 @@ import { InboxIcon, XIcon } from 'lucide-react'
 import type { useTransactions } from '@qubic-labs/react'
 import { motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
-import { formatBalanceCompact, truncateString } from '@/lib/utils'
+import AddressLabel from '@/components/address-label'
+import { formatBalanceCompact } from '@/lib/utils'
 import { ReceiveIcon } from '@/components/icons/receive-icon'
 import { SendIcon } from '@/components/icons/send-icon'
 import {
@@ -82,11 +83,6 @@ const TransactionsPreview = ({
         ? t('history.incoming')
         : t('history.outgoing')
     const counterparty = isIncoming ? tx.source : tx.destination
-    const counterpartyLabel = isSimpleTransfer
-      ? isIncoming
-        ? t('history.from', { address: truncateString(counterparty) })
-        : t('history.to', { address: truncateString(counterparty) })
-      : truncateString(counterparty)
     const Icon = isIncoming ? ReceiveIcon : SendIcon
     const isPending = isTransactionPending(tx.hash)
     const isFailed = isTransactionFailed(tx.hash)
@@ -124,7 +120,13 @@ const TransactionsPreview = ({
           </div>
           <div className="flex flex-col">
             <span className="text-xs font-semibold text-foreground">{label}</span>
-            <span className="text-xs text-muted-foreground">{counterpartyLabel}</span>
+            <AddressLabel
+              address={counterparty}
+              prefix={
+                isSimpleTransfer ? (isIncoming ? t('history.from') : t('history.to')) : undefined
+              }
+              className="text-xs text-muted-foreground"
+            />
             <span className="text-[11px] text-muted-foreground/70">
               {(() => {
                 if (isFailed) return t('history.failed')

@@ -70,6 +70,16 @@ export function truncateString(value: string, options: TruncateStringOptions = {
   return `${value.slice(0, leading)}…${value.slice(-trailing)}`
 }
 
+export const formatAddressLabel = (
+  address: string,
+  name?: string,
+  options?: TruncateStringOptions,
+): string => {
+  const truncated = truncateString(address, options)
+  if (!name) return truncated
+  return `${name} (${truncated})`
+}
+
 export type ExplorerObject = 'tx'
 
 export function buildExplorerObjectUrl(object: ExplorerObject, id: string) {
