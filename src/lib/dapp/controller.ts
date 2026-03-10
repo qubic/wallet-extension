@@ -359,7 +359,7 @@ const executeApprovedRequest = async (
           : previousIdentities
       permissions[normalizedOrigin] = {
         origin: normalizedOrigin,
-        connectedAt: Date.now(),
+        connectedAt: existing?.connectedAt ?? Date.now(),
         approvedIdentities,
       }
       await setDappPermissions(permissions)
