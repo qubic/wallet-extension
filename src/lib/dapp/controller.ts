@@ -125,7 +125,10 @@ const ensureApprovalWindow = async () => {
       height: DAPP_APPROVAL_WINDOW_HEIGHT,
     })
   } catch {
-    // Ignore window creation failures, the request stays pending.
+    throw new DappProviderError(
+      'INTERNAL_ERROR',
+      'Unable to open wallet approval window for this request',
+    )
   }
 }
 
