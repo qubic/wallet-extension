@@ -50,6 +50,7 @@ import {
 } from '@/lib/dapp/signing'
 import { QUBIC_RPC_BASE_URL } from '@/lib/config/constants'
 import { upsertPendingTransactionInChromeStorage } from '@/lib/pending-transactions-storage'
+import { normalizeBalance } from '@/lib/utils'
 import { openBrowserVault, verifyVaultAccess } from '@/lib/vault'
 
 const sdk = createSdk({ baseUrl: QUBIC_RPC_BASE_URL })
@@ -322,6 +323,29 @@ const queueSendTransactionApproval = async (
   ensureConnected(origin, permissions)
   const account = await requireCurrentAccount()
   ensureAccountApproved(origin, permissions, account)
+  const parsedParams = parseSignTransactionParams(request.params)
+  if (parsedParams.toIdentity === account.identity.trim().toUpperCase()) {
+    throw new DappProviderError(
+      'INVALID_PARAMS',
+      'Destination identity cannot match source identity',
+    )
+  }
+  if (parsedParams.inputType === undefined || parsedParams.inputType === 0) {
+    let currentBalance = 0n
+    try {
+      const balanceResponse = await sdk.rpc.live.balance(account.identity)
+      const rawBalance =
+        balanceResponse && typeof balanceResponse === 'object'
+          ? (balanceResponse as { balance?: bigint | number | string }).balance
+          : undefined
+      currentBalance = normalizeBalance(rawBalance)
+    } catch {
+      throw new DappProviderError('INTERNAL_ERROR', 'Unable to validate account balance')
+    }
+    if (parsedParams.amount > currentBalance) {
+      throw new DappProviderError('INVALID_PARAMS', 'Insufficient balance')
+    }
+  }
   const queuedParams = normalizeQueuedSendTransactionParams(request.params)
 
   await enqueueApprovalRequest({
