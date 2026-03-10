@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { QUBIC_RPC_BASE_URL } from './config/constants'
+import { STALE_TIME_ASSET_ISSUANCES } from './config/refresh-intervals'
 
 const QX_MANAGING_CONTRACT_INDEX = 1
 
@@ -20,7 +21,7 @@ export type OwnedAssetsResponse = {
 }
 
 export const fetchOwnedAssets = async (identity: string): Promise<OwnedAssetsResponse> => {
-  const response = await fetch(`${QUBIC_RPC_BASE_URL}/live/v1/assets/${identity}/owned`, {
+  const response = await fetch(`${QUBIC_RPC_BASE_URL}/v1/assets/${identity}/owned`, {
     headers: { accept: 'application/json' },
   })
   if (!response.ok) {
@@ -84,5 +85,38 @@ export const useOwnedAssets = (identity: string) => {
     queryFn: () => fetchOwnedAssets(identity),
     enabled: Boolean(identity),
     staleTime: 60_000,
+  })
+}
+
+export type AssetIssuance = {
+  data: {
+    issuerIdentity: string
+    type: number
+    name: string
+    numberOfDecimalPlaces: number
+    unitOfMeasurement: number[]
+  }
+  tick: number
+  universeIndex: number
+}
+
+export type AssetIssuancesResponse = {
+  assets: AssetIssuance[]
+}
+const fetchAssetIssuances = async (): Promise<AssetIssuancesResponse> => {
+  const response = await fetch(`${QUBIC_RPC_BASE_URL}/v1/assets/issuances`, {
+    headers: { accept: 'application/json' },
+  })
+  if (!response.ok) {
+    throw new Error('Failed to load asset issuances.')
+  }
+  return response.json() as Promise<AssetIssuancesResponse>
+}
+
+export const useAssetIssuances = () => {
+  return useQuery({
+    queryKey: ['qubic', 'asset-issuances'],
+    queryFn: fetchAssetIssuances,
+    staleTime: STALE_TIME_ASSET_ISSUANCES,
   })
 }

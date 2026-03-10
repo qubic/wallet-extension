@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { type AggregatedAsset, formatAssetUnits } from '@/lib/assets'
+import { useAddressName } from '@/hooks/use-address-name'
 import { formatBalance, truncateString } from '@/lib/utils'
 import type { FormErrors } from '@/components/pages/transfer/types'
 
@@ -64,6 +65,7 @@ const TransferForm = ({
     ? formatAssetUnits(selectedAsset.numberOfUnits, selectedAsset.decimals)
     : formatBalance(currentBalance)
   const availableUnits = selectedAsset ? BigInt(selectedAsset.numberOfUnits) : currentBalance
+  const recipientResolved = useAddressName(recipient.length === 60 ? recipient : '')
   const [isRecipientPickerOpen, setRecipientPickerOpen] = useState(false)
   const recipientPickerRef = useRef<HTMLDivElement | null>(null)
   const filteredVaultRecipients = useMemo(() => {
@@ -169,6 +171,13 @@ const TransferForm = ({
                   )}
                 </div>
               </div>
+            )}
+            <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+              <span>{t('transfer.form.recipientHint')}</span>
+              <span>{recipient.length}/60</span>
+            </div>
+            {recipientResolved && (
+              <p className="text-[11px] text-primary">{recipientResolved.name}</p>
             )}
             {errors.recipient && <p className="text-xs text-destructive">{errors.recipient}</p>}
           </div>

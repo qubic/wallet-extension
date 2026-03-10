@@ -3,7 +3,7 @@ Qubic Wallet Browser Extension (Chrome MV3), built with React, TypeScript, Vite,
 
 ## Requirements
 - Bun `>= 1.3`
-- Node `>= 20` (for tooling compatibility)
+- Node `>= 22` (required for semantic-release)
 - Chrome (or Chromium-based browser with extension developer mode)
 
 ## Quick start
@@ -159,9 +159,23 @@ Notes for dApp developers:
 
 Connected websites can be managed in `Settings -> Connected sites`.
 
-## Quality gates
-Run these before opening a PR:
+## Development workflow
 
+### Git hooks
+Husky hooks run automatically:
+- **Pre-commit**: Format and lint staged files (`lint-staged`)
+- **Pre-push**: TypeScript compilation check (`tsc -b`)
+
+Bypass with `--no-verify` if needed.
+
+### Commit message format
+Follow [Conventional Commits](https://www.conventionalcommits.org/): `<type>(<scope>): <description>`
+
+Examples: `feat: add feature`, `fix(accounts): resolve bug`, `chore: update deps`
+
+Valid types: `feat`, `fix`, `chore`, `refactor`, `docs`, `test`, `perf`, `ci`, `build`, `revert`
+
+### Quality gates
 ```bash
 bun run lint
 bunx tsc -b
@@ -178,8 +192,12 @@ bun run build
   ```
 
 ## Releases
-- Releases are automated with Semantic Release (`.github/workflows/release.yml`).
-- `main` publishes stable releases.
-- Stable release titles use semantic version format: `v<version>`.
-- Each release includes a zipped build artifact: `dist.zip`.
-- Local dry-run: `bun run release:dry`
+
+Releases are automated via [Semantic Release](https://semantic-release.gitbook.io/) on merge to `main`:
+- Version bumps based on commit types (`feat` → minor, `fix` → patch, `BREAKING CHANGE` → major)
+- Automatic changelog generation
+- GitHub release with `wallet-extension-dist.zip` artifact
+
+**Manual trigger:** Actions → release workflow → Run workflow on `main`
+
+**Local dry-run:** `bun run release:dry` (requires Node.js >= 22)
