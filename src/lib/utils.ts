@@ -80,8 +80,6 @@ export const formatAddressLabel = (
   return `${name} (${truncated})`
 }
 
-export const EXPLORER_BASE_URL = 'https://explorer.qubic.org'
-
 export type ExplorerObject = 'tx'
 
 export function buildExplorerObjectUrl(object: ExplorerObject, id: string) {
