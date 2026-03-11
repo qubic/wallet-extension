@@ -18,6 +18,7 @@ import Security from '../pages/settings/security'
 import TransactionDetails from '../pages/transaction-details'
 import Unlock from '../pages/unlock'
 import Welcome from '../pages/welcome'
+import TransferRights from '../pages/transfer-rights'
 import ImportWatchOnly from '../pages/accounts/import-watch-only'
 import {
   ensureUnlockTimestamp,
@@ -264,6 +265,14 @@ const AppRouter = () => {
             element={
               <AnimatedRoute>
                 <Transfer />
+              </AnimatedRoute>
+            }
+          />
+          <Route
+            path="/transfer/manage-rights"
+            element={
+              <AnimatedRoute>
+                <TransferRights />
               </AnimatedRoute>
             }
           />

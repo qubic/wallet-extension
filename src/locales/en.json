@@ -346,6 +346,57 @@
       "generic": "Transfer failed. Please retry."
     }
   },
+  "transferRights": {
+    "title": "Transfer Management Rights",
+    "subtitle": "Move asset management between smart contracts",
+    "selectAsset": "Select asset",
+    "selectAssetSubtitle": "Select the asset to transfer management rights",
+    "noAssets": "No assets with transferable management rights.",
+    "sourceContract": "Source contract",
+    "sourceContractPlaceholder": "Select source contract",
+    "destinationContract": "Destination contract",
+    "destinationContractPlaceholder": "Select destination contract",
+    "numberOfShares": "Number of shares",
+    "numberOfSharesPlaceholder": "Enter number of shares",
+    "available": "Available: {{balance}} {{token}}",
+    "fee": "Fee: {{fee}} QUBIC",
+    "quBalance": "Balance: {{balance}} QUBIC",
+    "confirm": {
+      "title": "Confirm transfer rights",
+      "description": "Review the details before transferring management rights.",
+      "asset": "Asset",
+      "from": "From contract",
+      "to": "To contract",
+      "shares": "Shares",
+      "feeLabel": "Fee",
+      "warning": "This action cannot be undone."
+    },
+    "validation": {
+      "sourceRequired": "Source contract is required.",
+      "destinationRequired": "Destination contract is required.",
+      "sameContract": "Source and destination must be different contracts.",
+      "sharesRequired": "Number of shares is required.",
+      "sharesInvalid": "Number of shares must be a positive number.",
+      "sharesExceedsBalance": "Number of shares exceeds available balance.",
+      "insufficientQuForFee": "Insufficient QUBIC balance to cover the {{fee}} QU fee."
+    },
+    "actions": {
+      "continue": "Continue",
+      "confirm": "Confirm & transfer",
+      "sending": "Transferring...",
+      "cancel": "Cancel"
+    },
+    "success": {
+      "title": "Transfer rights sent",
+      "description": "Your transaction has been broadcast and is scheduled for tick {{targetTick}}."
+    },
+    "errors": {
+      "networkError": "Network error. Please retry.",
+      "broadcastFailed": "Failed to broadcast transaction.",
+      "watchOnly": "Watch-only accounts cannot transfer rights.",
+      "generic": "Transfer rights failed. Please retry."
+    }
+  },
   "passphraseAuth": {
     "title": "Authentication Required",
     "subtitle": "Enter your vault passphrase to continue with this action.",

@@ -280,26 +280,33 @@ const Home = () => {
             )}
             {ownedAssets.data && aggregatedAssets.length > 0 && (
               <div className="space-y-2">
-                {aggregatedAssets.map((asset) => (
-                  <div
-                    key={`${asset.issuerIdentity}-${asset.name}`}
-                    className="group flex items-center justify-between rounded-lg border border-border/40 bg-transparent px-3 py-2.5 transition-colors hover:border-primary/30 hover:bg-background/40"
-                  >
-                    <div className="min-w-0 flex flex-col">
-                      <span className="truncate text-sm font-semibold leading-none text-foreground">
-                        {asset.name}
-                      </span>
-                      {asset.issuerIdentity && (
-                        <span className="truncate font-mono text-[11px] text-muted-foreground">
-                          {truncateString(asset.issuerIdentity)}
+                {aggregatedAssets.map((asset) => {
+                  const assetKey = `${asset.issuerIdentity}-${asset.name}`
+                  return (
+                    <button
+                      key={assetKey}
+                      type="button"
+                      className="group flex w-full cursor-pointer items-center justify-between rounded-lg border border-border/40 bg-transparent px-3 py-2.5 text-left transition-colors hover:border-primary/30 hover:bg-background/40"
+                      onClick={() =>
+                        navigate(`/transfer/manage-rights?asset=${encodeURIComponent(assetKey)}`)
+                      }
+                    >
+                      <div className="min-w-0 flex flex-col">
+                        <span className="truncate text-sm font-semibold leading-none text-foreground">
+                          {asset.name}
                         </span>
-                      )}
-                    </div>
-                    <div className="ml-3 shrink-0 text-right text-base font-semibold tabular-nums text-foreground">
-                      {formatAssetUnits(asset.numberOfUnits, asset.decimals)}
-                    </div>
-                  </div>
-                ))}
+                        {asset.issuerIdentity && (
+                          <span className="truncate font-mono text-[11px] text-muted-foreground">
+                            {truncateString(asset.issuerIdentity)}
+                          </span>
+                        )}
+                      </div>
+                      <div className="ml-3 shrink-0 text-right text-base font-semibold tabular-nums text-foreground">
+                        {formatAssetUnits(asset.numberOfUnits, asset.decimals)}
+                      </div>
+                    </button>
+                  )
+                })}
               </div>
             )}
             {ownedAssets.isSuccess && (!ownedAssets.data || aggregatedAssets.length === 0) && (
