@@ -1,6 +1,7 @@
 export type SmartContractProcedure = {
   id: number
   name: string
+  fee?: number
 }
 
 export type SmartContract = {
@@ -13,6 +14,7 @@ export type SmartContract = {
   procedures: SmartContractProcedure[]
   website?: string
   proposalUrl?: string
+  allowTransferShares?: boolean
 }
 
 export type AddressLabel = {
