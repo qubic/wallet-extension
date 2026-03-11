@@ -70,6 +70,40 @@ export const aggregateAssets = (
   return [...map.values()].filter((a) => BigInt(a.numberOfUnits) > 0n)
 }
 
+export type ContractAssetEntry = {
+  name: string
+  issuerIdentity: string
+  numberOfUnits: string
+  decimals: number
+  managingContractIndex: number
+}
+
+/**
+ * Returns asset entries grouped per managing contract (not aggregated across contracts).
+ * Used for Transfer Management Rights where we need to know which contract manages each batch.
+ */
+export const getAssetsPerContract = (response: OwnedAssetsResponse): ContractAssetEntry[] => {
+  const entries: ContractAssetEntry[] = []
+
+  for (const entry of response.ownedAssets ?? []) {
+    const info = entry.data
+    const issued = info?.issuedAsset
+    if (!issued?.name || !info?.numberOfUnits) continue
+    if (info.managingContractIndex === undefined || info.managingContractIndex === null) continue
+    if (BigInt(info.numberOfUnits) <= 0n) continue
+
+    entries.push({
+      name: issued.name,
+      issuerIdentity: issued.issuerIdentity ?? '',
+      numberOfUnits: info.numberOfUnits,
+      decimals: issued.numberOfDecimalPlaces ?? 0,
+      managingContractIndex: info.managingContractIndex,
+    })
+  }
+
+  return entries
+}
+
 export const formatAssetUnits = (units: string | undefined, decimals = 0) => {
   if (!units) return '--'
   if (decimals <= 0) return Number(units).toLocaleString()
