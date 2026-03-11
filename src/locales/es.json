@@ -353,6 +353,7 @@
     "selectAsset": "Seleccionar activo",
     "selectAssetSubtitle": "Selecciona el activo para transferir derechos de gestión",
     "noAssets": "No hay activos con derechos de gestión transferibles.",
+    "noDestinationContracts": "No hay contratos de destino elegibles disponibles.",
     "sourceContract": "Contrato de origen",
     "sourceContractPlaceholder": "Seleccionar contrato de origen",
     "destinationContract": "Contrato de destino",

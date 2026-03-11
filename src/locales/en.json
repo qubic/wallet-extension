@@ -353,6 +353,7 @@
     "selectAsset": "Select asset",
     "selectAssetSubtitle": "Select the asset to transfer management rights",
     "noAssets": "No assets with transferable management rights.",
+    "noDestinationContracts": "No eligible destination contracts available.",
     "sourceContract": "Source contract",
     "sourceContractPlaceholder": "Select source contract",
     "destinationContract": "Destination contract",

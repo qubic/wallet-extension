@@ -607,7 +607,7 @@ const TransferRights = () => {
               </Select>
               {selectedSourceIndex !== null && destinationOptions.length === 0 && (
                 <div className="py-1 text-xs text-muted-foreground">
-                  {t('transferRights.noAssets')}
+                  {t('transferRights.noDestinationContracts')}
                 </div>
               )}
               {errors.destinationContract && (
