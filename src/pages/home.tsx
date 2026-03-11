@@ -1,5 +1,12 @@
 import { useBalance, useTransactions } from '@qubic-labs/react'
-import { CopyIcon, EyeIcon, Loader2Icon, PackageIcon, RefreshCwIcon } from 'lucide-react'
+import {
+  ArrowRightLeftIcon,
+  CopyIcon,
+  EyeIcon,
+  Loader2Icon,
+  PackageIcon,
+  RefreshCwIcon,
+} from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import QRCode from 'qrcode'
 import { useNavigate } from 'react-router-dom'
@@ -283,13 +290,9 @@ const Home = () => {
                 {aggregatedAssets.map((asset) => {
                   const assetKey = `${asset.issuerIdentity}-${asset.name}`
                   return (
-                    <button
+                    <div
                       key={assetKey}
-                      type="button"
-                      className="group flex w-full cursor-pointer items-center justify-between rounded-lg border border-border/40 bg-transparent px-3 py-2.5 text-left transition-colors hover:border-primary/30 hover:bg-background/40"
-                      onClick={() =>
-                        navigate(`/transfer/manage-rights?asset=${encodeURIComponent(assetKey)}`)
-                      }
+                      className="group flex items-center justify-between rounded-lg border border-border/40 bg-transparent px-3 py-2.5 transition-colors hover:border-primary/30 hover:bg-background/40"
                     >
                       <div className="min-w-0 flex flex-col">
                         <span className="truncate text-sm font-semibold leading-none text-foreground">
@@ -301,10 +304,24 @@ const Home = () => {
                           </span>
                         )}
                       </div>
-                      <div className="ml-3 shrink-0 text-right text-base font-semibold tabular-nums text-foreground">
-                        {formatAssetUnits(asset.numberOfUnits, asset.decimals)}
+                      <div className="ml-3 flex shrink-0 items-center gap-2">
+                        <span className="text-right text-base font-semibold tabular-nums text-foreground">
+                          {formatAssetUnits(asset.numberOfUnits, asset.decimals)}
+                        </span>
+                        <button
+                          type="button"
+                          title={t('home.assets.manageRights')}
+                          className="cursor-pointer rounded-md p-1 text-muted-foreground opacity-0 transition-all hover:bg-primary/10 hover:text-primary group-hover:opacity-100"
+                          onClick={() =>
+                            navigate(
+                              `/transfer/manage-rights?asset=${encodeURIComponent(assetKey)}`,
+                            )
+                          }
+                        >
+                          <ArrowRightLeftIcon className="h-3.5 w-3.5" />
+                        </button>
                       </div>
-                    </button>
+                    </div>
                   )
                 })}
               </div>

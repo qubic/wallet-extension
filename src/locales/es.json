@@ -48,7 +48,8 @@
       "empty": "No hay activos adicionales.",
       "emptyTitle": "Sin activos aún",
       "error": "No se pudieron cargar los activos.",
-      "unknown": "Activo desconocido"
+      "unknown": "Activo desconocido",
+      "manageRights": "Gestionar derechos"
     },
     "receive": {
       "title": "Recibir Qubic",
