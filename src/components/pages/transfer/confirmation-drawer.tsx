@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/drawer'
 import { formatAddressLabel, formatBalance, parseAmount } from '@/lib/utils'
 import { useAddressName } from '@/hooks/use-address-name'
+import { NATIVE_TOKEN_SYMBOL } from '@/lib/config/constants'
 import SummaryRow from '@/components/pages/transfer/summary-row'
 
 type ConfirmationDrawerProps = {
@@ -70,8 +71,8 @@ const ConfirmationDrawer = ({
               value={`${formatBalance(parsed)} ${tokenName}`}
               emphasize
             />
-            {tokenName !== 'QU' && (
-              <SummaryRow label={t('transfer.confirm.feeLabel')} value="100 QU" />
+            {tokenName !== NATIVE_TOKEN_SYMBOL && (
+              <SummaryRow label={t('transfer.confirm.feeLabel')} value={`100 ${NATIVE_TOKEN_SYMBOL}`} />
             )}
           </div>
         </div>

@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { useBalance, useSdk, useSend } from '@qubic-labs/react'
+import { NATIVE_TOKEN_SYMBOL } from '@/lib/config/constants'
 import { isValidIdentity, normalizeBalance, parseAmount } from '@/lib/utils'
 import PassphraseAuth from '@/pages/passphrase-auth'
 import { getCachedAccounts, getCurrentIdentity, isWatchOnlyIdentity } from '@/lib/accounts'
@@ -429,7 +430,7 @@ const Transfer = () => {
         sourceIdentity={currentIdentity}
         recipient={recipient}
         amount={amount}
-        tokenName={selectedAsset?.name ?? 'QU'}
+        tokenName={selectedAsset?.name ?? NATIVE_TOKEN_SYMBOL}
         sending={sending}
         onCancel={() => {
           setDrawerOpen(false)

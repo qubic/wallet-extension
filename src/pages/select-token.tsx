@@ -10,6 +10,7 @@ import {
   useOwnedAssets,
 } from '@/lib/assets'
 import { getCurrentIdentity } from '@/lib/accounts'
+import { NATIVE_TOKEN_NAME, NATIVE_TOKEN_SYMBOL } from '@/lib/config/constants'
 import { formatBalance, normalizeBalance } from '@/lib/utils'
 
 const SelectToken = () => {
@@ -57,14 +58,14 @@ const SelectToken = () => {
             onClick={handleSelectQu}
           >
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
-              <span className="text-sm font-bold text-primary">QU</span>
+              <span className="text-sm font-bold text-primary">{NATIVE_TOKEN_SYMBOL}</span>
             </div>
             <div className="min-w-0 flex-1">
-              <div className="font-medium text-foreground">QUBIC</div>
+              <div className="font-medium text-foreground">{NATIVE_TOKEN_NAME}</div>
               <div className="text-xs text-muted-foreground">
                 {balance.isLoading
                   ? t('transfer.balance.loading')
-                  : `${formatBalance(onChainQuBalance)} QU`}
+                  : `${formatBalance(onChainQuBalance)} ${NATIVE_TOKEN_SYMBOL}`}
               </div>
             </div>
             <ChevronRightIcon className="h-4 w-4 shrink-0 text-muted-foreground" />
