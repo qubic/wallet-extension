@@ -29,6 +29,7 @@ package-lock.json
 
 # Temporary scaffolding
 tmp
+.temp
 
 # local audit outputs
 audit/

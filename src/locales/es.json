@@ -111,6 +111,8 @@
     "categories": {
       "general": "Preferencias",
       "generalDesc": "Preferencias de idioma y tema",
+      "connectedSites": "Sitios conectados",
+      "connectedSitesDesc": "Gestiona acceso de sitios web",
       "security": "Seguridad",
       "securityDesc": "Contraseña, bloqueo automático y restablecer",
       "backup": "Respaldo",
@@ -125,6 +127,13 @@
     "general": {
       "title": "Preferencias",
       "back": "Configuración"
+    },
+    "connectedSites": {
+      "title": "Sitios conectados",
+      "back": "Ajustes",
+      "empty": "No hay sitios web conectados.",
+      "disconnect": "Desconectar",
+      "connectedAt": "Conectado: {{date}}"
     },
     "security": {
       "title": "Seguridad",
@@ -277,45 +286,27 @@
   },
   "transfer": {
     "title": "Enviar",
-    "subtitle": "Transferir fondos a otra identidad",
     "selectToken": {
-      "subtitle": "Selecciona el token que deseas enviar",
-      "label": "Tokens disponibles",
-      "native": "Token nativo"
+      "subtitle": "Selecciona el token que deseas enviar"
     },
     "balance": {
-      "label": "Saldo disponible",
       "loading": "Cargando saldo..."
     },
     "form": {
-      "token": "Token",
-      "recipient": "Identidad del destinatario",
       "recipientPlaceholder": "Identidad de 60 caracteres (A-Z)",
-      "amount": "Monto ({{token}})",
       "amountPlaceholder": "Ingresa el monto",
-      "max": "MAX",
-      "fee": "Comisión",
-      "feeValue": "{{fee}} QUBIC",
+      "max": "Máximo",
+      "feeValue": "Comisión: {{fee}} QUBIC",
       "quBalance": "Saldo: {{balance}} QUBIC",
-      "from": "Desde",
-      "watchOnly": "Solo lectura",
-      "pasteRecipient": "Pegar destinatario",
       "recipientHint": "Usa una identidad de 60 letras o elige una de tu vault.",
       "available": "Disponible: {{balance}} {{token}}",
       "vaultRecipients": "Tus identidades",
-      "vaultRecipientsPlaceholder": "Selecciona una identidad de tu vault",
       "vaultRecipientsManual": "Entrada manual",
-      "sendAmount": "Monto",
-      "usdEquivalent": "Aprox. USD: {{value}}",
       "targetTickOffset": "Tick objetivo (actual + N)",
       "targetTickManual": "Tick objetivo (manual)",
       "targetTickOffsetManual": "Manual",
       "targetTickManualPlaceholder": "ej. 4378123",
-      "targetTickCurrentHint": "Tick actual de la red: {{tick}}",
-      "targetTickOffsetSoon": "Pronto (1)",
-      "targetTickOffsetDefault": "Por defecto (10)",
-      "targetTickOffsetLater": "Tarde (40)",
-      "fromPlaceholder": "Selecciona cuenta de origen"
+      "targetTickCurrentHint": "Tick actual de la red: {{tick}}"
     },
     "validation": {
       "recipientRequired": "La identidad del destinatario es requerida.",
@@ -336,8 +327,7 @@
       "to": "Para",
       "amount": "Monto",
       "warning": "Esta acción no se puede deshacer.",
-      "feeLabel": "Comisión de red",
-      "feeIncluded": "Incluida"
+      "feeLabel": "Comisión de red"
     },
     "actions": {
       "continue": "Continuar",
@@ -384,6 +374,43 @@
   "unlock": {
     "title": "Desbloquea tu billetera",
     "subtitle": "Tu billetera está bloqueada por seguridad. Ingresa tu contraseña para continuar."
+  },
+  "dapp": {
+    "approval": {
+      "title": "Solicitud de conexión",
+      "origin": "Sitio web",
+      "sharedAccount": "Cuenta compartida",
+      "sharedAccountFallback": "Cuenta seleccionada",
+      "connectSubtitle": "Este sitio quiere conectarse a tu billetera.",
+      "signMessageSubtitle": "Este sitio quiere que firmes un mensaje.",
+      "signTransactionSubtitle": "Este sitio quiere que firmes una transacción.",
+      "sendTransactionSubtitle": "Este sitio quiere que firmes y envíes una transacción a la red.",
+      "genericSubtitle": "Revisa esta solicitud antes de continuar.",
+      "messageLabel": "Mensaje",
+      "messageEmpty": "No hay vista previa del mensaje.",
+      "messageWarningTitle": "Revisa el mensaje con cuidado",
+      "messageWarnings": {
+        "encoded": "La dApp solicita firmar datos codificados (hex/base64), que pueden no ser legibles.",
+        "url": "El mensaje contiene una URL. Asegúrate de que coincida con el sitio en el que confías.",
+        "sensitiveTerms": "El mensaje incluye texto sensible de aprobación/transacción. Confirma qué estás autorizando.",
+        "long": "El mensaje es largo y puede ocultar detalles importantes."
+      },
+      "txTo": "Para",
+      "txAmount": "Cantidad",
+      "txInputType": "Tipo de entrada",
+      "txTargetTick": "Tick objetivo",
+      "txTargetTickOffset": "Offset del tick objetivo",
+      "txFee": "Comisión",
+      "txFeeNone": "0",
+      "txFeeMayApply": "Puede aplicar",
+      "approve": "Aprobar",
+      "approveAndSend": "Aprobar y enviar",
+      "reject": "Rechazar",
+      "errors": {
+        "runtimeUnavailable": "El runtime de la extensión no está disponible.",
+        "decisionFailed": "No se pudo enviar tu decisión."
+      }
+    }
   },
   "onboarding": {
     "importSeed": {

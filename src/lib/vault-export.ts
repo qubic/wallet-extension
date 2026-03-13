@@ -1,4 +1,5 @@
 import type { SeedVault } from '@qubic-labs/sdk'
+import { arrayBufferToBase64, bytesToBase64 } from '@/lib/encoding'
 import { getWatchOnlyAccounts } from './accounts'
 
 const RSA_ALG = {
@@ -12,19 +13,6 @@ const AES_ALG = {
   name: 'AES-GCM',
   length: 256,
   iv: new Uint8Array(12).fill(0),
-}
-
-function bytesToBase64(arr: Uint8Array): string {
-  return btoa(Array.from(arr, (b) => String.fromCharCode(b)).join(''))
-}
-
-function arrayBufferToBase64(buffer: ArrayBuffer): string {
-  const bytes = new Uint8Array(buffer)
-  let binary = ''
-  for (let i = 0; i < bytes.byteLength; i++) {
-    binary += String.fromCharCode(bytes[i])
-  }
-  return btoa(binary)
 }
 
 export async function exportVaultToWebWalletFormat(

@@ -77,6 +77,88 @@ sidepanel.html               # sidepanel entry point
 - App reset now clears wallet-specific keys only (scoped cleanup), not all origin storage.
 - Current RPC host permission is restricted to `https://rpc.qubic.org/*`.
 
+## dapp api (`window.qubic`)
+The extension injects `window.qubic` into regular web pages (`http/https`).
+
+### provider methods
+- `connect(): Promise<{ connected: true; origin: string }>`
+- `disconnect(): Promise<{ disconnected: true }>`
+- `getAccount(): Promise<{ identity: string; name?: string } | null>`
+- `signMessage(params): Promise<{ signatureHex: string; digestHex: string }>`
+- `signTransaction(params): Promise<{ txId: string; targetTick: number; txBytesBase64: string; txBytesHex: string }>`
+
+### events
+- `window.qubic.on('accountChanged', cb)`
+- `window.qubic.on('disconnect', cb)`
+
+### dapp integration (for app developers)
+Basic usage:
+
+```ts
+const provider = (window as Window & { qubic?: any }).qubic
+
+if (!provider?.isQubic) {
+  throw new Error('Qubic Wallet extension not found')
+}
+
+await provider.connect()
+const account = await provider.getAccount()
+
+const signedMessage = await provider.signMessage({ message: 'hello qubic' })
+
+const signedTx = await provider.signTransaction({
+  toIdentity: 'DESTINATION_IDENTITY',
+  amount: '1',
+  // optional
+  targetTick: 123456,
+  inputType: 0,
+  // optional bytes: Uint8Array | number[] | hex string | base64 string
+  // inputBytes: new Uint8Array([...]),
+})
+```
+
+Error handling:
+
+```ts
+try {
+  await window.qubic.signMessage({ message: 'hello' })
+} catch (error: any) {
+  console.error(error.code, error.message)
+}
+```
+
+Common provider error codes:
+- `NOT_CONNECTED`
+- `USER_REJECTED`
+- `INVALID_PARAMS`
+- `INVALID_PASSPHRASE`
+- `WATCH_ONLY_ACCOUNT`
+- `NO_ACCOUNT`
+
+Notes for dApp developers:
+- `connect`, `signMessage`, and `signTransaction` require user approval in the extension.
+- `signMessage` and `signTransaction` also require wallet passphrase confirmation.
+- `signTransaction` returns signed bytes only. Broadcasting is handled by your app/backend.
+- The current integration exposes the wallet's active account (wallet-level connect), not per-origin account selection.
+
+### implementation notes (extension developers)
+- Requests requiring approval are persisted so they survive MV3 service worker restarts.
+- Final results are stored short-term and polled by the content script.
+- Pending signing payloads are encrypted at rest in `chrome.storage.local` using a key stored in `chrome.storage.session`.
+- The page/content-script bridge is scoped with a per-page session token to reduce `window.postMessage` spoofing risk.
+
+### local test smoke (dapp feature)
+1. `bun run build`
+2. Reload extension in `chrome://extensions`
+3. Open a dApp page on `http://localhost:*` or `https://...`
+4. Run:
+   - `window.qubic`
+   - `await window.qubic.connect()`
+   - `await window.qubic.getAccount()`
+   - `await window.qubic.signMessage({ message: 'hello' })`
+
+Connected websites can be managed in `Settings -> Connected sites`.
+
 ## Development workflow
 
 ### Git hooks

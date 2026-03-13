@@ -111,6 +111,8 @@
     "categories": {
       "general": "Preferences",
       "generalDesc": "Language and theme preferences",
+      "connectedSites": "Connected sites",
+      "connectedSitesDesc": "Manage website wallet access",
       "security": "Security",
       "securityDesc": "Password, auto-lock, and app reset",
       "backup": "Backup",
@@ -125,6 +127,13 @@
     "general": {
       "title": "Preferences",
       "back": "Settings"
+    },
+    "connectedSites": {
+      "title": "Connected sites",
+      "back": "Settings",
+      "empty": "No websites are connected.",
+      "disconnect": "Disconnect",
+      "connectedAt": "Connected: {{date}}"
     },
     "security": {
       "title": "Security",
@@ -277,45 +286,27 @@
   },
   "transfer": {
     "title": "Send",
-    "subtitle": "Transfer funds to another identity",
     "selectToken": {
-      "subtitle": "Select the token you want to send",
-      "label": "Available tokens",
-      "native": "Native token"
+      "subtitle": "Select the token you want to send"
     },
     "balance": {
-      "label": "Available balance",
       "loading": "Loading balance..."
     },
     "form": {
-      "token": "Token",
-      "recipient": "Recipient identity",
       "recipientPlaceholder": "60-character identity (A-Z)",
-      "amount": "Amount ({{token}})",
       "amountPlaceholder": "Enter amount",
-      "max": "MAX",
-      "fee": "Fee",
-      "feeValue": "{{fee}} QUBIC",
+      "max": "Max",
+      "feeValue": "Fee: {{fee}} QUBIC",
       "quBalance": "Balance: {{balance}} QUBIC",
-      "from": "From",
-      "watchOnly": "Watch-only",
-      "pasteRecipient": "Paste recipient",
       "recipientHint": "Use a 60-letter identity or pick one from your vault.",
       "available": "Available: {{balance}} {{token}}",
       "vaultRecipients": "Your identities",
-      "vaultRecipientsPlaceholder": "Select an identity from your vault",
       "vaultRecipientsManual": "Manual entry",
-      "sendAmount": "Amount",
-      "usdEquivalent": "Approx. USD: {{value}}",
       "targetTickOffset": "Target tick (current + N)",
       "targetTickManual": "Target tick (manual)",
       "targetTickOffsetManual": "Manual",
       "targetTickManualPlaceholder": "e.g. 4378123",
-      "targetTickCurrentHint": "Current network tick: {{tick}}",
-      "targetTickOffsetSoon": "Soon (1)",
-      "targetTickOffsetDefault": "Default (10)",
-      "targetTickOffsetLater": "Later (40)",
-      "fromPlaceholder": "Select source account"
+      "targetTickCurrentHint": "Current network tick: {{tick}}"
     },
     "validation": {
       "recipientRequired": "Recipient identity is required.",
@@ -336,8 +327,7 @@
       "to": "To",
       "amount": "Amount",
       "warning": "This action cannot be undone.",
-      "feeLabel": "Network fee",
-      "feeIncluded": "Included"
+      "feeLabel": "Network fee"
     },
     "actions": {
       "continue": "Continue",
@@ -384,6 +374,43 @@
   "unlock": {
     "title": "Unlock Your Wallet",
     "subtitle": "Your wallet is locked for safety. Enter your passphrase to proceed."
+  },
+  "dapp": {
+    "approval": {
+      "title": "Connection request",
+      "origin": "Website",
+      "sharedAccount": "Shared account",
+      "sharedAccountFallback": "Selected account",
+      "connectSubtitle": "This website wants to connect to your wallet.",
+      "signMessageSubtitle": "This website wants you to sign a message.",
+      "signTransactionSubtitle": "This website wants you to sign a transaction.",
+      "sendTransactionSubtitle": "This website wants you to sign and broadcast a transaction.",
+      "genericSubtitle": "Review this request before continuing.",
+      "messageLabel": "Message",
+      "messageEmpty": "No message preview available.",
+      "messageWarningTitle": "Review message carefully",
+      "messageWarnings": {
+        "encoded": "The dApp is asking you to sign encoded data (hex/base64), which may not be human-readable.",
+        "url": "The message contains a URL. Make sure it matches the website you trust.",
+        "sensitiveTerms": "The message includes sensitive approval/transaction wording. Confirm what you are authorizing.",
+        "long": "The message is long and may hide important details."
+      },
+      "txTo": "To",
+      "txAmount": "Amount",
+      "txInputType": "Input type",
+      "txTargetTick": "Target tick",
+      "txTargetTickOffset": "Target tick offset",
+      "txFee": "Fee",
+      "txFeeNone": "0",
+      "txFeeMayApply": "May apply",
+      "approve": "Approve",
+      "approveAndSend": "Approve & Send",
+      "reject": "Reject",
+      "errors": {
+        "runtimeUnavailable": "Extension runtime is unavailable.",
+        "decisionFailed": "Could not submit your decision."
+      }
+    }
   },
   "onboarding": {
     "importSeed": {

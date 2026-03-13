@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { motion } from 'framer-motion'
 import { ArrowLeftRightIcon, HistoryIcon, HomeIcon, SettingsIcon } from 'lucide-react'
 import AppHeader from '@/components/app-header'
+import DappApprovalDrawer from '@/components/dapp/dapp-approval-drawer'
 import { getWatchOnlyAccounts } from '@/lib/accounts'
 
 const AppShell = ({
@@ -291,6 +292,7 @@ const AppShell = ({
           </motion.nav>
         )}
       </div>
+      <DappApprovalDrawer />
     </div>
   )
 }
