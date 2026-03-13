@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { useBalance, useSdk, useSend } from '@qubic-labs/react'
+import { useCurrentIdentity } from '@/hooks/use-current-identity'
 import { NATIVE_TOKEN_SYMBOL } from '@/lib/config/constants'
 import { isValidIdentity, normalizeBalance, parseAmount } from '@/lib/utils'
 import PassphraseAuth from '@/pages/passphrase-auth'
@@ -44,9 +45,13 @@ const Transfer = () => {
     return /^\d+$/.test(value) ? value : ''
   })()
   const selectedToken = (searchParams.get('token') ?? 'qu').trim()
-  const [currentIdentity, setCurrentIdentity] = useState(getCurrentIdentity())
   const [isWatchOnly, setIsWatchOnly] = useState(() => isWatchOnlyIdentity(getCurrentIdentity()))
   const [vaultRecipients, setVaultRecipients] = useState(() => getCachedAccounts())
+  const handleIdentityRefresh = useCallback((nextIdentity: string) => {
+    setIsWatchOnly(isWatchOnlyIdentity(nextIdentity))
+    setVaultRecipients(getCachedAccounts())
+  }, [])
+  const currentIdentity = useCurrentIdentity(handleIdentityRefresh)
 
   const sdk = useSdk()
   const balance = useBalance(currentIdentity)
@@ -91,23 +96,6 @@ const Transfer = () => {
     if (parsedAmount > BigInt(Number.MAX_SAFE_INTEGER)) return '--'
     return formatUsd(Number(parsedAmount) * usdPricePerQus)
   }, [latestStats.data?.data?.price, parsedAmount, selectedAsset])
-
-  useEffect(() => {
-    const refreshAccount = () => {
-      const nextIdentity = getCurrentIdentity()
-      setCurrentIdentity(nextIdentity)
-      setIsWatchOnly(isWatchOnlyIdentity(nextIdentity))
-      setVaultRecipients(getCachedAccounts())
-    }
-
-    refreshAccount()
-    window.addEventListener('storage', refreshAccount)
-    window.addEventListener('wallet-account-updated', refreshAccount)
-    return () => {
-      window.removeEventListener('storage', refreshAccount)
-      window.removeEventListener('wallet-account-updated', refreshAccount)
-    }
-  }, [])
 
   useEffect(() => {
     const handlePendingSettled = () => {

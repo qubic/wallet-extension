@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import { ChevronRightIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
@@ -9,30 +8,18 @@ import {
   formatAssetUnits,
   useOwnedAssets,
 } from '@/lib/assets'
-import { getCurrentIdentity } from '@/lib/accounts'
+import { useCurrentIdentity } from '@/hooks/use-current-identity'
 import { NATIVE_TOKEN_NAME, NATIVE_TOKEN_SYMBOL } from '@/lib/config/constants'
 import { formatBalance, normalizeBalance } from '@/lib/utils'
 
 const SelectToken = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const [currentIdentity, setCurrentIdentity] = useState(getCurrentIdentity())
+  const currentIdentity = useCurrentIdentity()
   const balance = useBalance(currentIdentity)
   const ownedAssets = useOwnedAssets(currentIdentity)
   const parsedAssets = aggregateAssets(ownedAssets.data ?? {}, true)
   const onChainQuBalance = normalizeBalance(balance.data?.balance)
-
-  useEffect(() => {
-    const refreshAccount = () => {
-      setCurrentIdentity(getCurrentIdentity())
-    }
-    window.addEventListener('storage', refreshAccount)
-    window.addEventListener('wallet-account-updated', refreshAccount)
-    return () => {
-      window.removeEventListener('storage', refreshAccount)
-      window.removeEventListener('wallet-account-updated', refreshAccount)
-    }
-  }, [])
 
   const handleSelectQu = () => {
     navigate('/transfer/send?token=qu')

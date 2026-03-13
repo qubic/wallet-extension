@@ -72,7 +72,10 @@ const ConfirmationDrawer = ({
               emphasize
             />
             {tokenName !== NATIVE_TOKEN_SYMBOL && (
-              <SummaryRow label={t('transfer.confirm.feeLabel')} value={`100 ${NATIVE_TOKEN_SYMBOL}`} />
+              <SummaryRow
+                label={t('transfer.confirm.feeLabel')}
+                value={`100 ${NATIVE_TOKEN_SYMBOL}`}
+              />
             )}
           </div>
         </div>
