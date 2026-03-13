@@ -390,6 +390,7 @@ const Transfer = () => {
         errors={errors}
         errorMessage={errorMessage}
         isWatchOnly={isWatchOnly}
+        isAssetLoading={selectedToken !== 'qu' && !selectedAsset}
         vaultRecipients={filteredVaultRecipients}
         selectedAsset={selectedAsset}
         targetTickOffset={targetTickOffset}

@@ -15,6 +15,7 @@ type TransferFormProps = {
   errors: FormErrors
   errorMessage: string
   isWatchOnly: boolean
+  isAssetLoading: boolean
   vaultRecipients: Array<{ name: string; identity: string }>
   selectedAsset: AggregatedAsset | null
   targetTickOffset: number
@@ -39,6 +40,7 @@ const TransferForm = ({
   errors,
   errorMessage,
   isWatchOnly,
+  isAssetLoading,
   vaultRecipients,
   selectedAsset,
   quBalance,
@@ -316,7 +318,7 @@ const TransferForm = ({
           <Button
             size="lg"
             className="flex-1"
-            disabled={isWatchOnly || !recipient.trim() || !amount.trim()}
+            disabled={isWatchOnly || isAssetLoading || !recipient.trim() || !amount.trim()}
             onClick={onContinue}
           >
             {t('transfer.actions.continue')}
