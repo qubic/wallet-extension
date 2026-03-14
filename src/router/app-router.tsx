@@ -9,6 +9,7 @@ import ManageAccounts from '../pages/manage-accounts'
 import CreateWallet from '../pages/onboarding/create-wallet'
 import ImportSeed from '../pages/onboarding/import-seed'
 import ImportVault from '../pages/onboarding/import-vault'
+import SelectToken from '../pages/select-token'
 import Transfer from '../pages/transfer'
 import Settings from '../pages/settings'
 import ConnectedSites from '../pages/settings/connected-sites'
@@ -252,6 +253,14 @@ const AppRouter = () => {
           />
           <Route
             path="/transfer"
+            element={
+              <AnimatedRoute>
+                <SelectToken />
+              </AnimatedRoute>
+            }
+          />
+          <Route
+            path="/transfer/send"
             element={
               <AnimatedRoute>
                 <Transfer />

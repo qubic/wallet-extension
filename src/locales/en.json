@@ -286,45 +286,27 @@
   },
   "transfer": {
     "title": "Send",
-    "subtitle": "Transfer funds to another identity",
     "selectToken": {
-      "subtitle": "Select the token you want to send",
-      "label": "Available tokens",
-      "native": "Native token"
+      "subtitle": "Select the token you want to send"
     },
     "balance": {
-      "label": "Available balance",
       "loading": "Loading balance..."
     },
     "form": {
-      "token": "Token",
-      "recipient": "Recipient identity",
       "recipientPlaceholder": "60-character identity (A-Z)",
-      "amount": "Amount ({{token}})",
       "amountPlaceholder": "Enter amount",
-      "max": "MAX",
-      "fee": "Fee",
-      "feeValue": "{{fee}} QUBIC",
+      "max": "Max",
+      "feeValue": "Fee: {{fee}} QUBIC",
       "quBalance": "Balance: {{balance}} QUBIC",
-      "from": "From",
-      "watchOnly": "Watch-only",
-      "pasteRecipient": "Paste recipient",
       "recipientHint": "Use a 60-letter identity or pick one from your vault.",
       "available": "Available: {{balance}} {{token}}",
       "vaultRecipients": "Your identities",
-      "vaultRecipientsPlaceholder": "Select an identity from your vault",
       "vaultRecipientsManual": "Manual entry",
-      "sendAmount": "Amount",
-      "usdEquivalent": "Approx. USD: {{value}}",
       "targetTickOffset": "Target tick (current + N)",
       "targetTickManual": "Target tick (manual)",
       "targetTickOffsetManual": "Manual",
       "targetTickManualPlaceholder": "e.g. 4378123",
-      "targetTickCurrentHint": "Current network tick: {{tick}}",
-      "targetTickOffsetSoon": "Soon (1)",
-      "targetTickOffsetDefault": "Default (10)",
-      "targetTickOffsetLater": "Later (40)",
-      "fromPlaceholder": "Select source account"
+      "targetTickCurrentHint": "Current network tick: {{tick}}"
     },
     "validation": {
       "recipientRequired": "Recipient identity is required.",
@@ -345,8 +327,7 @@
       "to": "To",
       "amount": "Amount",
       "warning": "This action cannot be undone.",
-      "feeLabel": "Network fee",
-      "feeIncluded": "Included"
+      "feeLabel": "Network fee"
     },
     "actions": {
       "continue": "Continue",

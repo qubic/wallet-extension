@@ -286,45 +286,27 @@
   },
   "transfer": {
     "title": "Enviar",
-    "subtitle": "Transferir fondos a otra identidad",
     "selectToken": {
-      "subtitle": "Selecciona el token que deseas enviar",
-      "label": "Tokens disponibles",
-      "native": "Token nativo"
+      "subtitle": "Selecciona el token que deseas enviar"
     },
     "balance": {
-      "label": "Saldo disponible",
       "loading": "Cargando saldo..."
     },
     "form": {
-      "token": "Token",
-      "recipient": "Identidad del destinatario",
       "recipientPlaceholder": "Identidad de 60 caracteres (A-Z)",
-      "amount": "Monto ({{token}})",
       "amountPlaceholder": "Ingresa el monto",
-      "max": "MAX",
-      "fee": "Comisión",
-      "feeValue": "{{fee}} QUBIC",
+      "max": "Máximo",
+      "feeValue": "Comisión: {{fee}} QUBIC",
       "quBalance": "Saldo: {{balance}} QUBIC",
-      "from": "Desde",
-      "watchOnly": "Solo lectura",
-      "pasteRecipient": "Pegar destinatario",
       "recipientHint": "Usa una identidad de 60 letras o elige una de tu vault.",
       "available": "Disponible: {{balance}} {{token}}",
       "vaultRecipients": "Tus identidades",
-      "vaultRecipientsPlaceholder": "Selecciona una identidad de tu vault",
       "vaultRecipientsManual": "Entrada manual",
-      "sendAmount": "Monto",
-      "usdEquivalent": "Aprox. USD: {{value}}",
       "targetTickOffset": "Tick objetivo (actual + N)",
       "targetTickManual": "Tick objetivo (manual)",
       "targetTickOffsetManual": "Manual",
       "targetTickManualPlaceholder": "ej. 4378123",
-      "targetTickCurrentHint": "Tick actual de la red: {{tick}}",
-      "targetTickOffsetSoon": "Pronto (1)",
-      "targetTickOffsetDefault": "Por defecto (10)",
-      "targetTickOffsetLater": "Tarde (40)",
-      "fromPlaceholder": "Selecciona cuenta de origen"
+      "targetTickCurrentHint": "Tick actual de la red: {{tick}}"
     },
     "validation": {
       "recipientRequired": "La identidad del destinatario es requerida.",
@@ -345,8 +327,7 @@
       "to": "Para",
       "amount": "Monto",
       "warning": "Esta acción no se puede deshacer.",
-      "feeLabel": "Comisión de red",
-      "feeIncluded": "Incluida"
+      "feeLabel": "Comisión de red"
     },
     "actions": {
       "continue": "Continuar",

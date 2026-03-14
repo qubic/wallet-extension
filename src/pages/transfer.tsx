@@ -1,8 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { useBalance, useSdk, useSend } from '@qubic-labs/react'
+import { useCurrentIdentity } from '@/hooks/use-current-identity'
+import { NATIVE_TOKEN_SYMBOL } from '@/lib/config/constants'
 import { isValidIdentity, normalizeBalance, parseAmount } from '@/lib/utils'
 import PassphraseAuth from '@/pages/passphrase-auth'
 import { getCachedAccounts, getCurrentIdentity, isWatchOnlyIdentity } from '@/lib/accounts'
@@ -42,10 +44,14 @@ const Transfer = () => {
     const value = (searchParams.get('amount') ?? '').trim()
     return /^\d+$/.test(value) ? value : ''
   })()
-  const initialPrefillToken = (searchParams.get('token') ?? 'qu').trim()
-  const [currentIdentity, setCurrentIdentity] = useState(getCurrentIdentity())
+  const selectedToken = (searchParams.get('token') ?? 'qu').trim()
   const [isWatchOnly, setIsWatchOnly] = useState(() => isWatchOnlyIdentity(getCurrentIdentity()))
   const [vaultRecipients, setVaultRecipients] = useState(() => getCachedAccounts())
+  const handleIdentityRefresh = useCallback((nextIdentity: string) => {
+    setIsWatchOnly(isWatchOnlyIdentity(nextIdentity))
+    setVaultRecipients(getCachedAccounts())
+  }, [])
+  const currentIdentity = useCurrentIdentity(handleIdentityRefresh)
 
   const sdk = useSdk()
   const balance = useBalance(currentIdentity)
@@ -55,7 +61,6 @@ const Transfer = () => {
   const tickInfo = useTickInfo('transfer')
 
   const [step, setStep] = useState<Step>('form')
-  const [selectedToken, setSelectedToken] = useState(initialPrefillToken || 'qu')
   const [recipient, setRecipient] = useState(initialPrefillRecipient)
   const [amount, setAmount] = useState(initialPrefillAmount)
   const [errors, setErrors] = useState<FormErrors>({})
@@ -91,39 +96,6 @@ const Transfer = () => {
     if (parsedAmount > BigInt(Number.MAX_SAFE_INTEGER)) return '--'
     return formatUsd(Number(parsedAmount) * usdPricePerQus)
   }, [latestStats.data?.data?.price, parsedAmount, selectedAsset])
-
-  const handleTokenChange = (value: string) => {
-    setSelectedToken(value)
-    setAmount('')
-    setErrors({})
-  }
-
-  useEffect(() => {
-    const refreshAccount = () => {
-      const nextIdentity = getCurrentIdentity()
-      setCurrentIdentity(nextIdentity)
-      setIsWatchOnly(isWatchOnlyIdentity(nextIdentity))
-      setVaultRecipients(getCachedAccounts())
-    }
-
-    refreshAccount()
-    window.addEventListener('storage', refreshAccount)
-    window.addEventListener('wallet-account-updated', refreshAccount)
-    return () => {
-      window.removeEventListener('storage', refreshAccount)
-      window.removeEventListener('wallet-account-updated', refreshAccount)
-    }
-  }, [])
-
-  useEffect(() => {
-    if (selectedToken === 'qu') return
-    const exists = parsedAssets.some(
-      (asset) => `${asset.issuerIdentity}-${asset.name}` === selectedToken,
-    )
-    if (!exists) {
-      setSelectedToken('qu')
-    }
-  }, [parsedAssets, selectedToken])
 
   useEffect(() => {
     const handlePendingSettled = () => {
@@ -407,16 +379,14 @@ const Transfer = () => {
         errors={errors}
         errorMessage={errorMessage}
         isWatchOnly={isWatchOnly}
-        assets={parsedAssets}
+        isAssetLoading={selectedToken !== 'qu' && !selectedAsset}
         vaultRecipients={filteredVaultRecipients}
-        selectedToken={selectedToken}
         selectedAsset={selectedAsset}
         targetTickOffset={targetTickOffset}
         manualTargetTick={manualTargetTick}
         isManualTargetTickEnabled={isManualTargetTickEnabled}
         currentTick={currentTick}
         usdEstimate={usdEstimate}
-        onTokenChange={handleTokenChange}
         onSelectVaultRecipient={handleSelectVaultRecipient}
         onRecipientChange={handleRecipientChange}
         onAmountChange={handleAmountChange}
@@ -448,7 +418,7 @@ const Transfer = () => {
         sourceIdentity={currentIdentity}
         recipient={recipient}
         amount={amount}
-        tokenName={selectedAsset?.name ?? 'QU'}
+        tokenName={selectedAsset?.name ?? NATIVE_TOKEN_SYMBOL}
         sending={sending}
         onCancel={() => {
           setDrawerOpen(false)
