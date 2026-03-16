@@ -224,6 +224,15 @@ const queueSigningApproval = async (
   ensureConnected(origin, permissions)
   const account = await requireCurrentAccount()
   ensureAccountApproved(origin, permissions, account)
+  if (request.method === 'signTransaction') {
+    const parsedParams = parseSignTransactionParams(request.params)
+    if (parsedParams.toIdentity === account.identity.trim().toUpperCase()) {
+      throw new DappProviderError(
+        'INVALID_PARAMS',
+        'Destination identity cannot match source identity',
+      )
+    }
+  }
   await enqueueApprovalRequest({
     id: request.id,
     method: request.method === 'signMessage' ? 'signMessage' : 'signTransaction',
