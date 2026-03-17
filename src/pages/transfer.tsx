@@ -425,6 +425,7 @@ const Transfer = () => {
           seedRef.current = null
         }}
         onConfirm={() => {
+          setDrawerOpen(false)
           setStep('auth')
         }}
       />
