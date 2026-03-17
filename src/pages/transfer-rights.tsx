@@ -827,7 +827,7 @@ const TransferRights = () => {
               />
               <SummaryRow
                 label={t('transferRights.confirm.shares')}
-                value={`${formatBalance(parseAmount(shares) ?? 0n)} ${selectedTokenLabel}`}
+                value={`${formatAssetUnits(String(parseAmount(shares) ?? 0n), selectedGroup?.decimals)} ${selectedTokenLabel}`}
                 emphasize
               />
               {sourceContract && (
