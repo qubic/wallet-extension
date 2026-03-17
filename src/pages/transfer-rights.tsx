@@ -843,6 +843,7 @@ const TransferRights = () => {
             <div className="flex flex-col gap-2">
               <Button
                 onClick={() => {
+                  setDrawerOpen(false)
                   setStep('auth')
                 }}
                 size="lg"
