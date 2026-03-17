@@ -18,6 +18,7 @@ import {
   getDappCurrentAccount,
   getDappPendingRequests,
   getDappPermissions,
+  isAccountApprovedForOrigin,
   removeDappPermission,
   setDappPermissions,
 } from '@/lib/dapp/storage'
@@ -49,6 +50,7 @@ import {
 } from '@/lib/dapp/signing'
 import { QUBIC_RPC_BASE_URL } from '@/lib/config/constants'
 import { upsertPendingTransactionInChromeStorage } from '@/lib/pending-transactions-storage'
+import { normalizeBalance } from '@/lib/utils'
 import { openBrowserVault, verifyVaultAccess } from '@/lib/vault'
 
 const sdk = createSdk({ baseUrl: QUBIC_RPC_BASE_URL })
@@ -68,6 +70,19 @@ type DappSendTransactionParams = {
 const ensureConnected = (origin: string, permissions: DappPermissionsState) => {
   if (!permissions[origin]) {
     throw new DappProviderError('NOT_CONNECTED', 'Origin is not connected to wallet')
+  }
+}
+
+const ensureAccountApproved = (
+  origin: string,
+  permissions: DappPermissionsState,
+  account: DappCurrentAccount,
+) => {
+  if (!isAccountApprovedForOrigin(origin, permissions, account.identity)) {
+    throw new DappProviderError(
+      'NOT_CONNECTED',
+      'Active account is not approved for this origin. Call connect() first.',
+    )
   }
 }
 
@@ -110,7 +125,10 @@ const ensureApprovalWindow = async () => {
       height: DAPP_APPROVAL_WINDOW_HEIGHT,
     })
   } catch {
-    // Ignore window creation failures, the request stays pending.
+    throw new DappProviderError(
+      'INTERNAL_ERROR',
+      'Unable to open wallet approval window for this request',
+    )
   }
 }
 
@@ -143,8 +161,14 @@ const enqueueApprovalRequest = async (request: DappExecutionRequest) => {
 
 const connectOrigin = async (origin: string, requestId: string, session: string) => {
   const permissions = await getDappPermissions()
-  if (!permissions[origin]) {
-    const account = await getDappCurrentAccount()
+  const account = await getDappCurrentAccount()
+  const existingPermission = permissions[origin]
+
+  const needsApproval = account
+    ? !existingPermission || !isAccountApprovedForOrigin(origin, permissions, account.identity)
+    : !existingPermission
+
+  if (needsApproval) {
     await enqueueApprovalRequest({
       id: requestId,
       method: 'connect',
@@ -157,8 +181,6 @@ const connectOrigin = async (origin: string, requestId: string, session: string)
     return asRuntimePendingAck(requestId)
   }
 
-  permissions[origin] = { origin, connectedAt: Date.now() }
-  await setDappPermissions(permissions)
   return { connected: true as const, origin }
 }
 
@@ -170,7 +192,11 @@ const disconnectOrigin = async (origin: string) => {
 const getAccountForOrigin = async (origin: string) => {
   const permissions = await getDappPermissions()
   ensureConnected(origin, permissions)
-  return getDappCurrentAccount()
+  const account = await getDappCurrentAccount()
+  if (account && !isAccountApprovedForOrigin(origin, permissions, account.identity)) {
+    return null
+  }
+  return account
 }
 
 const requireCurrentAccount = async (): Promise<DappCurrentAccount> => {
@@ -196,8 +222,17 @@ const queueSigningApproval = async (
 ): Promise<DappRuntimePendingAck> => {
   const permissions = await getDappPermissions()
   ensureConnected(origin, permissions)
-
   const account = await requireCurrentAccount()
+  ensureAccountApproved(origin, permissions, account)
+  if (request.method === 'signTransaction') {
+    const parsedParams = parseSignTransactionParams(request.params)
+    if (parsedParams.toIdentity === account.identity.trim().toUpperCase()) {
+      throw new DappProviderError(
+        'INVALID_PARAMS',
+        'Destination identity cannot match source identity',
+      )
+    }
+  }
   await enqueueApprovalRequest({
     id: request.id,
     method: request.method === 'signMessage' ? 'signMessage' : 'signTransaction',
@@ -299,6 +334,30 @@ const queueSendTransactionApproval = async (
   const permissions = await getDappPermissions()
   ensureConnected(origin, permissions)
   const account = await requireCurrentAccount()
+  ensureAccountApproved(origin, permissions, account)
+  const parsedParams = parseSignTransactionParams(request.params)
+  if (parsedParams.toIdentity === account.identity.trim().toUpperCase()) {
+    throw new DappProviderError(
+      'INVALID_PARAMS',
+      'Destination identity cannot match source identity',
+    )
+  }
+  if (parsedParams.inputType === undefined || parsedParams.inputType === 0) {
+    let currentBalance = 0n
+    try {
+      const balanceResponse = await sdk.rpc.live.balance(account.identity)
+      const rawBalance =
+        balanceResponse && typeof balanceResponse === 'object'
+          ? (balanceResponse as { balance?: bigint | number | string }).balance
+          : undefined
+      currentBalance = normalizeBalance(rawBalance)
+    } catch {
+      throw new DappProviderError('INTERNAL_ERROR', 'Unable to validate account balance')
+    }
+    if (parsedParams.amount > currentBalance) {
+      throw new DappProviderError('INVALID_PARAMS', 'Insufficient balance')
+    }
+  }
   const queuedParams = normalizeQueuedSendTransactionParams(request.params)
 
   await enqueueApprovalRequest({
@@ -326,9 +385,18 @@ const executeApprovedRequest = async (
         return asDappFailure(request.id, 'USER_REJECTED', 'Connection request was rejected')
       }
       const permissions = await getDappPermissions()
+      const currentAccount = await getDappCurrentAccount()
+      const existing = permissions[normalizedOrigin]
+      const previousIdentities = existing?.approvedIdentities ?? []
+      const identityToApprove = currentAccount?.identity
+      const approvedIdentities =
+        identityToApprove && !previousIdentities.includes(identityToApprove)
+          ? [...previousIdentities, identityToApprove]
+          : previousIdentities
       permissions[normalizedOrigin] = {
         origin: normalizedOrigin,
-        connectedAt: Date.now(),
+        connectedAt: existing?.connectedAt ?? Date.now(),
+        approvedIdentities,
       }
       await setDappPermissions(permissions)
       return asDappSuccess(request.id, { connected: true as const, origin: normalizedOrigin })
@@ -346,6 +414,7 @@ const executeApprovedRequest = async (
       const permissions = await getDappPermissions()
       ensureConnected(normalizedOrigin, permissions)
       const account = request.account
+      if (account) ensureAccountApproved(normalizedOrigin, permissions, account)
       if (!account?.identity) {
         throw new DappProviderError('NO_ACCOUNT', 'No active account is selected')
       }

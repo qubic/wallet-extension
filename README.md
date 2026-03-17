@@ -194,10 +194,11 @@ bun run build
 ## Releases
 
 Releases are automated via [Semantic Release](https://semantic-release.gitbook.io/) on merge to `main`:
-- Version bumps based on commit types (`feat` → minor, `fix` → patch, `BREAKING CHANGE` → major)
+- Version bumps based on commit types (`feat` -> minor, `fix` -> patch, `BREAKING CHANGE` -> major)
 - Automatic changelog generation
 - GitHub release with `wallet-extension-dist.zip` artifact
 
-**Manual trigger:** Actions → release workflow → Run workflow on `main`
+**Manual trigger:** Actions -> release workflow -> Run workflow on `main`
 
 **Local dry-run:** `bun run release:dry` (requires Node.js >= 22)
+
