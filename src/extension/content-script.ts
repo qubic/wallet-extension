@@ -1,63 +1,11 @@
-type DappProviderErrorCode =
-  | 'INVALID_REQUEST'
-  | 'INVALID_PARAMS'
-  | 'UNSUPPORTED_ORIGIN'
-  | 'NOT_CONNECTED'
-  | 'METHOD_NOT_SUPPORTED'
-  | 'USER_REJECTED'
-  | 'INVALID_PASSPHRASE'
-  | 'WATCH_ONLY_ACCOUNT'
-  | 'NO_ACCOUNT'
-  | 'NOT_IMPLEMENTED'
-  | 'INTERNAL_ERROR'
-
-type DappRpcRequest = Readonly<{
-  channel: string
-  source: string
-  id: string
-  method: string
-  params?: unknown
-  session?: string
-}>
-
-type DappRpcResponse =
-  | Readonly<{
-      channel: string
-      source: string
-      id: string
-      ok: true
-      result: unknown
-      session?: string
-    }>
-  | Readonly<{
-      channel: string
-      source: string
-      id: string
-      ok: false
-      error: {
-        code: DappProviderErrorCode
-        message: string
-      }
-      session?: string
-    }>
-
-type DappEventMessage = Readonly<{
-  channel: string
-  source: string
-  event: string
-  payload?: unknown
-  session?: string
-}>
-
-type DappRuntimeEventEnvelope = Readonly<{
-  type: string
-  payload: DappEventMessage
-}>
-
-type DappRuntimePendingAck = Readonly<{
-  pending: true
-  id: string
-}>
+import type {
+  DappEventMessage,
+  DappProviderErrorCode,
+  DappRpcRequest,
+  DappRpcResponse,
+  DappRuntimeEventEnvelope,
+  DappRuntimePendingAck,
+} from '@/lib/dapp/protocol'
 
 const DAPP_CHANNEL = 'qubic:dapp'
 const INPAGE_SOURCE = 'qubic:inpage'

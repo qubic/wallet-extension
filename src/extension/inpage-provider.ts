@@ -1,109 +1,12 @@
-type DappEvent = 'accountChanged' | 'disconnect'
-type DappMethod =
-  | 'connect'
-  | 'getAccount'
-  | 'signTransaction'
-  | 'sendTransaction'
-  | 'signMessage'
-  | 'disconnect'
-
-type DappProviderAccount = Readonly<{
-  identity: string
-  name?: string
-}>
-
-type DappConnectResult = Readonly<{
-  connected: true
-  origin: string
-}>
-
-type DappDisconnectResult = Readonly<{
-  disconnected: true
-}>
-
-type DappSignMessageResult = Readonly<{
-  signatureHex: string
-  digestHex: string
-}>
-
-type DappSignTransactionResult = Readonly<{
-  txId: string
-  targetTick: number
-  txBytesBase64: string
-  txBytesHex: string
-}>
-
-type DappSendTransactionResult = DappSignTransactionResult &
-  Readonly<{
-    networkTxId: string
-    broadcast: unknown
-  }>
-
-type DappMethodResultMap = {
-  connect: DappConnectResult
-  getAccount: DappProviderAccount | null
-  signTransaction: DappSignTransactionResult
-  sendTransaction: DappSendTransactionResult
-  signMessage: DappSignMessageResult
-  disconnect: DappDisconnectResult
-}
-
-type DappRpcRequest = Readonly<{
-  channel: string
-  source: string
-  id: string
-  method: DappMethod
-  params?: unknown
-  session?: string
-}>
-
-type DappRpcResponse =
-  | Readonly<{
-      channel: string
-      source: string
-      id: string
-      ok: true
-      result: unknown
-      session?: string
-    }>
-  | Readonly<{
-      channel: string
-      source: string
-      id: string
-      ok: false
-      error?: {
-        code?: string
-        message?: string
-      }
-      session?: string
-    }>
-
-type DappEventMessage = Readonly<{
-  channel: string
-  source: string
-  event: DappEvent
-  payload?: unknown
-  session?: string
-}>
-
-type ProviderEventCallback = (payload: unknown) => void
-
-type QubicProvider = {
-  isQubic: true
-  version: string
-  request: <TMethod extends DappMethod>(
-    method: TMethod,
-    params?: unknown,
-  ) => Promise<DappMethodResultMap[TMethod]>
-  connect: () => Promise<DappConnectResult>
-  getAccount: () => Promise<DappProviderAccount | null>
-  signTransaction: (tx: unknown) => Promise<DappSignTransactionResult>
-  sendTransaction: (tx: unknown) => Promise<DappSendTransactionResult>
-  signMessage: (message: unknown) => Promise<DappSignMessageResult>
-  disconnect: () => Promise<DappDisconnectResult>
-  on: (event: DappEvent, callback: ProviderEventCallback) => () => void
-  off: (event: DappEvent, callback: ProviderEventCallback) => void
-}
+import type {
+  DappEvent,
+  DappEventMessage,
+  DappMethod,
+  DappMethodResultMap,
+  DappRpcRequest,
+  DappRpcResponse,
+} from '@/lib/dapp/protocol'
+import type { ProviderEventCallback, QubicProvider } from '@/lib/dapp/provider'
 
 const DAPP_CHANNEL = 'qubic:dapp'
 const INPAGE_SOURCE = 'qubic:inpage'
