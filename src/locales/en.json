@@ -349,8 +349,6 @@
   },
   "transferRights": {
     "title": "Transfer Management Rights",
-    "subtitle": "Move asset management between smart contracts",
-    "selectAsset": "Select asset",
     "selectAssetSubtitle": "Select the asset to transfer management rights",
     "noAssets": "No assets with transferable management rights.",
     "noDestinationContracts": "No eligible destination contracts available.",
@@ -358,7 +356,6 @@
     "sourceContractPlaceholder": "Select source contract",
     "destinationContract": "Destination contract",
     "destinationContractPlaceholder": "Select destination contract",
-    "numberOfShares": "Number of shares",
     "numberOfSharesPlaceholder": "Enter number of shares",
     "available": "Available: {{balance}} {{token}}",
     "fee": "Fee: {{fee}} QUBIC",

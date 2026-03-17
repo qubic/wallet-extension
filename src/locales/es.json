@@ -349,8 +349,6 @@
   },
   "transferRights": {
     "title": "Transferir derechos de gestión",
-    "subtitle": "Mover la gestión de activos entre contratos inteligentes",
-    "selectAsset": "Seleccionar activo",
     "selectAssetSubtitle": "Selecciona el activo para transferir derechos de gestión",
     "noAssets": "No hay activos con derechos de gestión transferibles.",
     "noDestinationContracts": "No hay contratos de destino elegibles disponibles.",
@@ -358,7 +356,6 @@
     "sourceContractPlaceholder": "Seleccionar contrato de origen",
     "destinationContract": "Contrato de destino",
     "destinationContractPlaceholder": "Seleccionar contrato de destino",
-    "numberOfShares": "Número de participaciones",
     "numberOfSharesPlaceholder": "Ingresa el número de participaciones",
     "available": "Disponible: {{balance}} {{token}}",
     "fee": "Comisión: {{fee}} QUBIC",
