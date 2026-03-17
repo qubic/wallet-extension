@@ -1,8 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
-import { QUBIC_RPC_BASE_URL } from './config/constants'
+import { QUBIC_RPC_BASE_URL, QX_CONTRACT_INDEX } from './config/constants'
 import { STALE_TIME_ASSET_ISSUANCES } from './config/refresh-intervals'
-
-const QX_MANAGING_CONTRACT_INDEX = 1
 
 export type OwnedAssetsResponse = {
   ownedAssets?: Array<{
@@ -48,7 +46,7 @@ export const aggregateAssets = (
     const issued = info?.issuedAsset
     if (!issued?.name || !info?.numberOfUnits) continue
 
-    if (filterByQxManagement && info.managingContractIndex !== QX_MANAGING_CONTRACT_INDEX) continue
+    if (filterByQxManagement && info.managingContractIndex !== QX_CONTRACT_INDEX) continue
 
     const key = `${issued.issuerIdentity ?? ''}-${issued.name}`
     const existing = map.get(key)

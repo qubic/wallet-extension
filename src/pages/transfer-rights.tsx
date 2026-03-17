@@ -32,6 +32,7 @@ import SummaryRow from '@/components/pages/transfer/summary-row'
 import PassphraseAuth from '@/pages/passphrase-auth'
 import { getCurrentIdentity, isWatchOnlyIdentity } from '@/lib/accounts'
 import { formatAssetUnits, getAssetsPerContract, useOwnedAssets } from '@/lib/assets'
+import { QX_CONTRACT_INDEX } from '@/lib/config/constants'
 import { useSmartContracts } from '@/lib/qubic-static'
 import type { SmartContract } from '@/lib/qubic-static.types'
 import {
@@ -70,8 +71,6 @@ type AssetGroup = {
 const TARGET_TICK_OFFSET_MIN = 1
 const TARGET_TICK_OFFSET_MAX = 40
 const QUICK_TARGET_TICK_OFFSETS = [5, 10, 15] as const
-
-const QX_CONTRACT_INDEX = 1
 
 const TransferRights = () => {
   const { t } = useTranslation()
