@@ -130,7 +130,7 @@ const signedTx = await provider.signTransaction({
 const sentTx = await provider.sendTransaction({
   toIdentity: 'DESTINATION_IDENTITY',
   amount: '1000',
-  // optional: explicit tick or offset (default offset: 5)
+  // optional: explicit tick or offset (default offset: 10)
   // targetTick: 123456,
   // targetTickOffset: 10,
 })
@@ -184,7 +184,7 @@ Common provider error codes:
 | `toIdentity` | `string` | yes | 60-char uppercase Qubic identity |
 | `amount` | `string \| number \| bigint` | yes | Must be > 0 for simple transfers (inputType 0) |
 | `targetTick` | `number` | no | Explicit target tick. If omitted, resolved automatically (sendTransaction only) |
-| `targetTickOffset` | `number` | no | Offset from current tick (1-120, default 5). Ignored if `targetTick` is set. sendTransaction only |
+| `targetTickOffset` | `number` | no | Offset from current tick (1-60, default 10). Ignored if `targetTick` is set. sendTransaction only |
 | `inputType` | `number` | no | Smart contract input type (0 = simple transfer) |
 | `inputBytes` | `Uint8Array \| number[] \| string` | no | SC input data. String is parsed as hex (`0x...`) or base64 |
 
@@ -192,7 +192,7 @@ Notes for dApp developers:
 - `connect` requires user approval (approve/reject) in the extension.
 - `signMessage`, `signTransaction`, and `sendTransaction` require user approval and wallet passphrase confirmation.
 - `signTransaction` returns signed bytes only. Broadcasting is handled by your app/backend.
-- `sendTransaction` signs and broadcasts in one step. It resolves the target tick automatically if not provided (using `targetTickOffset`, default 5).
+- `sendTransaction` signs and broadcasts in one step. It resolves the target tick automatically if not provided (using `targetTickOffset`, default 10).
 - Permissions are per-account: `connect` approves the currently active account for the requesting origin. Switching to a different account requires the dApp to call `connect` again.
 
 ### implementation notes (extension developers)
