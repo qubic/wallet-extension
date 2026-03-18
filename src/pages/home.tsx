@@ -89,7 +89,9 @@ const Home = () => {
   const [qrCode, setQrCode] = useState<string | null>(null)
   const pendingForIdentity = getPendingTransactionsForIdentity(identity)
   const pricePerQu = latestStats.data?.data?.price
-  const pricePerBFormatted = pricePerQu ? `$${(pricePerQu * 1_000_000_000).toFixed(2)}` : '--'
+  const pricePerBFormatted = pricePerQu
+    ? `$${(pricePerQu * 1_000_000_000).toFixed(2)} / bQUBIC`
+    : '--'
   const handleRefresh = () => {
     void balance.refetch()
     void transactions.refetch()
@@ -175,7 +177,7 @@ const Home = () => {
           <motion.div className="space-y-4 p-1" variants={sectionMotion}>
             <div className="flex items-center justify-between gap-3">
               <div className="text-[11px] text-muted-foreground">
-                {t('home.price.label')}: {pricePerBFormatted}
+                {t('home.price.label')}: <span className="text-primary">{pricePerBFormatted}</span>
               </div>
               <Button
                 size="icon"
