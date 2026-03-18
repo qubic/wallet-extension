@@ -1,3 +1,31 @@
+# [1.0.0-beta.2](https://github.com/qubic/wallet-extension/compare/v1.0.0-beta.1...v1.0.0-beta.2) (2026-03-18)
+
+
+### Bug Fixes
+
+* **ci:** resolve version before build so dist contains correct version ([60a8eed](https://github.com/qubic/wallet-extension/commit/60a8eed4b339f985064b3506edb650931af3aaa2))
+
+
+---
+
+## Install (Chrome / Chromium)
+
+1. Download **wallet-extension-dist.zip** from the assets below
+2. Unzip to a folder
+3. Open `chrome://extensions`
+4. Enable **Developer mode** (top right)
+5. Click **Load unpacked**
+6. Select the unzipped folder
+7. Pin the extension from the puzzle icon in the toolbar
+
+### Updating to a new version
+
+1. Download the new **wallet-extension-dist.zip**
+2. Unzip and **replace the files in the same folder** you loaded originally
+3. Go to `chrome://extensions` and click the reload button on the extension
+
+> **Important:** Do not remove and re-load from a different folder — this changes the extension ID and you will lose your accounts and settings.
+
 # 1.0.0-beta.1 (2026-03-18)
 
 
