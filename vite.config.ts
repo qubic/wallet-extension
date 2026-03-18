@@ -2,6 +2,7 @@ import { resolve } from 'node:path'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 import { defineConfig, type Plugin } from 'vite'
+import { version } from './package.json'
 
 const extensionReloadPlugin = (enabled: boolean): Plugin => ({
   name: 'extension-reload-stamp',
@@ -21,6 +22,9 @@ export default defineConfig(({ mode }) => {
   const isExtensionDev = mode === 'extension'
 
   return {
+    define: {
+      __APP_VERSION__: JSON.stringify(version),
+    },
     base: './',
     resolve: {
       alias: {
