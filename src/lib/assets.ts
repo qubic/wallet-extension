@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { QUBIC_RPC_BASE_URL, QX_CONTRACT_INDEX } from './config/constants'
 import { STALE_TIME_ASSET_ISSUANCES } from './config/refresh-intervals'
+import { formatNumber } from './utils'
 
 export type OwnedAssetsResponse = {
   ownedAssets?: Array<{
@@ -104,11 +105,11 @@ export const getAssetsPerContract = (response: OwnedAssetsResponse): ContractAss
 
 export const formatAssetUnits = (units: string | undefined, decimals = 0) => {
   if (!units) return '--'
-  if (decimals <= 0) return Number(units).toLocaleString()
+  if (decimals <= 0) return formatNumber(BigInt(units))
   const padded = units.padStart(decimals + 1, '0')
   const whole = padded.slice(0, -decimals)
   const fraction = padded.slice(-decimals).replace(/0+$/, '')
-  return `${Number(whole).toLocaleString()}${fraction ? `.${fraction}` : ''}`
+  return `${formatNumber(BigInt(whole))}${fraction ? `.${fraction}` : ''}`
 }
 
 export const useOwnedAssets = (identity: string) => {
