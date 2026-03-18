@@ -13,6 +13,9 @@ dist-dev
 dist-ssr
 *.local
 
+# Package manager lock files
+package-lock.json
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -26,6 +29,9 @@ dist-ssr
 
 # Temporary scaffolding
 tmp
+.temp
 
+# local audit outputs
+audit/
 # Claude
 CLAUDE.md

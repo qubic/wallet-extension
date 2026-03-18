@@ -9,13 +9,16 @@ import ManageAccounts from '../pages/manage-accounts'
 import CreateWallet from '../pages/onboarding/create-wallet'
 import ImportSeed from '../pages/onboarding/import-seed'
 import ImportVault from '../pages/onboarding/import-vault'
+import SelectToken from '../pages/select-token'
 import Transfer from '../pages/transfer'
 import Settings from '../pages/settings'
+import ConnectedSites from '../pages/settings/connected-sites'
 import General from '../pages/settings/general'
 import Security from '../pages/settings/security'
 import TransactionDetails from '../pages/transaction-details'
 import Unlock from '../pages/unlock'
 import Welcome from '../pages/welcome'
+import TransferRights from '../pages/transfer-rights'
 import ImportWatchOnly from '../pages/accounts/import-watch-only'
 import {
   ensureUnlockTimestamp,
@@ -23,6 +26,8 @@ import {
   getLastUnlockAt,
   isWalletLocked,
   lockWallet,
+  reconcileLockStateWithBrowserSession,
+  touchWalletActivity,
 } from '../lib/lock'
 import { getCurrentIdentity } from '../lib/accounts'
 
@@ -53,6 +58,10 @@ const AppRouter = () => {
 
   const scheduleLock = useCallback(() => {
     clearLockTimeout()
+    const lockTimeoutMs = getLockTimeoutMs()
+    if (lockTimeoutMs <= 0) {
+      return
+    }
     const lastUnlockAt = getLastUnlockAt()
     if (!lastUnlockAt) {
       lockWallet()
@@ -60,7 +69,7 @@ const AppRouter = () => {
       return
     }
     const elapsed = Date.now() - lastUnlockAt
-    const remaining = getLockTimeoutMs() - elapsed
+    const remaining = lockTimeoutMs - elapsed
     if (remaining <= 0) {
       lockWallet()
       setIsLocked(true)
@@ -74,9 +83,20 @@ const AppRouter = () => {
 
   useEffect(() => {
     if (!isOnboarded) return undefined
-    ensureUnlockTimestamp()
-    setIsLocked(isWalletLocked())
-    return undefined
+    let isDisposed = false
+
+    const syncLockState = async () => {
+      ensureUnlockTimestamp()
+      await reconcileLockStateWithBrowserSession()
+      if (isDisposed) return
+      setIsLocked(isWalletLocked())
+    }
+
+    void syncLockState()
+
+    return () => {
+      isDisposed = true
+    }
   }, [isOnboarded])
 
   useEffect(() => {
@@ -90,6 +110,36 @@ const AppRouter = () => {
       clearLockTimeout()
     }
   }, [clearLockTimeout, isLocked, isOnboarded, scheduleLock])
+
+  useEffect(() => {
+    if (!isOnboarded) return undefined
+    if (isLocked) return undefined
+
+    const recordActivity = () => {
+      touchWalletActivity()
+      scheduleLock()
+    }
+
+    const lockOnClose = () => {
+      if (getLockTimeoutMs() <= 0) {
+        lockWallet()
+      }
+    }
+
+    window.addEventListener('pointerdown', recordActivity, { passive: true })
+    window.addEventListener('keydown', recordActivity, { passive: true })
+    window.addEventListener('touchstart', recordActivity, { passive: true })
+    window.addEventListener('beforeunload', lockOnClose)
+    window.addEventListener('pagehide', lockOnClose)
+
+    return () => {
+      window.removeEventListener('pointerdown', recordActivity)
+      window.removeEventListener('keydown', recordActivity)
+      window.removeEventListener('touchstart', recordActivity)
+      window.removeEventListener('beforeunload', lockOnClose)
+      window.removeEventListener('pagehide', lockOnClose)
+    }
+  }, [isLocked, isOnboarded, scheduleLock])
 
   useEffect(() => {
     if (!isOnboarded) return undefined
@@ -206,7 +256,23 @@ const AppRouter = () => {
             path="/transfer"
             element={
               <AnimatedRoute>
+                <SelectToken />
+              </AnimatedRoute>
+            }
+          />
+          <Route
+            path="/transfer/send"
+            element={
+              <AnimatedRoute>
                 <Transfer />
+              </AnimatedRoute>
+            }
+          />
+          <Route
+            path="/transfer/manage-rights"
+            element={
+              <AnimatedRoute>
+                <TransferRights />
               </AnimatedRoute>
             }
           />
@@ -223,6 +289,14 @@ const AppRouter = () => {
             element={
               <AnimatedRoute>
                 <Settings />
+              </AnimatedRoute>
+            }
+          />
+          <Route
+            path="/settings/connected-sites"
+            element={
+              <AnimatedRoute>
+                <ConnectedSites />
               </AnimatedRoute>
             }
           />

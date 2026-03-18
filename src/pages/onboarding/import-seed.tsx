@@ -1,20 +1,20 @@
 import { useMemo, useState } from 'react'
 import { identityFromSeed } from '@qubic-labs/core'
-import { ArrowLeftIcon, ArrowRightIcon, EyeIcon, EyeOffIcon, KeyRoundIcon } from 'lucide-react'
+import { ArrowLeftIcon, ArrowRightIcon, KeyRoundIcon } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Progress } from '@/components/ui/progress'
 import { Textarea } from '@/components/ui/textarea'
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupButton,
-  InputGroupInput,
-} from '@/components/ui/input-group'
+import { PasswordInput } from '@/components/ui/password-input'
 import { isSeedLike } from '@/lib/seed'
-import { getCachedAccounts, getWatchOnlyAccounts, saveCachedAccounts } from '@/lib/accounts'
+import {
+  getCachedAccounts,
+  getSuggestedNextAccountName,
+  isAccountNameTaken,
+  saveCachedAccounts,
+} from '@/lib/accounts'
 import { setUnlocked } from '@/lib/lock'
 import {
   openBrowserVault,
@@ -22,6 +22,7 @@ import {
   validateVaultPassphrase,
   verifyVaultAccess,
 } from '@/lib/vault'
+import FlowHeader from '@/components/onboarding/flow-header'
 
 const TOTAL_STEPS = 3
 const SEED_LENGTH = 55
@@ -44,15 +45,20 @@ const ImportSeed = ({
   variant = 'onboarding',
 }: ImportSeedProps) => {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [step, setStep] = useState(1)
   const [seed, setSeed] = useState('')
   const [passphrase, setPassphrase] = useState('')
-  const [name, setName] = useState('main')
+  const [name, setName] = useState(() =>
+    getSuggestedNextAccountName({
+      enableAutoName: variant === 'add-address',
+      prefix: t('accounts.manage.defaultNamePrefix'),
+      fallbackName: 'main',
+    }),
+  )
   const [status, setStatus] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [derivedIdentity, setDerivedIdentity] = useState<string | null>(null)
-  const [showPassphrase, setShowPassphrase] = useState(false)
-
   const progressValue = useMemo(() => (step / TOTAL_STEPS) * 100, [step])
   const seedLength = seed.length
   const isSeedValid = isSeedLike(seed)
@@ -101,12 +107,8 @@ const ImportSeed = ({
       return
     }
     if (step === 2 && variant === 'add-address') {
-      const existingNames = [
-        ...getCachedAccounts().map((entry) => entry.name.toLowerCase()),
-        ...getWatchOnlyAccounts().map((entry) => entry.name.toLowerCase()),
-      ]
-      if (existingNames.includes(name.trim().toLowerCase())) {
-        setStatus('Wallet name already exists.')
+      if (isAccountNameTaken(name)) {
+        setStatus(t('accounts.manage.errors.nameDuplicate'))
         return
       }
       const result = await validateVaultPassphrase(passphrase.trim())
@@ -149,12 +151,8 @@ const ImportSeed = ({
     }
 
     const cachedAccounts = getCachedAccounts()
-    const existingNames = [
-      ...cachedAccounts.map((entry) => entry.name.toLowerCase()),
-      ...getWatchOnlyAccounts().map((entry) => entry.name.toLowerCase()),
-    ]
-    if (existingNames.includes(name.trim().toLowerCase())) {
-      setStatus('Wallet name already exists.')
+    if (isAccountNameTaken(name)) {
+      setStatus(t('accounts.manage.errors.nameDuplicate'))
       setStep(2)
       return
     }
@@ -187,8 +185,8 @@ const ImportSeed = ({
       const existing = getCachedAccounts().filter((item) => item.identity !== entry.identity)
       saveCachedAccounts([...existing, { name: entry.name, identity: entry.identity }])
       if (variant !== 'add-address') {
-        setOnboarded(entry.identity, name)
         setUnlocked()
+        setOnboarded(entry.identity, name)
       }
       clearSensitiveState()
       navigate(onCompletePath)
@@ -202,15 +200,15 @@ const ImportSeed = ({
     <section className="flex h-full w-full justify-center px-6 py-8">
       <div className="flex w-full max-w-sm flex-col justify-between gap-6">
         <div className="space-y-3 text-center">
-          <div className="space-y-1">
-            <h2 className="text-xl font-semibold">
-              {variant === 'add-address' ? 'Import address seed' : 'Import private seed'}
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              Step {step} of {TOTAL_STEPS}
-            </p>
-          </div>
-          <Progress value={progressValue} />
+          <FlowHeader
+            title={
+              variant === 'add-address'
+                ? t('onboarding.importSeed.titleAddAddress')
+                : t('onboarding.importSeed.title')
+            }
+            stepLabel={t('onboarding.importSeed.step', { current: step, total: TOTAL_STEPS })}
+            progressValue={progressValue}
+          />
         </div>
 
         <div className="flex-1 space-y-4">
@@ -262,27 +260,11 @@ const ImportSeed = ({
                 <Label htmlFor="passphrase">
                   {variant === 'add-address' ? 'Current vault passphrase' : 'Vault passphrase'}
                 </Label>
-                <InputGroup>
-                  <InputGroupInput
-                    id="passphrase"
-                    type={showPassphrase ? 'text' : 'password'}
-                    value={passphrase}
-                    onChange={(event) => setPassphrase(event.target.value)}
-                  />
-                  <InputGroupAddon align="inline-end">
-                    <InputGroupButton
-                      size="icon-xs"
-                      aria-label={showPassphrase ? 'Hide passphrase' : 'Show passphrase'}
-                      onClick={() => setShowPassphrase((prev) => !prev)}
-                    >
-                      {showPassphrase ? (
-                        <EyeOffIcon className="size-4" />
-                      ) : (
-                        <EyeIcon className="size-4" />
-                      )}
-                    </InputGroupButton>
-                  </InputGroupAddon>
-                </InputGroup>
+                <PasswordInput
+                  id="passphrase"
+                  value={passphrase}
+                  onChange={(event) => setPassphrase(event.target.value)}
+                />
               </div>
             </div>
           )}

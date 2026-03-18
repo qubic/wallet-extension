@@ -1,31 +1,20 @@
 import { useMemo, useState } from 'react'
-import {
-  ArrowLeftIcon,
-  ArrowRightIcon,
-  EyeIcon,
-  EyeOffIcon,
-  FileJsonIcon,
-  UploadCloudIcon,
-} from 'lucide-react'
+import { ArrowLeftIcon, ArrowRightIcon, FileJsonIcon, UploadCloudIcon } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupButton,
-  InputGroupInput,
-} from '@/components/ui/input-group'
+import { PasswordInput } from '@/components/ui/password-input'
 import { Label } from '@/components/ui/label'
-import { Progress } from '@/components/ui/progress'
 import { setUnlocked } from '@/lib/lock'
 import { openBrowserVault, setOnboarded } from '@/lib/vault'
 // @ts-expect-error - No type definitions available for this library
 import { QubicVault } from '@qubic-lib/qubic-ts-vault-library/dist/vault.js'
 import { getWatchOnlyAccounts, saveCachedAccounts, saveWatchOnlyAccounts } from '@/lib/accounts'
+import FlowHeader from '@/components/onboarding/flow-header'
 
 const TOTAL_STEPS = 3
+const MAX_VAULT_FILE_SIZE = 102_400
 
 const ImportVault = () => {
   const navigate = useNavigate()
@@ -37,9 +26,6 @@ const ImportVault = () => {
   const [status, setStatus] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
-  const [showPassphrase, setShowPassphrase] = useState(false)
-  const [showSourcePassphrase, setShowSourcePassphrase] = useState(false)
-
   const progressValue = useMemo(() => (step / TOTAL_STEPS) * 100, [step])
 
   const clearSensitiveState = () => {
@@ -65,6 +51,11 @@ const ImportVault = () => {
   }
 
   const handleFileSelect = (selected: File | null) => {
+    if (selected && selected.size > MAX_VAULT_FILE_SIZE) {
+      setFile(null)
+      setStatus(t('onboarding.importVault.errors.fileTooLarge'))
+      return
+    }
     setFile(selected)
     setStatus(null)
   }
@@ -158,11 +149,11 @@ const ImportVault = () => {
 
         const firstEntry = vault.list()[0]
         const firstWatchOnly = seeds.find((s) => s.isOnlyWatch)
+        setUnlocked()
         setOnboarded(
           firstEntry?.identity ?? firstWatchOnly?.publicId,
           firstEntry?.name ?? firstWatchOnly?.alias,
         )
-        setUnlocked()
         clearSensitiveState()
         navigate('/home')
       } else {
@@ -181,8 +172,8 @@ const ImportVault = () => {
           return
         }
 
-        setOnboarded(entries[0].identity, entries[0].name)
         setUnlocked()
+        setOnboarded(entries[0].identity, entries[0].name)
         clearSensitiveState()
         navigate('/home')
       }
@@ -196,13 +187,11 @@ const ImportVault = () => {
     <section className="flex h-full w-full justify-center px-6 py-8">
       <div className="flex w-full max-w-sm flex-col justify-between gap-6">
         <div className="space-y-3 text-center">
-          <div className="space-y-1">
-            <h2 className="text-xl font-semibold">{t('onboarding.importVault.title')}</h2>
-            <p className="text-sm text-muted-foreground">
-              {t('onboarding.importVault.step', { current: step, total: TOTAL_STEPS })}
-            </p>
-          </div>
-          <Progress value={progressValue} />
+          <FlowHeader
+            title={t('onboarding.importVault.title')}
+            stepLabel={t('onboarding.importVault.step', { current: step, total: TOTAL_STEPS })}
+            progressValue={progressValue}
+          />
         </div>
 
         <div className="flex-1 space-y-4">
@@ -271,53 +260,21 @@ const ImportVault = () => {
                 <Label htmlFor="passphrase">
                   {t('onboarding.importVault.unlockSecure.newPassphrase')}
                 </Label>
-                <InputGroup>
-                  <InputGroupInput
-                    id="passphrase"
-                    type={showPassphrase ? 'text' : 'password'}
-                    value={passphrase}
-                    onChange={(event) => setPassphrase(event.target.value)}
-                  />
-                  <InputGroupAddon align="inline-end">
-                    <InputGroupButton
-                      type="button"
-                      variant="ghost"
-                      onClick={() => setShowPassphrase((v) => !v)}
-                    >
-                      {showPassphrase ? (
-                        <EyeOffIcon className="size-4" />
-                      ) : (
-                        <EyeIcon className="size-4" />
-                      )}
-                    </InputGroupButton>
-                  </InputGroupAddon>
-                </InputGroup>
+                <PasswordInput
+                  id="passphrase"
+                  value={passphrase}
+                  onChange={(event) => setPassphrase(event.target.value)}
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="source-passphrase">
                   {t('onboarding.importVault.unlockSecure.sourcePassphrase')}
                 </Label>
-                <InputGroup>
-                  <InputGroupInput
-                    id="source-passphrase"
-                    type={showSourcePassphrase ? 'text' : 'password'}
-                    value={sourcePassphrase}
-                    onChange={(event) => setSourcePassphrase(event.target.value)}
-                  />
-                  <InputGroupAddon align="inline-end">
-                    <InputGroupButton
-                      type="button"
-                      variant="ghost"
-                      onClick={() => setShowSourcePassphrase((v) => !v)}
-                    >
-                      {showSourcePassphrase ? (
-                        <EyeOffIcon className="size-4" />
-                      ) : (
-                        <EyeIcon className="size-4" />
-                      )}
-                    </InputGroupButton>
-                  </InputGroupAddon>
-                </InputGroup>
+                <PasswordInput
+                  id="source-passphrase"
+                  value={sourcePassphrase}
+                  onChange={(event) => setSourcePassphrase(event.target.value)}
+                />
               </div>
             </div>
           )}

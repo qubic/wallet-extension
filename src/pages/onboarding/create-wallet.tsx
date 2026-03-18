@@ -2,8 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { identityFromSeed } from '@qubic-labs/core'
 import { ArrowLeftIcon, ArrowRightIcon, CheckCircleIcon } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
-import { Progress } from '@/components/ui/progress'
 import { generateSeed, isSeedLike } from '@/lib/seed'
 import { setUnlocked } from '@/lib/lock'
 import {
@@ -12,9 +12,15 @@ import {
   validateVaultPassphrase,
   verifyVaultAccess,
 } from '@/lib/vault'
-import { getCachedAccounts, getWatchOnlyAccounts, saveCachedAccounts } from '@/lib/accounts'
+import {
+  getCachedAccounts,
+  getSuggestedNextAccountName,
+  isAccountNameTaken,
+  saveCachedAccounts,
+} from '@/lib/accounts'
 import SeedSecurityStep from '@/components/onboarding/seed-security-step'
 import PassphraseStep from '@/components/onboarding/passphrase-step'
+import FlowHeader from '@/components/onboarding/flow-header'
 
 const TOTAL_STEPS = 3
 
@@ -29,16 +35,22 @@ const CreateWallet = ({
   onCompletePath = '/home',
   variant = 'onboarding',
 }: CreateWalletProps) => {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [step, setStep] = useState(1)
   const [seed, setSeed] = useState(() => generateSeed())
   const [passphrase, setPassphrase] = useState('')
   const [confirmPassphrase, setConfirmPassphrase] = useState('')
-  const [name, setName] = useState('main')
+  const [name, setName] = useState(() =>
+    getSuggestedNextAccountName({
+      enableAutoName: variant === 'add-address',
+      prefix: t('accounts.manage.defaultNamePrefix'),
+      fallbackName: 'main',
+    }),
+  )
   const [status, setStatus] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [identity, setIdentity] = useState<string>('')
-  const [hasCopiedSeed, setHasCopiedSeed] = useState(false)
   const [hasConfirmedSeedBackup, setHasConfirmedSeedBackup] = useState(false)
 
   const progressValue = useMemo(() => (step / TOTAL_STEPS) * 100, [step])
@@ -47,7 +59,6 @@ const CreateWallet = ({
     setSeed('')
     setPassphrase('')
     setConfirmPassphrase('')
-    setHasCopiedSeed(false)
     setHasConfirmedSeedBackup(false)
   }
 
@@ -77,18 +88,7 @@ const CreateWallet = ({
   const regenerate = () => {
     setSeed(generateSeed())
     setStatus(null)
-    setHasCopiedSeed(false)
     setHasConfirmedSeedBackup(false)
-  }
-
-  const handleCopySeed = async () => {
-    try {
-      await navigator.clipboard.writeText(seed)
-      setHasCopiedSeed(true)
-      setStatus(null)
-    } catch {
-      setStatus('Unable to copy seed. Please copy it manually.')
-    }
   }
 
   const handleNext = async () => {
@@ -131,12 +131,8 @@ const CreateWallet = ({
       }
     }
     if (step === 2 && variant === 'add-address') {
-      const existingNames = [
-        ...getCachedAccounts().map((entry) => entry.name.toLowerCase()),
-        ...getWatchOnlyAccounts().map((entry) => entry.name.toLowerCase()),
-      ]
-      if (existingNames.includes(name.trim().toLowerCase())) {
-        setStatus('Wallet name already exists.')
+      if (isAccountNameTaken(name)) {
+        setStatus(t('accounts.manage.errors.nameDuplicate'))
         return
       }
       const result = await validateVaultPassphrase(passphrase.trim())
@@ -196,12 +192,8 @@ const CreateWallet = ({
     }
 
     const cachedAccounts = getCachedAccounts()
-    const existingNames = [
-      ...cachedAccounts.map((entry) => entry.name.toLowerCase()),
-      ...getWatchOnlyAccounts().map((entry) => entry.name.toLowerCase()),
-    ]
-    if (existingNames.includes(name.trim().toLowerCase())) {
-      setStatus('Wallet name already exists.')
+    if (isAccountNameTaken(name)) {
+      setStatus(t('accounts.manage.errors.nameDuplicate'))
       setStep(2)
       return
     }
@@ -226,10 +218,10 @@ const CreateWallet = ({
       await vault.save()
       const existing = getCachedAccounts().filter((item) => item.identity !== entry.identity)
       saveCachedAccounts([...existing, { name: entry.name, identity: entry.identity }])
-      setOnboarded(entry.identity, entry.name)
       if (variant !== 'add-address') {
         setUnlocked()
       }
+      setOnboarded(entry.identity, entry.name)
       clearSensitiveState()
       navigate(onCompletePath)
     } catch (error) {
@@ -242,15 +234,11 @@ const CreateWallet = ({
     <section className="flex h-full w-full justify-center px-6 py-8">
       <div className="flex w-full max-w-sm flex-col justify-between gap-6">
         <div className="space-y-3 text-center">
-          <div className="space-y-1">
-            <h2 className="text-xl font-semibold">
-              {variant === 'add-address' ? 'Add new address' : 'Create new wallet'}
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              Step {step} of {TOTAL_STEPS}
-            </p>
-          </div>
-          <Progress value={progressValue} />
+          <FlowHeader
+            title={variant === 'add-address' ? 'Add new address' : 'Create new wallet'}
+            stepLabel={`Step ${step} of ${TOTAL_STEPS}`}
+            progressValue={progressValue}
+          />
         </div>
 
         <div className="flex-1 space-y-4">
@@ -259,10 +247,8 @@ const CreateWallet = ({
               variant={variant}
               seed={seed}
               identity={identity}
-              hasCopiedSeed={hasCopiedSeed}
               hasConfirmedSeedBackup={hasConfirmedSeedBackup}
               onGenerate={regenerate}
-              onCopy={handleCopySeed}
               onConfirmChange={setHasConfirmedSeedBackup}
             />
           )}

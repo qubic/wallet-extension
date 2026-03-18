@@ -178,6 +178,10 @@
 }
 
 @layer utilities {
+  body[data-view="sidepanel"] .max-w-sm {
+    max-width: 100%;
+  }
+
   .app-scrollbar {
     scrollbar-width: none;
     scrollbar-color: transparent transparent;

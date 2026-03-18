@@ -36,7 +36,23 @@ export default defineConfig(({ mode }) => {
           index: resolve(__dirname, 'index.html'),
           popup: resolve(__dirname, 'popup.html'),
           sidepanel: resolve(__dirname, 'sidepanel.html'),
-          tab: resolve(__dirname, 'tab.html'),
+          background: resolve(__dirname, 'src/extension/background.ts'),
+          'content-script': resolve(__dirname, 'src/extension/content-script.ts'),
+          'inpage-provider': resolve(__dirname, 'src/extension/inpage-provider.ts'),
+        },
+        output: {
+          entryFileNames: 'assets/[name].js',
+          chunkFileNames: ({ name }) =>
+            name === 'dapp-protocol' || name === 'dapp-timing'
+              ? 'assets/[name].js'
+              : 'assets/[name]-[hash].js',
+          assetFileNames: 'assets/[name]-[hash][extname]',
+          manualChunks: (id) => {
+            const normalized = id.replaceAll('\\', '/')
+            if (normalized.endsWith('/src/lib/dapp/protocol.ts')) return 'dapp-protocol'
+            if (normalized.endsWith('/src/lib/dapp/timing.ts')) return 'dapp-timing'
+            return undefined
+          },
         },
       },
     },

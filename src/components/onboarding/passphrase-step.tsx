@@ -1,13 +1,6 @@
-import { useState } from 'react'
-import { EyeIcon, EyeOffIcon } from 'lucide-react'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupButton,
-  InputGroupInput,
-} from '@/components/ui/input-group'
+import { PasswordInput } from '@/components/ui/password-input'
 
 type PassphraseStepProps = {
   variant: 'onboarding' | 'add-address'
@@ -28,9 +21,6 @@ const PassphraseStep = ({
   onPassphraseChange,
   onConfirmPassphraseChange,
 }: PassphraseStepProps) => {
-  const [showPassphrase, setShowPassphrase] = useState(false)
-  const [showConfirm, setShowConfirm] = useState(false)
-
   return (
     <div className="space-y-4">
       <div className="space-y-1">
@@ -55,23 +45,11 @@ const PassphraseStep = ({
         <Label htmlFor="passphrase">
           {variant === 'add-address' ? 'Current vault passphrase' : 'Vault passphrase'}
         </Label>
-        <InputGroup>
-          <InputGroupInput
-            id="passphrase"
-            type={showPassphrase ? 'text' : 'password'}
-            value={passphrase}
-            onChange={(event) => onPassphraseChange(event.target.value)}
-          />
-          <InputGroupAddon align="inline-end">
-            <InputGroupButton
-              size="icon-xs"
-              aria-label={showPassphrase ? 'Hide passphrase' : 'Show passphrase'}
-              onClick={() => setShowPassphrase((prev) => !prev)}
-            >
-              {showPassphrase ? <EyeOffIcon className="size-4" /> : <EyeIcon className="size-4" />}
-            </InputGroupButton>
-          </InputGroupAddon>
-        </InputGroup>
+        <PasswordInput
+          id="passphrase"
+          value={passphrase}
+          onChange={(event) => onPassphraseChange(event.target.value)}
+        />
         {variant !== 'add-address' && (
           <p className="text-xs text-muted-foreground">Minimum 12 characters.</p>
         )}
@@ -79,23 +57,11 @@ const PassphraseStep = ({
       {variant !== 'add-address' && (
         <div className="space-y-2">
           <Label htmlFor="confirm-passphrase">Re-enter vault passphrase</Label>
-          <InputGroup>
-            <InputGroupInput
-              id="confirm-passphrase"
-              type={showConfirm ? 'text' : 'password'}
-              value={confirmPassphrase}
-              onChange={(event) => onConfirmPassphraseChange(event.target.value)}
-            />
-            <InputGroupAddon align="inline-end">
-              <InputGroupButton
-                size="icon-xs"
-                aria-label={showConfirm ? 'Hide passphrase' : 'Show passphrase'}
-                onClick={() => setShowConfirm((prev) => !prev)}
-              >
-                {showConfirm ? <EyeOffIcon className="size-4" /> : <EyeIcon className="size-4" />}
-              </InputGroupButton>
-            </InputGroupAddon>
-          </InputGroup>
+          <PasswordInput
+            id="confirm-passphrase"
+            value={confirmPassphrase}
+            onChange={(event) => onConfirmPassphraseChange(event.target.value)}
+          />
         </div>
       )}
     </div>

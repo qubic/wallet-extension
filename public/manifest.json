@@ -19,10 +19,36 @@
       "128": "icons/light-128.png"
     }
   },
-  "permissions": ["sidePanel", "tabs", "windows"],
-  "host_permissions": ["https://rpc.qubic.org/*"],
+  "permissions": ["sidePanel", "windows", "storage"],
+  "host_permissions": [
+    "https://rpc.qubic.org/*",
+    "https://static.qubic.org/*",
+    "http://*/*",
+    "https://*/*"
+  ],
+  "background": {
+    "service_worker": "assets/background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["assets/content-script.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "assets/inpage-provider.js",
+        "assets/dapp-protocol.js",
+        "assets/dapp-timing.js"
+      ],
+      "matches": ["http://*/*", "https://*/*"]
+    }
+  ],
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'; font-src 'self' data:; style-src 'self' 'unsafe-inline'; connect-src 'self' https://rpc.qubic.org"
+    "extension_pages": "script-src 'self'; object-src 'self'; font-src 'self' data:; style-src 'self' 'unsafe-inline'; connect-src 'self' https://rpc.qubic.org https://static.qubic.org"
   },
   "side_panel": {
     "default_path": "sidepanel.html"
