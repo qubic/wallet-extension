@@ -37,14 +37,20 @@ const General = () => {
           </Label>
           <Select
             value={i18n.language}
-            onValueChange={(value) => setLanguage(value as 'en' | 'es')}
+            onValueChange={(value) => setLanguage(value as Parameters<typeof setLanguage>[0])}
           >
             <SelectTrigger id="language" className="h-9 w-full text-sm">
               <SelectValue placeholder="English" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="en">English</SelectItem>
+              <SelectItem value="de">Deutsch</SelectItem>
               <SelectItem value="es">Español</SelectItem>
+              <SelectItem value="fr">Français</SelectItem>
+              <SelectItem value="ru">Русский</SelectItem>
+              <SelectItem value="tr">Türkçe</SelectItem>
+              <SelectItem value="vi">Tiếng Việt</SelectItem>
+              <SelectItem value="zh">中文</SelectItem>
             </SelectContent>
           </Select>
         </div>

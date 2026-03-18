@@ -1,0 +1,527 @@
+{
+  "app": {
+    "sidepanel": "Yan paneli aç",
+    "closeSidepanel": "Yan paneli kapat"
+  },
+  "nav": {
+    "home": "Ana Sayfa",
+    "transfer": "Transfer",
+    "history": "Geçmiş",
+    "accounts": "Hesaplar",
+    "settings": "Ayarlar"
+  },
+  "home": {
+    "actions": {
+      "send": "Gönder",
+      "receive": "Al",
+      "history": "Geçmiş"
+    },
+    "balance": {
+      "label": "Bakiye",
+      "loading": "Yükleniyor..."
+    },
+    "hero": {
+      "defaultAccount": "Ana hesap"
+    },
+    "recent": {
+      "title": "Son işlemler",
+      "loading": "Son işlemler yükleniyor...",
+      "empty": "Henüz işlem yok.",
+      "emptyTitle": "Henüz işlem yok",
+      "viewAll": "Tümünü görüntüle"
+    },
+    "network": {
+      "title": "Ağ",
+      "showDetails": "Detayları göster",
+      "hideDetails": "Detayları gizle",
+      "tick": "Tick",
+      "epoch": "Dönem",
+      "supply": "Arz",
+      "active": "Aktif",
+      "pricePerB": "Fiyat / B",
+      "marketCap": "Piyasa Değeri"
+    },
+    "assets": {
+      "title": "Varlıklar",
+      "more": "Diğer varlıklar yakında eklenecek.",
+      "loading": "Varlıklar yükleniyor...",
+      "empty": "Ek varlık bulunamadı.",
+      "emptyTitle": "Henüz varlık yok",
+      "error": "Varlıklar yüklenemedi.",
+      "unknown": "Bilinmeyen varlık",
+      "manageRights": "Hakları yönet"
+    },
+    "receive": {
+      "title": "Qubic Al",
+      "description": "Bu QR kodunu paylaşın veya genel kimlik adresinizi kopyalayın.",
+      "generating": "QR kodu oluşturuluyor...",
+      "copy": "Adresi kopyala"
+    },
+    "toast": {
+      "copySuccess": "Adres kopyalandı",
+      "copySuccessDesc": "Genel kimliğiniz panoya kopyalandı.",
+      "copyFail": "Kopyalama başarısız",
+      "copyFailDesc": "Lütfen tekrar deneyin veya manuel olarak kopyalayın."
+    },
+    "watchOnly": {
+      "title": "Yalnızca izleme hesabı",
+      "description": "Bu adres için gönderim devre dışı."
+    },
+    "price": {
+      "label": "QUBIC Fiyatı"
+    },
+    "accounts": {
+      "title": "Hesaplar",
+      "selectLabel": "Hesap seçin",
+      "passphrasePlaceholder": "Vault parolası",
+      "passphraseRequired": "Hesapları görüntülemek için vault parolanızı girin.",
+      "unlock": "Hesapları aç",
+      "unlocking": "Açılıyor...",
+      "unlockFailed": "Vault açılamadı. Parolanızı kontrol edin.",
+      "empty": "Ek hesap bulunamadı.",
+      "create": "Yeni hesap oluştur"
+    }
+  },
+  "settings": {
+    "language": "Dil",
+    "theme": "Tema",
+    "themeDark": "Koyu",
+    "themeLight": "Açık",
+    "themeSystem": "Sistem",
+    "lock": "İnaktivite sonrası otomatik kilitle",
+    "lockNow": "Cüzdanı kilitle",
+    "lockTimeout": {
+      "label": "Otomatik kilitleme süresi (dakika)",
+      "helper": "Seçilen süre sonunda cüzdanı kilitler.",
+      "option": "{{minutes}} dk",
+      "immediately": "Hemen"
+    },
+    "exportVault": {
+      "button": "Vault dosyasını dışa aktar",
+      "drawerTitle": "Vault dosyasını dışa aktar",
+      "drawerDescription": "Vault dosyanızı Qubic web cüzdanıyla uyumlu bir biçimde indirin.",
+      "passphrase": "Vault parolası",
+      "confirm": "Vault dosyasını dışa aktar",
+      "exporting": "Dışa aktarılıyor...",
+      "errors": {
+        "passphraseRequired": "Parola gereklidir.",
+        "invalidPassphrase": "Geçersiz parola.",
+        "exportFailed": "Vault dosyası dışa aktarılamadı."
+      }
+    },
+    "categories": {
+      "general": "Tercihler",
+      "generalDesc": "Dil ve tema tercihleri",
+      "connectedSites": "Bağlı siteler",
+      "connectedSitesDesc": "Web sitesi cüzdan erişimini yönetin",
+      "security": "Güvenlik",
+      "securityDesc": "Parola, otomatik kilitleme ve uygulama sıfırlama",
+      "backup": "Yedekleme",
+      "backupDesc": "Vault dosyanızı dışa aktarın",
+      "accounts": "Hesapları Yönet",
+      "accountsDesc": "Kimlikleri görüntüle, sırala ve yönet",
+      "support": "Destek",
+      "supportDesc": "Yardım alın ve sorun bildirin",
+      "about": "Hakkında",
+      "aboutDesc": "Uygulama sürümü ve bilgiler"
+    },
+    "general": {
+      "title": "Tercihler",
+      "back": "Ayarlar"
+    },
+    "connectedSites": {
+      "title": "Bağlı siteler",
+      "back": "Ayarlar",
+      "empty": "Bağlı web sitesi yok.",
+      "disconnect": "Bağlantıyı kes",
+      "connectedAt": "Bağlanma tarihi: {{date}}"
+    },
+    "security": {
+      "title": "Güvenlik",
+      "back": "Ayarlar",
+      "changePassword": "Şifreyi değiştir",
+      "changePasswordDesc": "Vault parolanızı güncelleyin",
+      "changePasswordDrawerTitle": "Şifreyi değiştir",
+      "changePasswordDrawerDesc": "Mevcut parolanızı girin ve yeni bir parola seçin.",
+      "currentPassphrase": "Mevcut parola",
+      "newPassphrase": "Yeni parola",
+      "confirmPassphrase": "Yeni parolayı doğrulayın",
+      "minChars": "En az 12 karakter.",
+      "save": "Yeni şifreyi kaydet",
+      "saving": "Kaydediliyor...",
+      "cancel": "İptal",
+      "resetApp": "Cüzdanı sil",
+      "resetAppTitle": "Cüzdan silinsin mi?",
+      "resetAppDesc": "Bu işlem vault, hesaplar ve ayarlar dahil tüm verilerinizi silecektir. Bu işlem geri alınamaz. Seed ifadelerinizi yedeklediğinizden emin olun.",
+      "resetAppConfirm": "Cüzdanı sil",
+      "errors": {
+        "currentRequired": "Mevcut parola gereklidir.",
+        "newRequired": "Yeni parola gereklidir.",
+        "confirmRequired": "Lütfen yeni parolanızı doğrulayın.",
+        "tooShort": "Parola en az 12 karakter olmalıdır.",
+        "mismatch": "Parolalar eşleşmiyor.",
+        "invalidCurrent": "Mevcut parola yanlış.",
+        "changeFailed": "Şifre değiştirilemedi. Lütfen tekrar deneyin."
+      }
+    },
+    "support": {
+      "title": "Destek",
+      "warningTitle": "Dolandırıcılara dikkat edin",
+      "warningDescription": "Qubic ekip üyeleri asla seed veya parolanızı istemez. Özel anahtarlarınızı kimseyle paylaşmayın.",
+      "discord": "Discord topluluğu",
+      "github": "GitHub'da sorun bildirin"
+    },
+    "about": {
+      "title": "Hakkında",
+      "appVersion": "Uygulama sürümü",
+      "extensionName": "Uzantı",
+      "versionLabel": "v{{version}}"
+    }
+  },
+  "accounts": {
+    "watchOnly": {
+      "title": "Yalnızca izleme adresi ekle",
+      "subtitle": "Seed içe aktarmadan bir genel kimliği takip edin.",
+      "submit": "Yalnızca izleme ekle"
+    },
+    "manage": {
+      "title": "Hesapları yönet",
+      "subtitle": "Kimliklerinizi görüntüleyin, sıralayın ve yönetin.",
+      "passphrase": "Vault parolası",
+      "passphraseTitle": "Vault kilidini aç",
+      "load": "Hesapları yükle",
+      "unlock": "Vault kilidini aç",
+      "loading": "Yükleniyor...",
+      "empty": "Henüz yüklenmiş hesap yok.",
+      "active": "Aktif",
+      "select": "Seç",
+      "balance": "Bakiye",
+      "menu": "Hesap seçenekleri",
+      "drag": "Hesabı sırala",
+      "rename": "Yeniden adlandır",
+      "renameTitle": "Hesabı yeniden adlandır",
+      "renameLabel": "Hesap adı",
+      "save": "Kaydet",
+      "cancel": "İptal",
+      "confirm": "Onayla",
+      "remove": "Kaldır",
+      "removeTitle": "Hesabı kaldır",
+      "removeDesc": "Bu işlem hesabı bu cihazdan kaldırır. Bu işlem geri alınamaz.",
+      "reveal": "Seed göster",
+      "revealTitle": "Seed ifadesi",
+      "copySeed": "Seed kopyala",
+      "seedCopied": "Seed kopyalandı",
+      "qrAlt": "Seed QR kodu",
+      "qrLabel": "Seed içe aktarmak için tarayın",
+      "done": "Tamam",
+      "addTitle": "Hesap ekle",
+      "addNewDesc": "Bu cüzdana yeni bir adres ekleyin.",
+      "addCreate": "Yeni adres oluştur",
+      "addImport": "Seed içe aktar",
+      "watchOnlyTitle": "Yalnızca izleme hesabı",
+      "watchOnlyName": "Hesap adı",
+      "watchOnlyIdentity": "Genel kimlik",
+      "watchOnlyAdd": "Yalnızca izleme ekle",
+      "watchOnly": "Yalnızca izleme",
+      "defaultNamePrefix": "Hesap",
+      "close": "Kapat",
+      "errors": {
+        "load": "Vault açılamadı.",
+        "remove": "Hesap kaldırılamadı.",
+        "rename": "Hesap yeniden adlandırılamadı.",
+        "reveal": "Seed gösterilemedi.",
+        "nameRequired": "Hesap adı gereklidir.",
+        "passphraseRequired": "Parola gereklidir.",
+        "invalidPassphrase": "Geçersiz parola.",
+        "nameDuplicate": "Bu adla bir hesap zaten mevcut.",
+        "lastAccount": "Son hesabı kaldıramazsınız.",
+        "watchOnlySeed": "Yalnızca izleme hesaplarının seed ifadesi yoktur.",
+        "watchOnlyRequired": "Ad ve kimlik gereklidir.",
+        "watchOnlyInvalid": "Kimlik biçimi geçersiz.",
+        "watchOnlyDuplicate": "Bu kimlik zaten ekli."
+      }
+    }
+  },
+  "history": {
+    "title": "Geçmiş",
+    "loading": "Geçmiş yükleniyor...",
+    "empty": "İşlem bulunamadı.",
+    "incoming": "Gelen",
+    "outgoing": "Giden",
+    "sent": "Gönderildi",
+    "received": "Alındı",
+    "to": "Alıcı:",
+    "from": "Gönderen:",
+    "tick": "Tick",
+    "type": "Tür",
+    "pending": "Onay Bekliyor",
+    "unconfirmed": "Onaylanmamış",
+    "unconfirmedMore": "+{{count}} onaylanmamış işlem daha",
+    "confirmed": "Onaylandı",
+    "failed": "Başarısız",
+    "resend": "Tekrar gönder",
+    "deleteFailed": "Başarısız işlemi sil",
+    "today": "Bugün",
+    "yesterday": "Dün"
+  },
+  "txDetails": {
+    "title": "İşlem detayları",
+    "loading": "İşlem yükleniyor...",
+    "error": "İşlem detayları yüklenemedi.",
+    "back": "Geri",
+    "refresh": "İşlemi yenile",
+    "copy": "Kopyala",
+    "copyTxId": "İşlem kimliğini kopyala",
+    "copied": "Kopyalandı",
+    "copyFailed": "Kopyalama başarısız",
+    "hash": "Hash",
+    "amount": "Miktar",
+    "tick": "Tick",
+    "inputType": "Giriş türü",
+    "source": "Kaynak",
+    "destination": "Hedef",
+    "timestamp": "Zaman damgası",
+    "openExplorer": "Gezginde aç",
+    "pending": "Onay Bekliyor",
+    "pendingHint": "Bu işlem hâlâ ağ tick'lerinde onay bekliyor."
+  },
+  "transfer": {
+    "title": "Gönder",
+    "selectToken": {
+      "subtitle": "Göndermek istediğiniz token'ı seçin"
+    },
+    "balance": {
+      "loading": "Bakiye yükleniyor..."
+    },
+    "form": {
+      "recipientPlaceholder": "60 karakterlik kimlik (A-Z)",
+      "amountPlaceholder": "Miktar girin",
+      "max": "Maks",
+      "feeValue": "Ücret: {{fee}} QUBIC",
+      "quBalance": "Bakiye: {{balance}} QUBIC",
+      "recipientHint": "60 harflik bir kimlik kullanın veya vault'unuzdan birini seçin.",
+      "available": "Kullanılabilir: {{balance}} {{token}}",
+      "vaultRecipients": "Kimlikleriniz",
+      "vaultRecipientsManual": "Manuel giriş",
+      "targetTickOffset": "Hedef tick (mevcut + N)",
+      "targetTickManual": "Hedef tick (manuel)",
+      "targetTickOffsetManual": "Manuel",
+      "targetTickManualPlaceholder": "örn. 4378123",
+      "targetTickCurrentHint": "Mevcut ağ tick'i: {{tick}}"
+    },
+    "validation": {
+      "recipientRequired": "Alıcı kimliği gereklidir.",
+      "recipientInvalid": "Kimlik 60 büyük harf (A-Z) olmalıdır.",
+      "recipientSameAsSender": "Kendi kimliğinize gönderim yapılamaz.",
+      "amountRequired": "Miktar gereklidir.",
+      "amountInvalid": "Miktar pozitif bir sayı olmalıdır.",
+      "targetTickOffsetInvalid": "Hedef tick ofseti 1 ile 40 arasında olmalıdır.",
+      "targetTickManualInvalid": "Manuel hedef tick pozitif bir sayı olmalıdır.",
+      "targetTickManualPast": "Manuel hedef tick mevcut ağ tick'inden büyük olmalıdır.",
+      "amountExceedsBalance": "Miktar kullanılabilir bakiyeyi aşıyor.",
+      "balanceLoading": "Lütfen bakiyenin yüklenmesini bekleyin.",
+      "insufficientQuForFee": "{{fee}} QU transfer ücreti için yeterli QUBIC bakiyesi yok."
+    },
+    "confirm": {
+      "title": "Transferi onayla",
+      "description": "Göndermeden önce detayları gözden geçirin.",
+      "to": "Alıcı",
+      "amount": "Miktar",
+      "warning": "Bu işlem geri alınamaz.",
+      "feeLabel": "Ağ ücreti"
+    },
+    "actions": {
+      "continue": "Devam et",
+      "confirm": "Onayla ve gönder",
+      "sending": "Gönderiliyor...",
+      "cancel": "İptal"
+    },
+    "success": {
+      "title": "Transfer gönderildi",
+      "description": "İşleminiz yayınlandı ve tick {{targetTick}} için planlandı."
+    },
+    "errors": {
+      "networkError": "Ağ hatası. Lütfen tekrar deneyin.",
+      "broadcastFailed": "İşlem yayınlanamadı.",
+      "watchOnly": "Yalnızca izleme hesapları transfer gönderemez.",
+      "generic": "Transfer başarısız. Lütfen tekrar deneyin."
+    }
+  },
+  "transferRights": {
+    "title": "Yönetim Haklarını Transfer Et",
+    "selectAssetSubtitle": "Yönetim haklarını transfer etmek istediğiniz varlığı seçin",
+    "noAssets": "Transfer edilebilir yönetim hakları olan varlık yok.",
+    "noDestinationContracts": "Uygun hedef sözleşme bulunamadı.",
+    "sourceContract": "Kaynak sözleşme",
+    "sourceContractPlaceholder": "Kaynak sözleşmeyi seçin",
+    "destinationContract": "Hedef sözleşme",
+    "destinationContractPlaceholder": "Hedef sözleşmeyi seçin",
+    "numberOfSharesPlaceholder": "Pay sayısını girin",
+    "available": "Kullanılabilir: {{balance}} {{token}}",
+    "fee": "Ücret: {{fee}} QUBIC",
+    "quBalance": "Bakiye: {{balance}} QUBIC",
+    "confirm": {
+      "title": "Hak transferini onayla",
+      "description": "Yönetim haklarını transfer etmeden önce detayları gözden geçirin.",
+      "asset": "Varlık",
+      "from": "Kaynak sözleşme",
+      "to": "Hedef sözleşme",
+      "shares": "Paylar",
+      "feeLabel": "Ücret",
+      "warning": "Bu işlem geri alınamaz."
+    },
+    "validation": {
+      "sourceRequired": "Kaynak sözleşme gereklidir.",
+      "destinationRequired": "Hedef sözleşme gereklidir.",
+      "sameContract": "Kaynak ve hedef farklı sözleşmeler olmalıdır.",
+      "sharesRequired": "Pay sayısı gereklidir.",
+      "sharesInvalid": "Pay sayısı pozitif bir sayı olmalıdır.",
+      "sharesExceedsBalance": "Pay sayısı kullanılabilir bakiyeyi aşıyor.",
+      "insufficientQuForFee": "{{fee}} QU ücreti için yeterli QUBIC bakiyesi yok."
+    },
+    "actions": {
+      "continue": "Devam et",
+      "confirm": "Onayla ve transfer et",
+      "sending": "Transfer ediliyor...",
+      "cancel": "İptal"
+    },
+    "success": {
+      "title": "Hak transferi gönderildi",
+      "description": "İşleminiz yayınlandı ve tick {{targetTick}} için planlandı."
+    },
+    "errors": {
+      "networkError": "Ağ hatası. Lütfen tekrar deneyin.",
+      "broadcastFailed": "İşlem yayınlanamadı.",
+      "watchOnly": "Yalnızca izleme hesapları hak transferi yapamaz.",
+      "generic": "Hak transferi başarısız. Lütfen tekrar deneyin."
+    }
+  },
+  "passphraseAuth": {
+    "title": "Kimlik Doğrulama Gerekli",
+    "subtitle": "Bu işleme devam etmek için vault parolanızı girin.",
+    "form": {
+      "passphrase": "Vault parolası",
+      "passphrasePlaceholder": "Parolanızı girin",
+      "showPassphrase": "Parolayı göster",
+      "hidePassphrase": "Parolayı gizle"
+    },
+    "validation": {
+      "required": "Parola gereklidir."
+    },
+    "securityNote": "Parolanız vault şifresini çözmek ve işlemleri imzalamak için yerel olarak kullanılır. Asla ağ üzerinden iletilmez.",
+    "actions": {
+      "back": "Geri",
+      "cancel": "İptal",
+      "unlock": "Kilidi aç",
+      "unlocking": "Açılıyor..."
+    },
+    "errors": {
+      "invalidPassphrase": "Geçersiz parola. Lütfen tekrar deneyin.",
+      "accountNotFound": "Hesap vault'ta bulunamadı.",
+      "generic": "Kimlik doğrulama başarısız. Lütfen tekrar deneyin."
+    }
+  },
+  "unlock": {
+    "title": "Cüzdanınızın Kilidini Açın",
+    "subtitle": "Cüzdanınız güvenlik nedeniyle kilitlendi. Devam etmek için parolanızı girin."
+  },
+  "dapp": {
+    "approval": {
+      "title": "Bağlantı isteği",
+      "origin": "Web sitesi",
+      "sharedAccount": "Paylaşılan hesap",
+      "sharedAccountFallback": "Seçili hesap",
+      "connectSubtitle": "Bu web sitesi cüzdanınıza bağlanmak istiyor.",
+      "signMessageSubtitle": "Bu web sitesi bir mesaj imzalamanızı istiyor.",
+      "signTransactionSubtitle": "Bu web sitesi bir işlem imzalamanızı istiyor.",
+      "sendTransactionSubtitle": "Bu web sitesi bir işlemi imzalayıp yayınlamanızı istiyor.",
+      "genericSubtitle": "Devam etmeden önce bu isteği gözden geçirin.",
+      "messageLabel": "Mesaj",
+      "messageEmpty": "Mesaj önizlemesi mevcut değil.",
+      "messageWarningTitle": "Mesajı dikkatlice inceleyin",
+      "messageWarnings": {
+        "encoded": "dApp, insan tarafından okunamayabilecek kodlanmış veri (hex/base64) imzalamanızı istiyor.",
+        "url": "Mesaj bir URL içeriyor. Güvendiğiniz web sitesiyle eşleştiğinden emin olun.",
+        "sensitiveTerms": "Mesaj hassas onay/işlem ifadeleri içeriyor. Neyi yetkilendirdiğinizi doğrulayın.",
+        "long": "Mesaj uzun ve önemli detayları gizliyor olabilir."
+      },
+      "txTo": "Alıcı",
+      "txAmount": "Miktar",
+      "txInputType": "Giriş türü",
+      "txTargetTick": "Hedef tick",
+      "txTargetTickOffset": "Hedef tick ofseti",
+      "txFee": "Ücret",
+      "txFeeNone": "0",
+      "txFeeMayApply": "Uygulanabilir",
+      "approve": "Onayla",
+      "approveAndSend": "Onayla ve Gönder",
+      "reject": "Reddet",
+      "errors": {
+        "runtimeUnavailable": "Uzantı çalışma ortamı kullanılamıyor.",
+        "decisionFailed": "Kararınız gönderilemedi."
+      }
+    }
+  },
+  "onboarding": {
+    "importSeed": {
+      "title": "Özel seed içe aktar",
+      "titleAddAddress": "Adres seed'i içe aktar",
+      "step": "Adım {{current}} / {{total}}"
+    },
+    "importVault": {
+      "title": "Vault dosyasını içe aktar",
+      "step": "Adım {{current}} / {{total}}",
+      "selectVault": {
+        "title": "Vault dosyanızı seçin",
+        "subtitle": "Bu uzantıdan veya Qubic web cüzdanından dışa aktarılmış bir vault dosyası yükleyin.",
+        "label": "Vault dosyası",
+        "dropText": "Vault dosyanızı sürükleyip bırakın",
+        "browseText": "veya göz atmak için tıklayın (.json, .qubic-vault)"
+      },
+      "unlockSecure": {
+        "title": "Kilidi aç ve güvence altına al",
+        "subtitle": "Bu cihaz için yeni bir parola belirleyin ve gerekirse kaynak parolayı girin.",
+        "newPassphrase": "Yeni vault parolası",
+        "sourcePassphrase": "Kaynak vault parolası"
+      },
+      "review": {
+        "title": "İçe aktarmayı gözden geçir",
+        "subtitle": "İçe aktarmadan önce dosya ve parola detaylarını doğrulayın.",
+        "vaultFile": "Vault dosyası",
+        "notSelected": "Seçilmedi",
+        "sourcePassphraseProvided": "Girildi",
+        "sourcePassphraseSame": "Yenisi ile aynı",
+        "sourcePassphraseLabel": "Kaynak parolası",
+        "addMoreLater": "Daha sonra Hesapları Yönet bölümünden daha fazla hesap ekleyebilirsiniz."
+      },
+      "actions": {
+        "back": "Geri",
+        "previous": "Önceki",
+        "continue": "Devam et",
+        "import": "Vault içe aktar",
+        "importing": "İçe aktarılıyor..."
+      },
+      "errors": {
+        "fileTooLarge": "Seçilen dosya geçerli bir vault dosyası için çok büyük.",
+        "selectFile": "Bir vault dosyası seçin.",
+        "passphraseRequired": "Parola gereklidir.",
+        "importFailed": "Web cüzdanı vault dosyası içe aktarılamadı.",
+        "noEntries": "Vault içe aktarıldı ancak hiçbir giriş bulunamadı.",
+        "generic": "Vault içe aktarılamadı."
+      }
+    },
+    "seedSecurity": {
+      "title": "Seed ifadenizi güvence altına alın",
+      "subtitle": "Bu 55 harflik seed ifadesini güvenli bir yere kaydedin. Cüzdanınızı geri yüklemek için buna ihtiyacınız olacak.",
+      "subtitleAddAddress": "Bu 55 harflik seed ifadesini güvenli bir yere kaydedin. Bu adresi geri yüklemek için buna ihtiyacınız olacak.",
+      "warningTitle": "Bu seed ifadesini güvenli bir şekilde saklayın.",
+      "seedLabel": "Seed",
+      "publicIdentityLabel": "Genel kimlik",
+      "deriving": "Türetiliyor...",
+      "generateNew": "Yeni seed oluştur",
+      "copySeed": "Seed kopyala",
+      "seedCopied": "Seed kopyalandı",
+      "confirmationLabel": "Bu seed ifadesini güvenli bir şekilde sakladığımı ve cüzdanı kurtarmak için gerekli olduğunu anlıyorum."
+    }
+  }
+}

@@ -1,0 +1,527 @@
+{
+  "app": {
+    "sidepanel": "Mở bảng điều khiển bên",
+    "closeSidepanel": "Đóng bảng điều khiển bên"
+  },
+  "nav": {
+    "home": "Trang chủ",
+    "transfer": "Chuyển",
+    "history": "Lịch sử",
+    "accounts": "Tài khoản",
+    "settings": "Cài đặt"
+  },
+  "home": {
+    "actions": {
+      "send": "Gửi",
+      "receive": "Nhận",
+      "history": "Lịch sử"
+    },
+    "balance": {
+      "label": "Số dư",
+      "loading": "Đang tải..."
+    },
+    "hero": {
+      "defaultAccount": "Tài khoản chính"
+    },
+    "recent": {
+      "title": "Hoạt động gần đây",
+      "loading": "Đang tải hoạt động gần đây...",
+      "empty": "Không có giao dịch gần đây.",
+      "emptyTitle": "Chưa có hoạt động",
+      "viewAll": "Xem tất cả"
+    },
+    "network": {
+      "title": "Mạng",
+      "showDetails": "Hiện chi tiết",
+      "hideDetails": "Ẩn chi tiết",
+      "tick": "Tick",
+      "epoch": "Epoch",
+      "supply": "Cung",
+      "active": "Hoạt động",
+      "pricePerB": "Giá / B",
+      "marketCap": "MCap"
+    },
+    "assets": {
+      "title": "Tài sản",
+      "more": "Các tài sản khác sẽ sớm có.",
+      "loading": "Đang tải tài sản...",
+      "empty": "Không tìm thấy tài sản bổ sung.",
+      "emptyTitle": "Chưa có tài sản",
+      "error": "Không thể tải tài sản.",
+      "unknown": "Tài sản không xác định",
+      "manageRights": "Quản lý quyền"
+    },
+    "receive": {
+      "title": "Nhận Qubic",
+      "description": "Chia sẻ mã QR này hoặc sao chép địa chỉ danh tính công khai của bạn.",
+      "generating": "Đang tạo mã QR...",
+      "copy": "Sao chép địa chỉ"
+    },
+    "toast": {
+      "copySuccess": "Đã sao chép địa chỉ",
+      "copySuccessDesc": "Danh tính công khai của bạn đã được sao chép vào clipboard.",
+      "copyFail": "Sao chép thất bại",
+      "copyFailDesc": "Vui lòng thử lại hoặc sao chép thủ công."
+    },
+    "watchOnly": {
+      "title": "Tài khoản chỉ xem",
+      "description": "Gửi bị vô hiệu hóa cho địa chỉ này."
+    },
+    "price": {
+      "label": "Giá QUBIC"
+    },
+    "accounts": {
+      "title": "Tài khoản",
+      "selectLabel": "Chọn tài khoản",
+      "passphrasePlaceholder": "Mật khẩu vault",
+      "passphraseRequired": "Nhập mật khẩu vault để xem tài khoản.",
+      "unlock": "Mở khóa tài khoản",
+      "unlocking": "Đang mở khóa...",
+      "unlockFailed": "Không thể mở khóa vault. Vui lòng kiểm tra mật khẩu.",
+      "empty": "Không tìm thấy tài khoản bổ sung.",
+      "create": "Tạo tài khoản mới"
+    }
+  },
+  "settings": {
+    "language": "Ngôn ngữ",
+    "theme": "Giao diện",
+    "themeDark": "Tối",
+    "themeLight": "Sáng",
+    "themeSystem": "Hệ thống",
+    "lock": "Tự động khóa sau khi không hoạt động",
+    "lockNow": "Khóa ví",
+    "lockTimeout": {
+      "label": "Thời gian tự động khóa (phút)",
+      "helper": "Khóa ví sau khoảng thời gian đã chọn.",
+      "option": "{{minutes}} phút",
+      "immediately": "Ngay lập tức"
+    },
+    "exportVault": {
+      "button": "Xuất vault",
+      "drawerTitle": "Xuất tập tin vault",
+      "drawerDescription": "Tải vault của bạn về định dạng tương thích với ví web Qubic.",
+      "passphrase": "Mật khẩu vault",
+      "confirm": "Xuất vault",
+      "exporting": "Đang xuất...",
+      "errors": {
+        "passphraseRequired": "Yêu cầu mật khẩu.",
+        "invalidPassphrase": "Mật khẩu không hợp lệ.",
+        "exportFailed": "Không thể xuất vault."
+      }
+    },
+    "categories": {
+      "general": "Tùy chỉnh",
+      "generalDesc": "Tùy chỉnh ngôn ngữ và giao diện",
+      "connectedSites": "Trang đã kết nối",
+      "connectedSitesDesc": "Quản lý quyền truy cập ví của trang web",
+      "security": "Bảo mật",
+      "securityDesc": "Mật khẩu, tự động khóa và đặt lại ứng dụng",
+      "backup": "Sao lưu",
+      "backupDesc": "Xuất tập tin vault của bạn",
+      "accounts": "Quản lý tài khoản",
+      "accountsDesc": "Xem, sắp xếp và quản lý danh tính",
+      "support": "Hỗ trợ",
+      "supportDesc": "Nhận trợ giúp và báo cáo sự cố",
+      "about": "Giới thiệu",
+      "aboutDesc": "Phiên bản ứng dụng và thông tin"
+    },
+    "general": {
+      "title": "Tùy chỉnh",
+      "back": "Cài đặt"
+    },
+    "connectedSites": {
+      "title": "Trang đã kết nối",
+      "back": "Cài đặt",
+      "empty": "Không có trang web nào được kết nối.",
+      "disconnect": "Ngắt kết nối",
+      "connectedAt": "Kết nối: {{date}}"
+    },
+    "security": {
+      "title": "Bảo mật",
+      "back": "Cài đặt",
+      "changePassword": "Đổi mật khẩu",
+      "changePasswordDesc": "Cập nhật mật khẩu vault của bạn",
+      "changePasswordDrawerTitle": "Đổi mật khẩu",
+      "changePasswordDrawerDesc": "Nhập mật khẩu hiện tại và chọn mật khẩu mới.",
+      "currentPassphrase": "Mật khẩu hiện tại",
+      "newPassphrase": "Mật khẩu mới",
+      "confirmPassphrase": "Xác nhận mật khẩu mới",
+      "minChars": "Tối thiểu 12 ký tự.",
+      "save": "Lưu mật khẩu mới",
+      "saving": "Đang lưu...",
+      "cancel": "Hủy",
+      "resetApp": "Xóa ví",
+      "resetAppTitle": "Xóa ví?",
+      "resetAppDesc": "Thao tác này sẽ xóa tất cả dữ liệu bao gồm vault, tài khoản và cài đặt. Hành động này không thể hoàn tác. Hãy đảm bảo bạn đã sao lưu seed của mình.",
+      "resetAppConfirm": "Xóa ví",
+      "errors": {
+        "currentRequired": "Yêu cầu mật khẩu hiện tại.",
+        "newRequired": "Yêu cầu mật khẩu mới.",
+        "confirmRequired": "Vui lòng xác nhận mật khẩu mới.",
+        "tooShort": "Mật khẩu phải có ít nhất 12 ký tự.",
+        "mismatch": "Mật khẩu không khớp.",
+        "invalidCurrent": "Mật khẩu hiện tại không đúng.",
+        "changeFailed": "Không thể đổi mật khẩu. Vui lòng thử lại."
+      }
+    },
+    "support": {
+      "title": "Hỗ trợ",
+      "warningTitle": "Cảnh giác với kẻ lừa đảo",
+      "warningDescription": "Thành viên nhóm Qubic sẽ không bao giờ hỏi seed hoặc mật khẩu của bạn. Không bao giờ chia sẻ khóa riêng tư của bạn với bất kỳ ai.",
+      "discord": "Cộng đồng Discord",
+      "github": "Báo cáo sự cố trên GitHub"
+    },
+    "about": {
+      "title": "Giới thiệu",
+      "appVersion": "Phiên bản ứng dụng",
+      "extensionName": "Tiện ích mở rộng",
+      "versionLabel": "v{{version}}"
+    }
+  },
+  "accounts": {
+    "watchOnly": {
+      "title": "Thêm địa chỉ chỉ xem",
+      "subtitle": "Theo dõi danh tính công khai mà không cần nhập seed.",
+      "submit": "Thêm chỉ xem"
+    },
+    "manage": {
+      "title": "Quản lý tài khoản",
+      "subtitle": "Xem, sắp xếp và quản lý danh tính của bạn.",
+      "passphrase": "Mật khẩu vault",
+      "passphraseTitle": "Mở khóa vault",
+      "load": "Tải tài khoản",
+      "unlock": "Mở khóa vault",
+      "loading": "Đang tải...",
+      "empty": "Chưa có tài khoản nào được tải.",
+      "active": "Đang hoạt động",
+      "select": "Chọn",
+      "balance": "Số dư",
+      "menu": "Tùy chọn tài khoản",
+      "drag": "Sắp xếp lại tài khoản",
+      "rename": "Đổi tên",
+      "renameTitle": "Đổi tên tài khoản",
+      "renameLabel": "Tên tài khoản",
+      "save": "Lưu",
+      "cancel": "Hủy",
+      "confirm": "Xác nhận",
+      "remove": "Xóa",
+      "removeTitle": "Xóa tài khoản",
+      "removeDesc": "Hành động này sẽ xóa tài khoản khỏi thiết bị này. Không thể hoàn tác.",
+      "reveal": "Hiện seed",
+      "revealTitle": "Cụm từ seed",
+      "copySeed": "Sao chép seed",
+      "seedCopied": "Đã sao chép seed",
+      "qrAlt": "Mã QR seed",
+      "qrLabel": "Quét để nhập seed",
+      "done": "Xong",
+      "addTitle": "Thêm tài khoản",
+      "addNewDesc": "Thêm địa chỉ khác vào ví này.",
+      "addCreate": "Thêm địa chỉ mới",
+      "addImport": "Nhập seed",
+      "watchOnlyTitle": "Tài khoản chỉ xem",
+      "watchOnlyName": "Tên tài khoản",
+      "watchOnlyIdentity": "Danh tính công khai",
+      "watchOnlyAdd": "Thêm chỉ xem",
+      "watchOnly": "Chỉ xem",
+      "defaultNamePrefix": "Tài khoản",
+      "close": "Đóng",
+      "errors": {
+        "load": "Không thể mở vault.",
+        "remove": "Không thể xóa tài khoản.",
+        "rename": "Không thể đổi tên tài khoản.",
+        "reveal": "Không thể hiện seed.",
+        "nameRequired": "Yêu cầu tên tài khoản.",
+        "passphraseRequired": "Yêu cầu mật khẩu.",
+        "invalidPassphrase": "Mật khẩu không hợp lệ.",
+        "nameDuplicate": "Tài khoản với tên này đã tồn tại.",
+        "lastAccount": "Bạn không thể xóa tài khoản cuối cùng.",
+        "watchOnlySeed": "Tài khoản chỉ xem không có seed.",
+        "watchOnlyRequired": "Yêu cầu tên và danh tính.",
+        "watchOnlyInvalid": "Định dạng danh tính không hợp lệ.",
+        "watchOnlyDuplicate": "Danh tính này đã được thêm."
+      }
+    }
+  },
+  "history": {
+    "title": "Lịch sử",
+    "loading": "Đang tải lịch sử...",
+    "empty": "Không tìm thấy giao dịch.",
+    "incoming": "Đến",
+    "outgoing": "Đi",
+    "sent": "Đã gửi",
+    "received": "Đã nhận",
+    "to": "Đến:",
+    "from": "Từ:",
+    "tick": "Tick",
+    "type": "Loại",
+    "pending": "Đang chờ",
+    "unconfirmed": "Chưa xác nhận",
+    "unconfirmedMore": "+{{count}} chưa xác nhận khác",
+    "confirmed": "Đã xác nhận",
+    "failed": "Thất bại",
+    "resend": "Gửi lại",
+    "deleteFailed": "Xóa giao dịch thất bại",
+    "today": "Hôm nay",
+    "yesterday": "Hôm qua"
+  },
+  "txDetails": {
+    "title": "Chi tiết giao dịch",
+    "loading": "Đang tải giao dịch...",
+    "error": "Không thể tải chi tiết giao dịch.",
+    "back": "Quay lại",
+    "refresh": "Làm mới giao dịch",
+    "copy": "Sao chép",
+    "copyTxId": "Sao chép txid",
+    "copied": "Đã sao chép",
+    "copyFailed": "Sao chép thất bại",
+    "hash": "Hash",
+    "amount": "Số lượng",
+    "tick": "Tick",
+    "inputType": "Loại đầu vào",
+    "source": "Nguồn",
+    "destination": "Đích",
+    "timestamp": "Thời gian",
+    "openExplorer": "Mở trong Explorer",
+    "pending": "Đang chờ",
+    "pendingHint": "Giao dịch này vẫn đang chờ xác nhận trên các tick của mạng."
+  },
+  "transfer": {
+    "title": "Gửi",
+    "selectToken": {
+      "subtitle": "Chọn token bạn muốn gửi"
+    },
+    "balance": {
+      "loading": "Đang tải số dư..."
+    },
+    "form": {
+      "recipientPlaceholder": "Danh tính 60 ký tự (A-Z)",
+      "amountPlaceholder": "Nhập số lượng",
+      "max": "Tối đa",
+      "feeValue": "Phí: {{fee}} QUBIC",
+      "quBalance": "Số dư: {{balance}} QUBIC",
+      "recipientHint": "Sử dụng danh tính 60 chữ cái hoặc chọn một từ vault của bạn.",
+      "available": "Khả dụng: {{balance}} {{token}}",
+      "vaultRecipients": "Danh tính của bạn",
+      "vaultRecipientsManual": "Nhập thủ công",
+      "targetTickOffset": "Tick mục tiêu (hiện tại + N)",
+      "targetTickManual": "Tick mục tiêu (thủ công)",
+      "targetTickOffsetManual": "Thủ công",
+      "targetTickManualPlaceholder": "vd. 4378123",
+      "targetTickCurrentHint": "Tick mạng hiện tại: {{tick}}"
+    },
+    "validation": {
+      "recipientRequired": "Yêu cầu danh tính người nhận.",
+      "recipientInvalid": "Danh tính phải là 60 chữ cái viết hoa (A-Z).",
+      "recipientSameAsSender": "Không thể gửi đến danh tính của chính bạn.",
+      "amountRequired": "Yêu cầu số lượng.",
+      "amountInvalid": "Số lượng phải là số dương.",
+      "targetTickOffsetInvalid": "Độ lệch tick mục tiêu phải từ 1 đến 40.",
+      "targetTickManualInvalid": "Tick mục tiêu thủ công phải là số dương.",
+      "targetTickManualPast": "Tick mục tiêu thủ công phải lớn hơn tick mạng hiện tại.",
+      "amountExceedsBalance": "Số lượng vượt quá số dư khả dụng.",
+      "balanceLoading": "Vui lòng đợi tải số dư.",
+      "insufficientQuForFee": "Không đủ số dư QUBIC để trang trải phí chuyển {{fee}} QU."
+    },
+    "confirm": {
+      "title": "Xác nhận chuyển khoản",
+      "description": "Xem lại chi tiết trước khi gửi.",
+      "to": "Đến",
+      "amount": "Số lượng",
+      "warning": "Hành động này không thể hoàn tác.",
+      "feeLabel": "Phí mạng"
+    },
+    "actions": {
+      "continue": "Tiếp tục",
+      "confirm": "Xác nhận và gửi",
+      "sending": "Đang gửi...",
+      "cancel": "Hủy"
+    },
+    "success": {
+      "title": "Chuyển khoản đã gửi",
+      "description": "Giao dịch của bạn đã được truyền và được lên lịch cho tick {{targetTick}}."
+    },
+    "errors": {
+      "networkError": "Lỗi mạng. Vui lòng thử lại.",
+      "broadcastFailed": "Không thể truyền giao dịch.",
+      "watchOnly": "Tài khoản chỉ xem không thể gửi chuyển khoản.",
+      "generic": "Chuyển khoản thất bại. Vui lòng thử lại."
+    }
+  },
+  "transferRights": {
+    "title": "Chuyển quyền quản lý",
+    "selectAssetSubtitle": "Chọn tài sản để chuyển quyền quản lý",
+    "noAssets": "Không có tài sản nào có quyền quản lý có thể chuyển.",
+    "noDestinationContracts": "Không có hợp đồng đích đủ điều kiện.",
+    "sourceContract": "Hợp đồng nguồn",
+    "sourceContractPlaceholder": "Chọn hợp đồng nguồn",
+    "destinationContract": "Hợp đồng đích",
+    "destinationContractPlaceholder": "Chọn hợp đồng đích",
+    "numberOfSharesPlaceholder": "Nhập số lượng cổ phần",
+    "available": "Khả dụng: {{balance}} {{token}}",
+    "fee": "Phí: {{fee}} QUBIC",
+    "quBalance": "Số dư: {{balance}} QUBIC",
+    "confirm": {
+      "title": "Xác nhận chuyển quyền",
+      "description": "Xem lại chi tiết trước khi chuyển quyền quản lý.",
+      "asset": "Tài sản",
+      "from": "Từ hợp đồng",
+      "to": "Đến hợp đồng",
+      "shares": "Cổ phần",
+      "feeLabel": "Phí",
+      "warning": "Hành động này không thể hoàn tác."
+    },
+    "validation": {
+      "sourceRequired": "Yêu cầu hợp đồng nguồn.",
+      "destinationRequired": "Yêu cầu hợp đồng đích.",
+      "sameContract": "Hợp đồng nguồn và đích phải khác nhau.",
+      "sharesRequired": "Yêu cầu số lượng cổ phần.",
+      "sharesInvalid": "Số lượng cổ phần phải là số dương.",
+      "sharesExceedsBalance": "Số lượng cổ phần vượt quá số dư khả dụng.",
+      "insufficientQuForFee": "Không đủ số dư QUBIC để trang trải phí {{fee}} QU."
+    },
+    "actions": {
+      "continue": "Tiếp tục",
+      "confirm": "Xác nhận và chuyển",
+      "sending": "Đang chuyển...",
+      "cancel": "Hủy"
+    },
+    "success": {
+      "title": "Quyền đã được chuyển",
+      "description": "Giao dịch của bạn đã được truyền và được lên lịch cho tick {{targetTick}}."
+    },
+    "errors": {
+      "networkError": "Lỗi mạng. Vui lòng thử lại.",
+      "broadcastFailed": "Không thể truyền giao dịch.",
+      "watchOnly": "Tài khoản chỉ xem không thể chuyển quyền.",
+      "generic": "Chuyển quyền thất bại. Vui lòng thử lại."
+    }
+  },
+  "passphraseAuth": {
+    "title": "Yêu cầu xác thực",
+    "subtitle": "Nhập mật khẩu vault của bạn để tiếp tục hành động này.",
+    "form": {
+      "passphrase": "Mật khẩu vault",
+      "passphrasePlaceholder": "Nhập mật khẩu của bạn",
+      "showPassphrase": "Hiện mật khẩu",
+      "hidePassphrase": "Ẩn mật khẩu"
+    },
+    "validation": {
+      "required": "Yêu cầu mật khẩu."
+    },
+    "securityNote": "Mật khẩu của bạn được sử dụng cục bộ để giải mã vault và ký giao dịch. Nó không bao giờ được truyền qua mạng.",
+    "actions": {
+      "back": "Quay lại",
+      "cancel": "Hủy",
+      "unlock": "Mở khóa",
+      "unlocking": "Đang mở khóa..."
+    },
+    "errors": {
+      "invalidPassphrase": "Mật khẩu không hợp lệ. Vui lòng thử lại.",
+      "accountNotFound": "Không tìm thấy tài khoản trong vault.",
+      "generic": "Xác thực thất bại. Vui lòng thử lại."
+    }
+  },
+  "unlock": {
+    "title": "Mở khóa ví của bạn",
+    "subtitle": "Ví của bạn đã bị khóa để đảm bảo an toàn. Nhập mật khẩu để tiếp tục."
+  },
+  "dapp": {
+    "approval": {
+      "title": "Yêu cầu kết nối",
+      "origin": "Trang web",
+      "sharedAccount": "Tài khoản chia sẻ",
+      "sharedAccountFallback": "Tài khoản đã chọn",
+      "connectSubtitle": "Trang web này muốn kết nối với ví của bạn.",
+      "signMessageSubtitle": "Trang web này muốn bạn ký một tin nhắn.",
+      "signTransactionSubtitle": "Trang web này muốn bạn ký một giao dịch.",
+      "sendTransactionSubtitle": "Trang web này muốn bạn ký và truyền một giao dịch.",
+      "genericSubtitle": "Xem lại yêu cầu này trước khi tiếp tục.",
+      "messageLabel": "Tin nhắn",
+      "messageEmpty": "Không có bản xem trước tin nhắn.",
+      "messageWarningTitle": "Xem lại tin nhắn cẩn thận",
+      "messageWarnings": {
+        "encoded": "dApp yêu cầu bạn ký dữ liệu được mã hóa (hex/base64), có thể không đọc được.",
+        "url": "Tin nhắn chứa URL. Hãy đảm bảo nó khớp với trang web bạn tin tưởng.",
+        "sensitiveTerms": "Tin nhắn chứa nội dung nhạy cảm về phê duyệt/giao dịch. Xác nhận những gì bạn đang ủy quyền.",
+        "long": "Tin nhắn dài và có thể ẩn các chi tiết quan trọng."
+      },
+      "txTo": "Đến",
+      "txAmount": "Số lượng",
+      "txInputType": "Loại đầu vào",
+      "txTargetTick": "Tick mục tiêu",
+      "txTargetTickOffset": "Độ lệch tick mục tiêu",
+      "txFee": "Phí",
+      "txFeeNone": "0",
+      "txFeeMayApply": "Có thể áp dụng",
+      "approve": "Chấp thuận",
+      "approveAndSend": "Chấp thuận và gửi",
+      "reject": "Từ chối",
+      "errors": {
+        "runtimeUnavailable": "Môi trường chạy của tiện ích mở rộng không khả dụng.",
+        "decisionFailed": "Không thể gửi quyết định của bạn."
+      }
+    }
+  },
+  "onboarding": {
+    "importSeed": {
+      "title": "Nhập seed riêng tư",
+      "titleAddAddress": "Nhập seed địa chỉ",
+      "step": "Bước {{current}} trong {{total}}"
+    },
+    "importVault": {
+      "title": "Nhập tập tin vault",
+      "step": "Bước {{current}} trong {{total}}",
+      "selectVault": {
+        "title": "Chọn vault của bạn",
+        "subtitle": "Tải lên tập tin vault được xuất từ tiện ích mở rộng này hoặc ví web Qubic.",
+        "label": "Tập tin vault",
+        "dropText": "Thả tập tin vault của bạn",
+        "browseText": "hoặc nhấn để duyệt (.json, .qubic-vault)"
+      },
+      "unlockSecure": {
+        "title": "Mở khóa và bảo mật",
+        "subtitle": "Cung cấp mật khẩu mới cho thiết bị này và mật khẩu nguồn nếu cần.",
+        "newPassphrase": "Mật khẩu vault mới",
+        "sourcePassphrase": "Mật khẩu vault nguồn"
+      },
+      "review": {
+        "title": "Xem lại nhập",
+        "subtitle": "Xác nhận chi tiết tập tin và mật khẩu trước khi nhập.",
+        "vaultFile": "Tập tin vault",
+        "notSelected": "Chưa chọn",
+        "sourcePassphraseProvided": "Đã cung cấp",
+        "sourcePassphraseSame": "Giống mật khẩu mới",
+        "sourcePassphraseLabel": "Mật khẩu nguồn",
+        "addMoreLater": "Bạn có thể thêm tài khoản sau trong Quản lý tài khoản."
+      },
+      "actions": {
+        "back": "Quay lại",
+        "previous": "Trước",
+        "continue": "Tiếp tục",
+        "import": "Nhập vault",
+        "importing": "Đang nhập..."
+      },
+      "errors": {
+        "fileTooLarge": "Tập tin đã chọn quá lớn để là tập tin vault hợp lệ.",
+        "selectFile": "Chọn một tập tin vault.",
+        "passphraseRequired": "Yêu cầu mật khẩu.",
+        "importFailed": "Không thể nhập vault từ ví web.",
+        "noEntries": "Đã nhập vault nhưng không tìm thấy mục nào.",
+        "generic": "Không thể nhập vault."
+      }
+    },
+    "seedSecurity": {
+      "title": "Bảo mật seed của bạn",
+      "subtitle": "Lưu seed 55 chữ cái này ở nơi an toàn. Bạn sẽ cần nó để khôi phục ví của mình.",
+      "subtitleAddAddress": "Lưu seed 55 chữ cái này ở nơi an toàn. Bạn sẽ cần nó để khôi phục địa chỉ này.",
+      "warningTitle": "Lưu seed này một cách an toàn.",
+      "seedLabel": "Seed",
+      "publicIdentityLabel": "Danh tính công khai",
+      "deriving": "Đang tạo...",
+      "generateNew": "Tạo seed mới",
+      "copySeed": "Sao chép seed",
+      "seedCopied": "Đã sao chép seed",
+      "confirmationLabel": "Tôi đã lưu seed này một cách an toàn và hiểu rằng nó cần thiết để khôi phục ví này."
+    }
+  }
+}
