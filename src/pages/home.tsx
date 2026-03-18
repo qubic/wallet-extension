@@ -7,7 +7,7 @@ import {
   PackageIcon,
   RefreshCwIcon,
 } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import QRCode from 'qrcode'
 import { useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -17,7 +17,8 @@ import { ReceiveIcon } from '@/components/icons/receive-icon'
 import { SendIcon } from '@/components/icons/send-icon'
 import { useTranslation } from 'react-i18next'
 import { truncateString } from '@/lib/utils'
-import { getCurrentIdentity, isWatchOnlyIdentity } from '@/lib/accounts'
+import { isWatchOnlyIdentity } from '@/lib/accounts'
+import { useCurrentIdentity } from '@/hooks/use-current-identity'
 import { aggregateAssets, formatAssetUnits, useOwnedAssets } from '@/lib/assets'
 import { useLatestStats } from '@/lib/network-stats'
 import { useClipboardCopy } from '@/hooks/use-clipboard-copy'
@@ -59,8 +60,12 @@ const sectionMotion = {
 const Home = () => {
   const { t } = useTranslation()
   usePendingTransactionsVersion()
-  const [identity, setIdentity] = useState(getCurrentIdentity())
-  const [isWatchOnly, setIsWatchOnly] = useState(() => isWatchOnlyIdentity(getCurrentIdentity()))
+  const [isWatchOnly, setIsWatchOnly] = useState(false)
+  const handleIdentityRefresh = useCallback(
+    (id: string) => setIsWatchOnly(isWatchOnlyIdentity(id)),
+    [],
+  )
+  const identity = useCurrentIdentity(handleIdentityRefresh)
   const pathname = globalThis.location?.pathname ?? ''
   const isSidePanel = pathname.endsWith('sidepanel.html')
   const isPopup = pathname.endsWith('popup.html')
@@ -112,22 +117,6 @@ const Home = () => {
       },
     })
   }
-
-  useEffect(() => {
-    const refreshIdentity = () => {
-      const nextIdentity = getCurrentIdentity()
-      setIdentity(nextIdentity)
-      setIsWatchOnly(isWatchOnlyIdentity(nextIdentity))
-    }
-
-    refreshIdentity()
-    window.addEventListener('storage', refreshIdentity)
-    window.addEventListener('wallet-account-updated', refreshIdentity)
-    return () => {
-      window.removeEventListener('storage', refreshIdentity)
-      window.removeEventListener('wallet-account-updated', refreshIdentity)
-    }
-  }, [])
 
   useEffect(() => {
     resolvePendingTransactions(transactionItems, archiverProcessedTick)

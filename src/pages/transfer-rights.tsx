@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -30,7 +30,8 @@ import {
 } from '@/components/ui/drawer'
 import SummaryRow from '@/components/pages/transfer/summary-row'
 import PassphraseAuth from '@/pages/passphrase-auth'
-import { getCurrentIdentity, isWatchOnlyIdentity } from '@/lib/accounts'
+import { isWatchOnlyIdentity } from '@/lib/accounts'
+import { useCurrentIdentity } from '@/hooks/use-current-identity'
 import { formatAssetUnits, getAssetsPerContract, useOwnedAssets } from '@/lib/assets'
 import { QX_CONTRACT_INDEX } from '@/lib/config/constants'
 import { useSmartContracts } from '@/lib/qubic-static'
@@ -79,8 +80,12 @@ const TransferRights = () => {
   const preselectedAsset = searchParams.get('asset') ?? ''
   const preselectedContract = searchParams.get('contractIndex')
 
-  const [currentIdentity, setCurrentIdentity] = useState(getCurrentIdentity())
-  const [isWatchOnly, setIsWatchOnly] = useState(() => isWatchOnlyIdentity(getCurrentIdentity()))
+  const [isWatchOnly, setIsWatchOnly] = useState(false)
+  const handleIdentityRefresh = useCallback(
+    (identity: string) => setIsWatchOnly(isWatchOnlyIdentity(identity)),
+    [],
+  )
+  const currentIdentity = useCurrentIdentity(handleIdentityRefresh)
 
   const sdk = useSdk()
   const balance = useBalance(currentIdentity)
@@ -194,21 +199,6 @@ const TransferRights = () => {
       }
     }
   }, [selectedSourceIndex, selectedDestIndex, destinationOptions])
-
-  useEffect(() => {
-    const refreshAccount = () => {
-      const nextIdentity = getCurrentIdentity()
-      setCurrentIdentity(nextIdentity)
-      setIsWatchOnly(isWatchOnlyIdentity(nextIdentity))
-    }
-    refreshAccount()
-    window.addEventListener('storage', refreshAccount)
-    window.addEventListener('wallet-account-updated', refreshAccount)
-    return () => {
-      window.removeEventListener('storage', refreshAccount)
-      window.removeEventListener('wallet-account-updated', refreshAccount)
-    }
-  }, [])
 
   useEffect(() => {
     const handlePendingSettled = () => {
