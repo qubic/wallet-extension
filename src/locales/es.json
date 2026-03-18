@@ -48,7 +48,8 @@
       "empty": "No hay activos adicionales.",
       "emptyTitle": "Sin activos aún",
       "error": "No se pudieron cargar los activos.",
-      "unknown": "Activo desconocido"
+      "unknown": "Activo desconocido",
+      "manageRights": "Gestionar derechos"
     },
     "receive": {
       "title": "Recibir Qubic",
@@ -344,6 +345,55 @@
       "broadcastFailed": "Fallo al transmitir la transacción.",
       "watchOnly": "Las cuentas de solo lectura no pueden enviar transferencias.",
       "generic": "Transferencia fallida. Intenta de nuevo."
+    }
+  },
+  "transferRights": {
+    "title": "Transferir derechos de gestión",
+    "selectAssetSubtitle": "Selecciona el activo para transferir derechos de gestión",
+    "noAssets": "No hay activos con derechos de gestión transferibles.",
+    "noDestinationContracts": "No hay contratos de destino elegibles disponibles.",
+    "sourceContract": "Contrato de origen",
+    "sourceContractPlaceholder": "Seleccionar contrato de origen",
+    "destinationContract": "Contrato de destino",
+    "destinationContractPlaceholder": "Seleccionar contrato de destino",
+    "numberOfSharesPlaceholder": "Ingresa el número de participaciones",
+    "available": "Disponible: {{balance}} {{token}}",
+    "fee": "Comisión: {{fee}} QUBIC",
+    "quBalance": "Saldo: {{balance}} QUBIC",
+    "confirm": {
+      "title": "Confirmar transferencia de derechos",
+      "description": "Revisa los detalles antes de transferir los derechos de gestión.",
+      "asset": "Activo",
+      "from": "Desde contrato",
+      "to": "Hacia contrato",
+      "shares": "Participaciones",
+      "feeLabel": "Comisión",
+      "warning": "Esta acción no se puede deshacer."
+    },
+    "validation": {
+      "sourceRequired": "El contrato de origen es requerido.",
+      "destinationRequired": "El contrato de destino es requerido.",
+      "sameContract": "El origen y destino deben ser contratos diferentes.",
+      "sharesRequired": "El número de participaciones es requerido.",
+      "sharesInvalid": "El número de participaciones debe ser un número positivo.",
+      "sharesExceedsBalance": "El número de participaciones excede el saldo disponible.",
+      "insufficientQuForFee": "Saldo QUBIC insuficiente para cubrir la comisión de {{fee}} QU."
+    },
+    "actions": {
+      "continue": "Continuar",
+      "confirm": "Confirmar y transferir",
+      "sending": "Transfiriendo...",
+      "cancel": "Cancelar"
+    },
+    "success": {
+      "title": "Derechos transferidos",
+      "description": "Tu transacción ha sido transmitida y está programada para el tick {{targetTick}}."
+    },
+    "errors": {
+      "networkError": "Error de red. Intenta de nuevo.",
+      "broadcastFailed": "Fallo al transmitir la transacción.",
+      "watchOnly": "Las cuentas de solo lectura no pueden transferir derechos.",
+      "generic": "Transferencia de derechos fallida. Intenta de nuevo."
     }
   },
   "passphraseAuth": {

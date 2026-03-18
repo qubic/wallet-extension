@@ -1,6 +1,13 @@
 import { useBalance, useTransactions } from '@qubic-labs/react'
-import { CopyIcon, EyeIcon, Loader2Icon, PackageIcon, RefreshCwIcon } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import {
+  ArrowRightLeftIcon,
+  CopyIcon,
+  EyeIcon,
+  Loader2Icon,
+  PackageIcon,
+  RefreshCwIcon,
+} from 'lucide-react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import QRCode from 'qrcode'
 import { useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -10,7 +17,8 @@ import { ReceiveIcon } from '@/components/icons/receive-icon'
 import { SendIcon } from '@/components/icons/send-icon'
 import { useTranslation } from 'react-i18next'
 import { truncateString } from '@/lib/utils'
-import { getCurrentIdentity, isWatchOnlyIdentity } from '@/lib/accounts'
+import { isWatchOnlyIdentity } from '@/lib/accounts'
+import { useCurrentIdentity } from '@/hooks/use-current-identity'
 import { aggregateAssets, formatAssetUnits, useOwnedAssets } from '@/lib/assets'
 import { useLatestStats } from '@/lib/network-stats'
 import { useClipboardCopy } from '@/hooks/use-clipboard-copy'
@@ -52,8 +60,12 @@ const sectionMotion = {
 const Home = () => {
   const { t } = useTranslation()
   usePendingTransactionsVersion()
-  const [identity, setIdentity] = useState(getCurrentIdentity())
-  const [isWatchOnly, setIsWatchOnly] = useState(() => isWatchOnlyIdentity(getCurrentIdentity()))
+  const [isWatchOnly, setIsWatchOnly] = useState(false)
+  const handleIdentityRefresh = useCallback(
+    (id: string) => setIsWatchOnly(isWatchOnlyIdentity(id)),
+    [],
+  )
+  const identity = useCurrentIdentity(handleIdentityRefresh)
   const pathname = globalThis.location?.pathname ?? ''
   const isSidePanel = pathname.endsWith('sidepanel.html')
   const isPopup = pathname.endsWith('popup.html')
@@ -105,22 +117,6 @@ const Home = () => {
       },
     })
   }
-
-  useEffect(() => {
-    const refreshIdentity = () => {
-      const nextIdentity = getCurrentIdentity()
-      setIdentity(nextIdentity)
-      setIsWatchOnly(isWatchOnlyIdentity(nextIdentity))
-    }
-
-    refreshIdentity()
-    window.addEventListener('storage', refreshIdentity)
-    window.addEventListener('wallet-account-updated', refreshIdentity)
-    return () => {
-      window.removeEventListener('storage', refreshIdentity)
-      window.removeEventListener('wallet-account-updated', refreshIdentity)
-    }
-  }, [])
 
   useEffect(() => {
     resolvePendingTransactions(transactionItems, archiverProcessedTick)
@@ -280,26 +276,43 @@ const Home = () => {
             )}
             {ownedAssets.data && aggregatedAssets.length > 0 && (
               <div className="space-y-2">
-                {aggregatedAssets.map((asset) => (
-                  <div
-                    key={`${asset.issuerIdentity}-${asset.name}`}
-                    className="group flex items-center justify-between rounded-lg border border-border/40 bg-transparent px-3 py-2.5 transition-colors hover:border-primary/30 hover:bg-background/40"
-                  >
-                    <div className="min-w-0 flex flex-col">
-                      <span className="truncate text-sm font-semibold leading-none text-foreground">
-                        {asset.name}
-                      </span>
-                      {asset.issuerIdentity && (
-                        <span className="truncate font-mono text-[11px] text-muted-foreground">
-                          {truncateString(asset.issuerIdentity)}
+                {aggregatedAssets.map((asset) => {
+                  const assetKey = `${asset.issuerIdentity}-${asset.name}`
+                  return (
+                    <div
+                      key={assetKey}
+                      className="group flex items-center justify-between rounded-lg border border-border/40 bg-transparent px-3 py-2.5 transition-colors hover:border-primary/30 hover:bg-background/40"
+                    >
+                      <div className="min-w-0 flex flex-col">
+                        <span className="truncate text-sm font-semibold leading-none text-foreground">
+                          {asset.name}
                         </span>
-                      )}
+                        {asset.issuerIdentity && (
+                          <span className="truncate font-mono text-[11px] text-muted-foreground">
+                            {truncateString(asset.issuerIdentity)}
+                          </span>
+                        )}
+                      </div>
+                      <div className="ml-3 flex shrink-0 items-center gap-2">
+                        <span className="text-right text-base font-semibold tabular-nums text-foreground">
+                          {formatAssetUnits(asset.numberOfUnits, asset.decimals)}
+                        </span>
+                        <button
+                          type="button"
+                          title={t('home.assets.manageRights')}
+                          className="cursor-pointer rounded-md p-1 text-muted-foreground opacity-0 transition-all hover:bg-primary/10 hover:text-primary group-hover:opacity-100"
+                          onClick={() =>
+                            navigate(
+                              `/transfer/manage-rights?asset=${encodeURIComponent(assetKey)}`,
+                            )
+                          }
+                        >
+                          <ArrowRightLeftIcon className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
                     </div>
-                    <div className="ml-3 shrink-0 text-right text-base font-semibold tabular-nums text-foreground">
-                      {formatAssetUnits(asset.numberOfUnits, asset.decimals)}
-                    </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             )}
             {ownedAssets.isSuccess && (!ownedAssets.data || aggregatedAssets.length === 0) && (
