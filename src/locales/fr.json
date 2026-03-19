@@ -137,7 +137,11 @@
       "back": "Paramètres",
       "empty": "Aucun site connecté.",
       "disconnect": "Déconnecter",
-      "connectedAt": "Connecté le : {{date}}"
+      "connectedAt": "Connecté le : {{date}}",
+      "authorizedAccounts": "Comptes autorisés",
+      "authorizedAccountsCount": "Comptes autorisés ({{count}})",
+      "accountFallback": "Compte",
+      "noAuthorizedAccounts": "Aucun compte autorisé"
     },
     "security": {
       "title": "Sécurité",
@@ -442,13 +446,6 @@
       "genericSubtitle": "Vérifiez cette demande avant de continuer.",
       "messageLabel": "Message",
       "messageEmpty": "Aucun aperçu du message disponible.",
-      "messageWarningTitle": "Vérifiez attentivement le message",
-      "messageWarnings": {
-        "encoded": "La dApp vous demande de signer des données encodées (hex/base64), qui peuvent ne pas être lisibles.",
-        "url": "Le message contient une URL. Assurez-vous qu'elle correspond au site de confiance.",
-        "sensitiveTerms": "Le message contient des termes sensibles d'approbation/transaction. Confirmez ce que vous autorisez.",
-        "long": "Le message est long et peut masquer des détails importants."
-      },
       "txTo": "À",
       "txAmount": "Montant",
       "txInputType": "Type d'entrée",

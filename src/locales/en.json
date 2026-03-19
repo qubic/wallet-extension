@@ -136,8 +136,12 @@
       "title": "Connected sites",
       "back": "Settings",
       "empty": "No websites are connected.",
+      "authorizedAccounts": "Authorized accounts",
+      "authorizedAccountsCount": "Authorized accounts ({{count}})",
+      "accountFallback": "Account",
       "disconnect": "Disconnect",
-      "connectedAt": "Connected: {{date}}"
+      "connectedAt": "Connected: {{date}}",
+      "noAuthorizedAccounts": "No authorized accounts"
     },
     "security": {
       "title": "Security",
@@ -442,13 +446,6 @@
       "genericSubtitle": "Review this request before continuing.",
       "messageLabel": "Message",
       "messageEmpty": "No message preview available.",
-      "messageWarningTitle": "Review message carefully",
-      "messageWarnings": {
-        "encoded": "The dApp is asking you to sign encoded data (hex/base64), which may not be human-readable.",
-        "url": "The message contains a URL. Make sure it matches the website you trust.",
-        "sensitiveTerms": "The message includes sensitive approval/transaction wording. Confirm what you are authorizing.",
-        "long": "The message is long and may hide important details."
-      },
       "txTo": "To",
       "txAmount": "Amount",
       "txInputType": "Input type",

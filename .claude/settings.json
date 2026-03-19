@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e \"const { version } = require\\(''./package.json''\\); console.log\\(''version:'', version\\)\")",
+      "Bash(gh run:*)",
+      "Bash(python3 -c \":*)",
+      "Bash(node -e \":*)",
+      "Bash(node /tmp/check_placeholders.js)",
+      "Bash(git status:*)",
+      "Bash(git stash:*)",
+      "Bash(cp /tmp/wallet-staged/src/components/pages/transaction-details/tx-details-header.tsx src/components/pages/transaction-details/tx-details-header.tsx)",
+      "Bash(cp /tmp/wallet-staged/src/pages/transaction-details.tsx src/pages/transaction-details.tsx)",
+      "Bash(cp /tmp/wallet-staged/src/styles/global.css src/styles/global.css)",
+      "Bash(cp /tmp/wallet-staged/src/pages/history.tsx src/pages/history.tsx)",
+      "Bash(cp /tmp/wallet-staged/src/components/pages/home/transactions-preview.tsx src/components/pages/home/transactions-preview.tsx)",
+      "Bash(cp /tmp/wallet-staged/src/components/pages/transfer/transfer-form.tsx src/components/pages/transfer/transfer-form.tsx)",
+      "Bash(cp /tmp/wallet-staged/src/pages/transfer.tsx src/pages/transfer.tsx)",
+      "Bash(done)",
+      "Bash(find /Users/jmoccetti/qubic/github/qubic/wallet-app -name eye*.png -o -name *eye* -type f)",
+      "Bash(cp /Users/jmoccetti/qubic/github/qubic/wallet-app/assets/images/3.0x/eye-closed.png /Users/jmoccetti/qubic/github/qubic/wallet-extension/public/icons/eye-closed.png)",
+      "Bash(cp /Users/jmoccetti/qubic/github/qubic/wallet-app/assets/images/3.0x/eye-open.png /Users/jmoccetti/qubic/github/qubic/wallet-extension/public/icons/eye-open.png)",
+      "Bash(gh issue:*)",
+      "Bash(do grep:*)"
+    ],
+    "additionalDirectories": [
+      "/private/tmp/wallet-staged"
+    ]
+  }
+}
