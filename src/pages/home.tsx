@@ -19,6 +19,7 @@ import { useTranslation } from 'react-i18next'
 import { truncateString } from '@/lib/utils'
 import { isWatchOnlyIdentity } from '@/lib/accounts'
 import { useCurrentIdentity } from '@/hooks/use-current-identity'
+import { HIDDEN_BALANCE, useBalanceVisibility } from '@/lib/balance-visibility'
 import { aggregateAssets, formatAssetUnits, useOwnedAssets } from '@/lib/assets'
 import { useLatestStats } from '@/lib/network-stats'
 import { useClipboardCopy } from '@/hooks/use-clipboard-copy'
@@ -60,6 +61,7 @@ const sectionMotion = {
 const Home = () => {
   const { t } = useTranslation()
   usePendingTransactionsVersion()
+  const { isVisible } = useBalanceVisibility()
   const [isWatchOnly, setIsWatchOnly] = useState(false)
   const handleIdentityRefresh = useCallback(
     (id: string) => setIsWatchOnly(isWatchOnlyIdentity(id)),
@@ -297,7 +299,9 @@ const Home = () => {
                       </div>
                       <div className="ml-3 flex shrink-0 items-center gap-2">
                         <span className="text-right text-base font-semibold tabular-nums text-foreground">
-                          {formatAssetUnits(asset.numberOfUnits, asset.decimals)}
+                          {isVisible
+                            ? formatAssetUnits(asset.numberOfUnits, asset.decimals)
+                            : HIDDEN_BALANCE}
                         </span>
                         <button
                           type="button"

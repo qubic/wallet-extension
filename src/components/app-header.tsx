@@ -17,6 +17,7 @@ import { useClipboardCopy } from '@/hooks/use-clipboard-copy'
 import { useQueries } from '@tanstack/react-query'
 import { useSdk } from '@qubic-labs/react'
 import { formatBalanceCompact } from '@/lib/utils'
+import { HIDDEN_BALANCE, useBalanceVisibility } from '@/lib/balance-visibility'
 import {
   getAccountOrder,
   getCachedAccounts,
@@ -41,6 +42,7 @@ const AppHeader = ({
   closeSidePanelLabel,
 }: AppHeaderProps) => {
   const { t } = useTranslation()
+  const { isVisible } = useBalanceVisibility()
   const sdk = useSdk()
   const navigate = useNavigate()
   const { copyText } = useClipboardCopy({
@@ -228,9 +230,11 @@ const AppHeader = ({
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                           <span className="truncate">{truncateString(account.identity)}</span>
                           <span className="shrink-0 text-[11px] font-semibold text-foreground">
-                            {balanceByIdentity.has(account.identity)
-                              ? formatBalanceCompact(balanceByIdentity.get(account.identity) ?? 0n)
-                              : '--'}
+                            {isVisible
+                              ? balanceByIdentity.has(account.identity)
+                                ? formatBalanceCompact(balanceByIdentity.get(account.identity) ?? 0n)
+                                : '--'
+                              : HIDDEN_BALANCE}
                           </span>
                         </div>
                       </div>

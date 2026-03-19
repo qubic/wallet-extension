@@ -18,6 +18,9 @@
     },
     "balance": {
       "label": "Balance",
+      "title": "QUBIC Balance",
+      "show": "Show balance",
+      "hide": "Hide balance",
       "loading": "Loading..."
     },
     "hero": {

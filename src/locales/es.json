@@ -18,6 +18,9 @@
     },
     "balance": {
       "label": "Saldo",
+      "title": "Saldo QUBIC",
+      "show": "Mostrar saldo",
+      "hide": "Ocultar saldo",
       "loading": "Cargando..."
     },
     "hero": {

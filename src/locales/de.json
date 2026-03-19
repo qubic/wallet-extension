@@ -18,6 +18,9 @@
     },
     "balance": {
       "label": "Kontostand",
+      "title": "QUBIC-Guthaben",
+      "show": "Guthaben anzeigen",
+      "hide": "Guthaben ausblenden",
       "loading": "Lädt..."
     },
     "hero": {

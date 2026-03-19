@@ -18,6 +18,9 @@
     },
     "balance": {
       "label": "Số dư",
+      "title": "Số dư QUBIC",
+      "show": "Hiển thị số dư",
+      "hide": "Ẩn số dư",
       "loading": "Đang tải..."
     },
     "hero": {
