@@ -17,6 +17,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { formatBalanceCompact, truncateString } from '@/lib/utils'
+import { HIDDEN_BALANCE, useBalanceVisibility } from '@/lib/balance-visibility'
 import type { AccountEntry } from '@/components/pages/manage-accounts/types'
 
 type AccountListItemProps = {
@@ -53,6 +54,7 @@ const AccountListItem = ({
   onRemove,
 }: AccountListItemProps) => {
   const { t } = useTranslation()
+  const { isVisible } = useBalanceVisibility()
 
   return (
     <button
@@ -94,7 +96,11 @@ const AccountListItem = ({
               {truncateString(account.identity, { leading: 5, trailing: 5 })}
             </span>
             <span className="text-[11px] font-semibold text-foreground">
-              {balance ? formatBalanceCompact(balance) : '--'}
+              {isVisible
+                ? balance !== undefined
+                  ? formatBalanceCompact(balance)
+                  : '--'
+                : HIDDEN_BALANCE}
             </span>
           </div>
         </div>

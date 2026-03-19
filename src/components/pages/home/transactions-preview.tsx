@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next'
 import AddressLabel from '@/components/address-label'
 import { formatBalanceCompact } from '@/lib/utils'
 import { getTransactionPresentation } from '@/lib/transaction-presentation'
+import { HIDDEN_BALANCE, useBalanceVisibility } from '@/lib/balance-visibility'
 import {
   canResendPendingTransaction,
   type PendingTransaction,
@@ -44,6 +45,7 @@ const TransactionsPreview = ({
   onResend,
 }: TransactionsPreviewProps) => {
   const { t } = useTranslation()
+  const { isVisible } = useBalanceVisibility()
 
   const { unconfirmedTop, unconfirmedOverflow, recentChain } = useMemo(() => {
     const items = transactions.data?.pages.flatMap((page) => page.transactions) ?? []
@@ -137,15 +139,16 @@ const TransactionsPreview = ({
         </div>
         <span
           className={`text-sm font-semibold ${
-            isPending
-              ? 'text-amber-700 dark:text-amber-300'
-              : isFailed
-                ? 'text-red-700 dark:text-red-300'
-                : amountColorClass
+            !isVisible
+              ? 'text-muted-foreground'
+              : isPending
+                ? 'text-amber-700 dark:text-amber-300'
+                : isFailed
+                  ? 'text-red-700 dark:text-red-300'
+                  : amountColorClass
           }`}
         >
-          {amountSign}
-          {formatBalanceCompact(tx.amount)}
+          {isVisible ? `${amountSign}${formatBalanceCompact(tx.amount)}` : HIDDEN_BALANCE}
         </span>
         {isFailed && (
           <div className="ml-2 flex items-center gap-1">

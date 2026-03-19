@@ -18,6 +18,9 @@
     },
     "balance": {
       "label": "余额",
+      "title": "QUBIC 余额",
+      "show": "显示余额",
+      "hide": "隐藏余额",
       "loading": "加载中..."
     },
     "hero": {

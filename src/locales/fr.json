@@ -18,6 +18,9 @@
     },
     "balance": {
       "label": "Solde",
+      "title": "Solde QUBIC",
+      "show": "Afficher le solde",
+      "hide": "Masquer le solde",
       "loading": "Chargement..."
     },
     "hero": {

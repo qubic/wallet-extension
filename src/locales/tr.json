@@ -18,6 +18,9 @@
     },
     "balance": {
       "label": "Bakiye",
+      "title": "QUBIC Bakiyesi",
+      "show": "Bakiyeyi göster",
+      "hide": "Bakiyeyi gizle",
       "loading": "Yükleniyor..."
     },
     "hero": {
