@@ -2,7 +2,14 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeftIcon, Link2OffIcon } from 'lucide-react'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion'
 import { Button } from '@/components/ui/button'
+import { ACCOUNT_UPDATED_EVENT, getCachedAccounts, getWatchOnlyAccounts } from '@/lib/accounts'
 import { getChromeApi } from '@/lib/dapp/chrome-api'
 import {
   type DappPermissionRecord,
@@ -16,6 +23,7 @@ const ConnectedSites = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const [sites, setSites] = useState<DappPermissionRecord[]>([])
+  const [accountNames, setAccountNames] = useState<Record<string, string>>({})
 
   const [disconnectingOrigin, setDisconnectingOrigin] = useState('')
 
@@ -23,6 +31,15 @@ const ConnectedSites = () => {
     const permissions = await getDappPermissions()
     const entries = Object.values(permissions).sort((a, b) => b.connectedAt - a.connectedAt)
     setSites(entries)
+  }, [])
+
+  const loadAccountNames = useCallback(() => {
+    const entries = [...getCachedAccounts(), ...getWatchOnlyAccounts()]
+    const next: Record<string, string> = {}
+    for (const entry of entries) {
+      next[entry.identity] = entry.name
+    }
+    setAccountNames(next)
   }, [])
 
   useEffect(() => {
@@ -36,6 +53,17 @@ const ConnectedSites = () => {
     chromeApi?.storage?.onChanged?.addListener(onChanged)
     return () => chromeApi?.storage?.onChanged?.removeListener(onChanged)
   }, [loadSites])
+
+  useEffect(() => {
+    loadAccountNames()
+    const refresh = () => loadAccountNames()
+    window.addEventListener(ACCOUNT_UPDATED_EVENT, refresh)
+    window.addEventListener('storage', refresh)
+    return () => {
+      window.removeEventListener(ACCOUNT_UPDATED_EVENT, refresh)
+      window.removeEventListener('storage', refresh)
+    }
+  }, [loadAccountNames])
 
   const handleDisconnect = async (origin: string) => {
     setDisconnectingOrigin(origin)
@@ -68,34 +96,56 @@ const ConnectedSites = () => {
         ) : (
           <div className="space-y-2">
             {sites.map((site) => (
-              <div
-                key={site.origin}
-                className="flex items-center gap-3 rounded-lg border border-border/60 px-3 py-3"
-              >
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium text-foreground">{site.origin}</p>
-                  {site.approvedIdentities?.map((id) => (
-                    <p key={id} className="truncate font-mono text-xs text-muted-foreground">
-                      {truncateString(id)}
+              <div key={site.origin} className="rounded-lg border border-border/60 px-3 py-3">
+                <div className="flex items-start gap-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium text-foreground">{site.origin}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {t('settings.connectedSites.connectedAt', {
+                        date: new Date(site.connectedAt).toLocaleString(),
+                      })}
                     </p>
-                  ))}
-                  <p className="text-xs text-muted-foreground">
-                    {t('settings.connectedSites.connectedAt', {
-                      date: new Date(site.connectedAt).toLocaleString(),
-                    })}
-                  </p>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="gap-1"
+                    onClick={() => void handleDisconnect(site.origin)}
+                    disabled={disconnectingOrigin === site.origin}
+                  >
+                    <Link2OffIcon className="h-3.5 w-3.5" />
+                    {t('settings.connectedSites.disconnect')}
+                  </Button>
                 </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="gap-1"
-                  onClick={() => void handleDisconnect(site.origin)}
-                  disabled={disconnectingOrigin === site.origin}
-                >
-                  <Link2OffIcon className="h-3.5 w-3.5" />
-                  {t('settings.connectedSites.disconnect')}
-                </Button>
+                {(site.approvedIdentities?.length ?? 0) === 0 ? (
+                  <p className="mt-2 truncate text-xs text-muted-foreground">
+                    {t('settings.connectedSites.authorizedAccounts')}:{' '}
+                    {t('settings.connectedSites.allAccounts')}
+                  </p>
+                ) : (
+                  <Accordion type="single" collapsible className="mt-1">
+                    <AccordionItem value="authorized-accounts" className="border-b-0">
+                      <AccordionTrigger className="py-2 text-xs text-muted-foreground hover:no-underline">
+                        {t('settings.connectedSites.authorizedAccountsCount', {
+                          count: site.approvedIdentities?.length ?? 0,
+                        })}
+                      </AccordionTrigger>
+                      <AccordionContent className="pb-1">
+                        <div className="space-y-1">
+                          {site.approvedIdentities?.map((id) => (
+                            <p key={id} className="truncate text-xs text-muted-foreground">
+                              <span className="text-foreground">
+                                {accountNames[id] ?? t('settings.connectedSites.accountFallback')}
+                              </span>{' '}
+                              <span className="font-mono">({truncateString(id)})</span>
+                            </p>
+                          ))}
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                )}
               </div>
             ))}
           </div>

@@ -132,6 +132,10 @@
       "title": "Connected sites",
       "back": "Settings",
       "empty": "No websites are connected.",
+      "authorizedAccounts": "Authorized accounts",
+      "authorizedAccountsCount": "Authorized accounts ({{count}})",
+      "allAccounts": "All accounts",
+      "accountFallback": "Account",
       "disconnect": "Disconnect",
       "connectedAt": "Connected: {{date}}"
     },

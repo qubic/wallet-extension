@@ -132,6 +132,10 @@
       "title": "Sitios conectados",
       "back": "Ajustes",
       "empty": "No hay sitios web conectados.",
+      "authorizedAccounts": "Cuentas autorizadas",
+      "authorizedAccountsCount": "Cuentas autorizadas ({{count}})",
+      "allAccounts": "Todas las cuentas",
+      "accountFallback": "Cuenta",
       "disconnect": "Desconectar",
       "connectedAt": "Conectado: {{date}}"
     },
