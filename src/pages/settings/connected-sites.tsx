@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeftIcon, Link2OffIcon } from 'lucide-react'
@@ -9,7 +9,6 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion'
 import { Button } from '@/components/ui/button'
-import { ACCOUNT_UPDATED_EVENT, getCachedAccounts, getWatchOnlyAccounts } from '@/lib/accounts'
 import { getChromeApi } from '@/lib/dapp/chrome-api'
 import {
   type DappPermissionRecord,
@@ -17,13 +16,21 @@ import {
   getDappPermissions,
   removeDappPermission,
 } from '@/lib/dapp/storage'
+import { useAccountNames } from '@/hooks/use-account-names'
 import { truncateString } from '@/lib/utils'
 
 const ConnectedSites = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const [sites, setSites] = useState<DappPermissionRecord[]>([])
-  const [accountNames, setAccountNames] = useState<Record<string, string>>({})
+  const allAccounts = useAccountNames()
+  const accountNames = useMemo(() => {
+    const next: Record<string, string> = {}
+    for (const entry of allAccounts) {
+      next[entry.identity] = entry.name
+    }
+    return next
+  }, [allAccounts])
 
   const [disconnectingOrigin, setDisconnectingOrigin] = useState('')
 
@@ -31,15 +38,6 @@ const ConnectedSites = () => {
     const permissions = await getDappPermissions()
     const entries = Object.values(permissions).sort((a, b) => b.connectedAt - a.connectedAt)
     setSites(entries)
-  }, [])
-
-  const loadAccountNames = useCallback(() => {
-    const entries = [...getCachedAccounts(), ...getWatchOnlyAccounts()]
-    const next: Record<string, string> = {}
-    for (const entry of entries) {
-      next[entry.identity] = entry.name
-    }
-    setAccountNames(next)
   }, [])
 
   useEffect(() => {
@@ -53,17 +51,6 @@ const ConnectedSites = () => {
     chromeApi?.storage?.onChanged?.addListener(onChanged)
     return () => chromeApi?.storage?.onChanged?.removeListener(onChanged)
   }, [loadSites])
-
-  useEffect(() => {
-    loadAccountNames()
-    const refresh = () => loadAccountNames()
-    window.addEventListener(ACCOUNT_UPDATED_EVENT, refresh)
-    window.addEventListener('storage', refresh)
-    return () => {
-      window.removeEventListener(ACCOUNT_UPDATED_EVENT, refresh)
-      window.removeEventListener('storage', refresh)
-    }
-  }, [loadAccountNames])
 
   const handleDisconnect = async (origin: string) => {
     setDisconnectingOrigin(origin)

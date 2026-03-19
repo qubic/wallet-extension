@@ -393,7 +393,7 @@ const executeApprovedRequest = async (
       }
       const existing = permissions[normalizedOrigin]
       const previousIdentities = existing?.approvedIdentities ?? []
-      const identityToApprove = currentAccount?.identity
+      const identityToApprove = currentAccount.identity
       const approvedIdentities =
         identityToApprove && !previousIdentities.includes(identityToApprove)
           ? [...previousIdentities, identityToApprove]
