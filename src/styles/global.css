@@ -40,9 +40,8 @@
   --destructive: #f97066;
   --destructive-foreground: var(--foreground);
 
-  --positive: #7ed890;
-
   --success: #47cd89;
+  --positive: var(--success);
   --success-foreground: var(--primary-foreground);
 
   --warning: #fabc3c;
@@ -85,9 +84,8 @@
   --destructive: #d92d20;
   --destructive-foreground: #ffffff;
 
-  --positive: #2e7d32;
-
   --success: #079455;
+  --positive: var(--success);
   --success-foreground: #ffffff;
 
   --warning: #f5a623;
