@@ -36,23 +36,44 @@ export const parseAmount = (str: string): bigint | null => {
   return BigInt(cleaned)
 }
 
+const standardFormatter = new Intl.NumberFormat('en', { notation: 'standard' })
+const compactFormatter = new Intl.NumberFormat('en', {
+  notation: 'compact',
+  maximumFractionDigits: 2,
+})
+
+/**
+ * Format a number with commas (e.g. 1,000,000). Use for any numeric display.
+ */
+export const formatNumber = (value: number | bigint): string => {
+  return standardFormatter.format(value as number)
+}
+
 /**
  * Format balance for display with full precision (standard notation)
  */
 export const formatBalance = (value: bigint): string => {
-  return new Intl.NumberFormat('en', {
-    notation: 'standard',
-  }).format(value)
+  return formatNumber(value)
 }
 
 /**
  * Format balance for display with compact notation (e.g., 1.5B, 2.3M)
  */
 export const formatBalanceCompact = (value: bigint): string => {
-  return new Intl.NumberFormat('en', {
-    notation: 'compact',
-    maximumFractionDigits: 2,
-  }).format(Number(value))
+  return compactFormatter.format(Number(value))
+}
+
+const usdFormatter = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  maximumFractionDigits: 2,
+})
+
+/**
+ * Format a number as USD currency (e.g. $1,234.56)
+ */
+export const formatUsd = (value: number): string => {
+  return usdFormatter.format(value)
 }
 
 type TruncateStringOptions = {

@@ -12,29 +12,23 @@ import {
 import { useAddressName } from '@/hooks/use-address-name'
 import { useProcedureName } from '@/hooks/use-procedure-name'
 import { useClipboardCopy } from '@/hooks/use-clipboard-copy'
-import { formatAddressLabel } from '@/lib/utils'
+import { formatAddressLabel, formatNumber } from '@/lib/utils'
 import TxDetailsHeader from '@/components/pages/transaction-details/tx-details-header'
 import TxDetailsRow, { formatValue } from '@/components/pages/transaction-details/tx-details-row'
 
 const formatIntegerLike = (value: unknown): string => {
   if (value === null || value === undefined) return '--'
 
-  if (typeof value === 'bigint') {
-    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-  }
+  if (typeof value === 'bigint') return formatNumber(value)
 
   if (typeof value === 'number') {
     if (!Number.isFinite(value)) return '--'
-    return Math.trunc(value).toLocaleString()
+    return formatNumber(Math.trunc(value))
   }
 
   if (typeof value === 'string') {
     const normalized = value.trim()
-    if (/^-?\d+$/.test(normalized)) {
-      const sign = normalized.startsWith('-') ? '-' : ''
-      const digits = sign ? normalized.slice(1) : normalized
-      return `${sign}${digits.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`
-    }
+    if (/^-?\d+$/.test(normalized)) return formatNumber(BigInt(normalized))
   }
 
   return formatValue(value)
@@ -118,7 +112,7 @@ const TransactionDetails = () => {
       value: (() => {
         const tick = details?.tickNumber ?? details?.tick ?? pending?.targetTick
         if (tick === null || tick === undefined) return '--'
-        return Number(tick).toLocaleString()
+        return formatNumber(Number(tick))
       })(),
     },
     {

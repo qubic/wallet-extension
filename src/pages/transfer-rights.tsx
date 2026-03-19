@@ -45,7 +45,7 @@ import {
 import { addPendingTransaction, PENDING_SETTLED_EVENT } from '@/lib/pending-transactions'
 import { isWalletLocked } from '@/lib/lock'
 import { useTickInfo, fetchTickInfo } from '@/lib/network-stats'
-import { formatBalance, normalizeBalance, parseAmount } from '@/lib/utils'
+import { formatBalance, formatNumber, normalizeBalance, parseAmount } from '@/lib/utils'
 
 type Step = 'select-asset' | 'form' | 'auth'
 type FormErrors = {
@@ -375,7 +375,7 @@ const TransferRights = () => {
 
       toast.success(t('transferRights.success.title'), {
         description: t('transferRights.success.description', {
-          targetTick: Number(result.targetTick).toLocaleString(),
+          targetTick: formatNumber(Number(result.targetTick)),
         }),
       })
 
@@ -734,7 +734,7 @@ const TransferRights = () => {
                   />
                   <div className="text-[11px] text-muted-foreground">
                     {t('transfer.form.targetTickCurrentHint', {
-                      tick: typeof currentTick === 'number' ? currentTick.toLocaleString() : '--',
+                      tick: typeof currentTick === 'number' ? formatNumber(currentTick) : '--',
                     })}
                   </div>
                 </div>

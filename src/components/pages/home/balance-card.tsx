@@ -1,16 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import type { useBalance } from '@qubic-labs/react'
 import { useTranslation } from 'react-i18next'
-import { formatBalanceCompact, normalizeBalance } from '@/lib/utils'
+import { formatBalanceCompact, formatUsd, normalizeBalance } from '@/lib/utils'
 
 const formatUsdFromNumber = (value: number, pricePerQu?: number) => {
   if (!pricePerQu) return '--'
-  const usdValue = value * pricePerQu
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 2,
-  }).format(usdValue)
+  return formatUsd(value * pricePerQu)
 }
 
 const getCachedBalance = (identity: string): bigint | null => {
