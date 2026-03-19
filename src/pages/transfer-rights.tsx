@@ -660,17 +660,10 @@ const TransferRights = () => {
 
             {/* Target tick */}
             <div className="space-y-2">
-              <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
-                <span>
-                  {isManualTargetTickEnabled
-                    ? t('transfer.form.targetTickManual')
-                    : t('transfer.form.targetTickOffset')}
-                </span>
-                <span className="text-xs font-medium text-foreground">
-                  {isManualTargetTickEnabled
-                    ? manualTargetTick.trim() || '--'
-                    : `+${targetTickOffset}`}
-                </span>
+              <div className="text-xs text-muted-foreground">
+                {isManualTargetTickEnabled
+                  ? t('transfer.form.targetTickManual')
+                  : t('transfer.form.targetTickOffset')}
               </div>
               <div className="flex flex-wrap gap-2">
                 {QUICK_TARGET_TICK_OFFSETS.map((offset) => (
@@ -728,7 +721,7 @@ const TransferRights = () => {
                         setErrors((prev) => ({ ...prev, targetTick: undefined }))
                       }
                     }}
-                    className="h-10 w-full"
+                    className="h-12 w-full text-sm"
                     disabled={isWatchOnly}
                     placeholder={t('transfer.form.targetTickManualPlaceholder')}
                   />
