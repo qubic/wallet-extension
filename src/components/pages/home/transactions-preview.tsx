@@ -148,9 +148,7 @@ const TransactionsPreview = ({
                   : amountColorClass
           }`}
         >
-          {isVisible
-            ? `${amountSign}${formatBalanceCompact(tx.amount)}`
-            : HIDDEN_BALANCE}
+          {isVisible ? `${amountSign}${formatBalanceCompact(tx.amount)}` : HIDDEN_BALANCE}
         </span>
         {isFailed && (
           <div className="ml-2 flex items-center gap-1">

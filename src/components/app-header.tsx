@@ -232,7 +232,9 @@ const AppHeader = ({
                           <span className="shrink-0 text-[11px] font-semibold text-foreground">
                             {isVisible
                               ? balanceByIdentity.has(account.identity)
-                                ? formatBalanceCompact(balanceByIdentity.get(account.identity) ?? 0n)
+                                ? formatBalanceCompact(
+                                    balanceByIdentity.get(account.identity) ?? 0n,
+                                  )
                                 : '--'
                               : HIDDEN_BALANCE}
                           </span>
