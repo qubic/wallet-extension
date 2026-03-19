@@ -162,11 +162,13 @@ const enqueueApprovalRequest = async (request: DappExecutionRequest) => {
 const connectOrigin = async (origin: string, requestId: string, session: string) => {
   const permissions = await getDappPermissions()
   const account = await getDappCurrentAccount()
+  if (!account?.identity) {
+    throw new DappProviderError('NO_ACCOUNT', 'No active account is selected')
+  }
   const existingPermission = permissions[origin]
 
-  const needsApproval = account
-    ? !existingPermission || !isAccountApprovedForOrigin(origin, permissions, account.identity)
-    : !existingPermission
+  const needsApproval =
+    !existingPermission || !isAccountApprovedForOrigin(origin, permissions, account.identity)
 
   if (needsApproval) {
     await enqueueApprovalRequest({
@@ -176,7 +178,7 @@ const connectOrigin = async (origin: string, requestId: string, session: string)
       createdAt: Date.now(),
       session,
       state: 'awaitingApproval',
-      account: account ?? undefined,
+      account,
     })
     return asRuntimePendingAck(requestId)
   }
@@ -386,6 +388,9 @@ const executeApprovedRequest = async (
       }
       const permissions = await getDappPermissions()
       const currentAccount = await getDappCurrentAccount()
+      if (!currentAccount?.identity) {
+        return asDappFailure(request.id, 'NO_ACCOUNT', 'No active account is selected')
+      }
       const existing = permissions[normalizedOrigin]
       const previousIdentities = existing?.approvedIdentities ?? []
       const identityToApprove = currentAccount?.identity
