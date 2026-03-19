@@ -1,3 +1,60 @@
+# [1.0.0-beta.4](https://github.com/qubic/wallet-extension/compare/v1.0.0-beta.3...v1.0.0-beta.4) (2026-03-19)
+
+
+### Bug Fixes
+
+* **ci:** resolve version before build so dist contains correct version ([71a0fe7](https://github.com/qubic/wallet-extension/commit/71a0fe7e36dd9a49c34f2dec8500344549ecb451))
+* **dapp:** improve signing approval passphrase handling ([55d7b38](https://github.com/qubic/wallet-extension/commit/55d7b38f04177def5401695cc7070d1f44d3015c))
+* **dapp:** require active account for connect ([ed22cd5](https://github.com/qubic/wallet-extension/commit/ed22cd534ac4dfc90750e4ddb821b4aa79a87fe3))
+* **home:** add bQUBIC suffix and highlight price in primary color ([b89798d](https://github.com/qubic/wallet-extension/commit/b89798dd0328d5eb3080d386b54dc990653dec27))
+* **i18n:** add missing transfer.confirm.from key to all locales ([a7ff859](https://github.com/qubic/wallet-extension/commit/a7ff8590c5f1b5e9f11307c99e61e8dd493f9e3b))
+* **i18n:** remove orphaned txDetails.copyTxId and txDetails.refresh keys ([241a306](https://github.com/qubic/wallet-extension/commit/241a306f58bc1ab21ac8a17f49755c6775e77c5c))
+* **i18n:** rename vault recipients label to "Your accounts" ([2059da8](https://github.com/qubic/wallet-extension/commit/2059da8b9fad9eaff6a33ad73c8184150fe71ef1))
+* **release:** show beta intro and install instructions only on beta releases ([819df2b](https://github.com/qubic/wallet-extension/commit/819df2b26105c3d1e11ec2370fc71ab55170369b))
+* **review:** align account auth semantics and locale coverage ([f809a76](https://github.com/qubic/wallet-extension/commit/f809a76b032653920f5ba256fd49c1ebd97415e0))
+* **transfer-rights:** remove redundant tick label and align input ([2bf8174](https://github.com/qubic/wallet-extension/commit/2bf81749e67a890d3daaaf3d36ca8547398a4d38))
+* **transfer:** show QX-managed balance, remove redundant tick label, match input styling ([3d5b508](https://github.com/qubic/wallet-extension/commit/3d5b5084048f11f9d5794d120ba07612b4b57ab9))
+* **tx-details:** remove duplicate hash, rename to TX ID, reposition explorer button ([bacb369](https://github.com/qubic/wallet-extension/commit/bacb3693b6fbff3f57394a71a8a4401a1ba1e49b))
+* **tx:** extract shared presentation logic and fix display issues ([33b0c95](https://github.com/qubic/wallet-extension/commit/33b0c950be6ff594c653242fd9d11ed7682e0e85))
+* **ui:** use success color for positive token via var() ([eca1890](https://github.com/qubic/wallet-extension/commit/eca1890f273806a5c2ae175e1fdea2e745cff9b1))
+
+
+### Features
+
+* add balance visibility toggle ([#110](https://github.com/qubic/wallet-extension/issues/110)) ([4572010](https://github.com/qubic/wallet-extension/commit/4572010bd14b12886f30f93ad989f331303036b3))
+* **i18n:** add German, French, Russian, Turkish, Vietnamese, and Chinese translations ([3a674bb](https://github.com/qubic/wallet-extension/commit/3a674bbf734aca1af639ad62fd5b2e0e678e7d5c))
+* **settings:** streamline connected sites account details ([dfce8a2](https://github.com/qubic/wallet-extension/commit/dfce8a2873f83b2376909d8eae07abaa9b6294db))
+* **ui:** add positive color for incoming transaction amounts ([b52c338](https://github.com/qubic/wallet-extension/commit/b52c338605723dec074adecdd90eafc9f4ee66f7)), closes [#7ed890](https://github.com/qubic/wallet-extension/issues/7ed890) [#2e7d32](https://github.com/qubic/wallet-extension/issues/2e7d32)
+
+
+---
+
+**Qubic Wallet — Beta Release**
+
+Manage your Qubic accounts, send transfers, transfer asset rights, and connect to dApps via the `window.qubic` provider API.
+
+This is a pre-release build — please report any issues on [GitHub Issues](https://github.com/qubic/wallet-extension/issues).
+
+## Install (Chrome / Chromium)
+
+### First time
+
+1. Download **wallet-extension-dist.zip** from the assets below
+2. Unzip to a permanent folder (e.g. `~/qubic-wallet`)
+3. Open `chrome://extensions`
+4. Enable **Developer mode** (top right)
+5. Click **Load unpacked** and select the unzipped folder
+6. Pin the extension from the puzzle icon in the toolbar
+
+### Updating
+
+1. Download the new **wallet-extension-dist.zip**
+2. Delete the contents of your existing extension folder
+3. Unzip the new files into the **same folder**
+4. Open `chrome://extensions` and click the **reload** button (↻) on the extension
+
+> **Important:** Always reuse the same folder. Loading from a different folder changes the extension ID and you will lose your wallet data.
+
 # [1.0.0-beta.3](https://github.com/qubic/wallet-extension/compare/v1.0.0-beta.2...v1.0.0-beta.3) (2026-03-19)
 
 
