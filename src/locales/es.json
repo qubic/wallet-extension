@@ -274,7 +274,7 @@
     "copyTxId": "Copiar txid",
     "copied": "Copiado",
     "copyFailed": "Error al copiar",
-    "hash": "Hash",
+    "txId": "ID de TX",
     "amount": "Monto",
     "tick": "Tick",
     "inputType": "Tipo de input",

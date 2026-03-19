@@ -274,7 +274,7 @@
     "copyTxId": "复制交易 ID",
     "copied": "已复制",
     "copyFailed": "复制失败",
-    "hash": "Hash",
+    "txId": "交易 ID",
     "amount": "金额",
     "tick": "Tick",
     "inputType": "输入类型",

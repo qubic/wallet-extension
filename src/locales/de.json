@@ -274,7 +274,7 @@
     "copyTxId": "Transaktions-ID kopieren",
     "copied": "Kopiert",
     "copyFailed": "Kopieren fehlgeschlagen",
-    "hash": "Hash",
+    "txId": "TX-ID",
     "amount": "Betrag",
     "tick": "Tick",
     "inputType": "Eingabetyp",

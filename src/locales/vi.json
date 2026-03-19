@@ -274,7 +274,7 @@
     "copyTxId": "Sao chép txid",
     "copied": "Đã sao chép",
     "copyFailed": "Sao chép thất bại",
-    "hash": "Hash",
+    "txId": "ID giao dịch",
     "amount": "Số lượng",
     "tick": "Tick",
     "inputType": "Loại đầu vào",

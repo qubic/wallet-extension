@@ -274,7 +274,7 @@
     "copyTxId": "Копировать txid",
     "copied": "Скопировано",
     "copyFailed": "Ошибка копирования",
-    "hash": "Hash",
+    "txId": "ID транзакции",
     "amount": "Сумма",
     "tick": "Tick",
     "inputType": "Тип ввода",

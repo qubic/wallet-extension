@@ -274,7 +274,7 @@
     "copyTxId": "İşlem kimliğini kopyala",
     "copied": "Kopyalandı",
     "copyFailed": "Kopyalama başarısız",
-    "hash": "Hash",
+    "txId": "TX ID",
     "amount": "Miktar",
     "tick": "Tick",
     "inputType": "Giriş türü",

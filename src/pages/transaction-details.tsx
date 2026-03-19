@@ -95,7 +95,7 @@ const TransactionDetails = () => {
     copyable?: boolean
     copyText?: string
   }> = [
-    { key: 'hash', label: t('txDetails.hash'), value: hash, copyable: true },
+    { key: 'hash', label: t('txDetails.txId'), value: hash, copyable: true },
     {
       key: 'amount',
       label: t('txDetails.amount'),
@@ -142,7 +142,7 @@ const TransactionDetails = () => {
 
   return (
     <section className="flex w-full justify-center pt-4">
-      <div className="flex w-full max-w-sm flex-col gap-4 px-4 pb-4">
+      <div className="flex w-full max-w-sm flex-col gap-3 px-4 pb-4">
         <button
           type="button"
           className="flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
@@ -151,7 +151,7 @@ const TransactionDetails = () => {
           <ArrowLeftIcon className="h-3.5 w-3.5" />
           {t('txDetails.back')}
         </button>
-        <TxDetailsHeader hash={hash} copiedKey={copiedKey} onCopy={copyValue} />
+        <TxDetailsHeader hash={hash} />
 
         {txQuery.isLoading && (
           <div className="space-y-2">
