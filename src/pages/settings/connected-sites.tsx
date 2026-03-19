@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeftIcon, Link2OffIcon } from 'lucide-react'
@@ -75,7 +75,7 @@ const ConnectedSites = () => {
     }
   }
 
-  const empty = useMemo(() => sites.length === 0, [sites.length])
+  const empty = sites.length === 0
 
   return (
     <section className="flex w-full justify-center pt-4">
@@ -121,7 +121,7 @@ const ConnectedSites = () => {
                 {(site.approvedIdentities?.length ?? 0) === 0 ? (
                   <p className="mt-2 truncate text-xs text-muted-foreground">
                     {t('settings.connectedSites.authorizedAccounts')}:{' '}
-                    {t('settings.connectedSites.allAccounts')}
+                    {t('settings.connectedSites.noAuthorizedAccounts')}
                   </p>
                 ) : (
                   <Accordion type="single" collapsible className="mt-1">

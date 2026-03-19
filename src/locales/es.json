@@ -135,10 +135,10 @@
       "empty": "No hay sitios web conectados.",
       "authorizedAccounts": "Cuentas autorizadas",
       "authorizedAccountsCount": "Cuentas autorizadas ({{count}})",
-      "allAccounts": "Todas las cuentas",
       "accountFallback": "Cuenta",
       "disconnect": "Desconectar",
-      "connectedAt": "Conectado: {{date}}"
+      "connectedAt": "Conectado: {{date}}",
+      "noAuthorizedAccounts": "No hay cuentas autorizadas"
     },
     "security": {
       "title": "Seguridad",
@@ -442,13 +442,6 @@
       "genericSubtitle": "Revisa esta solicitud antes de continuar.",
       "messageLabel": "Mensaje",
       "messageEmpty": "No hay vista previa del mensaje.",
-      "messageWarningTitle": "Revisa el mensaje con cuidado",
-      "messageWarnings": {
-        "encoded": "La dApp solicita firmar datos codificados (hex/base64), que pueden no ser legibles.",
-        "url": "El mensaje contiene una URL. Asegúrate de que coincida con el sitio en el que confías.",
-        "sensitiveTerms": "El mensaje incluye texto sensible de aprobación/transacción. Confirma qué estás autorizando.",
-        "long": "El mensaje es largo y puede ocultar detalles importantes."
-      },
       "txTo": "Para",
       "txAmount": "Cantidad",
       "txInputType": "Tipo de entrada",

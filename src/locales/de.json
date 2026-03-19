@@ -134,7 +134,11 @@
       "back": "Einstellungen",
       "empty": "Keine Websites verbunden.",
       "disconnect": "Trennen",
-      "connectedAt": "Verbunden: {{date}}"
+      "connectedAt": "Verbunden: {{date}}",
+      "authorizedAccounts": "Autorisierte Konten",
+      "authorizedAccountsCount": "Autorisierte Konten ({{count}})",
+      "accountFallback": "Konto",
+      "noAuthorizedAccounts": "Keine autorisierten Konten"
     },
     "security": {
       "title": "Sicherheit",
@@ -438,13 +442,6 @@
       "genericSubtitle": "Überprüfe diese Anfrage, bevor du fortfährst.",
       "messageLabel": "Nachricht",
       "messageEmpty": "Keine Nachrichtenvorschau verfügbar.",
-      "messageWarningTitle": "Nachricht sorgfältig prüfen",
-      "messageWarnings": {
-        "encoded": "Die dApp fordert dich auf, codierte Daten (hex/base64) zu signieren, die möglicherweise nicht lesbar sind.",
-        "url": "Die Nachricht enthält eine URL. Stelle sicher, dass sie zur vertrauenswürdigen Website gehört.",
-        "sensitiveTerms": "Die Nachricht enthält sensible Genehmigungs-/Transaktionsformulierungen. Bestätige, was du autorisierst.",
-        "long": "Die Nachricht ist lang und könnte wichtige Details verbergen."
-      },
       "txTo": "An",
       "txAmount": "Betrag",
       "txInputType": "Eingabetyp",
