@@ -14,8 +14,6 @@ export type DappTxApprovalSummary = Readonly<{
   fee: string
 }>
 
-export type DappMessageWarning = 'encoded' | 'url' | 'sensitiveTerms' | 'long'
-
 type ApprovalPreviewOptions = {
   account?: {
     identity: string
@@ -86,30 +84,6 @@ export const getApprovalMessagePreview = (params: unknown): string => {
   if (typeof record.hex === 'string') return record.hex
   if (typeof record.base64 === 'string') return record.base64
   return ''
-}
-
-export const getApprovalMessageWarnings = (params: unknown): DappMessageWarning[] => {
-  const warnings = new Set<DappMessageWarning>()
-  const message = getApprovalMessagePreview(params)
-
-  if (message.length > 180) warnings.add('long')
-  if (/(https?:\/\/|www\.)/i.test(message)) warnings.add('url')
-  if (
-    /\b(seed|mnemonic|recovery|private key|passphrase|authorize|approval|transaction|transfer)\b/i.test(
-      message,
-    )
-  ) {
-    warnings.add('sensitiveTerms')
-  }
-
-  if (params && typeof params === 'object') {
-    const record = params as Record<string, unknown>
-    if (typeof record.hex === 'string' || typeof record.base64 === 'string') {
-      warnings.add('encoded')
-    }
-  }
-
-  return Array.from(warnings)
 }
 
 export const getApprovalConnectSummary = (params: unknown): DappConnectApprovalSummary | null => {

@@ -137,7 +137,11 @@
       "back": "设置",
       "empty": "暂无已连接的网站。",
       "disconnect": "断开连接",
-      "connectedAt": "连接时间：{{date}}"
+      "connectedAt": "连接时间：{{date}}",
+      "authorizedAccounts": "已授权账户",
+      "authorizedAccountsCount": "已授权账户（{{count}}）",
+      "accountFallback": "账户",
+      "noAuthorizedAccounts": "没有已授权账户"
     },
     "security": {
       "title": "安全",
@@ -442,13 +446,6 @@
       "genericSubtitle": "继续前请审核此请求。",
       "messageLabel": "消息",
       "messageEmpty": "无消息预览。",
-      "messageWarningTitle": "请仔细审核消息",
-      "messageWarnings": {
-        "encoded": "该 dApp 请求您签署编码数据（hex/base64），可能无法直接阅读。",
-        "url": "消息中包含 URL，请确认其与您信任的网站一致。",
-        "sensitiveTerms": "消息包含敏感的授权/交易相关措辞，请确认您正在授权的内容。",
-        "long": "消息较长，可能隐藏重要信息。"
-      },
       "txTo": "收款方",
       "txAmount": "金额",
       "txInputType": "输入类型",

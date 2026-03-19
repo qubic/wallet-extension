@@ -190,6 +190,7 @@ Common provider error codes:
 
 Notes for dApp developers:
 - `connect` requires user approval (approve/reject) in the extension.
+- `connect` also requires an active account. If no account is available, the request fails with `NO_ACCOUNT` (no approval/onboarding popup is opened).
 - `signMessage`, `signTransaction`, and `sendTransaction` require user approval and wallet passphrase confirmation.
 - `signTransaction` returns signed bytes only. Broadcasting is handled by your app/backend.
 - `sendTransaction` signs and broadcasts in one step. It resolves the target tick automatically if not provided (using `targetTickOffset`, default 10).
@@ -204,15 +205,16 @@ Notes for dApp developers:
 ### local test smoke (dapp feature)
 1. `bun run build`
 2. Reload extension in `chrome://extensions`
-3. Open a dApp page on `http://localhost:*` or `https://...`
-4. Run:
+3. Ensure the wallet has an active account selected.
+4. Open a dApp page on `http://localhost:*` or `https://...`
+5. Run:
    - `window.qubic`
    - `await window.qubic.connect()`
    - `await window.qubic.getAccount()`
    - `await window.qubic.signMessage({ message: 'hello' })`
    - `await window.qubic.sendTransaction({ toIdentity: '...', amount: '1' })`
 
-Connected websites can be managed in `Settings -> Connected sites`.
+Connected websites can be managed in `Settings -> Connected sites`, including the per-site authorized account list.
 
 For a full interactive test app, see [wallet-extension-dapp](https://github.com/qubic/wallet-extension-dapp).
 
@@ -258,4 +260,3 @@ Releases are automated via [Semantic Release](https://semantic-release.gitbook.i
 **Manual trigger:** Actions -> release workflow -> Run workflow on `main`
 
 **Local dry-run:** `bun run release:dry` (requires Node.js >= 22)
-

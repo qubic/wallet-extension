@@ -137,7 +137,11 @@
       "back": "Cài đặt",
       "empty": "Không có trang web nào được kết nối.",
       "disconnect": "Ngắt kết nối",
-      "connectedAt": "Kết nối: {{date}}"
+      "connectedAt": "Kết nối: {{date}}",
+      "authorizedAccounts": "Tài khoản được ủy quyền",
+      "authorizedAccountsCount": "Tài khoản được ủy quyền ({{count}})",
+      "accountFallback": "Tài khoản",
+      "noAuthorizedAccounts": "Không có tài khoản được ủy quyền"
     },
     "security": {
       "title": "Bảo mật",
@@ -442,13 +446,6 @@
       "genericSubtitle": "Xem lại yêu cầu này trước khi tiếp tục.",
       "messageLabel": "Tin nhắn",
       "messageEmpty": "Không có bản xem trước tin nhắn.",
-      "messageWarningTitle": "Xem lại tin nhắn cẩn thận",
-      "messageWarnings": {
-        "encoded": "dApp yêu cầu bạn ký dữ liệu được mã hóa (hex/base64), có thể không đọc được.",
-        "url": "Tin nhắn chứa URL. Hãy đảm bảo nó khớp với trang web bạn tin tưởng.",
-        "sensitiveTerms": "Tin nhắn chứa nội dung nhạy cảm về phê duyệt/giao dịch. Xác nhận những gì bạn đang ủy quyền.",
-        "long": "Tin nhắn dài và có thể ẩn các chi tiết quan trọng."
-      },
       "txTo": "Đến",
       "txAmount": "Số lượng",
       "txInputType": "Loại đầu vào",

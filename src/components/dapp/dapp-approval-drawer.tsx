@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router-dom'
-import { AlertTriangleIcon, GlobeIcon, Link2OffIcon, LinkIcon } from 'lucide-react'
+import { GlobeIcon, Link2OffIcon, LinkIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Drawer,
@@ -20,13 +20,13 @@ import { RUNTIME_APPROVAL_DECISION_TYPE } from '@/lib/dapp/protocol'
 import {
   getApprovalConnectSummary,
   getApprovalMessagePreview,
-  getApprovalMessageWarnings,
   getApprovalTxSummary,
 } from '@/lib/dapp/approval-preview'
 import { getChromeApi } from '@/lib/dapp/chrome-api'
 import { PasswordInput } from '@/components/ui/password-input'
 import { truncateString } from '@/lib/utils'
 import { isWalletLocked } from '@/lib/lock'
+import { validateVaultPassphrase } from '@/lib/vault'
 
 const DappApprovalDrawer = () => {
   const { t } = useTranslation()
@@ -81,10 +81,6 @@ const DappApprovalDrawer = () => {
     () => getApprovalMessagePreview(current?.params),
     [current?.params],
   )
-  const messageWarnings = useMemo(
-    () => getApprovalMessageWarnings(current?.params),
-    [current?.params],
-  )
   const connectSummary = useMemo(
     () => getApprovalConnectSummary(current?.params),
     [current?.params],
@@ -116,9 +112,21 @@ const DappApprovalDrawer = () => {
       return
     }
 
-    if (approved && requiresPassphrase && !passphrase.trim()) {
-      setError(t('passphraseAuth.validation.required'))
-      return
+    const normalizedPassphrase = passphrase.trim()
+    if (approved && requiresPassphrase) {
+      if (!normalizedPassphrase) {
+        setError(t('passphraseAuth.validation.required'))
+        return
+      }
+      const validation = await validateVaultPassphrase(normalizedPassphrase)
+      if (!validation.valid) {
+        setError(
+          validation.reason === 'invalid'
+            ? t('passphraseAuth.errors.invalidPassphrase')
+            : t('passphraseAuth.errors.generic'),
+        )
+        return
+      }
     }
 
     setLoading(true)
@@ -131,7 +139,7 @@ const DappApprovalDrawer = () => {
             payload: {
               id: current.id,
               approved,
-              passphrase: approved && requiresPassphrase ? passphrase : undefined,
+              passphrase: approved && requiresPassphrase ? normalizedPassphrase : undefined,
             },
           },
           (response?: { ok?: boolean }) => {
@@ -212,26 +220,6 @@ const DappApprovalDrawer = () => {
                       : t('dapp.approval.messageEmpty')}
                   </p>
                 </div>
-                {messageWarnings.length > 0 && (
-                  <div className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-3">
-                    <div className="mb-1 flex items-center gap-2 text-amber-700 dark:text-amber-300">
-                      <AlertTriangleIcon className="h-4 w-4" />
-                      <p className="text-xs font-semibold">
-                        {t('dapp.approval.messageWarningTitle')}
-                      </p>
-                    </div>
-                    <div className="space-y-1">
-                      {messageWarnings.map((warning) => (
-                        <p
-                          key={warning}
-                          className="text-xs text-amber-800/90 dark:text-amber-200/90"
-                        >
-                          {t(`dapp.approval.messageWarnings.${warning}`)}
-                        </p>
-                      ))}
-                    </div>
-                  </div>
-                )}
               </div>
             )}
             {(current.method === 'signTransaction' || current.method === 'sendTransaction') &&
