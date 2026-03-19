@@ -102,7 +102,7 @@ const TransactionsPreview = ({
                 : isFailed
                   ? 'border-red-500/40 bg-red-500/15 text-red-700 dark:text-red-300'
                   : isIncoming
-                    ? 'border-primary/40 bg-primary/10 text-primary'
+                    ? 'border-positive/40 bg-positive/10 text-positive'
                     : 'border-[var(--destructive)]/40 bg-[var(--destructive)]/10 text-[var(--destructive)]'
             }`}
           >
