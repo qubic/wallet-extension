@@ -1,3 +1,33 @@
+# [1.0.0-beta.3](https://github.com/qubic/wallet-extension/compare/v1.0.0-beta.2...v1.0.0-beta.3) (2026-03-19)
+
+
+### Features
+
+* balance visibility toggle and dApp auth improvements ([cf62f2b](https://github.com/qubic/wallet-extension/commit/cf62f2b4d9ab7024a7d42c5b60418dd3edf0e005))
+
+
+---
+
+## Install (Chrome / Chromium)
+
+### First time
+
+1. Download **wallet-extension-dist.zip** from the assets below
+2. Unzip to a permanent folder (e.g. `~/qubic-wallet`)
+3. Open `chrome://extensions`
+4. Enable **Developer mode** (top right)
+5. Click **Load unpacked** and select the unzipped folder
+6. Pin the extension from the puzzle icon in the toolbar
+
+### Updating
+
+1. Download the new **wallet-extension-dist.zip**
+2. Delete the contents of your existing extension folder
+3. Unzip the new files into the **same folder**
+4. Open `chrome://extensions` and click the **reload** button (↻) on the extension
+
+> **Important:** Always reuse the same folder. Loading from a different folder changes the extension ID and you will lose your wallet data.
+
 # [1.0.0-beta.2](https://github.com/qubic/wallet-extension/compare/v1.0.0-beta.1...v1.0.0-beta.2) (2026-03-18)
 
 
