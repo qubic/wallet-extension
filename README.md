@@ -86,6 +86,7 @@ The extension injects `window.qubic` into regular web pages (`http/https`).
 - `getAccount(): Promise<{ identity: string; name?: string } | null>`
 - `signMessage(params): Promise<{ signatureHex: string; digestHex: string }>`
 - `signTransaction(params): Promise<{ txId: string; targetTick: number; txBytesBase64: string; txBytesHex: string }>`
+- `sendTransaction(params): Promise<{ txId: string; targetTick: number; txBytesBase64: string; txBytesHex: string; networkTxId: string; broadcast: unknown }>`
 
 ### events
 - `window.qubic.on('accountChanged', cb)`
@@ -136,10 +137,11 @@ Common provider error codes:
 - `NO_ACCOUNT`
 
 Notes for dApp developers:
-- `connect`, `signMessage`, and `signTransaction` require user approval in the extension.
-- `signMessage` and `signTransaction` also require wallet passphrase confirmation.
+- `connect`, `signMessage`, `signTransaction`, and `sendTransaction` require user approval in the extension.
+- `signMessage`, `signTransaction`, and `sendTransaction` also require wallet passphrase confirmation.
+- `connect` requires an active account. If no account is available, the request fails with `NO_ACCOUNT` (no approval/onboarding popup is opened).
 - `signTransaction` returns signed bytes only. Broadcasting is handled by your app/backend.
-- The current integration exposes the wallet's active account (wallet-level connect), not per-origin account selection.
+- Authorization is identity-scoped: `connect()` approves the currently active account for that origin.
 
 ### implementation notes (extension developers)
 - Requests requiring approval are persisted so they survive MV3 service worker restarts.
@@ -150,14 +152,15 @@ Notes for dApp developers:
 ### local test smoke (dapp feature)
 1. `bun run build`
 2. Reload extension in `chrome://extensions`
-3. Open a dApp page on `http://localhost:*` or `https://...`
-4. Run:
+3. Ensure the wallet has an active account selected.
+4. Open a dApp page on `http://localhost:*` or `https://...`
+5. Run:
    - `window.qubic`
    - `await window.qubic.connect()`
    - `await window.qubic.getAccount()`
    - `await window.qubic.signMessage({ message: 'hello' })`
 
-Connected websites can be managed in `Settings -> Connected sites`.
+Connected websites can be managed in `Settings -> Connected sites`, including the per-site authorized account list.
 
 ## Development workflow
 
@@ -201,4 +204,3 @@ Releases are automated via [Semantic Release](https://semantic-release.gitbook.i
 **Manual trigger:** Actions -> release workflow -> Run workflow on `main`
 
 **Local dry-run:** `bun run release:dry` (requires Node.js >= 22)
-
