@@ -27,7 +27,7 @@ export const isAccountApprovedForOrigin = (
   identity: string,
 ): boolean => {
   const permission = permissions[origin]
-  if (!permission?.approvedIdentities?.length) return true
+  if (!permission?.approvedIdentities?.length) return false
   return permission.approvedIdentities.includes(identity)
 }
 
