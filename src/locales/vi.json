@@ -303,7 +303,7 @@
       "available": "Khả dụng: {{balance}} {{token}}",
       "availableQx": "Khả dụng (quản lý bởi Qx): {{balance}} {{token}}",
       "totalBalanceHint": "* Tổng số dư: {{balance}} {{token}}. Để tăng số dư có thể chuyển, hãy di chuyển thêm sang QX qua \"Chuyển quyền quản lý\" trong Tài sản.",
-      "vaultRecipients": "Danh tính của bạn",
+      "vaultRecipients": "Tài khoản của bạn",
       "vaultRecipientsManual": "Nhập thủ công",
       "targetTickOffset": "Tick mục tiêu (hiện tại + N)",
       "targetTickManual": "Tick mục tiêu (thủ công)",

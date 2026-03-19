@@ -303,7 +303,7 @@
       "available": "可用：{{balance}} {{token}}",
       "availableQx": "可用（由 Qx 管理）：{{balance}} {{token}}",
       "totalBalanceHint": "* 总余额：{{balance}} {{token}}。要增加可转账余额，请先在资产中通过\"转移管理权限\"将更多资产移至 QX。",
-      "vaultRecipients": "我的身份",
+      "vaultRecipients": "我的账户",
       "vaultRecipientsManual": "手动输入",
       "targetTickOffset": "目标 Tick（当前 + N）",
       "targetTickManual": "目标 Tick（手动）",

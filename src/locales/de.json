@@ -303,7 +303,7 @@
       "available": "Verfügbar: {{balance}} {{token}}",
       "availableQx": "Verfügbar (von Qx verwaltet): {{balance}} {{token}}",
       "totalBalanceHint": "* Gesamtguthaben: {{balance}} {{token}}. Um das übertragbare Guthaben zu erhöhen, verschiebe mehr zu QX über \"Verwaltungsrechte übertragen\" in Assets.",
-      "vaultRecipients": "Deine Adressen",
+      "vaultRecipients": "Deine Konten",
       "vaultRecipientsManual": "Manuelle Eingabe",
       "targetTickOffset": "Ziel-Tick (aktuell + N)",
       "targetTickManual": "Ziel-Tick (manuell)",

@@ -303,7 +303,7 @@
       "available": "Доступно: {{balance}} {{token}}",
       "availableQx": "Доступно (управляется Qx): {{balance}} {{token}}",
       "totalBalanceHint": "* Общий баланс: {{balance}} {{token}}. Чтобы увеличить переводимый баланс, переместите больше в QX через \"Передать права управления\" в Активах.",
-      "vaultRecipients": "Ваши идентичности",
+      "vaultRecipients": "Ваши аккаунты",
       "vaultRecipientsManual": "Ввод вручную",
       "targetTickOffset": "Целевой тик (текущий + N)",
       "targetTickManual": "Целевой тик (вручную)",

@@ -303,7 +303,7 @@
       "available": "Disponible: {{balance}} {{token}}",
       "availableQx": "Disponible (gestionado por Qx): {{balance}} {{token}}",
       "totalBalanceHint": "* Balance total: {{balance}} {{token}}. Para aumentar el balance transferible, mueve más a QX a través de \"Transferir derechos de gestión\" en Activos.",
-      "vaultRecipients": "Tus identidades",
+      "vaultRecipients": "Tus cuentas",
       "vaultRecipientsManual": "Entrada manual",
       "targetTickOffset": "Tick objetivo (actual + N)",
       "targetTickManual": "Tick objetivo (manual)",

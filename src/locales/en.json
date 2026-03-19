@@ -303,7 +303,7 @@
       "available": "Available: {{balance}} {{token}}",
       "availableQx": "Available (managed by Qx): {{balance}} {{token}}",
       "totalBalanceHint": "* Total balance: {{balance}} {{token}}. To increase transferable balance, move more to QX via \"Transfer Management Rights\" in Assets first.",
-      "vaultRecipients": "Your identities",
+      "vaultRecipients": "Your accounts",
       "vaultRecipientsManual": "Manual entry",
       "targetTickOffset": "Target tick (current + N)",
       "targetTickManual": "Target tick (manual)",
