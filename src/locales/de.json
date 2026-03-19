@@ -325,6 +325,7 @@
     "confirm": {
       "title": "Überweisung bestätigen",
       "description": "Überprüfe die Details vor dem Senden.",
+      "from": "Von",
       "to": "An",
       "amount": "Betrag",
       "warning": "Diese Aktion kann nicht rückgängig gemacht werden.",

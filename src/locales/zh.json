@@ -325,6 +325,7 @@
     "confirm": {
       "title": "确认转账",
       "description": "发送前请核实以下详情。",
+      "from": "付款方",
       "to": "收款方",
       "amount": "金额",
       "warning": "此操作无法撤销。",

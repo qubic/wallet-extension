@@ -325,6 +325,7 @@
     "confirm": {
       "title": "Xác nhận chuyển khoản",
       "description": "Xem lại chi tiết trước khi gửi.",
+      "from": "Từ",
       "to": "Đến",
       "amount": "Số lượng",
       "warning": "Hành động này không thể hoàn tác.",

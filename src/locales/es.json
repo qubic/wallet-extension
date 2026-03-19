@@ -325,6 +325,7 @@
     "confirm": {
       "title": "Confirmar transferencia",
       "description": "Revisa los detalles antes de enviar.",
+      "from": "Desde",
       "to": "Para",
       "amount": "Monto",
       "warning": "Esta acción no se puede deshacer.",

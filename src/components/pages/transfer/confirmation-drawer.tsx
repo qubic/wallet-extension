@@ -57,7 +57,7 @@ const ConfirmationDrawer = ({
         <div className="flex-1 space-y-4 overflow-y-auto px-4 pb-2">
           <div className="space-y-3">
             <SummaryRow
-              label={t('transfer.form.from')}
+              label={t('transfer.confirm.from')}
               value={formatAddressLabel(sourceIdentity, sourceName?.name)}
               mono
             />

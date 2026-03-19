@@ -325,6 +325,7 @@
     "confirm": {
       "title": "Transferi onayla",
       "description": "Göndermeden önce detayları gözden geçirin.",
+      "from": "Gönderen",
       "to": "Alıcı",
       "amount": "Miktar",
       "warning": "Bu işlem geri alınamaz.",

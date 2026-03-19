@@ -325,6 +325,7 @@
     "confirm": {
       "title": "Confirmer le transfert",
       "description": "Vérifiez les détails avant d'envoyer.",
+      "from": "De",
       "to": "À",
       "amount": "Montant",
       "warning": "Cette action est irréversible.",

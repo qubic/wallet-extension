@@ -325,6 +325,7 @@
     "confirm": {
       "title": "Confirm transfer",
       "description": "Review the details before sending.",
+      "from": "From",
       "to": "To",
       "amount": "Amount",
       "warning": "This action cannot be undone.",
