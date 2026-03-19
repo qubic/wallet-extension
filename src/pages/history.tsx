@@ -231,7 +231,7 @@ const History = () => {
                 isPending
                   ? 'border-amber-500/40 bg-amber-500/15 text-amber-700 dark:text-amber-300'
                   : isIncoming
-                    ? 'border-primary/40 bg-primary/10 text-primary'
+                    ? 'border-positive/40 bg-positive/10 text-positive'
                     : 'border-[var(--destructive)]/40 bg-[var(--destructive)]/10 text-[var(--destructive)]'
               }`}
             >

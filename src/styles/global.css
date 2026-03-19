@@ -41,6 +41,7 @@
   --destructive-foreground: var(--foreground);
 
   --success: #47cd89;
+  --positive: var(--success);
   --success-foreground: var(--primary-foreground);
 
   --warning: #fabc3c;
@@ -84,6 +85,7 @@
   --destructive-foreground: #ffffff;
 
   --success: #079455;
+  --positive: var(--success);
   --success-foreground: #ffffff;
 
   --warning: #f5a623;
@@ -126,6 +128,7 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-positive: var(--positive);
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);
   --color-warning: var(--warning);
