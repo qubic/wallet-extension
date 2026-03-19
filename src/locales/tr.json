@@ -301,6 +301,8 @@
       "quBalance": "Bakiye: {{balance}} QUBIC",
       "recipientHint": "60 harflik bir kimlik kullanın veya vault'unuzdan birini seçin.",
       "available": "Kullanılabilir: {{balance}} {{token}}",
+      "availableQx": "Kullanılabilir (Qx tarafından yönetilen): {{balance}} {{token}}",
+      "totalBalanceHint": "* Toplam bakiye: {{balance}} {{token}}. Transfer edilebilir bakiyeyi artırmak için Varlıklar'daki \"Yönetim Haklarını Devret\" seçeneğinden QX'e daha fazla taşıyın.",
       "vaultRecipients": "Kimlikleriniz",
       "vaultRecipientsManual": "Manuel giriş",
       "targetTickOffset": "Hedef tick (mevcut + N)",

@@ -72,6 +72,7 @@ const Transfer = () => {
   const seedRef = useRef<string | null>(null)
 
   const parsedAssets = aggregateAssets(ownedAssets.data ?? {}, true)
+  const allAssets = aggregateAssets(ownedAssets.data ?? {}, false)
   const filteredVaultRecipients = useMemo(
     () =>
       vaultRecipients.filter(
@@ -85,6 +86,10 @@ const Transfer = () => {
     selectedToken === 'qu'
       ? null
       : (parsedAssets.find((a) => `${a.issuerIdentity}-${a.name}` === selectedToken) ?? null)
+  const totalAsset =
+    selectedToken === 'qu'
+      ? null
+      : (allAssets.find((a) => `${a.issuerIdentity}-${a.name}` === selectedToken) ?? null)
   const parsedAmount = parseAmount(amount)
   const currentTick = tickInfo.data?.tickInfo?.tick
   const onChainQuBalance = normalizeBalance(balance.data?.balance)
@@ -381,6 +386,7 @@ const Transfer = () => {
         isAssetLoading={selectedToken !== 'qu' && !selectedAsset}
         vaultRecipients={filteredVaultRecipients}
         selectedAsset={selectedAsset}
+        totalAssetUnits={totalAsset?.numberOfUnits}
         targetTickOffset={targetTickOffset}
         manualTargetTick={manualTargetTick}
         isManualTargetTickEnabled={isManualTargetTickEnabled}

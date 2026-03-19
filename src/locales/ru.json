@@ -301,6 +301,8 @@
       "quBalance": "Баланс: {{balance}} QUBIC",
       "recipientHint": "Используйте 60-буквенную идентичность или выберите из vault.",
       "available": "Доступно: {{balance}} {{token}}",
+      "availableQx": "Доступно (управляется Qx): {{balance}} {{token}}",
+      "totalBalanceHint": "* Общий баланс: {{balance}} {{token}}. Чтобы увеличить переводимый баланс, переместите больше в QX через \"Передать права управления\" в Активах.",
       "vaultRecipients": "Ваши идентичности",
       "vaultRecipientsManual": "Ввод вручную",
       "targetTickOffset": "Целевой тик (текущий + N)",

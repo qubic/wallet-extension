@@ -301,6 +301,8 @@
       "quBalance": "Kontostand: {{balance}} QUBIC",
       "recipientHint": "Verwende eine 60-stellige Adresse oder wähle eine aus deinem Vault.",
       "available": "Verfügbar: {{balance}} {{token}}",
+      "availableQx": "Verfügbar (von Qx verwaltet): {{balance}} {{token}}",
+      "totalBalanceHint": "* Gesamtguthaben: {{balance}} {{token}}. Um das übertragbare Guthaben zu erhöhen, verschiebe mehr zu QX über \"Verwaltungsrechte übertragen\" in Assets.",
       "vaultRecipients": "Deine Adressen",
       "vaultRecipientsManual": "Manuelle Eingabe",
       "targetTickOffset": "Ziel-Tick (aktuell + N)",

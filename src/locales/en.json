@@ -301,6 +301,8 @@
       "quBalance": "Balance: {{balance}} QUBIC",
       "recipientHint": "Use a 60-letter identity or pick one from your vault.",
       "available": "Available: {{balance}} {{token}}",
+      "availableQx": "Available (managed by Qx): {{balance}} {{token}}",
+      "totalBalanceHint": "* Total balance: {{balance}} {{token}}. To increase transferable balance, move more to QX via \"Transfer Management Rights\" in Assets first.",
       "vaultRecipients": "Your identities",
       "vaultRecipientsManual": "Manual entry",
       "targetTickOffset": "Target tick (current + N)",

@@ -301,6 +301,8 @@
       "quBalance": "Solde : {{balance}} QUBIC",
       "recipientHint": "Utilisez une identité de 60 lettres ou choisissez-en une dans votre vault.",
       "available": "Disponible : {{balance}} {{token}}",
+      "availableQx": "Disponible (géré par Qx) : {{balance}} {{token}}",
+      "totalBalanceHint": "* Solde total : {{balance}} {{token}}. Pour augmenter le solde transférable, déplacez plus vers QX via \"Transférer les droits de gestion\" dans Actifs.",
       "vaultRecipients": "Vos identités",
       "vaultRecipientsManual": "Saisie manuelle",
       "targetTickOffset": "Tick cible (actuel + N)",
