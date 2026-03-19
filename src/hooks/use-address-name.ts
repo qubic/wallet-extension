@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { useSmartContracts, useAddressLabels, useExchanges } from '@/lib/qubic-static'
 import { useAssetIssuances } from '@/lib/assets'
-import { ACCOUNT_UPDATED_EVENT, getCachedAccounts, getWatchOnlyAccounts } from '@/lib/accounts'
+import { useAccountNames } from '@/hooks/use-account-names'
 import { EMPTY_ADDRESS } from '@/lib/config/constants'
 
 export type AddressNameResult = {
@@ -9,20 +9,12 @@ export type AddressNameResult = {
   type: 'account' | 'smartContract' | 'exchange' | 'token' | 'namedAddress'
 }
 
-const readAllAccounts = () => [...getCachedAccounts(), ...getWatchOnlyAccounts()]
-
 export const useAddressName = (address: string): AddressNameResult | undefined => {
   const { data: smartContracts } = useSmartContracts()
   const { data: exchanges } = useExchanges()
   const { data: assetIssuances } = useAssetIssuances()
   const { data: addressLabels } = useAddressLabels()
-  const [allAccounts, setAllAccounts] = useState(readAllAccounts)
-
-  useEffect(() => {
-    const refresh = () => setAllAccounts(readAllAccounts())
-    window.addEventListener(ACCOUNT_UPDATED_EVENT, refresh)
-    return () => window.removeEventListener(ACCOUNT_UPDATED_EVENT, refresh)
-  }, [])
+  const allAccounts = useAccountNames()
 
   return useMemo(() => {
     if (!address) return undefined

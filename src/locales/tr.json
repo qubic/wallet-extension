@@ -137,7 +137,11 @@
       "back": "Ayarlar",
       "empty": "Bağlı web sitesi yok.",
       "disconnect": "Bağlantıyı kes",
-      "connectedAt": "Bağlanma tarihi: {{date}}"
+      "connectedAt": "Bağlanma tarihi: {{date}}",
+      "authorizedAccounts": "Yetkili hesaplar",
+      "authorizedAccountsCount": "Yetkili hesaplar ({{count}})",
+      "accountFallback": "Hesap",
+      "noAuthorizedAccounts": "Yetkili hesap yok"
     },
     "security": {
       "title": "Güvenlik",
@@ -442,13 +446,6 @@
       "genericSubtitle": "Devam etmeden önce bu isteği gözden geçirin.",
       "messageLabel": "Mesaj",
       "messageEmpty": "Mesaj önizlemesi mevcut değil.",
-      "messageWarningTitle": "Mesajı dikkatlice inceleyin",
-      "messageWarnings": {
-        "encoded": "dApp, insan tarafından okunamayabilecek kodlanmış veri (hex/base64) imzalamanızı istiyor.",
-        "url": "Mesaj bir URL içeriyor. Güvendiğiniz web sitesiyle eşleştiğinden emin olun.",
-        "sensitiveTerms": "Mesaj hassas onay/işlem ifadeleri içeriyor. Neyi yetkilendirdiğinizi doğrulayın.",
-        "long": "Mesaj uzun ve önemli detayları gizliyor olabilir."
-      },
       "txTo": "Alıcı",
       "txAmount": "Miktar",
       "txInputType": "Giriş türü",
