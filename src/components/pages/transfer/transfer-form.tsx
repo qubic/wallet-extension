@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { type AggregatedAsset, formatAssetUnits } from '@/lib/assets'
 import { NATIVE_TOKEN_SYMBOL } from '@/lib/config/constants'
 import { useAddressName } from '@/hooks/use-address-name'
-import { formatBalance, truncateString } from '@/lib/utils'
+import { formatBalance, formatNumber, truncateString } from '@/lib/utils'
 import type { FormErrors } from '@/components/pages/transfer/types'
 
 type TransferFormProps = {
@@ -19,6 +19,7 @@ type TransferFormProps = {
   isAssetLoading: boolean
   vaultRecipients: Array<{ name: string; identity: string }>
   selectedAsset: AggregatedAsset | null
+  totalAssetUnits?: string
   targetTickOffset: number
   manualTargetTick: string
   isManualTargetTickEnabled: boolean
@@ -44,6 +45,7 @@ const TransferForm = ({
   isAssetLoading,
   vaultRecipients,
   selectedAsset,
+  totalAssetUnits,
   quBalance,
   usdEstimate,
   targetTickOffset,
@@ -213,12 +215,22 @@ const TransferForm = ({
             <div className="flex items-center justify-between px-0.5 text-xs text-muted-foreground">
               {!selectedAsset && <span>{usdEstimateDisplay}</span>}
               <span className={selectedAsset ? 'ml-auto' : ''}>
-                {t('transfer.form.available', {
+                {t(selectedAsset ? 'transfer.form.availableQx' : 'transfer.form.available', {
                   balance: availableBalanceText,
                   token: selectedTokenLabel,
                 })}
               </span>
             </div>
+            {selectedAsset &&
+              totalAssetUnits &&
+              BigInt(totalAssetUnits) > BigInt(selectedAsset.numberOfUnits) && (
+                <p className="text-[11px] text-muted-foreground/70">
+                  {t('transfer.form.totalBalanceHint', {
+                    balance: formatAssetUnits(totalAssetUnits, selectedAsset.decimals),
+                    token: selectedTokenLabel,
+                  })}
+                </p>
+              )}
             {errors.amount && <p className="text-xs text-destructive">{errors.amount}</p>}
           </div>
 
@@ -232,17 +244,10 @@ const TransferForm = ({
 
           {/* Target tick */}
           <div className="space-y-2">
-            <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
-              <span>
-                {isManualTargetTickEnabled
-                  ? t('transfer.form.targetTickManual')
-                  : t('transfer.form.targetTickOffset')}
-              </span>
-              <span className="text-xs font-medium text-foreground">
-                {isManualTargetTickEnabled
-                  ? manualTargetTick.trim() || '--'
-                  : `+${targetTickOffset}`}
-              </span>
+            <div className="text-xs text-muted-foreground">
+              {isManualTargetTickEnabled
+                ? t('transfer.form.targetTickManual')
+                : t('transfer.form.targetTickOffset')}
             </div>
             <div className="flex flex-wrap gap-2">
               {quickTargetTickOffsets.map((offset) => (
@@ -283,13 +288,13 @@ const TransferForm = ({
                   onChange={(event) => {
                     onManualTargetTickChange(event.target.value)
                   }}
-                  className="h-10 w-full"
+                  className="h-12 w-full text-sm"
                   disabled={isWatchOnly}
                   placeholder={t('transfer.form.targetTickManualPlaceholder')}
                 />
                 <div className="text-[11px] text-muted-foreground">
                   {t('transfer.form.targetTickCurrentHint', {
-                    tick: typeof currentTick === 'number' ? currentTick.toLocaleString() : '--',
+                    tick: typeof currentTick === 'number' ? formatNumber(currentTick) : '--',
                   })}
                 </div>
               </div>

@@ -5,8 +5,8 @@ import { motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import AddressLabel from '@/components/address-label'
 import { formatBalanceCompact } from '@/lib/utils'
-import { ReceiveIcon } from '@/components/icons/receive-icon'
-import { SendIcon } from '@/components/icons/send-icon'
+import { getTransactionPresentation } from '@/lib/transaction-presentation'
+import { HIDDEN_BALANCE, useBalanceVisibility } from '@/lib/balance-visibility'
 import {
   canResendPendingTransaction,
   type PendingTransaction,
@@ -45,6 +45,7 @@ const TransactionsPreview = ({
   onResend,
 }: TransactionsPreviewProps) => {
   const { t } = useTranslation()
+  const { isVisible } = useBalanceVisibility()
 
   const { unconfirmedTop, unconfirmedOverflow, recentChain } = useMemo(() => {
     const items = transactions.data?.pages.flatMap((page) => page.transactions) ?? []
@@ -73,17 +74,8 @@ const TransactionsPreview = ({
   }, [transactions.data, pendingTransactions])
 
   const renderRow = (tx: PreviewTransaction) => {
-    const isIncoming = tx.destination === identity
-    const isSimpleTransfer = Number(tx.inputType) === 0
-    const label = isSimpleTransfer
-      ? isIncoming
-        ? t('history.received')
-        : t('history.sent')
-      : isIncoming
-        ? t('history.incoming')
-        : t('history.outgoing')
-    const counterparty = isIncoming ? tx.source : tx.destination
-    const Icon = isIncoming ? ReceiveIcon : SendIcon
+    const { isIncoming, label, counterparty, Icon, addressPrefix, amountSign, amountColorClass } =
+      getTransactionPresentation(tx, identity, t)
     const isPending = isTransactionPending(tx.hash)
     const isFailed = isTransactionFailed(tx.hash)
     const canResend = canResendPendingTransaction({
@@ -112,7 +104,7 @@ const TransactionsPreview = ({
                 : isFailed
                   ? 'border-red-500/40 bg-red-500/15 text-red-700 dark:text-red-300'
                   : isIncoming
-                    ? 'border-primary/40 bg-primary/10 text-primary'
+                    ? 'border-positive/40 bg-positive/10 text-positive'
                     : 'border-[var(--destructive)]/40 bg-[var(--destructive)]/10 text-[var(--destructive)]'
             }`}
           >
@@ -122,9 +114,7 @@ const TransactionsPreview = ({
             <span className="text-xs font-semibold text-foreground">{label}</span>
             <AddressLabel
               address={counterparty}
-              prefix={
-                isSimpleTransfer ? (isIncoming ? t('history.from') : t('history.to')) : undefined
-              }
+              prefix={addressPrefix}
               className="text-xs text-muted-foreground"
             />
             <span className="text-[11px] text-muted-foreground/70">
@@ -149,17 +139,16 @@ const TransactionsPreview = ({
         </div>
         <span
           className={`text-sm font-semibold ${
-            isPending
-              ? 'text-amber-700 dark:text-amber-300'
-              : isFailed
-                ? 'text-red-700 dark:text-red-300'
-                : isIncoming
-                  ? 'text-primary'
-                  : 'text-[var(--destructive)]'
+            !isVisible
+              ? 'text-muted-foreground'
+              : isPending
+                ? 'text-amber-700 dark:text-amber-300'
+                : isFailed
+                  ? 'text-red-700 dark:text-red-300'
+                  : amountColorClass
           }`}
         >
-          {isIncoming ? '+' : '-'}
-          {formatBalanceCompact(tx.amount)}
+          {isVisible ? `${amountSign}${formatBalanceCompact(tx.amount)}` : HIDDEN_BALANCE}
         </span>
         {isFailed && (
           <div className="ml-2 flex items-center gap-1">

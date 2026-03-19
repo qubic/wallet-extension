@@ -1,16 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import type { useBalance } from '@qubic-labs/react'
 import { useTranslation } from 'react-i18next'
-import { formatBalanceCompact, normalizeBalance } from '@/lib/utils'
+import { formatBalanceCompact, formatUsd, normalizeBalance } from '@/lib/utils'
+import { HIDDEN_BALANCE, useBalanceVisibility } from '@/lib/balance-visibility'
 
 const formatUsdFromNumber = (value: number, pricePerQu?: number) => {
   if (!pricePerQu) return '--'
-  const usdValue = value * pricePerQu
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 2,
-  }).format(usdValue)
+  return formatUsd(value * pricePerQu)
 }
 
 const getCachedBalance = (identity: string): bigint | null => {
@@ -41,6 +37,7 @@ type BalanceCardProps = {
 
 const BalanceCard = ({ balance, identity, price }: BalanceCardProps) => {
   const { t } = useTranslation()
+  const { isVisible, toggle } = useBalanceVisibility()
   const [cachedBalance, setCachedBalanceState] = useState<bigint | null>(() =>
     getCachedBalance(identity),
   )
@@ -76,18 +73,28 @@ const BalanceCard = ({ balance, identity, price }: BalanceCardProps) => {
   }
 
   const displayValue = normalized
+  const eyeIcon = isVisible ? '/icons/eye-closed.png' : '/icons/eye-open.png'
 
   return (
-    <div className="space-y-3 text-center">
+    <div className="space-y-2 text-center">
+      <button
+        type="button"
+        className="mx-auto flex cursor-pointer items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground transition-colors hover:text-foreground"
+        onClick={toggle}
+        aria-label={t(isVisible ? 'home.balance.hide' : 'home.balance.show')}
+      >
+        {t('home.balance.title')}
+        <img src={eyeIcon} alt="" className="h-3.5 w-3.5 opacity-60" />
+      </button>
       <div
-        className={`text-5xl font-semibold leading-none tracking-tight text-foreground transition-all duration-400 ${
+        className={`text-4xl font-semibold leading-none tracking-tight text-foreground transition-all duration-400 ${
           balanceChanged ? 'scale-105 text-primary' : ''
         }`}
       >
-        {formatBalanceCompact(displayValue)}
+        {isVisible ? formatBalanceCompact(displayValue) : HIDDEN_BALANCE}
       </div>
       <div className="inline-flex items-center rounded-full border border-primary/25 bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary">
-        {`≈ ${formatUsdFromNumber(Number(displayValue), price)}`}
+        {isVisible ? `≈ ${formatUsdFromNumber(Number(displayValue), price)}` : HIDDEN_BALANCE}
       </div>
     </div>
   )

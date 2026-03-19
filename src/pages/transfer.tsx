@@ -5,7 +5,13 @@ import { toast } from 'sonner'
 import { useBalance, useSdk, useSend } from '@qubic-labs/react'
 import { useCurrentIdentity } from '@/hooks/use-current-identity'
 import { NATIVE_TOKEN_SYMBOL } from '@/lib/config/constants'
-import { isValidIdentity, normalizeBalance, parseAmount } from '@/lib/utils'
+import {
+  formatNumber,
+  formatUsd,
+  isValidIdentity,
+  normalizeBalance,
+  parseAmount,
+} from '@/lib/utils'
 import PassphraseAuth from '@/pages/passphrase-auth'
 import { getCachedAccounts, getCurrentIdentity, isWatchOnlyIdentity } from '@/lib/accounts'
 import { aggregateAssets, useOwnedAssets } from '@/lib/assets'
@@ -27,13 +33,6 @@ type Step = 'form' | 'auth'
 const TARGET_TICK_OFFSET_MIN = 1
 const TARGET_TICK_OFFSET_MAX = 40
 const QUICK_TARGET_TICK_OFFSETS = [5, 10, 15] as const
-
-const formatUsd = (value: number) =>
-  new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 2,
-  }).format(value)
 
 const Transfer = () => {
   const { t } = useTranslation()
@@ -73,6 +72,7 @@ const Transfer = () => {
   const seedRef = useRef<string | null>(null)
 
   const parsedAssets = aggregateAssets(ownedAssets.data ?? {}, true)
+  const allAssets = aggregateAssets(ownedAssets.data ?? {}, false)
   const filteredVaultRecipients = useMemo(
     () =>
       vaultRecipients.filter(
@@ -86,6 +86,10 @@ const Transfer = () => {
     selectedToken === 'qu'
       ? null
       : (parsedAssets.find((a) => `${a.issuerIdentity}-${a.name}` === selectedToken) ?? null)
+  const totalAsset =
+    selectedToken === 'qu'
+      ? null
+      : (allAssets.find((a) => `${a.issuerIdentity}-${a.name}` === selectedToken) ?? null)
   const parsedAmount = parseAmount(amount)
   const currentTick = tickInfo.data?.tickInfo?.tick
   const onChainQuBalance = normalizeBalance(balance.data?.balance)
@@ -283,7 +287,7 @@ const Transfer = () => {
 
       toast.success(t('transfer.success.title'), {
         description: t('transfer.success.description', {
-          targetTick: Number(result.targetTick).toLocaleString(),
+          targetTick: formatNumber(Number(result.targetTick)),
         }),
       })
 
@@ -382,6 +386,7 @@ const Transfer = () => {
         isAssetLoading={selectedToken !== 'qu' && !selectedAsset}
         vaultRecipients={filteredVaultRecipients}
         selectedAsset={selectedAsset}
+        totalAssetUnits={totalAsset?.numberOfUnits}
         targetTickOffset={targetTickOffset}
         manualTargetTick={manualTargetTick}
         isManualTargetTickEnabled={isManualTargetTickEnabled}

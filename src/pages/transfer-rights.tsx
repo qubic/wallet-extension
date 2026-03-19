@@ -45,7 +45,7 @@ import {
 import { addPendingTransaction, PENDING_SETTLED_EVENT } from '@/lib/pending-transactions'
 import { isWalletLocked } from '@/lib/lock'
 import { useTickInfo, fetchTickInfo } from '@/lib/network-stats'
-import { formatBalance, normalizeBalance, parseAmount } from '@/lib/utils'
+import { formatBalance, formatNumber, normalizeBalance, parseAmount } from '@/lib/utils'
 
 type Step = 'select-asset' | 'form' | 'auth'
 type FormErrors = {
@@ -375,7 +375,7 @@ const TransferRights = () => {
 
       toast.success(t('transferRights.success.title'), {
         description: t('transferRights.success.description', {
-          targetTick: Number(result.targetTick).toLocaleString(),
+          targetTick: formatNumber(Number(result.targetTick)),
         }),
       })
 
@@ -660,17 +660,10 @@ const TransferRights = () => {
 
             {/* Target tick */}
             <div className="space-y-2">
-              <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
-                <span>
-                  {isManualTargetTickEnabled
-                    ? t('transfer.form.targetTickManual')
-                    : t('transfer.form.targetTickOffset')}
-                </span>
-                <span className="text-xs font-medium text-foreground">
-                  {isManualTargetTickEnabled
-                    ? manualTargetTick.trim() || '--'
-                    : `+${targetTickOffset}`}
-                </span>
+              <div className="text-xs text-muted-foreground">
+                {isManualTargetTickEnabled
+                  ? t('transfer.form.targetTickManual')
+                  : t('transfer.form.targetTickOffset')}
               </div>
               <div className="flex flex-wrap gap-2">
                 {QUICK_TARGET_TICK_OFFSETS.map((offset) => (
@@ -728,13 +721,13 @@ const TransferRights = () => {
                         setErrors((prev) => ({ ...prev, targetTick: undefined }))
                       }
                     }}
-                    className="h-10 w-full"
+                    className="h-12 w-full text-sm"
                     disabled={isWatchOnly}
                     placeholder={t('transfer.form.targetTickManualPlaceholder')}
                   />
                   <div className="text-[11px] text-muted-foreground">
                     {t('transfer.form.targetTickCurrentHint', {
-                      tick: typeof currentTick === 'number' ? currentTick.toLocaleString() : '--',
+                      tick: typeof currentTick === 'number' ? formatNumber(currentTick) : '--',
                     })}
                   </div>
                 </div>

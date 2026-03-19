@@ -1,0 +1,531 @@
+{
+  "app": {
+    "sidepanel": "打开侧边栏",
+    "closeSidepanel": "关闭侧边栏"
+  },
+  "nav": {
+    "home": "首页",
+    "transfer": "转账",
+    "history": "记录",
+    "accounts": "账户",
+    "settings": "设置"
+  },
+  "home": {
+    "actions": {
+      "send": "发送",
+      "receive": "接收",
+      "history": "记录"
+    },
+    "balance": {
+      "label": "余额",
+      "title": "QUBIC 余额",
+      "show": "显示余额",
+      "hide": "隐藏余额",
+      "loading": "加载中..."
+    },
+    "hero": {
+      "defaultAccount": "主账户"
+    },
+    "recent": {
+      "title": "近期活动",
+      "loading": "加载近期活动...",
+      "empty": "暂无近期交易。",
+      "emptyTitle": "暂无活动",
+      "viewAll": "查看全部"
+    },
+    "network": {
+      "title": "网络",
+      "showDetails": "显示详情",
+      "hideDetails": "隐藏详情",
+      "tick": "Tick",
+      "epoch": "纪元",
+      "supply": "供应量",
+      "active": "活跃",
+      "pricePerB": "价格 / B",
+      "marketCap": "市值"
+    },
+    "assets": {
+      "title": "资产",
+      "more": "更多资产即将推出。",
+      "loading": "加载资产...",
+      "empty": "未找到其他资产。",
+      "emptyTitle": "暂无资产",
+      "error": "无法加载资产。",
+      "unknown": "未知资产",
+      "manageRights": "管理权限"
+    },
+    "receive": {
+      "title": "接收 Qubic",
+      "description": "分享此 QR 码或复制您的公共身份地址。",
+      "generating": "生成 QR 码...",
+      "copy": "复制地址"
+    },
+    "toast": {
+      "copySuccess": "地址已复制",
+      "copySuccessDesc": "您的公共身份已复制到剪贴板。",
+      "copyFail": "复制失败",
+      "copyFailDesc": "请重试或手动复制。"
+    },
+    "watchOnly": {
+      "title": "仅观察账户",
+      "description": "此地址已禁用发送功能。"
+    },
+    "price": {
+      "label": "QUBIC 价格"
+    },
+    "accounts": {
+      "title": "账户",
+      "selectLabel": "选择账户",
+      "passphrasePlaceholder": "vault 密码",
+      "passphraseRequired": "输入 vault 密码以查看账户。",
+      "unlock": "解锁账户",
+      "unlocking": "解锁中...",
+      "unlockFailed": "无法解锁 vault，请检查密码。",
+      "empty": "未找到其他账户。",
+      "create": "创建新账户"
+    }
+  },
+  "settings": {
+    "language": "语言",
+    "theme": "主题",
+    "themeDark": "深色",
+    "themeLight": "浅色",
+    "themeSystem": "跟随系统",
+    "lock": "无操作后自动锁定",
+    "lockNow": "锁定钱包",
+    "lockTimeout": {
+      "label": "自动锁定时间（分钟）",
+      "helper": "在选定时间后锁定钱包。",
+      "option": "{{minutes}} 分钟",
+      "immediately": "立即"
+    },
+    "exportVault": {
+      "button": "导出 vault",
+      "drawerTitle": "导出 vault 文件",
+      "drawerDescription": "下载与 Qubic 网页钱包兼容的 vault 文件。",
+      "passphrase": "vault 密码",
+      "confirm": "导出 vault",
+      "exporting": "导出中...",
+      "errors": {
+        "passphraseRequired": "请输入密码。",
+        "invalidPassphrase": "密码无效。",
+        "exportFailed": "导出 vault 失败。"
+      }
+    },
+    "categories": {
+      "general": "偏好设置",
+      "generalDesc": "语言和主题偏好",
+      "connectedSites": "已连接的网站",
+      "connectedSitesDesc": "管理网站钱包访问权限",
+      "security": "安全",
+      "securityDesc": "密码、自动锁定和重置",
+      "backup": "备份",
+      "backupDesc": "导出 vault 文件",
+      "accounts": "管理账户",
+      "accountsDesc": "查看、排序和管理身份",
+      "support": "支持",
+      "supportDesc": "获取帮助和报告问题",
+      "about": "关于",
+      "aboutDesc": "应用版本与信息"
+    },
+    "general": {
+      "title": "偏好设置",
+      "back": "设置"
+    },
+    "connectedSites": {
+      "title": "已连接的网站",
+      "back": "设置",
+      "empty": "暂无已连接的网站。",
+      "disconnect": "断开连接",
+      "connectedAt": "连接时间：{{date}}"
+    },
+    "security": {
+      "title": "安全",
+      "back": "设置",
+      "changePassword": "修改密码",
+      "changePasswordDesc": "更新 vault 密码",
+      "changePasswordDrawerTitle": "修改密码",
+      "changePasswordDrawerDesc": "输入当前密码并设置新密码。",
+      "currentPassphrase": "当前密码",
+      "newPassphrase": "新密码",
+      "confirmPassphrase": "确认新密码",
+      "minChars": "至少 12 个字符。",
+      "save": "保存新密码",
+      "saving": "保存中...",
+      "cancel": "取消",
+      "resetApp": "删除钱包",
+      "resetAppTitle": "确认删除钱包？",
+      "resetAppDesc": "此操作将清除所有数据，包括 vault、账户和设置。此操作无法撤销。请确保已备份您的种子。",
+      "resetAppConfirm": "删除钱包",
+      "errors": {
+        "currentRequired": "请输入当前密码。",
+        "newRequired": "请输入新密码。",
+        "confirmRequired": "请确认新密码。",
+        "tooShort": "密码至少需要 12 个字符。",
+        "mismatch": "两次输入的密码不一致。",
+        "invalidCurrent": "当前密码不正确。",
+        "changeFailed": "修改密码失败，请重试。"
+      }
+    },
+    "support": {
+      "title": "支持",
+      "warningTitle": "谨防诈骗",
+      "warningDescription": "Qubic 团队成员绝不会向您索取种子或密码。请勿将私钥分享给任何人。",
+      "discord": "Discord 社区",
+      "github": "在 GitHub 上报告问题"
+    },
+    "about": {
+      "title": "关于",
+      "appVersion": "应用版本",
+      "extensionName": "扩展程序",
+      "versionLabel": "v{{version}}"
+    }
+  },
+  "accounts": {
+    "watchOnly": {
+      "title": "添加仅观察地址",
+      "subtitle": "跟踪公共身份，无需导入种子。",
+      "submit": "添加仅观察"
+    },
+    "manage": {
+      "title": "管理账户",
+      "subtitle": "查看、排序和管理您的身份。",
+      "passphrase": "vault 密码",
+      "passphraseTitle": "解锁 vault",
+      "load": "加载账户",
+      "unlock": "解锁 vault",
+      "loading": "加载中...",
+      "empty": "尚未加载任何账户。",
+      "active": "当前",
+      "select": "选择",
+      "balance": "余额",
+      "menu": "账户选项",
+      "drag": "调整顺序",
+      "rename": "重命名",
+      "renameTitle": "重命名账户",
+      "renameLabel": "账户名称",
+      "save": "保存",
+      "cancel": "取消",
+      "confirm": "确认",
+      "remove": "移除",
+      "removeTitle": "移除账户",
+      "removeDesc": "此操作将从本设备移除该账户，且无法撤销。",
+      "reveal": "显示种子",
+      "revealTitle": "种子短语",
+      "copySeed": "复制种子",
+      "seedCopied": "种子已复制",
+      "qrAlt": "种子 QR 码",
+      "qrLabel": "扫描以导入种子",
+      "done": "完成",
+      "addTitle": "添加账户",
+      "addNewDesc": "向此钱包添加新地址。",
+      "addCreate": "创建新地址",
+      "addImport": "导入种子",
+      "watchOnlyTitle": "仅观察账户",
+      "watchOnlyName": "账户名称",
+      "watchOnlyIdentity": "公共身份",
+      "watchOnlyAdd": "添加仅观察",
+      "watchOnly": "仅观察",
+      "defaultNamePrefix": "账户",
+      "close": "关闭",
+      "errors": {
+        "load": "无法打开 vault。",
+        "remove": "无法移除账户。",
+        "rename": "无法重命名账户。",
+        "reveal": "无法显示种子。",
+        "nameRequired": "请输入账户名称。",
+        "passphraseRequired": "请输入密码。",
+        "invalidPassphrase": "密码无效。",
+        "nameDuplicate": "已存在同名账户。",
+        "lastAccount": "无法移除最后一个账户。",
+        "watchOnlySeed": "仅观察账户没有种子。",
+        "watchOnlyRequired": "名称和身份为必填项。",
+        "watchOnlyInvalid": "身份格式无效。",
+        "watchOnlyDuplicate": "此身份已添加。"
+      }
+    }
+  },
+  "history": {
+    "title": "记录",
+    "loading": "加载记录...",
+    "empty": "未找到交易。",
+    "incoming": "收入",
+    "outgoing": "支出",
+    "sent": "已发送",
+    "received": "已接收",
+    "to": "收款方：",
+    "from": "发送方：",
+    "tick": "Tick",
+    "type": "类型",
+    "pending": "待确认",
+    "unconfirmed": "未确认",
+    "unconfirmedMore": "+{{count}} 笔未确认",
+    "confirmed": "已确认",
+    "failed": "失败",
+    "resend": "重新发送",
+    "deleteFailed": "删除失败交易",
+    "today": "今天",
+    "yesterday": "昨天"
+  },
+  "txDetails": {
+    "title": "交易详情",
+    "loading": "加载交易...",
+    "error": "无法加载交易详情。",
+    "back": "返回",
+    "copy": "复制",
+    "copied": "已复制",
+    "copyFailed": "复制失败",
+    "txId": "交易 ID",
+    "amount": "金额",
+    "tick": "Tick",
+    "inputType": "输入类型",
+    "source": "发送方",
+    "destination": "接收方",
+    "timestamp": "时间戳",
+    "openExplorer": "在浏览器中查看",
+    "pending": "待确认",
+    "pendingHint": "此交易仍在等待网络 Tick 确认。"
+  },
+  "transfer": {
+    "title": "发送",
+    "selectToken": {
+      "subtitle": "选择要发送的代币"
+    },
+    "balance": {
+      "loading": "加载余额..."
+    },
+    "form": {
+      "recipientPlaceholder": "60 位身份标识（A-Z）",
+      "amountPlaceholder": "输入金额",
+      "max": "最大",
+      "feeValue": "手续费：{{fee}} QUBIC",
+      "quBalance": "余额：{{balance}} QUBIC",
+      "recipientHint": "输入 60 位身份标识或从 vault 中选择。",
+      "available": "可用：{{balance}} {{token}}",
+      "availableQx": "可用（由 Qx 管理）：{{balance}} {{token}}",
+      "totalBalanceHint": "* 总余额：{{balance}} {{token}}。要增加可转账余额，请先在资产中通过\"转移管理权限\"将更多资产移至 QX。",
+      "vaultRecipients": "我的账户",
+      "vaultRecipientsManual": "手动输入",
+      "targetTickOffset": "目标 Tick（当前 + N）",
+      "targetTickManual": "目标 Tick（手动）",
+      "targetTickOffsetManual": "手动",
+      "targetTickManualPlaceholder": "例如 4378123",
+      "targetTickCurrentHint": "当前网络 Tick：{{tick}}"
+    },
+    "validation": {
+      "recipientRequired": "请输入收款方身份。",
+      "recipientInvalid": "身份必须为 60 位大写字母（A-Z）。",
+      "recipientSameAsSender": "不能向自己的身份发送。",
+      "amountRequired": "请输入金额。",
+      "amountInvalid": "金额必须为正数。",
+      "targetTickOffsetInvalid": "目标 Tick 偏移量必须在 1 到 40 之间。",
+      "targetTickManualInvalid": "手动目标 Tick 必须为正数。",
+      "targetTickManualPast": "手动目标 Tick 必须大于当前网络 Tick。",
+      "amountExceedsBalance": "金额超出可用余额。",
+      "balanceLoading": "请等待余额加载完成。",
+      "insufficientQuForFee": "QUBIC 余额不足以支付 {{fee}} QU 的转账手续费。"
+    },
+    "confirm": {
+      "title": "确认转账",
+      "description": "发送前请核实以下详情。",
+      "from": "付款方",
+      "to": "收款方",
+      "amount": "金额",
+      "warning": "此操作无法撤销。",
+      "feeLabel": "网络手续费"
+    },
+    "actions": {
+      "continue": "继续",
+      "confirm": "确认并发送",
+      "sending": "发送中...",
+      "cancel": "取消"
+    },
+    "success": {
+      "title": "转账已发送",
+      "description": "您的交易已广播，计划在 Tick {{targetTick}} 执行。"
+    },
+    "errors": {
+      "networkError": "网络错误，请重试。",
+      "broadcastFailed": "交易广播失败。",
+      "watchOnly": "仅观察账户无法发送转账。",
+      "generic": "转账失败，请重试。"
+    }
+  },
+  "transferRights": {
+    "title": "转移管理权限",
+    "selectAssetSubtitle": "选择要转移管理权限的资产",
+    "noAssets": "没有可转移管理权限的资产。",
+    "noDestinationContracts": "没有可用的目标合约。",
+    "sourceContract": "来源合约",
+    "sourceContractPlaceholder": "选择来源合约",
+    "destinationContract": "目标合约",
+    "destinationContractPlaceholder": "选择目标合约",
+    "numberOfSharesPlaceholder": "输入份额数量",
+    "available": "可用：{{balance}} {{token}}",
+    "fee": "手续费：{{fee}} QUBIC",
+    "quBalance": "余额：{{balance}} QUBIC",
+    "confirm": {
+      "title": "确认权限转移",
+      "description": "转移管理权限前请核实以下详情。",
+      "asset": "资产",
+      "from": "来源合约",
+      "to": "目标合约",
+      "shares": "份额",
+      "feeLabel": "手续费",
+      "warning": "此操作无法撤销。"
+    },
+    "validation": {
+      "sourceRequired": "请选择来源合约。",
+      "destinationRequired": "请选择目标合约。",
+      "sameContract": "来源合约和目标合约不能相同。",
+      "sharesRequired": "请输入份额数量。",
+      "sharesInvalid": "份额数量必须为正数。",
+      "sharesExceedsBalance": "份额数量超出可用余额。",
+      "insufficientQuForFee": "QUBIC 余额不足以支付 {{fee}} QU 的手续费。"
+    },
+    "actions": {
+      "continue": "继续",
+      "confirm": "确认并转移",
+      "sending": "转移中...",
+      "cancel": "取消"
+    },
+    "success": {
+      "title": "权限转移已发送",
+      "description": "您的交易已广播，计划在 Tick {{targetTick}} 执行。"
+    },
+    "errors": {
+      "networkError": "网络错误，请重试。",
+      "broadcastFailed": "交易广播失败。",
+      "watchOnly": "仅观察账户无法转移权限。",
+      "generic": "权限转移失败，请重试。"
+    }
+  },
+  "passphraseAuth": {
+    "title": "需要身份验证",
+    "subtitle": "输入 vault 密码以继续此操作。",
+    "form": {
+      "passphrase": "vault 密码",
+      "passphrasePlaceholder": "输入密码",
+      "showPassphrase": "显示密码",
+      "hidePassphrase": "隐藏密码"
+    },
+    "validation": {
+      "required": "请输入密码。"
+    },
+    "securityNote": "您的密码仅在本地用于解密 vault 和签署交易，不会通过网络传输。",
+    "actions": {
+      "back": "返回",
+      "cancel": "取消",
+      "unlock": "解锁",
+      "unlocking": "解锁中..."
+    },
+    "errors": {
+      "invalidPassphrase": "密码无效，请重试。",
+      "accountNotFound": "在 vault 中未找到该账户。",
+      "generic": "身份验证失败，请重试。"
+    }
+  },
+  "unlock": {
+    "title": "解锁钱包",
+    "subtitle": "为确保安全，您的钱包已锁定。请输入密码以继续。"
+  },
+  "dapp": {
+    "approval": {
+      "title": "连接请求",
+      "origin": "网站",
+      "sharedAccount": "共享账户",
+      "sharedAccountFallback": "已选账户",
+      "connectSubtitle": "此网站请求连接您的钱包。",
+      "signMessageSubtitle": "此网站请求您签署一条消息。",
+      "signTransactionSubtitle": "此网站请求您签署一笔交易。",
+      "sendTransactionSubtitle": "此网站请求您签署并广播一笔交易。",
+      "genericSubtitle": "继续前请审核此请求。",
+      "messageLabel": "消息",
+      "messageEmpty": "无消息预览。",
+      "messageWarningTitle": "请仔细审核消息",
+      "messageWarnings": {
+        "encoded": "该 dApp 请求您签署编码数据（hex/base64），可能无法直接阅读。",
+        "url": "消息中包含 URL，请确认其与您信任的网站一致。",
+        "sensitiveTerms": "消息包含敏感的授权/交易相关措辞，请确认您正在授权的内容。",
+        "long": "消息较长，可能隐藏重要信息。"
+      },
+      "txTo": "收款方",
+      "txAmount": "金额",
+      "txInputType": "输入类型",
+      "txTargetTick": "目标 Tick",
+      "txTargetTickOffset": "目标 Tick 偏移量",
+      "txFee": "手续费",
+      "txFeeNone": "0",
+      "txFeeMayApply": "可能收取",
+      "approve": "批准",
+      "approveAndSend": "批准并发送",
+      "reject": "拒绝",
+      "errors": {
+        "runtimeUnavailable": "扩展程序运行时不可用。",
+        "decisionFailed": "无法提交您的决定。"
+      }
+    }
+  },
+  "onboarding": {
+    "importSeed": {
+      "title": "导入私钥种子",
+      "titleAddAddress": "导入地址种子",
+      "step": "第 {{current}} 步，共 {{total}} 步"
+    },
+    "importVault": {
+      "title": "导入 vault 文件",
+      "step": "第 {{current}} 步，共 {{total}} 步",
+      "selectVault": {
+        "title": "选择 vault 文件",
+        "subtitle": "上传从此扩展程序或 Qubic 网页钱包导出的 vault 文件。",
+        "label": "vault 文件",
+        "dropText": "拖放 vault 文件",
+        "browseText": "或点击浏览（.json, .qubic-vault）"
+      },
+      "unlockSecure": {
+        "title": "解锁并设置安全",
+        "subtitle": "为此设备设置新密码，如需要，请提供来源 vault 密码。",
+        "newPassphrase": "新 vault 密码",
+        "sourcePassphrase": "来源 vault 密码"
+      },
+      "review": {
+        "title": "审核导入",
+        "subtitle": "导入前请确认文件和密码信息。",
+        "vaultFile": "vault 文件",
+        "notSelected": "未选择",
+        "sourcePassphraseProvided": "已提供",
+        "sourcePassphraseSame": "与新密码相同",
+        "sourcePassphraseLabel": "来源密码",
+        "addMoreLater": "您可以稍后在「管理账户」中添加更多账户。"
+      },
+      "actions": {
+        "back": "返回",
+        "previous": "上一步",
+        "continue": "继续",
+        "import": "导入 vault",
+        "importing": "导入中..."
+      },
+      "errors": {
+        "fileTooLarge": "所选文件过大，不是有效的 vault 文件。",
+        "selectFile": "请选择 vault 文件。",
+        "passphraseRequired": "请输入密码。",
+        "importFailed": "导入网页钱包 vault 失败。",
+        "noEntries": "vault 已导入但未找到任何条目。",
+        "generic": "导入 vault 失败。"
+      }
+    },
+    "seedSecurity": {
+      "title": "保护您的种子",
+      "subtitle": "请将此 55 位种子保存在安全的地方。恢复钱包时需要使用它。",
+      "subtitleAddAddress": "请将此 55 位种子保存在安全的地方。恢复此地址时需要使用它。",
+      "warningTitle": "请妥善保管此种子。",
+      "seedLabel": "种子",
+      "publicIdentityLabel": "公共身份",
+      "deriving": "正在派生...",
+      "generateNew": "生成新种子",
+      "copySeed": "复制种子",
+      "seedCopied": "种子已复制",
+      "confirmationLabel": "我已安全保存此种子，并了解恢复钱包时需要使用它。"
+    }
+  }
+}

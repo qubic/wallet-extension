@@ -1,11 +1,15 @@
 import { useTransactions } from '@qubic-labs/react'
 import { HashIcon, RefreshCwIcon, XIcon } from 'lucide-react'
-import { ReceiveIcon } from '@/components/icons/receive-icon'
-import { SendIcon } from '@/components/icons/send-icon'
+import { getTransactionPresentation } from '@/lib/transaction-presentation'
 import { Button } from '@/components/ui/button'
 import { useProcedureName } from '@/hooks/use-procedure-name'
 import AddressLabel from '@/components/address-label'
-import { buildExplorerObjectUrl, formatBalanceCompact, truncateString } from '@/lib/utils'
+import {
+  buildExplorerObjectUrl,
+  formatBalanceCompact,
+  formatNumber,
+  truncateString,
+} from '@/lib/utils'
 import { useTranslation } from 'react-i18next'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -199,24 +203,12 @@ const History = () => {
     hidden: { opacity: 0, y: 8 },
     show: { opacity: 1, y: 0, transition: { duration: 0.2 } },
   }
-  const getRowPresentation = (tx: HistoryRowTransaction) => {
-    const isIncoming = tx.destination === identity
-    const isSimpleTransfer = Number(tx.inputType) === 0
-    const label = isSimpleTransfer
-      ? isIncoming
-        ? t('history.received')
-        : t('history.sent')
-      : isIncoming
-        ? t('history.incoming')
-        : t('history.outgoing')
-    const counterparty = isIncoming ? tx.source : tx.destination
-    const Icon = isIncoming ? ReceiveIcon : SendIcon
-
-    return { isIncoming, isSimpleTransfer, label, counterparty, Icon }
-  }
+  const getRowPresentation = (tx: HistoryRowTransaction) =>
+    getTransactionPresentation(tx, identity, t)
 
   const renderHistoryRow = (tx: HistoryRowTransaction, state: HistoryRowState) => {
-    const { isIncoming, isSimpleTransfer, label, counterparty, Icon } = getRowPresentation(tx)
+    const { isIncoming, label, counterparty, Icon, addressPrefix, amountSign, amountColorClass } =
+      getRowPresentation(tx)
     const isPending = state === 'pending'
     const isDefault = state === 'default'
 
@@ -239,7 +231,7 @@ const History = () => {
                 isPending
                   ? 'border-amber-500/40 bg-amber-500/15 text-amber-700 dark:text-amber-300'
                   : isIncoming
-                    ? 'border-primary/40 bg-primary/10 text-primary'
+                    ? 'border-positive/40 bg-positive/10 text-positive'
                     : 'border-[var(--destructive)]/40 bg-[var(--destructive)]/10 text-[var(--destructive)]'
               }`}
             >
@@ -249,23 +241,17 @@ const History = () => {
               <span className="text-xs font-semibold text-foreground">{label}</span>
               <AddressLabel
                 address={counterparty}
-                prefix={
-                  isSimpleTransfer ? (isIncoming ? t('history.from') : t('history.to')) : undefined
-                }
+                prefix={addressPrefix}
                 className="text-xs text-muted-foreground"
               />
             </div>
           </div>
           <span
             className={`text-sm font-semibold ${
-              isPending
-                ? 'text-amber-700 dark:text-amber-300'
-                : isIncoming
-                  ? 'text-primary'
-                  : 'text-[var(--destructive)]'
+              isPending ? 'text-amber-700 dark:text-amber-300' : amountColorClass
             }`}
           >
-            {isIncoming ? '+' : '-'}
+            {amountSign}
             {formatBalanceCompact(tx.amount)}
           </span>
         </div>
@@ -302,14 +288,8 @@ const History = () => {
             </div>
             <div className="ml-auto flex items-center gap-1 font-mono">
               <span className="text-muted-foreground/70">{t('history.tick')}</span>
-              <span>{Number(tx.tickNumber).toLocaleString()}</span>
+              <span>{formatNumber(Number(tx.tickNumber))}</span>
             </div>
-            {Number(tx.inputType) === 0 && (
-              <div className="flex items-center gap-1 font-mono">
-                <span className="text-muted-foreground/70">{t('history.type')}</span>
-                <span>0</span>
-              </div>
-            )}
           </div>
           {Number(tx.inputType) !== 0 && (
             <div className="flex items-center gap-1 font-mono">
@@ -433,7 +413,7 @@ const History = () => {
                     {t('history.failed')}
                   </span>
                   {failedTopItems.map((tx) => {
-                    const { isIncoming, isSimpleTransfer, label, counterparty, Icon } =
+                    const { label, counterparty, Icon, addressPrefix, amountSign } =
                       getRowPresentation(tx)
                     const canResend = canResendPendingTransaction({
                       status: tx.status,
@@ -457,20 +437,14 @@ const History = () => {
                               <span className="text-xs font-semibold text-foreground">{label}</span>
                               <AddressLabel
                                 address={counterparty}
-                                prefix={
-                                  isSimpleTransfer
-                                    ? isIncoming
-                                      ? t('history.from')
-                                      : t('history.to')
-                                    : undefined
-                                }
+                                prefix={addressPrefix}
                                 className="text-xs text-muted-foreground"
                               />
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
                             <span className="text-sm font-semibold text-red-700 dark:text-red-300">
-                              {isIncoming ? '+' : '-'}
+                              {amountSign}
                               {formatBalanceCompact(tx.amount)}
                             </span>
                             <div className="flex items-center gap-1">
@@ -515,16 +489,8 @@ const History = () => {
                             </div>
                             <div className="ml-auto flex items-center gap-1 font-mono">
                               <span className="text-muted-foreground/70">{t('history.tick')}</span>
-                              <span>{Number(tx.tickNumber).toLocaleString()}</span>
+                              <span>{formatNumber(Number(tx.tickNumber))}</span>
                             </div>
-                            {Number(tx.inputType) === 0 && (
-                              <div className="flex items-center gap-1 font-mono">
-                                <span className="text-muted-foreground/70">
-                                  {t('history.type')}
-                                </span>
-                                <span>0</span>
-                              </div>
-                            )}
                           </div>
                           {Number(tx.inputType) !== 0 && (
                             <div className="flex items-center gap-1 font-mono">

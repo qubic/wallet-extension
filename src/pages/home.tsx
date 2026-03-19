@@ -19,6 +19,7 @@ import { useTranslation } from 'react-i18next'
 import { truncateString } from '@/lib/utils'
 import { isWatchOnlyIdentity } from '@/lib/accounts'
 import { useCurrentIdentity } from '@/hooks/use-current-identity'
+import { HIDDEN_BALANCE, useBalanceVisibility } from '@/lib/balance-visibility'
 import { aggregateAssets, formatAssetUnits, useOwnedAssets } from '@/lib/assets'
 import { useLatestStats } from '@/lib/network-stats'
 import { useClipboardCopy } from '@/hooks/use-clipboard-copy'
@@ -60,6 +61,7 @@ const sectionMotion = {
 const Home = () => {
   const { t } = useTranslation()
   usePendingTransactionsVersion()
+  const { isVisible } = useBalanceVisibility()
   const [isWatchOnly, setIsWatchOnly] = useState(false)
   const handleIdentityRefresh = useCallback(
     (id: string) => setIsWatchOnly(isWatchOnlyIdentity(id)),
@@ -89,7 +91,9 @@ const Home = () => {
   const [qrCode, setQrCode] = useState<string | null>(null)
   const pendingForIdentity = getPendingTransactionsForIdentity(identity)
   const pricePerQu = latestStats.data?.data?.price
-  const pricePerBFormatted = pricePerQu ? `$${(pricePerQu * 1_000_000_000).toFixed(2)}` : '--'
+  const pricePerBFormatted = pricePerQu
+    ? `$${(pricePerQu * 1_000_000_000).toFixed(2)} / bQUBIC`
+    : '--'
   const handleRefresh = () => {
     void balance.refetch()
     void transactions.refetch()
@@ -175,7 +179,7 @@ const Home = () => {
           <motion.div className="space-y-4 p-1" variants={sectionMotion}>
             <div className="flex items-center justify-between gap-3">
               <div className="text-[11px] text-muted-foreground">
-                {t('home.price.label')}: {pricePerBFormatted}
+                {t('home.price.label')}: <span className="text-primary">{pricePerBFormatted}</span>
               </div>
               <Button
                 size="icon"
@@ -295,7 +299,9 @@ const Home = () => {
                       </div>
                       <div className="ml-3 flex shrink-0 items-center gap-2">
                         <span className="text-right text-base font-semibold tabular-nums text-foreground">
-                          {formatAssetUnits(asset.numberOfUnits, asset.decimals)}
+                          {isVisible
+                            ? formatAssetUnits(asset.numberOfUnits, asset.decimals)
+                            : HIDDEN_BALANCE}
                         </span>
                         <button
                           type="button"

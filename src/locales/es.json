@@ -18,6 +18,9 @@
     },
     "balance": {
       "label": "Saldo",
+      "title": "Saldo QUBIC",
+      "show": "Mostrar saldo",
+      "hide": "Ocultar saldo",
       "loading": "Cargando..."
     },
     "hero": {
@@ -269,12 +272,10 @@
     "loading": "Cargando transacción...",
     "error": "No se pudieron cargar los detalles de la transacción.",
     "back": "Atrás",
-    "refresh": "Actualizar transacción",
     "copy": "Copiar",
-    "copyTxId": "Copiar txid",
     "copied": "Copiado",
     "copyFailed": "Error al copiar",
-    "hash": "Hash",
+    "txId": "ID de TX",
     "amount": "Monto",
     "tick": "Tick",
     "inputType": "Tipo de input",
@@ -301,7 +302,9 @@
       "quBalance": "Saldo: {{balance}} QUBIC",
       "recipientHint": "Usa una identidad de 60 letras o elige una de tu vault.",
       "available": "Disponible: {{balance}} {{token}}",
-      "vaultRecipients": "Tus identidades",
+      "availableQx": "Disponible (gestionado por Qx): {{balance}} {{token}}",
+      "totalBalanceHint": "* Balance total: {{balance}} {{token}}. Para aumentar el balance transferible, mueve más a QX a través de \"Transferir derechos de gestión\" en Activos.",
+      "vaultRecipients": "Tus cuentas",
       "vaultRecipientsManual": "Entrada manual",
       "targetTickOffset": "Tick objetivo (actual + N)",
       "targetTickManual": "Tick objetivo (manual)",
@@ -325,6 +328,7 @@
     "confirm": {
       "title": "Confirmar transferencia",
       "description": "Revisa los detalles antes de enviar.",
+      "from": "Desde",
       "to": "Para",
       "amount": "Monto",
       "warning": "Esta acción no se puede deshacer.",

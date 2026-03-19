@@ -18,6 +18,9 @@
     },
     "balance": {
       "label": "Balance",
+      "title": "QUBIC Balance",
+      "show": "Show balance",
+      "hide": "Hide balance",
       "loading": "Loading..."
     },
     "hero": {
@@ -269,12 +272,10 @@
     "loading": "Loading transaction...",
     "error": "Unable to load transaction details.",
     "back": "Back",
-    "refresh": "Refresh transaction",
     "copy": "Copy",
-    "copyTxId": "Copy txid",
     "copied": "Copied",
     "copyFailed": "Copy failed",
-    "hash": "Hash",
+    "txId": "TX ID",
     "amount": "Amount",
     "tick": "Tick",
     "inputType": "Input type",
@@ -301,7 +302,9 @@
       "quBalance": "Balance: {{balance}} QUBIC",
       "recipientHint": "Use a 60-letter identity or pick one from your vault.",
       "available": "Available: {{balance}} {{token}}",
-      "vaultRecipients": "Your identities",
+      "availableQx": "Available (managed by Qx): {{balance}} {{token}}",
+      "totalBalanceHint": "* Total balance: {{balance}} {{token}}. To increase transferable balance, move more to QX via \"Transfer Management Rights\" in Assets first.",
+      "vaultRecipients": "Your accounts",
       "vaultRecipientsManual": "Manual entry",
       "targetTickOffset": "Target tick (current + N)",
       "targetTickManual": "Target tick (manual)",
@@ -325,6 +328,7 @@
     "confirm": {
       "title": "Confirm transfer",
       "description": "Review the details before sending.",
+      "from": "From",
       "to": "To",
       "amount": "Amount",
       "warning": "This action cannot be undone.",
