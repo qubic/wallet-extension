@@ -54,8 +54,10 @@ public/
 src/
   app/                       # app providers/setup
   components/                # reusable UI and feature components
+  extension/                 # MV3 entry points (background, content-script, inpage-provider)
   hooks/                     # shared React hooks
   lib/                       # wallet/business/storage helpers
+  lib/dapp/                  # dApp provider: controller, signing, storage, protocol
   locales/                   # i18n translations
   pages/                     # routed screens
   router/                    # route map + guards
@@ -75,7 +77,7 @@ sidepanel.html               # sidepanel entry point
 - Sensitive vault data is managed through the SDK vault store.
 - Passphrases/seeds are handled in-memory only during active flows and cleared on completion paths.
 - App reset now clears wallet-specific keys only (scoped cleanup), not all origin storage.
-- Current RPC host permission is restricted to `https://rpc.qubic.org/*`.
+- RPC calls are scoped to `https://rpc.qubic.org/*`. The extension also requests broad host permissions (`http://*/*`, `https://*/*`) to inject the dApp provider into web pages.
 
 ## dapp api (`window.qubic`)
 The extension injects `window.qubic` into regular web pages (`http/https`).
@@ -89,8 +91,10 @@ The extension injects `window.qubic` into regular web pages (`http/https`).
 - `sendTransaction(params): Promise<{ txId: string; targetTick: number; txBytesBase64: string; txBytesHex: string; networkTxId: string; broadcast: unknown }>`
 
 ### events
-- `window.qubic.on('accountChanged', cb)`
-- `window.qubic.on('disconnect', cb)`
+- `window.qubic.on('accountChanged', cb)` — fires with `{ identity: string; name?: string }` when the user switches to an approved account, or `null` when the new account is not approved for this origin (the dApp should treat `null` as "no account available" and prompt `connect()` again)
+- `window.qubic.on('disconnect', cb)` — fires when the origin is disconnected
+
+`on()` returns an unsubscribe function. You can also call `off(event, cb)` to remove a listener.
 
 ### dapp integration (for app developers)
 Basic usage:
@@ -105,8 +109,13 @@ if (!provider?.isQubic) {
 await provider.connect()
 const account = await provider.getAccount()
 
-const signedMessage = await provider.signMessage({ message: 'hello qubic' })
+// signMessage accepts a plain string or an object with message/hex/base64
+const signedMessage = await provider.signMessage('hello qubic')
+// await provider.signMessage({ message: 'hello qubic' })
+// await provider.signMessage({ hex: '0x48656c6c6f' })
+// await provider.signMessage({ base64: 'SGVsbG8=' })
 
+// signTransaction: sign only (you broadcast)
 const signedTx = await provider.signTransaction({
   toIdentity: 'DESTINATION_IDENTITY',
   amount: '1',
@@ -116,6 +125,26 @@ const signedTx = await provider.signTransaction({
   // optional bytes: Uint8Array | number[] | hex string | base64 string
   // inputBytes: new Uint8Array([...]),
 })
+
+// sendTransaction: sign + broadcast via the wallet
+const sentTx = await provider.sendTransaction({
+  toIdentity: 'DESTINATION_IDENTITY',
+  amount: '1000',
+  // optional: explicit tick or offset (default offset: 10)
+  // targetTick: 123456,
+  // targetTickOffset: 10,
+})
+
+// listen for account changes
+const unsub = provider.on('accountChanged', (account) => {
+  if (account) {
+    console.log('switched to:', account) // { identity: string; name?: string }
+  } else {
+    // new account is not approved for this origin — prompt connect() again
+    console.log('account not available, call connect() to approve')
+  }
+})
+// unsub() to stop listening
 ```
 
 Error handling:
@@ -129,19 +158,43 @@ try {
 ```
 
 Common provider error codes:
-- `NOT_CONNECTED`
-- `USER_REJECTED`
-- `INVALID_PARAMS`
-- `INVALID_PASSPHRASE`
-- `WATCH_ONLY_ACCOUNT`
-- `NO_ACCOUNT`
+- `NOT_CONNECTED` — origin not connected or account not approved
+- `USER_REJECTED` — user declined the approval request
+- `INVALID_PARAMS` — invalid or missing method parameters
+- `INVALID_PASSPHRASE` — incorrect wallet passphrase
+- `WATCH_ONLY_ACCOUNT` — active account cannot sign
+- `NO_ACCOUNT` — no active account selected
+- `METHOD_NOT_SUPPORTED` — unknown provider method
+- `UNSUPPORTED_ORIGIN` — sender origin not allowed
+- `INVALID_REQUEST` — malformed request or too many pending requests
+- `INTERNAL_ERROR` — unexpected wallet error
+
+### parameter reference
+
+**signMessage params:**
+- `string` — plain text to sign
+- `{ message: string }` — plain text
+- `{ hex: string }` — hex-encoded bytes (must start with `0x`, even length)
+- `{ base64: string }` — base64-encoded bytes
+
+**signTransaction / sendTransaction params:**
+
+| Param | Type | Required | Notes |
+|-------|------|----------|-------|
+| `toIdentity` | `string` | yes | 60-char uppercase Qubic identity |
+| `amount` | `string \| number \| bigint` | yes | Must be > 0 for simple transfers (inputType 0) |
+| `targetTick` | `number` | no | Explicit target tick. If omitted, resolved automatically (sendTransaction only) |
+| `targetTickOffset` | `number` | no | Offset from current tick (1-60, default 10). Ignored if `targetTick` is set. sendTransaction only |
+| `inputType` | `number` | no | Smart contract input type (0 = simple transfer) |
+| `inputBytes` | `Uint8Array \| number[] \| string` | no | SC input data. String is parsed as hex (`0x...`) or base64 |
 
 Notes for dApp developers:
-- `connect`, `signMessage`, `signTransaction`, and `sendTransaction` require user approval in the extension.
-- `signMessage`, `signTransaction`, and `sendTransaction` also require wallet passphrase confirmation.
-- `connect` requires an active account. If no account is available, the request fails with `NO_ACCOUNT` (no approval/onboarding popup is opened).
+- `connect` requires user approval (approve/reject) in the extension.
+- `connect` also requires an active account. If no account is available, the request fails with `NO_ACCOUNT` (no approval/onboarding popup is opened).
+- `signMessage`, `signTransaction`, and `sendTransaction` require user approval and wallet passphrase confirmation.
 - `signTransaction` returns signed bytes only. Broadcasting is handled by your app/backend.
-- Authorization is identity-scoped: `connect()` approves the currently active account for that origin.
+- `sendTransaction` signs and broadcasts in one step. It resolves the target tick automatically if not provided (using `targetTickOffset`, default 10).
+- Permissions are per-account: `connect` approves the currently active account for the requesting origin. Switching to a different account requires the dApp to call `connect` again.
 
 ### implementation notes (extension developers)
 - Requests requiring approval are persisted so they survive MV3 service worker restarts.
@@ -159,8 +212,11 @@ Notes for dApp developers:
    - `await window.qubic.connect()`
    - `await window.qubic.getAccount()`
    - `await window.qubic.signMessage({ message: 'hello' })`
+   - `await window.qubic.sendTransaction({ toIdentity: '...', amount: '1' })`
 
 Connected websites can be managed in `Settings -> Connected sites`, including the per-site authorized account list.
+
+For a full interactive test app, see [wallet-extension-dapp](https://github.com/qubic/wallet-extension-dapp).
 
 ## Development workflow
 

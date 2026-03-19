@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { type AggregatedAsset, formatAssetUnits } from '@/lib/assets'
 import { NATIVE_TOKEN_SYMBOL } from '@/lib/config/constants'
 import { useAddressName } from '@/hooks/use-address-name'
-import { formatBalance, truncateString } from '@/lib/utils'
+import { formatBalance, formatNumber, truncateString } from '@/lib/utils'
 import type { FormErrors } from '@/components/pages/transfer/types'
 
 type TransferFormProps = {
@@ -289,7 +289,7 @@ const TransferForm = ({
                 />
                 <div className="text-[11px] text-muted-foreground">
                   {t('transfer.form.targetTickCurrentHint', {
-                    tick: typeof currentTick === 'number' ? currentTick.toLocaleString() : '--',
+                    tick: typeof currentTick === 'number' ? formatNumber(currentTick) : '--',
                   })}
                 </div>
               </div>

@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - beta
   workflow_dispatch:
 
 concurrency:
@@ -35,14 +36,34 @@ jobs:
           key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
       - name: install deps
         run: bun install
+      - name: resolve next version
+        id: version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          NEXT_VERSION=$(npx semantic-release --dry-run 2>&1 | grep -oP 'next release version is \K[0-9a-z.\-]+' || true)
+          if [ -n "$NEXT_VERSION" ]; then
+            echo "Resolved version: $NEXT_VERSION"
+            npm version "$NEXT_VERSION" --no-git-tag-version
+            echo "resolved=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "No new version to release"
+            echo "resolved=false" >> "$GITHUB_OUTPUT"
+          fi
       - name: build extension
+        if: steps.version.outputs.resolved == 'true'
         run: bun run build
       - name: package dist artifact
+        if: steps.version.outputs.resolved == 'true'
         run: |
           rm -f dist.zip
           cd dist
           zip -r ../dist.zip .
+      - name: restore package.json
+        if: steps.version.outputs.resolved == 'true'
+        run: git checkout package.json
       - name: release
+        if: steps.version.outputs.resolved == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: bun run release

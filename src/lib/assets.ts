@@ -1,8 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
-import { QUBIC_RPC_BASE_URL } from './config/constants'
+import { QUBIC_RPC_BASE_URL, QX_CONTRACT_INDEX } from './config/constants'
 import { STALE_TIME_ASSET_ISSUANCES } from './config/refresh-intervals'
-
-const QX_MANAGING_CONTRACT_INDEX = 1
+import { formatNumber } from './utils'
 
 export type OwnedAssetsResponse = {
   ownedAssets?: Array<{
@@ -48,7 +47,7 @@ export const aggregateAssets = (
     const issued = info?.issuedAsset
     if (!issued?.name || !info?.numberOfUnits) continue
 
-    if (filterByQxManagement && info.managingContractIndex !== QX_MANAGING_CONTRACT_INDEX) continue
+    if (filterByQxManagement && info.managingContractIndex !== QX_CONTRACT_INDEX) continue
 
     const key = `${issued.issuerIdentity ?? ''}-${issued.name}`
     const existing = map.get(key)
@@ -70,13 +69,47 @@ export const aggregateAssets = (
   return [...map.values()].filter((a) => BigInt(a.numberOfUnits) > 0n)
 }
 
+export type ContractAssetEntry = {
+  name: string
+  issuerIdentity: string
+  numberOfUnits: string
+  decimals: number
+  managingContractIndex: number
+}
+
+/**
+ * Returns asset entries grouped per managing contract (not aggregated across contracts).
+ * Used for Transfer Management Rights where we need to know which contract manages each batch.
+ */
+export const getAssetsPerContract = (response: OwnedAssetsResponse): ContractAssetEntry[] => {
+  const entries: ContractAssetEntry[] = []
+
+  for (const entry of response.ownedAssets ?? []) {
+    const info = entry.data
+    const issued = info?.issuedAsset
+    if (!issued?.name || !info?.numberOfUnits) continue
+    if (info.managingContractIndex === undefined || info.managingContractIndex === null) continue
+    if (BigInt(info.numberOfUnits) <= 0n) continue
+
+    entries.push({
+      name: issued.name,
+      issuerIdentity: issued.issuerIdentity ?? '',
+      numberOfUnits: info.numberOfUnits,
+      decimals: issued.numberOfDecimalPlaces ?? 0,
+      managingContractIndex: info.managingContractIndex,
+    })
+  }
+
+  return entries
+}
+
 export const formatAssetUnits = (units: string | undefined, decimals = 0) => {
   if (!units) return '--'
-  if (decimals <= 0) return Number(units).toLocaleString()
+  if (decimals <= 0) return formatNumber(BigInt(units))
   const padded = units.padStart(decimals + 1, '0')
   const whole = padded.slice(0, -decimals)
   const fraction = padded.slice(-decimals).replace(/0+$/, '')
-  return `${Number(whole).toLocaleString()}${fraction ? `.${fraction}` : ''}`
+  return `${formatNumber(BigInt(whole))}${fraction ? `.${fraction}` : ''}`
 }
 
 export const useOwnedAssets = (identity: string) => {

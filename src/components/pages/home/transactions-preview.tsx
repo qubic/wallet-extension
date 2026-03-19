@@ -5,8 +5,7 @@ import { motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import AddressLabel from '@/components/address-label'
 import { formatBalanceCompact } from '@/lib/utils'
-import { ReceiveIcon } from '@/components/icons/receive-icon'
-import { SendIcon } from '@/components/icons/send-icon'
+import { getTransactionPresentation } from '@/lib/transaction-presentation'
 import {
   canResendPendingTransaction,
   type PendingTransaction,
@@ -73,17 +72,8 @@ const TransactionsPreview = ({
   }, [transactions.data, pendingTransactions])
 
   const renderRow = (tx: PreviewTransaction) => {
-    const isIncoming = tx.destination === identity
-    const isSimpleTransfer = Number(tx.inputType) === 0
-    const label = isSimpleTransfer
-      ? isIncoming
-        ? t('history.received')
-        : t('history.sent')
-      : isIncoming
-        ? t('history.incoming')
-        : t('history.outgoing')
-    const counterparty = isIncoming ? tx.source : tx.destination
-    const Icon = isIncoming ? ReceiveIcon : SendIcon
+    const { isIncoming, label, counterparty, Icon, addressPrefix, amountSign, amountColorClass } =
+      getTransactionPresentation(tx, identity, t)
     const isPending = isTransactionPending(tx.hash)
     const isFailed = isTransactionFailed(tx.hash)
     const canResend = canResendPendingTransaction({
@@ -122,9 +112,7 @@ const TransactionsPreview = ({
             <span className="text-xs font-semibold text-foreground">{label}</span>
             <AddressLabel
               address={counterparty}
-              prefix={
-                isSimpleTransfer ? (isIncoming ? t('history.from') : t('history.to')) : undefined
-              }
+              prefix={addressPrefix}
               className="text-xs text-muted-foreground"
             />
             <span className="text-[11px] text-muted-foreground/70">
@@ -153,12 +141,10 @@ const TransactionsPreview = ({
               ? 'text-amber-700 dark:text-amber-300'
               : isFailed
                 ? 'text-red-700 dark:text-red-300'
-                : isIncoming
-                  ? 'text-primary'
-                  : 'text-[var(--destructive)]'
+                : amountColorClass
           }`}
         >
-          {isIncoming ? '+' : '-'}
+          {amountSign}
           {formatBalanceCompact(tx.amount)}
         </span>
         {isFailed && (
