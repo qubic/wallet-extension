@@ -345,8 +345,7 @@
       "cancel": "İptal"
     },
     "success": {
-      "title": "Transfer gönderildi",
-      "description": "İşleminiz yayınlandı ve tick {{targetTick}} için planlandı."
+      "title": "Transfer gönderildi"
     },
     "errors": {
       "networkError": "Ağ hatası. Lütfen tekrar deneyin.",
@@ -394,8 +393,7 @@
       "cancel": "İptal"
     },
     "success": {
-      "title": "Hak transferi gönderildi",
-      "description": "İşleminiz yayınlandı ve tick {{targetTick}} için planlandı."
+      "title": "Hak transferi gönderildi"
     },
     "errors": {
       "networkError": "Ağ hatası. Lütfen tekrar deneyin.",
@@ -454,6 +452,7 @@
       "txInputBytes": "Giriş verisi",
       "txInputBytesExpand": "Daha fazla göster",
       "txInputBytesCollapse": "Daha az göster",
+      "txBroadcastSuccess": "İşlem gönderildi",
       "approve": "Onayla",
       "approveAndSend": "Onayla ve Gönder",
       "reject": "Reddet",
@@ -462,6 +461,9 @@
         "decisionFailed": "Kararınız gönderilemedi."
       }
     }
+  },
+  "transaction": {
+    "broadcastDescription": "İşleminiz yayınlandı ve tick {{targetTick}} için planlandı."
   },
   "onboarding": {
     "importSeed": {

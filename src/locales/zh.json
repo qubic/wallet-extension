@@ -345,8 +345,7 @@
       "cancel": "取消"
     },
     "success": {
-      "title": "转账已发送",
-      "description": "您的交易已广播，计划在 Tick {{targetTick}} 执行。"
+      "title": "转账已发送"
     },
     "errors": {
       "networkError": "网络错误，请重试。",
@@ -394,8 +393,7 @@
       "cancel": "取消"
     },
     "success": {
-      "title": "权限转移已发送",
-      "description": "您的交易已广播，计划在 Tick {{targetTick}} 执行。"
+      "title": "权限转移已发送"
     },
     "errors": {
       "networkError": "网络错误，请重试。",
@@ -454,6 +452,7 @@
       "txInputBytes": "输入数据",
       "txInputBytesExpand": "展开",
       "txInputBytesCollapse": "收起",
+      "txBroadcastSuccess": "交易已提交",
       "approve": "批准",
       "approveAndSend": "批准并发送",
       "reject": "拒绝",
@@ -462,6 +461,9 @@
         "decisionFailed": "无法提交您的决定。"
       }
     }
+  },
+  "transaction": {
+    "broadcastDescription": "您的交易已广播，计划在 Tick {{targetTick}} 执行。"
   },
   "onboarding": {
     "importSeed": {

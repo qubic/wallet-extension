@@ -24,11 +24,12 @@ import {
 } from '@/lib/dapp/approval-preview'
 import { getChromeApi } from '@/lib/dapp/chrome-api'
 import { PasswordInput } from '@/components/ui/password-input'
-import { truncateString } from '@/lib/utils'
+import { formatNumber, truncateString } from '@/lib/utils'
 import AddressLabel from '@/components/address-label'
 import { useProcedureName } from '@/hooks/use-procedure-name'
 import { isWalletLocked } from '@/lib/lock'
 import { validateVaultPassphrase } from '@/lib/vault'
+import { toast } from 'sonner'
 
 const DappApprovalDrawer = () => {
   const { t } = useTranslation()
@@ -139,7 +140,11 @@ const DappApprovalDrawer = () => {
     setLoading(true)
     setError('')
     try {
-      const ok = await new Promise<boolean>((resolve) => {
+      const result = await new Promise<{
+        ok?: boolean
+        executed?: boolean
+        targetTick?: number
+      }>((resolve) => {
         runtime.sendMessage(
           {
             type: RUNTIME_APPROVAL_DECISION_TYPE,
@@ -149,15 +154,33 @@ const DappApprovalDrawer = () => {
               passphrase: approved && requiresPassphrase ? normalizedPassphrase : undefined,
             },
           },
-          (response?: { ok?: boolean }) => {
-            resolve(Boolean(response?.ok))
+          (response?: { ok?: boolean; executed?: boolean; targetTick?: number }) => {
+            resolve(response ?? { ok: false })
           },
         )
       })
-      if (!ok) {
+      if (!result.ok) {
         setError(t('dapp.approval.errors.decisionFailed'))
         return
       }
+      if (approved && current.method === 'sendTransaction') {
+        if (result.executed === true) {
+          const isSimpleTransfer = txSummary?.inputType === '0' && Number(txSummary?.amount) > 0
+          const targetTick =
+            result.targetTick && Number.isFinite(result.targetTick)
+              ? formatNumber(result.targetTick)
+              : undefined
+          toast.success(
+            isSimpleTransfer ? t('transfer.success.title') : t('dapp.approval.txBroadcastSuccess'),
+            targetTick
+              ? { description: t('transaction.broadcastDescription', { targetTick }) }
+              : undefined,
+          )
+        } else if (result.executed === false) {
+          toast.error(t('transfer.errors.broadcastFailed'))
+        }
+      }
+
       setRequests((prev) => prev.filter((request) => request.id !== current.id))
       setPassphrase('')
 

@@ -345,8 +345,7 @@
       "cancel": "Annuler"
     },
     "success": {
-      "title": "Transfert envoyé",
-      "description": "Votre transaction a été diffusée et est programmée pour le tick {{targetTick}}."
+      "title": "Transfert envoyé"
     },
     "errors": {
       "networkError": "Erreur réseau. Veuillez réessayer.",
@@ -394,8 +393,7 @@
       "cancel": "Annuler"
     },
     "success": {
-      "title": "Transfert de droits envoyé",
-      "description": "Votre transaction a été diffusée et est programmée pour le tick {{targetTick}}."
+      "title": "Transfert de droits envoyé"
     },
     "errors": {
       "networkError": "Erreur réseau. Veuillez réessayer.",
@@ -454,6 +452,7 @@
       "txInputBytes": "Données d'entrée",
       "txInputBytesExpand": "Voir plus",
       "txInputBytesCollapse": "Voir moins",
+      "txBroadcastSuccess": "Transaction soumise",
       "approve": "Approuver",
       "approveAndSend": "Approuver et envoyer",
       "reject": "Rejeter",
@@ -462,6 +461,9 @@
         "decisionFailed": "Impossible de soumettre votre décision."
       }
     }
+  },
+  "transaction": {
+    "broadcastDescription": "Votre transaction a été diffusée et est programmée pour le tick {{targetTick}}."
   },
   "onboarding": {
     "importSeed": {

@@ -510,7 +510,20 @@ export const handleDappApprovalDecision = async (decision: DappApprovalDecision)
       const response = await executeApprovedRequest(claimedRequest, decision)
       await storeRequestResult(claimedRequest, response)
       await completeExecutionRequest(claimedRequest.id)
-      return true
+      const result =
+        response.ok && response.result && typeof response.result === 'object'
+          ? (response.result as Record<string, unknown>)
+          : null
+      return {
+        ok: true as const,
+        executed: true as const,
+        targetTick:
+          typeof result?.targetTick === 'number'
+            ? result.targetTick
+            : typeof result?.targetTick === 'string'
+              ? Number(result.targetTick)
+              : undefined,
+      }
     } catch (error) {
       const normalized = asProviderError(error, {
         code: 'INTERNAL_ERROR',
@@ -521,7 +534,7 @@ export const handleDappApprovalDecision = async (decision: DappApprovalDecision)
         asDappFailure(claimedRequest.id, normalized.code, normalized.message),
       )
       await completeExecutionRequest(claimedRequest.id)
-      return true
+      return { ok: true as const, executed: false as const }
     }
   } finally {
     processingApprovalDecisionIds.delete(decision.id)

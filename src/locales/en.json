@@ -345,8 +345,7 @@
       "cancel": "Cancel"
     },
     "success": {
-      "title": "Transfer sent",
-      "description": "Your transaction has been broadcast and is scheduled for tick {{targetTick}}."
+      "title": "Transfer sent"
     },
     "errors": {
       "networkError": "Network error. Please retry.",
@@ -394,8 +393,7 @@
       "cancel": "Cancel"
     },
     "success": {
-      "title": "Transfer rights sent",
-      "description": "Your transaction has been broadcast and is scheduled for tick {{targetTick}}."
+      "title": "Transfer rights sent"
     },
     "errors": {
       "networkError": "Network error. Please retry.",
@@ -454,6 +452,7 @@
       "txInputBytes": "Input data",
       "txInputBytesExpand": "Show more",
       "txInputBytesCollapse": "Show less",
+      "txBroadcastSuccess": "Transaction submitted",
       "approve": "Approve",
       "approveAndSend": "Approve & Send",
       "reject": "Reject",
@@ -462,6 +461,9 @@
         "decisionFailed": "Could not submit your decision."
       }
     }
+  },
+  "transaction": {
+    "broadcastDescription": "Your transaction has been broadcast and is scheduled for tick {{targetTick}}."
   },
   "onboarding": {
     "importSeed": {

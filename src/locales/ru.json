@@ -345,8 +345,7 @@
       "cancel": "Отмена"
     },
     "success": {
-      "title": "Перевод отправлен",
-      "description": "Ваша транзакция отправлена в сеть и запланирована на тик {{targetTick}}."
+      "title": "Перевод отправлен"
     },
     "errors": {
       "networkError": "Ошибка сети. Попробуйте снова.",
@@ -394,8 +393,7 @@
       "cancel": "Отмена"
     },
     "success": {
-      "title": "Права переданы",
-      "description": "Ваша транзакция отправлена в сеть и запланирована на тик {{targetTick}}."
+      "title": "Права переданы"
     },
     "errors": {
       "networkError": "Ошибка сети. Попробуйте снова.",
@@ -454,6 +452,7 @@
       "txInputBytes": "Входные данные",
       "txInputBytesExpand": "Показать больше",
       "txInputBytesCollapse": "Показать меньше",
+      "txBroadcastSuccess": "Транзакция отправлена",
       "approve": "Одобрить",
       "approveAndSend": "Одобрить и отправить",
       "reject": "Отклонить",
@@ -462,6 +461,9 @@
         "decisionFailed": "Не удалось отправить ваше решение."
       }
     }
+  },
+  "transaction": {
+    "broadcastDescription": "Ваша транзакция отправлена в сеть и запланирована на тик {{targetTick}}."
   },
   "onboarding": {
     "importSeed": {

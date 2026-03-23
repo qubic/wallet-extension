@@ -53,7 +53,13 @@ chrome.runtime.onMessage.addListener((message: unknown, sender, sendResponse) =>
     const payload = parsed.data.payload
 
     void handleDappApprovalDecision(payload)
-      .then((ok) => sendResponse({ ok }))
+      .then((result) => {
+        if (typeof result === 'object') {
+          sendResponse(result)
+        } else {
+          sendResponse({ ok: result })
+        }
+      })
       .catch(() => sendResponse({ ok: false }))
     return true
   }

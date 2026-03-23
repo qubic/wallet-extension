@@ -345,8 +345,7 @@
       "cancel": "Abbrechen"
     },
     "success": {
-      "title": "Überweisung gesendet",
-      "description": "Deine Transaktion wurde übertragen und ist für Tick {{targetTick}} eingeplant."
+      "title": "Überweisung gesendet"
     },
     "errors": {
       "networkError": "Netzwerkfehler. Bitte erneut versuchen.",
@@ -394,8 +393,7 @@
       "cancel": "Abbrechen"
     },
     "success": {
-      "title": "Rechte übertragen",
-      "description": "Deine Transaktion wurde übertragen und ist für Tick {{targetTick}} eingeplant."
+      "title": "Rechte übertragen"
     },
     "errors": {
       "networkError": "Netzwerkfehler. Bitte erneut versuchen.",
@@ -454,6 +452,7 @@
       "txInputBytes": "Eingabedaten",
       "txInputBytesExpand": "Mehr anzeigen",
       "txInputBytesCollapse": "Weniger anzeigen",
+      "txBroadcastSuccess": "Transaktion gesendet",
       "approve": "Genehmigen",
       "approveAndSend": "Genehmigen & senden",
       "reject": "Ablehnen",
@@ -462,6 +461,9 @@
         "decisionFailed": "Entscheidung konnte nicht übermittelt werden."
       }
     }
+  },
+  "transaction": {
+    "broadcastDescription": "Deine Transaktion wurde übertragen und ist für Tick {{targetTick}} eingeplant."
   },
   "onboarding": {
     "importSeed": {

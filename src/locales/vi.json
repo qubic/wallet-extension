@@ -345,8 +345,7 @@
       "cancel": "Hủy"
     },
     "success": {
-      "title": "Chuyển khoản đã gửi",
-      "description": "Giao dịch của bạn đã được truyền và được lên lịch cho tick {{targetTick}}."
+      "title": "Chuyển khoản đã gửi"
     },
     "errors": {
       "networkError": "Lỗi mạng. Vui lòng thử lại.",
@@ -394,8 +393,7 @@
       "cancel": "Hủy"
     },
     "success": {
-      "title": "Quyền đã được chuyển",
-      "description": "Giao dịch của bạn đã được truyền và được lên lịch cho tick {{targetTick}}."
+      "title": "Quyền đã được chuyển"
     },
     "errors": {
       "networkError": "Lỗi mạng. Vui lòng thử lại.",
@@ -454,6 +452,7 @@
       "txInputBytes": "Dữ liệu đầu vào",
       "txInputBytesExpand": "Xem thêm",
       "txInputBytesCollapse": "Thu gọn",
+      "txBroadcastSuccess": "Giao dịch đã gửi",
       "approve": "Chấp thuận",
       "approveAndSend": "Chấp thuận và gửi",
       "reject": "Từ chối",
@@ -462,6 +461,9 @@
         "decisionFailed": "Không thể gửi quyết định của bạn."
       }
     }
+  },
+  "transaction": {
+    "broadcastDescription": "Giao dịch của bạn đã được truyền và được lên lịch cho tick {{targetTick}}."
   },
   "onboarding": {
     "importSeed": {

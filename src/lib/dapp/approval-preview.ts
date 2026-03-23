@@ -107,7 +107,7 @@ export const getApprovalTxSummary = (params: unknown): DappTxApprovalSummary | n
   const inputType =
     typeof record.inputType === 'string' || typeof record.inputType === 'number'
       ? `${record.inputType}`
-      : ''
+      : '0'
   const targetTick =
     typeof record.targetTick === 'string' || typeof record.targetTick === 'number'
       ? `${record.targetTick}`

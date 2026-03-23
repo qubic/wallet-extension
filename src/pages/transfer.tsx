@@ -286,7 +286,7 @@ const Transfer = () => {
       setDrawerOpen(false)
 
       toast.success(t('transfer.success.title'), {
-        description: t('transfer.success.description', {
+        description: t('transaction.broadcastDescription', {
           targetTick: formatNumber(Number(result.targetTick)),
         }),
       })
