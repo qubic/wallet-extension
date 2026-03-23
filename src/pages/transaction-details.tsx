@@ -88,20 +88,6 @@ const TransactionDetails = () => {
           : '--',
     },
     {
-      key: 'timestamp',
-      label: t('txDetails.timestamp'),
-      value: formatTimestamp(details?.timestamp),
-    },
-    {
-      key: 'tick',
-      label: t('txDetails.tick'),
-      value: (() => {
-        const tick = details?.tickNumber ?? details?.tick ?? pending?.targetTick
-        if (tick === null || tick === undefined) return '--'
-        return formatNumber(Number(tick))
-      })(),
-    },
-    {
       key: 'inputType',
       label: t('txDetails.txType'),
       value: txTypeDescription,
@@ -119,6 +105,20 @@ const TransactionDetails = () => {
       value: destName ? formatAddressLabel(destAddress, destName.name) : details?.destination,
       copyable: true,
       copyText: destAddress,
+    },
+    {
+      key: 'tick',
+      label: t('txDetails.tick'),
+      value: (() => {
+        const tick = details?.tickNumber ?? details?.tick ?? pending?.targetTick
+        if (tick === null || tick === undefined) return '--'
+        return formatNumber(Number(tick))
+      })(),
+    },
+    {
+      key: 'timestamp',
+      label: t('txDetails.timestamp'),
+      value: formatTimestamp(details?.timestamp),
     },
   ]
 
