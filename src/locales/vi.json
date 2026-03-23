@@ -436,6 +436,10 @@
   "dapp": {
     "approval": {
       "title": "Yêu cầu kết nối",
+      "connectTitle": "Yêu cầu kết nối",
+      "signMessageTitle": "Ký tin nhắn",
+      "signTransactionTitle": "Ký giao dịch",
+      "sendTransactionTitle": "Gửi giao dịch",
       "origin": "Trang web",
       "sharedAccount": "Tài khoản chia sẻ",
       "sharedAccountFallback": "Tài khoản đã chọn",
