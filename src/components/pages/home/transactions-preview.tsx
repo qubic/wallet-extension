@@ -137,41 +137,43 @@ const TransactionsPreview = ({
             </span>
           </div>
         </div>
-        <span
-          className={`text-sm font-semibold ${
-            !isVisible
-              ? 'text-muted-foreground'
-              : isPending
-                ? 'text-amber-700 dark:text-amber-300'
-                : isFailed
-                  ? 'text-red-700 dark:text-red-300'
-                  : amountColorClass
-          }`}
-        >
-          {isVisible ? `${amountSign}${formatBalanceCompact(tx.amount)}` : HIDDEN_BALANCE}
-        </span>
-        {isFailed && (
-          <div className="ml-2 flex items-center gap-1">
-            {canResend && (
+        <div className="flex items-center gap-2">
+          <span
+            className={`text-sm font-semibold ${
+              !isVisible
+                ? 'text-muted-foreground'
+                : isPending
+                  ? 'text-amber-700 dark:text-amber-300'
+                  : isFailed
+                    ? 'text-red-700 dark:text-red-300'
+                    : amountColorClass
+            }`}
+          >
+            {isVisible ? `${amountSign}${formatBalanceCompact(tx.amount)}` : HIDDEN_BALANCE}
+          </span>
+          {isFailed && (
+            <div className="flex items-center gap-1">
+              {canResend && (
+                <button
+                  type="button"
+                  className="cursor-pointer text-[11px] font-semibold uppercase tracking-wide text-primary hover:underline"
+                  onClick={() => onResend(tx.hash, tx.destination, tx.amount, tx.tokenKey)}
+                >
+                  {t('history.resend')}
+                </button>
+              )}
               <button
                 type="button"
-                className="cursor-pointer text-[11px] font-semibold uppercase tracking-wide text-primary hover:underline"
-                onClick={() => onResend(tx.hash, tx.destination, tx.amount, tx.tokenKey)}
+                className="cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
+                onClick={() => removePendingTransaction(tx.hash)}
+                aria-label={t('history.deleteFailed')}
+                title={t('history.deleteFailed')}
               >
-                {t('history.resend')}
+                <XIcon className="h-3.5 w-3.5" />
               </button>
-            )}
-            <button
-              type="button"
-              className="cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
-              onClick={() => removePendingTransaction(tx.hash)}
-              aria-label={t('history.deleteFailed')}
-              title={t('history.deleteFailed')}
-            >
-              <XIcon className="h-3.5 w-3.5" />
-            </button>
-          </div>
-        )}
+            </div>
+          )}
+        </div>
         {!isFailed && (
           <button
             type="button"
