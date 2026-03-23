@@ -260,7 +260,7 @@
     "to": "Alıcı:",
     "from": "Gönderen:",
     "tick": "Tick",
-    "type": "Tür",
+    "txType": "TX Türü",
     "pending": "Onay Bekliyor",
     "unconfirmed": "Onaylanmamış",
     "unconfirmedMore": "+{{count}} onaylanmamış işlem daha",
@@ -282,7 +282,7 @@
     "txId": "TX ID",
     "amount": "Miktar",
     "tick": "Tick",
-    "inputType": "Giriş türü",
+    "txType": "TX Türü",
     "source": "Kaynak",
     "destination": "Hedef",
     "timestamp": "Zaman damgası",
@@ -446,7 +446,7 @@
       "messageEmpty": "Mesaj önizlemesi mevcut değil.",
       "txTo": "Alıcı",
       "txAmount": "Miktar",
-      "txInputType": "Giriş türü",
+      "txType": "TX Türü",
       "txTargetTick": "Hedef tick",
       "txTargetTickOffset": "Hedef tick ofseti",
       "txInputBytes": "Giriş verisi",
@@ -463,7 +463,8 @@
     }
   },
   "transaction": {
-    "broadcastDescription": "İşleminiz yayınlandı ve tick {{targetTick}} için planlandı."
+    "broadcastDescription": "İşleminiz yayınlandı ve tick {{targetTick}} için planlandı.",
+    "txTypeTransfer": "Transfer"
   },
   "onboarding": {
     "importSeed": {

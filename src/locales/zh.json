@@ -260,7 +260,7 @@
     "to": "收款方：",
     "from": "发送方：",
     "tick": "Tick",
-    "type": "类型",
+    "txType": "交易类型",
     "pending": "待确认",
     "unconfirmed": "未确认",
     "unconfirmedMore": "+{{count}} 笔未确认",
@@ -282,7 +282,7 @@
     "txId": "交易 ID",
     "amount": "金额",
     "tick": "Tick",
-    "inputType": "输入类型",
+    "txType": "TX 类型",
     "source": "发送方",
     "destination": "接收方",
     "timestamp": "时间戳",
@@ -446,7 +446,7 @@
       "messageEmpty": "无消息预览。",
       "txTo": "收款方",
       "txAmount": "金额",
-      "txInputType": "输入类型",
+      "txType": "TX 类型",
       "txTargetTick": "目标 Tick",
       "txTargetTickOffset": "目标 Tick 偏移量",
       "txInputBytes": "输入数据",
@@ -463,7 +463,8 @@
     }
   },
   "transaction": {
-    "broadcastDescription": "您的交易已广播，计划在 Tick {{targetTick}} 执行。"
+    "broadcastDescription": "您的交易已广播，计划在 Tick {{targetTick}} 执行。",
+    "txTypeTransfer": "转账"
   },
   "onboarding": {
     "importSeed": {

@@ -260,7 +260,7 @@
     "to": "À :",
     "from": "De :",
     "tick": "Tick",
-    "type": "Type",
+    "txType": "Type de TX",
     "pending": "En attente",
     "unconfirmed": "Non confirmé",
     "unconfirmedMore": "+{{count}} non confirmées supplémentaires",
@@ -282,7 +282,7 @@
     "txId": "ID de TX",
     "amount": "Montant",
     "tick": "Tick",
-    "inputType": "Type d'entrée",
+    "txType": "TX Type",
     "source": "Source",
     "destination": "Destination",
     "timestamp": "Horodatage",
@@ -446,7 +446,7 @@
       "messageEmpty": "Aucun aperçu du message disponible.",
       "txTo": "À",
       "txAmount": "Montant",
-      "txInputType": "Type d'entrée",
+      "txType": "TX Type",
       "txTargetTick": "Tick cible",
       "txTargetTickOffset": "Décalage du tick cible",
       "txInputBytes": "Données d'entrée",
@@ -463,7 +463,8 @@
     }
   },
   "transaction": {
-    "broadcastDescription": "Votre transaction a été diffusée et est programmée pour le tick {{targetTick}}."
+    "broadcastDescription": "Votre transaction a été diffusée et est programmée pour le tick {{targetTick}}.",
+    "txTypeTransfer": "Transfert"
   },
   "onboarding": {
     "importSeed": {

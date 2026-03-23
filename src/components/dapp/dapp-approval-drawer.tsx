@@ -24,9 +24,10 @@ import {
 } from '@/lib/dapp/approval-preview'
 import { getChromeApi } from '@/lib/dapp/chrome-api'
 import { PasswordInput } from '@/components/ui/password-input'
-import { formatNumber, truncateString } from '@/lib/utils'
+import { formatIntegerLike, formatNumber, truncateString } from '@/lib/utils'
+import { NATIVE_TOKEN_SYMBOL } from '@/lib/config/constants'
 import AddressLabel from '@/components/address-label'
-import { useProcedureName } from '@/hooks/use-procedure-name'
+import { useTxTypeDescription } from '@/hooks/use-tx-type-description'
 import { isWalletLocked } from '@/lib/lock'
 import { validateVaultPassphrase } from '@/lib/vault'
 import { toast } from 'sonner'
@@ -90,7 +91,7 @@ const DappApprovalDrawer = () => {
     [current?.params],
   )
   const txSummary = useMemo(() => getApprovalTxSummary(current?.params), [current?.params])
-  const procedureName = useProcedureName(
+  const txTypeDescription = useTxTypeDescription(
     txSummary?.toIdentity ?? '',
     Number(txSummary?.inputType ?? 0),
   )
@@ -267,23 +268,23 @@ const DappApprovalDrawer = () => {
                   {txSummary.amount && (
                     <p className="text-xs text-muted-foreground">
                       {t('dapp.approval.txAmount')}:{' '}
-                      <span className="font-mono text-foreground">{txSummary.amount}</span>
+                      <span className="font-mono text-foreground">
+                        {formatIntegerLike(txSummary.amount)} {NATIVE_TOKEN_SYMBOL}
+                      </span>
                     </p>
                   )}
                   {txSummary.inputType && (
                     <p className="text-xs text-muted-foreground">
-                      {t('dapp.approval.txInputType')}:{' '}
-                      <span className="font-mono text-foreground">
-                        {procedureName
-                          ? `${txSummary.inputType} (${procedureName})`
-                          : txSummary.inputType}
-                      </span>
+                      {t('dapp.approval.txType')}:{' '}
+                      <span className="font-mono text-foreground">{txTypeDescription}</span>
                     </p>
                   )}
                   {txSummary.targetTick && (
                     <p className="text-xs text-muted-foreground">
                       {t('dapp.approval.txTargetTick')}:{' '}
-                      <span className="font-mono text-foreground">{txSummary.targetTick}</span>
+                      <span className="font-mono text-foreground">
+                        {formatNumber(Number(txSummary.targetTick))}
+                      </span>
                     </p>
                   )}
                   {txSummary.targetTickOffset && (

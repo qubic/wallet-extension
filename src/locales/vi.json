@@ -260,7 +260,7 @@
     "to": "Đến:",
     "from": "Từ:",
     "tick": "Tick",
-    "type": "Loại",
+    "txType": "Loại TX",
     "pending": "Đang chờ",
     "unconfirmed": "Chưa xác nhận",
     "unconfirmedMore": "+{{count}} chưa xác nhận khác",
@@ -282,7 +282,7 @@
     "txId": "ID giao dịch",
     "amount": "Số lượng",
     "tick": "Tick",
-    "inputType": "Loại đầu vào",
+    "txType": "TX Loại",
     "source": "Nguồn",
     "destination": "Đích",
     "timestamp": "Thời gian",
@@ -446,7 +446,7 @@
       "messageEmpty": "Không có bản xem trước tin nhắn.",
       "txTo": "Đến",
       "txAmount": "Số lượng",
-      "txInputType": "Loại đầu vào",
+      "txType": "TX Loại",
       "txTargetTick": "Tick mục tiêu",
       "txTargetTickOffset": "Độ lệch tick mục tiêu",
       "txInputBytes": "Dữ liệu đầu vào",
@@ -463,7 +463,8 @@
     }
   },
   "transaction": {
-    "broadcastDescription": "Giao dịch của bạn đã được truyền và được lên lịch cho tick {{targetTick}}."
+    "broadcastDescription": "Giao dịch của bạn đã được truyền và được lên lịch cho tick {{targetTick}}.",
+    "txTypeTransfer": "Chuyển khoản"
   },
   "onboarding": {
     "importSeed": {

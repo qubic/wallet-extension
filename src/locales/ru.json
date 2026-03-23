@@ -260,7 +260,7 @@
     "to": "Кому:",
     "from": "От:",
     "tick": "Tick",
-    "type": "Тип",
+    "txType": "Тип TX",
     "pending": "В ожидании",
     "unconfirmed": "Не подтверждено",
     "unconfirmedMore": "+{{count}} еще не подтверждено",
@@ -282,7 +282,7 @@
     "txId": "ID транзакции",
     "amount": "Сумма",
     "tick": "Tick",
-    "inputType": "Тип ввода",
+    "txType": "TX Тип",
     "source": "Отправитель",
     "destination": "Получатель",
     "timestamp": "Дата",
@@ -446,7 +446,7 @@
       "messageEmpty": "Предварительный просмотр сообщения недоступен.",
       "txTo": "Кому",
       "txAmount": "Сумма",
-      "txInputType": "Тип ввода",
+      "txType": "TX Тип",
       "txTargetTick": "Целевой тик",
       "txTargetTickOffset": "Смещение целевого тика",
       "txInputBytes": "Входные данные",
@@ -463,7 +463,8 @@
     }
   },
   "transaction": {
-    "broadcastDescription": "Ваша транзакция отправлена в сеть и запланирована на тик {{targetTick}}."
+    "broadcastDescription": "Ваша транзакция отправлена в сеть и запланирована на тик {{targetTick}}.",
+    "txTypeTransfer": "Перевод"
   },
   "onboarding": {
     "importSeed": {

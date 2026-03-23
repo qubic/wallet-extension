@@ -10,29 +10,11 @@ import {
   usePendingTransactionsVersion,
 } from '@/lib/pending-transactions'
 import { useAddressName } from '@/hooks/use-address-name'
-import { useProcedureName } from '@/hooks/use-procedure-name'
+import { useTxTypeDescription } from '@/hooks/use-tx-type-description'
 import { useClipboardCopy } from '@/hooks/use-clipboard-copy'
-import { formatAddressLabel, formatNumber } from '@/lib/utils'
+import { formatAddressLabel, formatIntegerLike, formatNumber } from '@/lib/utils'
 import TxDetailsHeader from '@/components/pages/transaction-details/tx-details-header'
 import TxDetailsRow, { formatValue } from '@/components/pages/transaction-details/tx-details-row'
-
-const formatIntegerLike = (value: unknown): string => {
-  if (value === null || value === undefined) return '--'
-
-  if (typeof value === 'bigint') return formatNumber(value)
-
-  if (typeof value === 'number') {
-    if (!Number.isFinite(value)) return '--'
-    return formatNumber(Math.trunc(value))
-  }
-
-  if (typeof value === 'string') {
-    const normalized = value.trim()
-    if (/^-?\d+$/.test(normalized)) return formatNumber(BigInt(normalized))
-  }
-
-  return formatValue(value)
-}
 
 const TX_DETAILS_SKELETON_IDS = ['a', 'b', 'c', 'd', 'e', 'f'] as const
 
@@ -71,7 +53,7 @@ const TransactionDetails = () => {
   const destAddress = (details?.destination as string) ?? ''
   const sourceName = useAddressName(sourceAddress)
   const destName = useAddressName(destAddress)
-  const procedureName = useProcedureName(destAddress, Number(details?.inputType ?? 0))
+  const txTypeDescription = useTxTypeDescription(destAddress, Number(details?.inputType ?? 0))
 
   const formatTimestamp = (ts: unknown): string => {
     if (ts === null || ts === undefined) return '--'
@@ -117,8 +99,8 @@ const TransactionDetails = () => {
     },
     {
       key: 'inputType',
-      label: t('txDetails.inputType'),
-      value: procedureName ? `${details?.inputType} (${procedureName})` : details?.inputType,
+      label: t('txDetails.txType'),
+      value: txTypeDescription,
     },
     {
       key: 'source',
