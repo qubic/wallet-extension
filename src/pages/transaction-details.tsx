@@ -13,6 +13,7 @@ import { useAddressName } from '@/hooks/use-address-name'
 import { useTxTypeDescription } from '@/hooks/use-tx-type-description'
 import { useClipboardCopy } from '@/hooks/use-clipboard-copy'
 import { formatAddressLabel, formatIntegerLike, formatNumber } from '@/lib/utils'
+import { NATIVE_TOKEN_SYMBOL } from '@/lib/config/constants'
 import TxDetailsHeader from '@/components/pages/transaction-details/tx-details-header'
 import TxDetailsRow, { formatValue } from '@/components/pages/transaction-details/tx-details-row'
 
@@ -81,7 +82,10 @@ const TransactionDetails = () => {
     {
       key: 'amount',
       label: t('txDetails.amount'),
-      value: formatIntegerLike(details?.amount),
+      value:
+        details?.amount != null
+          ? `${formatIntegerLike(details.amount)} ${NATIVE_TOKEN_SYMBOL}`
+          : '--',
     },
     {
       key: 'timestamp',
