@@ -41,7 +41,7 @@ import {
   DAPP_SEND_TRANSACTION_TARGET_TICK_OFFSET_MAX,
   DAPP_SEND_TRANSACTION_TARGET_TICK_OFFSET_MIN,
 } from '@/lib/dapp/timing'
-import { validateDappMethodParams } from '@/lib/dapp/validators'
+import { parseOptionalInteger, validateDappMethodParams } from '@/lib/dapp/validators'
 import {
   sendTransactionFromSeed,
   parseSignTransactionParams,
@@ -234,6 +234,7 @@ const queueSigningApproval = async (
         'Destination identity cannot match source identity',
       )
     }
+    await rejectIfTickInPast(parsedParams.targetTick)
   }
   await enqueueApprovalRequest({
     id: request.id,
@@ -248,24 +249,23 @@ const queueSigningApproval = async (
   return asRuntimePendingAck(request.id)
 }
 
-const toOptionalInteger = (value: unknown): number | undefined => {
-  if (value === undefined || value === null) return undefined
-  const numeric =
-    typeof value === 'number'
-      ? value
-      : typeof value === 'bigint'
-        ? Number(value)
-        : typeof value === 'string'
-          ? Number.parseInt(value.trim(), 10)
-          : Number.NaN
-  if (!Number.isFinite(numeric)) return undefined
-  return Math.trunc(numeric)
+const rejectIfTickInPast = async (targetTick: number | undefined): Promise<void> => {
+  if (targetTick === undefined) return
+  try {
+    const currentTick = Number((await sdk.rpc.live.tickInfo()).tick)
+    if (Number.isFinite(currentTick) && targetTick <= currentTick) {
+      throw new DappProviderError('INVALID_PARAMS', 'targetTick is already in the past')
+    }
+  } catch (error) {
+    if (error instanceof DappProviderError) throw error
+    // If we can't fetch the current tick, skip the check rather than blocking the request
+  }
 }
 
 const normalizeQueuedSendTransactionParams = (params: unknown) => {
   const input = (params && typeof params === 'object' ? params : {}) as DappSendTransactionParams
-  const explicitTargetTick = toOptionalInteger(input.targetTick)
-  const rawOffset = toOptionalInteger(input.targetTickOffset)
+  const explicitTargetTick = parseOptionalInteger(input.targetTick, 'targetTick')
+  const rawOffset = parseOptionalInteger(input.targetTickOffset, 'targetTickOffset')
 
   if (explicitTargetTick !== undefined && explicitTargetTick < 1) {
     throw new DappProviderError('INVALID_PARAMS', 'Invalid targetTick')
@@ -299,13 +299,14 @@ const normalizeQueuedSendTransactionParams = (params: unknown) => {
 const resolveSendTransactionParams = async (params: unknown) => {
   const normalized = normalizeQueuedSendTransactionParams(params)
   const input = normalized as Record<string, unknown>
-  const explicitTargetTick = toOptionalInteger(input.targetTick)
-  if (explicitTargetTick !== undefined) {
+  if (typeof input.targetTick === 'number') {
     return normalized
   }
 
   const offset =
-    toOptionalInteger(input.targetTickOffset) ?? DAPP_SEND_TRANSACTION_TARGET_TICK_OFFSET_DEFAULT
+    typeof input.targetTickOffset === 'number'
+      ? input.targetTickOffset
+      : DAPP_SEND_TRANSACTION_TARGET_TICK_OFFSET_DEFAULT
   let targetTick: number | undefined
 
   try {
@@ -360,6 +361,8 @@ const queueSendTransactionApproval = async (
       throw new DappProviderError('INVALID_PARAMS', 'Insufficient balance')
     }
   }
+  await rejectIfTickInPast(parsedParams.targetTick)
+
   const queuedParams = normalizeQueuedSendTransactionParams(request.params)
 
   await enqueueApprovalRequest({
