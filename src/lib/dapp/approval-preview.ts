@@ -11,7 +11,7 @@ export type DappTxApprovalSummary = Readonly<{
   inputType: string
   targetTick: string
   targetTickOffset?: string
-  fee: string
+  inputBytes?: string
 }>
 
 type ApprovalPreviewOptions = {
@@ -70,6 +70,9 @@ export const buildApprovalParamsPreview = (
     ) {
       preview.targetTickOffset = record.targetTickOffset
     }
+    if (typeof record.inputBytes === 'string' && record.inputBytes.trim()) {
+      preview.inputBytes = truncatePreviewValue(record.inputBytes.trim())
+    }
     return Object.keys(preview).length > 0 ? preview : undefined
   }
 
@@ -113,11 +116,10 @@ export const getApprovalTxSummary = (params: unknown): DappTxApprovalSummary | n
     typeof record.targetTickOffset === 'string' || typeof record.targetTickOffset === 'number'
       ? `${record.targetTickOffset}`
       : undefined
-  const inputTypeNumber =
-    typeof record.inputType === 'string' || typeof record.inputType === 'number'
-      ? Number(record.inputType)
-      : Number.NaN
-  const fee = Number.isFinite(inputTypeNumber) && inputTypeNumber === 0 ? '0' : 'may-apply'
+  const inputBytes =
+    typeof record.inputBytes === 'string' && record.inputBytes.trim()
+      ? record.inputBytes.trim()
+      : undefined
   if (!toIdentity && !amount && !inputType && !targetTick) return null
-  return { toIdentity, amount, inputType, targetTick, targetTickOffset, fee }
+  return { toIdentity, amount, inputType, targetTick, targetTickOffset, inputBytes }
 }

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router-dom'
-import { GlobeIcon, Link2OffIcon, LinkIcon } from 'lucide-react'
+import { ChevronDownIcon, ChevronUpIcon, GlobeIcon, Link2OffIcon, LinkIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Drawer,
@@ -25,6 +25,8 @@ import {
 import { getChromeApi } from '@/lib/dapp/chrome-api'
 import { PasswordInput } from '@/components/ui/password-input'
 import { truncateString } from '@/lib/utils'
+import AddressLabel from '@/components/address-label'
+import { useProcedureName } from '@/hooks/use-procedure-name'
 import { isWalletLocked } from '@/lib/lock'
 import { validateVaultPassphrase } from '@/lib/vault'
 
@@ -35,6 +37,7 @@ const DappApprovalDrawer = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [passphrase, setPassphrase] = useState('')
+  const [inputBytesExpanded, setInputBytesExpanded] = useState(false)
   const [locked, setLocked] = useState(() => isWalletLocked())
   const isDappApprovalPopup =
     window.location.pathname.endsWith('popup.html') &&
@@ -86,6 +89,10 @@ const DappApprovalDrawer = () => {
     [current?.params],
   )
   const txSummary = useMemo(() => getApprovalTxSummary(current?.params), [current?.params])
+  const procedureName = useProcedureName(
+    txSummary?.toIdentity ?? '',
+    Number(txSummary?.inputType ?? 0),
+  )
 
   const subtitle = useMemo(() => {
     if (!current) return ''
@@ -226,11 +233,12 @@ const DappApprovalDrawer = () => {
               txSummary && (
                 <div className="space-y-2 rounded-xl border border-border/60 bg-background/40 p-3">
                   {txSummary.toIdentity && (
-                    <p className="text-xs text-muted-foreground">
-                      {t('dapp.approval.txTo')}:{' '}
-                      <span className="font-mono text-foreground" title={txSummary.toIdentity}>
-                        {truncateString(txSummary.toIdentity)}
-                      </span>
+                    <p className="text-xs text-muted-foreground" title={txSummary.toIdentity}>
+                      <AddressLabel
+                        address={txSummary.toIdentity}
+                        prefix={`${t('dapp.approval.txTo')}:`}
+                        className="text-foreground"
+                      />
                     </p>
                   )}
                   {txSummary.amount && (
@@ -242,7 +250,11 @@ const DappApprovalDrawer = () => {
                   {txSummary.inputType && (
                     <p className="text-xs text-muted-foreground">
                       {t('dapp.approval.txInputType')}:{' '}
-                      <span className="font-mono text-foreground">{txSummary.inputType}</span>
+                      <span className="font-mono text-foreground">
+                        {procedureName
+                          ? `${txSummary.inputType} (${procedureName})`
+                          : txSummary.inputType}
+                      </span>
                     </p>
                   )}
                   {txSummary.targetTick && (
@@ -259,14 +271,35 @@ const DappApprovalDrawer = () => {
                       </span>
                     </p>
                   )}
-                  <p className="text-xs text-muted-foreground">
-                    {t('dapp.approval.txFee')}:{' '}
-                    <span className="font-mono text-foreground">
-                      {txSummary.fee === '0'
-                        ? t('dapp.approval.txFeeNone')
-                        : t('dapp.approval.txFeeMayApply')}
-                    </span>
-                  </p>
+                  {txSummary.inputBytes && (
+                    <div className="text-xs text-muted-foreground">
+                      <p>{t('dapp.approval.txInputBytes')}:</p>
+                      <p
+                        className={`mt-1 break-all rounded bg-muted/50 p-1.5 font-mono text-[11px] text-foreground ${inputBytesExpanded ? 'max-h-40 overflow-y-auto' : 'max-h-10 overflow-hidden'}`}
+                      >
+                        {txSummary.inputBytes}
+                      </p>
+                      {txSummary.inputBytes.length > 80 && (
+                        <button
+                          type="button"
+                          className="mt-1 flex items-center gap-0.5 text-primary"
+                          onClick={() => setInputBytesExpanded((prev) => !prev)}
+                        >
+                          {inputBytesExpanded ? (
+                            <>
+                              {t('dapp.approval.txInputBytesCollapse')}{' '}
+                              <ChevronUpIcon className="h-3 w-3" />
+                            </>
+                          ) : (
+                            <>
+                              {t('dapp.approval.txInputBytesExpand')}{' '}
+                              <ChevronDownIcon className="h-3 w-3" />
+                            </>
+                          )}
+                        </button>
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
             {requiresPassphrase && (
