@@ -279,19 +279,11 @@ const DappApprovalDrawer = () => {
                       <span className="font-mono text-foreground">{txTypeDescription}</span>
                     </p>
                   )}
-                  {txSummary.targetTick && (
+                  {txSummary.targetTick && Number(txSummary.targetTick) > 0 && (
                     <p className="text-xs text-muted-foreground">
                       {t('dapp.approval.txTargetTick')}:{' '}
                       <span className="font-mono text-foreground">
                         {formatNumber(Number(txSummary.targetTick))}
-                      </span>
-                    </p>
-                  )}
-                  {txSummary.targetTickOffset && (
-                    <p className="text-xs text-muted-foreground">
-                      {t('dapp.approval.txTargetTickOffset')}:{' '}
-                      <span className="font-mono text-foreground">
-                        +{txSummary.targetTickOffset}
                       </span>
                     </p>
                   )}
