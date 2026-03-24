@@ -196,7 +196,7 @@ const AssetDetail = () => {
                 <Button
                   size="sm"
                   variant="ghost"
-                  className="ml-2 h-8 shrink-0 gap-1.5 text-xs text-muted-foreground hover:text-primary"
+                  className="ml-2 h-8 shrink-0 gap-1.5 text-xs text-muted-foreground"
                   onClick={() =>
                     navigate(
                       `/transfer/manage-rights?asset=${encodeURIComponent(decodedAssetKey)}&contractIndex=${contract.contractIndex}`,
