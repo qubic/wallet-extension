@@ -436,6 +436,10 @@
   "dapp": {
     "approval": {
       "title": "连接请求",
+      "connectTitle": "连接请求",
+      "signMessageTitle": "签署消息",
+      "signTransactionTitle": "签署交易",
+      "sendTransactionTitle": "发送交易",
       "origin": "网站",
       "sharedAccount": "共享账户",
       "sharedAccountFallback": "已选账户",

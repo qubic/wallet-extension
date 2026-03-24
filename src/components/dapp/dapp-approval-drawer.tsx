@@ -38,6 +38,7 @@ const DappApprovalDrawer = () => {
   const [error, setError] = useState('')
   const [passphrase, setPassphrase] = useState('')
   const [inputBytesExpanded, setInputBytesExpanded] = useState(false)
+  const [faviconError, setFaviconError] = useState<string | null>(null)
   const [locked, setLocked] = useState(() => isWalletLocked())
   const isDappApprovalPopup =
     window.location.pathname.endsWith('popup.html') &&
@@ -94,6 +95,22 @@ const DappApprovalDrawer = () => {
     Number(txSummary?.inputType ?? 0),
   )
 
+  const title = useMemo(() => {
+    if (!current) return ''
+    switch (current.method) {
+      case 'connect':
+        return t('dapp.approval.connectTitle')
+      case 'signMessage':
+        return t('dapp.approval.signMessageTitle')
+      case 'signTransaction':
+        return t('dapp.approval.signTransactionTitle')
+      case 'sendTransaction':
+        return t('dapp.approval.sendTransactionTitle')
+      default:
+        return t('dapp.approval.title')
+    }
+  }, [current, t])
+
   const subtitle = useMemo(() => {
     if (!current) return ''
     switch (current.method) {
@@ -109,6 +126,16 @@ const DappApprovalDrawer = () => {
         return t('dapp.approval.genericSubtitle')
     }
   }, [current, t])
+
+  const faviconUrl = useMemo(() => {
+    if (!current?.origin) return null
+    try {
+      const url = new URL(current.origin)
+      return `${url.origin}/favicon.ico`
+    } catch {
+      return null
+    }
+  }, [current?.origin])
 
   const submitDecision = async (approved: boolean) => {
     if (!current) return
@@ -188,9 +215,18 @@ const DappApprovalDrawer = () => {
       >
         <DrawerHeader className="space-y-2 text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-            <GlobeIcon className="h-6 w-6 shrink-0 text-primary" />
+            {faviconUrl && faviconError !== faviconUrl ? (
+              <img
+                src={faviconUrl}
+                alt=""
+                className="h-6 w-6 shrink-0 rounded-sm"
+                onError={() => setFaviconError(faviconUrl)}
+              />
+            ) : (
+              <GlobeIcon className="h-6 w-6 shrink-0 text-primary" />
+            )}
           </div>
-          <DrawerTitle>{t('dapp.approval.title')}</DrawerTitle>
+          <DrawerTitle>{title}</DrawerTitle>
           <DrawerDescription>{subtitle}</DrawerDescription>
         </DrawerHeader>
 

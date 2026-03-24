@@ -436,6 +436,10 @@
   "dapp": {
     "approval": {
       "title": "Запрос на подключение",
+      "connectTitle": "Запрос на подключение",
+      "signMessageTitle": "Подписать сообщение",
+      "signTransactionTitle": "Подписать транзакцию",
+      "sendTransactionTitle": "Отправить транзакцию",
       "origin": "Веб-сайт",
       "sharedAccount": "Общий аккаунт",
       "sharedAccountFallback": "Выбранный аккаунт",

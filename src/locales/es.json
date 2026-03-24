@@ -436,6 +436,10 @@
   "dapp": {
     "approval": {
       "title": "Solicitud de conexión",
+      "connectTitle": "Solicitud de conexión",
+      "signMessageTitle": "Firmar mensaje",
+      "signTransactionTitle": "Firmar transacción",
+      "sendTransactionTitle": "Enviar transacción",
       "origin": "Sitio web",
       "sharedAccount": "Cuenta compartida",
       "sharedAccountFallback": "Cuenta seleccionada",
