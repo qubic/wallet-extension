@@ -89,7 +89,7 @@ const AssetDetail = () => {
   if (isLoading) {
     return (
       <section className="flex w-full justify-center pt-4">
-        <div className="flex w-full max-w-sm flex-col items-center gap-4 px-6 pt-12">
+        <div className="flex w-full max-w-sm flex-col items-center gap-6 px-6 pt-12">
           <Loader2Icon className="h-6 w-6 animate-spin text-muted-foreground" />
         </div>
       </section>
@@ -99,7 +99,7 @@ const AssetDetail = () => {
   if (!asset) {
     return (
       <section className="flex w-full justify-center pt-4">
-        <div className="flex w-full max-w-sm flex-col gap-4 px-4">
+        <div className="flex w-full max-w-sm flex-col gap-6 px-6">
           <div className="relative flex items-center justify-center py-3">
             <button
               type="button"
@@ -123,8 +123,8 @@ const AssetDetail = () => {
   }
 
   return (
-    <section className="flex w-full justify-center pt-2">
-      <div className="flex w-full max-w-sm flex-col gap-6 px-4 pb-6">
+    <section className="flex w-full justify-center pt-4">
+      <div className="flex w-full max-w-sm flex-col gap-6 px-6 pb-6">
         {/* Header */}
         <div className="relative flex items-center justify-center py-2">
           <button
