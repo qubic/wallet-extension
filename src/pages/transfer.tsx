@@ -150,7 +150,7 @@ const Transfer = () => {
           newErrors.amount = t('transfer.validation.amountExceedsBalance')
         }
         if (onChainQuBalance < QX_TRANSFER_ASSET_FEE) {
-          newErrors.amount = t('transfer.validation.insufficientQuForFee', { fee: '100' })
+          newErrors.fee = t('transfer.validation.insufficientQuForFee', { fee: '100' })
         }
       } else if (balance.isLoading) {
         newErrors.amount = t('transfer.validation.balanceLoading')

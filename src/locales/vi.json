@@ -377,7 +377,7 @@
     "sourceContractPlaceholder": "Chọn hợp đồng nguồn",
     "destinationContract": "Hợp đồng đích",
     "destinationContractPlaceholder": "Chọn hợp đồng đích",
-    "numberOfSharesPlaceholder": "Nhập số lượng cổ phần",
+    "numberOfSharesPlaceholder": "Nhập số lượng",
     "available": "Khả dụng: {{balance}} {{token}}",
     "fee": "Phí: {{fee}} QUBIC",
     "quBalance": "Số dư: {{balance}} QUBIC",
@@ -385,9 +385,10 @@
       "title": "Xác nhận chuyển quyền",
       "description": "Xem lại chi tiết trước khi chuyển quyền quản lý.",
       "asset": "Tài sản",
+      "issuedBy": "Phát hành bởi {{issuer}}",
       "from": "Từ hợp đồng",
       "to": "Đến hợp đồng",
-      "shares": "Cổ phần",
+      "amount": "Số lượng",
       "feeLabel": "Phí",
       "warning": "Hành động này không thể hoàn tác."
     },
@@ -395,9 +396,9 @@
       "sourceRequired": "Yêu cầu hợp đồng nguồn.",
       "destinationRequired": "Yêu cầu hợp đồng đích.",
       "sameContract": "Hợp đồng nguồn và đích phải khác nhau.",
-      "sharesRequired": "Yêu cầu số lượng cổ phần.",
-      "sharesInvalid": "Số lượng cổ phần phải là số dương.",
-      "sharesExceedsBalance": "Số lượng cổ phần vượt quá số dư khả dụng.",
+      "sharesRequired": "Số lượng là bắt buộc.",
+      "sharesInvalid": "Số lượng phải là số dương.",
+      "sharesExceedsBalance": "Số lượng vượt quá số dư khả dụng.",
       "insufficientQuForFee": "Không đủ số dư QUBIC để trang trải phí {{fee}} QU."
     },
     "actions": {

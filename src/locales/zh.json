@@ -377,7 +377,7 @@
     "sourceContractPlaceholder": "选择来源合约",
     "destinationContract": "目标合约",
     "destinationContractPlaceholder": "选择目标合约",
-    "numberOfSharesPlaceholder": "输入份额数量",
+    "numberOfSharesPlaceholder": "输入数量",
     "available": "可用：{{balance}} {{token}}",
     "fee": "手续费：{{fee}} QUBIC",
     "quBalance": "余额：{{balance}} QUBIC",
@@ -385,9 +385,10 @@
       "title": "确认权限转移",
       "description": "转移管理权限前请核实以下详情。",
       "asset": "资产",
+      "issuedBy": "由 {{issuer}} 发行",
       "from": "来源合约",
       "to": "目标合约",
-      "shares": "份额",
+      "amount": "数量",
       "feeLabel": "手续费",
       "warning": "此操作无法撤销。"
     },
@@ -395,9 +396,9 @@
       "sourceRequired": "请选择来源合约。",
       "destinationRequired": "请选择目标合约。",
       "sameContract": "来源合约和目标合约不能相同。",
-      "sharesRequired": "请输入份额数量。",
-      "sharesInvalid": "份额数量必须为正数。",
-      "sharesExceedsBalance": "份额数量超出可用余额。",
+      "sharesRequired": "数量为必填项。",
+      "sharesInvalid": "数量必须为正数。",
+      "sharesExceedsBalance": "数量超过可用余额。",
       "insufficientQuForFee": "QUBIC 余额不足以支付 {{fee}} QU 的手续费。"
     },
     "actions": {

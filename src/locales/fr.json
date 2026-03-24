@@ -377,7 +377,7 @@
     "sourceContractPlaceholder": "Sélectionner le contrat source",
     "destinationContract": "Contrat de destination",
     "destinationContractPlaceholder": "Sélectionner le contrat de destination",
-    "numberOfSharesPlaceholder": "Entrer le nombre de parts",
+    "numberOfSharesPlaceholder": "Entrez le montant",
     "available": "Disponible : {{balance}} {{token}}",
     "fee": "Frais : {{fee}} QUBIC",
     "quBalance": "Solde : {{balance}} QUBIC",
@@ -385,9 +385,10 @@
       "title": "Confirmer le transfert de droits",
       "description": "Vérifiez les détails avant de transférer les droits de gestion.",
       "asset": "Actif",
+      "issuedBy": "Émis par {{issuer}}",
       "from": "Du contrat",
       "to": "Vers le contrat",
-      "shares": "Parts",
+      "amount": "Montant",
       "feeLabel": "Frais",
       "warning": "Cette action est irréversible."
     },
@@ -395,9 +396,9 @@
       "sourceRequired": "Le contrat source est requis.",
       "destinationRequired": "Le contrat de destination est requis.",
       "sameContract": "Les contrats source et de destination doivent être différents.",
-      "sharesRequired": "Le nombre de parts est requis.",
-      "sharesInvalid": "Le nombre de parts doit être un nombre positif.",
-      "sharesExceedsBalance": "Le nombre de parts dépasse le solde disponible.",
+      "sharesRequired": "Le montant est requis.",
+      "sharesInvalid": "Le montant doit être un nombre positif.",
+      "sharesExceedsBalance": "Le montant dépasse le solde disponible.",
       "insufficientQuForFee": "Solde QUBIC insuffisant pour couvrir les frais de {{fee}} QU."
     },
     "actions": {
