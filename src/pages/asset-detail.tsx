@@ -74,6 +74,7 @@ const AssetDetail = () => {
   }, [ownedAssets.data, decodedAssetKey, contractsMap, t])
 
   const isLoading = ownedAssets.isLoading || smartContracts.isLoading
+  const isError = ownedAssets.isError || smartContracts.isError
 
   const handleCopyIssuer = async () => {
     if (!asset?.issuerIdentity) return
@@ -109,10 +110,13 @@ const AssetDetail = () => {
             </button>
             <h2 className="text-lg font-semibold">{t('assetDetail.title')}</h2>
           </div>
-          <div className="flex items-center gap-3 rounded-lg border border-dashed border-border/60 bg-transparent px-3 py-3 text-xs text-muted-foreground">
-            <PackageIcon className="h-4 w-4" />
-            <span>{t('assetDetail.notFound')}</span>
-          </div>
+          {isError && <div className="text-xs text-destructive">{t('assetDetail.error')}</div>}
+          {!isError && (
+            <div className="flex items-center gap-3 rounded-lg border border-dashed border-border/60 bg-transparent px-3 py-3 text-xs text-muted-foreground">
+              <PackageIcon className="h-4 w-4" />
+              <span>{t('assetDetail.notFound')}</span>
+            </div>
+          )}
         </div>
       </section>
     )

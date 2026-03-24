@@ -413,7 +413,8 @@
     "noContracts": "No managing contracts found.",
     "unknownContract": "Contract #{{index}}",
     "transferRights": "Transfer rights",
-    "notFound": "Asset not found."
+    "notFound": "Asset not found.",
+    "error": "Failed to load asset details."
   },
   "passphraseAuth": {
     "title": "Authentication Required",

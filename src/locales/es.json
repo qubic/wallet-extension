@@ -413,7 +413,8 @@
     "noContracts": "No se encontraron contratos de gestión.",
     "unknownContract": "Contrato #{{index}}",
     "transferRights": "Transferir derechos",
-    "notFound": "Activo no encontrado."
+    "notFound": "Activo no encontrado.",
+    "error": "Error al cargar los detalles del activo."
   },
   "passphraseAuth": {
     "title": "Autenticación requerida",
