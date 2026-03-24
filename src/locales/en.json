@@ -404,6 +404,17 @@
       "generic": "Transfer rights failed. Please retry."
     }
   },
+  "assetDetail": {
+    "title": "Asset Details",
+    "issuer": "Issuer Identity",
+    "issuerCopied": "Issuer identity copied",
+    "copyFailed": "Copy failed",
+    "managingContracts": "Managing contracts",
+    "noContracts": "No managing contracts found.",
+    "unknownContract": "Contract #{{index}}",
+    "transferRights": "Transfer rights",
+    "notFound": "Asset not found."
+  },
   "passphraseAuth": {
     "title": "Authentication Required",
     "subtitle": "Enter your vault passphrase to continue with this action.",

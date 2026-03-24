@@ -283,9 +283,11 @@ const Home = () => {
                 {aggregatedAssets.map((asset) => {
                   const assetKey = `${asset.issuerIdentity}-${asset.name}`
                   return (
-                    <div
+                    <button
                       key={assetKey}
-                      className="group flex items-center justify-between rounded-lg border border-border/40 bg-transparent px-3 py-2.5 transition-colors hover:border-primary/30 hover:bg-background/40"
+                      type="button"
+                      className="group flex w-full cursor-pointer items-center justify-between rounded-lg border border-border/40 bg-transparent px-3 py-2.5 text-left transition-colors hover:border-primary/30 hover:bg-background/40"
+                      onClick={() => navigate(`/asset/${encodeURIComponent(assetKey)}`)}
                     >
                       <div className="min-w-0 flex flex-col">
                         <span className="truncate text-sm font-semibold leading-none text-foreground">
@@ -303,20 +305,9 @@ const Home = () => {
                             ? formatAssetUnits(asset.numberOfUnits, asset.decimals)
                             : HIDDEN_BALANCE}
                         </span>
-                        <button
-                          type="button"
-                          title={t('home.assets.manageRights')}
-                          className="cursor-pointer rounded-md p-1 text-muted-foreground opacity-0 transition-all hover:bg-primary/10 hover:text-primary group-hover:opacity-100"
-                          onClick={() =>
-                            navigate(
-                              `/transfer/manage-rights?asset=${encodeURIComponent(assetKey)}`,
-                            )
-                          }
-                        >
-                          <ArrowRightLeftIcon className="h-3.5 w-3.5" />
-                        </button>
+                        <ArrowRightLeftIcon className="h-3.5 w-3.5 text-muted-foreground opacity-0 transition-all group-hover:opacity-100" />
                       </div>
-                    </div>
+                    </button>
                   )
                 })}
               </div>

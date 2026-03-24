@@ -404,6 +404,17 @@
       "generic": "Transferencia de derechos fallida. Intenta de nuevo."
     }
   },
+  "assetDetail": {
+    "title": "Detalles del activo",
+    "issuer": "Identidad del emisor",
+    "issuerCopied": "Identidad del emisor copiada",
+    "copyFailed": "Error al copiar",
+    "managingContracts": "Contratos de gestión",
+    "noContracts": "No se encontraron contratos de gestión.",
+    "unknownContract": "Contrato #{{index}}",
+    "transferRights": "Transferir derechos",
+    "notFound": "Activo no encontrado."
+  },
   "passphraseAuth": {
     "title": "Autenticación requerida",
     "subtitle": "Ingresa tu contraseña del vault para continuar con esta acción.",
