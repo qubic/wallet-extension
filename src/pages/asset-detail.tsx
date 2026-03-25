@@ -52,15 +52,17 @@ const AssetDetail = () => {
     const first = matching[0]
     const totalUnits = matching.reduce((sum, c) => sum + BigInt(c.numberOfUnits), 0n).toString()
 
-    const breakdown: ContractBreakdown[] = matching.map((entry) => ({
-      contractIndex: entry.managingContractIndex,
-      contractName:
-        contractsMap.get(entry.managingContractIndex) ??
-        t('assetDetail.unknownContract', {
-          index: entry.managingContractIndex,
-        }),
-      numberOfUnits: entry.numberOfUnits,
-    }))
+    const breakdown: ContractBreakdown[] = matching
+      .map((entry) => ({
+        contractIndex: entry.managingContractIndex,
+        contractName:
+          contractsMap.get(entry.managingContractIndex) ??
+          t('assetDetail.unknownContract', {
+            index: entry.managingContractIndex,
+          }),
+        numberOfUnits: entry.numberOfUnits,
+      }))
+      .sort((a, b) => Number(BigInt(b.numberOfUnits) - BigInt(a.numberOfUnits)))
 
     return {
       asset: {

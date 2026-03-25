@@ -159,6 +159,10 @@ const TransferRights = () => {
       })
     }
 
+    for (const group of groupMap.values()) {
+      group.contracts.sort((a, b) => Number(BigInt(b.numberOfUnits) - BigInt(a.numberOfUnits)))
+    }
+
     return [...groupMap.values()]
   }, [ownedAssets.data, contractsMap])
 
