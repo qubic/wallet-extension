@@ -493,6 +493,7 @@ const ManageAccounts = () => {
       <RevealSeedDrawer
         open={Boolean(seedTarget)}
         seed={revealedSeed}
+        accountName={seedTarget?.name ?? ''}
         onOpenChange={(open) => {
           if (!open) {
             setSeedTarget(null)
