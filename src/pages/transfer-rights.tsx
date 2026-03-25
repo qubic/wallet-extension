@@ -757,7 +757,7 @@ const TransferRights = () => {
               }
               onClick={handleContinue}
             >
-              {t('transferRights.actions.continue')}
+              {t('common.continue')}
             </Button>
           </div>
         </div>

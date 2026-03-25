@@ -277,7 +277,7 @@ const Settings = () => {
           <div className="space-y-3 px-4 pb-4">
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">{t('settings.about.extensionName')}</span>
-              <span className="font-medium">Qubic Wallet</span>
+              <span className="font-medium">{t('settings.about.extensionFullName')}</span>
             </div>
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">{t('settings.about.appVersion')}</span>

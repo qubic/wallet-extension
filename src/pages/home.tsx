@@ -185,7 +185,7 @@ const Home = () => {
                 size="icon"
                 variant="ghost"
                 className="h-9 w-9 shrink-0"
-                aria-label="Refresh"
+                aria-label={t('home.refresh')}
                 onClick={handleRefresh}
                 disabled={isSyncingRaw}
               >
@@ -351,7 +351,7 @@ const Home = () => {
           <div className="mt-4 flex flex-col items-center gap-4 text-center">
             <div className="flex h-52 w-52 items-center justify-center rounded-lg bg-card">
               {qrCode ? (
-                <img src={qrCode} alt="Public identity QR code" className="h-48 w-48" />
+                <img src={qrCode} alt={t('home.receive.qrAlt')} className="h-48 w-48" />
               ) : (
                 <div className="text-xs text-muted-foreground">{t('home.receive.generating')}</div>
               )}

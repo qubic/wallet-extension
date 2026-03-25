@@ -1,4 +1,17 @@
 {
+  "common": {
+    "back": "Geri",
+    "previous": "Önceki",
+    "continue": "Devam",
+    "step": "Adım {{current}} / {{total}}",
+    "accountName": "Hesap adı",
+    "addressLabel": "Adres etiketi",
+    "vaultPassphrase": "Kasa parolası",
+    "currentVaultPassphrase": "Mevcut kasa parolası",
+    "seedLabel": "Özel seed",
+    "seedLength": "Seed uzunluğu: {{length}}",
+    "identity": "Kimlik"
+  },
   "app": {
     "sidepanel": "Yan paneli aç",
     "closeSidepanel": "Yan paneli kapat"
@@ -58,7 +71,8 @@
       "title": "Qubic Al",
       "description": "Bu QR kodunu paylaşın veya genel kimlik adresinizi kopyalayın.",
       "generating": "QR kodu oluşturuluyor...",
-      "copy": "Adresi kopyala"
+      "copy": "Adresi kopyala",
+      "qrAlt": "Genel kimlik QR kodu"
     },
     "toast": {
       "copySuccess": "Adres kopyalandı",
@@ -70,6 +84,7 @@
       "title": "Yalnızca izleme hesabı",
       "description": "Bu adres için gönderim devre dışı."
     },
+    "refresh": "Yenile",
     "price": {
       "label": "QUBIC Fiyatı"
     },
@@ -159,7 +174,7 @@
       "cancel": "İptal",
       "resetApp": "Cüzdanı sil",
       "resetAppTitle": "Cüzdan silinsin mi?",
-      "resetAppDesc": "Bu işlem vault, hesaplar ve ayarlar dahil tüm verilerinizi silecektir. Bu işlem geri alınamaz. Seed ifadelerinizi yedeklediğinizden emin olun.",
+      "resetAppDesc": "Bu işlem vault, hesaplar ve ayarlar dahil tüm verilerinizi silecektir. Bu işlem geri alınamaz. Özel seed'lerinizi yedeklediğinizden emin olun.",
       "resetAppConfirm": "Cüzdanı sil",
       "errors": {
         "currentRequired": "Mevcut parola gereklidir.",
@@ -182,13 +197,14 @@
       "title": "Hakkında",
       "appVersion": "Uygulama sürümü",
       "extensionName": "Uzantı",
+      "extensionFullName": "Qubic Wallet",
       "versionLabel": "v{{version}}"
     }
   },
   "accounts": {
     "watchOnly": {
       "title": "Yalnızca izleme adresi ekle",
-      "subtitle": "Seed içe aktarmadan bir genel kimliği takip edin.",
+      "subtitle": "Özel seed içe aktarmadan bir genel kimliği takip edin.",
       "submit": "Yalnızca izleme ekle"
     },
     "manage": {
@@ -214,17 +230,17 @@
       "remove": "Kaldır",
       "removeTitle": "Hesabı kaldır",
       "removeDesc": "Bu işlem hesabı bu cihazdan kaldırır. Bu işlem geri alınamaz.",
-      "reveal": "Seed göster",
-      "revealTitle": "Seed ifadesi",
-      "copySeed": "Seed kopyala",
-      "seedCopied": "Seed kopyalandı",
-      "qrAlt": "Seed QR kodu",
-      "qrLabel": "Seed içe aktarmak için tarayın",
+      "reveal": "Özel seed'i göster",
+      "revealTitle": "\"{{name}}\" için özel seed",
+      "copySeed": "Özel seed'i kopyala",
+      "seedCopied": "Özel seed kopyalandı",
+      "qrAlt": "Özel seed QR kodu",
+      "qrLabel": "Özel seed'i içe aktarmak için tarayın",
       "done": "Tamam",
       "addTitle": "Hesap ekle",
       "addNewDesc": "Bu cüzdana yeni bir adres ekleyin.",
       "addCreate": "Yeni adres oluştur",
-      "addImport": "Seed içe aktar",
+      "addImport": "Özel seed içe aktar",
       "watchOnlyTitle": "Yalnızca izleme hesabı",
       "watchOnlyName": "Hesap adı",
       "watchOnlyIdentity": "Genel kimlik",
@@ -236,13 +252,13 @@
         "load": "Vault açılamadı.",
         "remove": "Hesap kaldırılamadı.",
         "rename": "Hesap yeniden adlandırılamadı.",
-        "reveal": "Seed gösterilemedi.",
+        "reveal": "Özel seed gösterilemedi.",
         "nameRequired": "Hesap adı gereklidir.",
         "passphraseRequired": "Parola gereklidir.",
         "invalidPassphrase": "Geçersiz parola.",
         "nameDuplicate": "Bu adla bir hesap zaten mevcut.",
         "lastAccount": "Son hesabı kaldıramazsınız.",
-        "watchOnlySeed": "Yalnızca izleme hesaplarının seed ifadesi yoktur.",
+        "watchOnlySeed": "Yalnızca izleme hesaplarının özel seed'i yoktur.",
         "watchOnlyRequired": "Ad ve kimlik gereklidir.",
         "watchOnlyInvalid": "Kimlik biçimi geçersiz.",
         "watchOnlyDuplicate": "Bu kimlik zaten ekli."
@@ -251,6 +267,7 @@
   },
   "history": {
     "title": "Geçmiş",
+    "refresh": "Geçmişi yenile",
     "loading": "Geçmiş yükleniyor...",
     "empty": "İşlem bulunamadı.",
     "incoming": "Gelen",
@@ -275,7 +292,6 @@
     "title": "İşlem detayları",
     "loading": "İşlem yükleniyor...",
     "error": "İşlem detayları yüklenemedi.",
-    "back": "Geri",
     "copy": "Kopyala",
     "copied": "Kopyalandı",
     "copyFailed": "Kopyalama başarısız",
@@ -339,7 +355,6 @@
       "feeLabel": "Ağ ücreti"
     },
     "actions": {
-      "continue": "Devam et",
       "confirm": "Onayla ve gönder",
       "sending": "Gönderiliyor...",
       "cancel": "İptal"
@@ -388,7 +403,6 @@
       "insufficientQuForFee": "{{fee}} QU ücreti için yeterli QUBIC bakiyesi yok."
     },
     "actions": {
-      "continue": "Devam et",
       "confirm": "Onayla ve transfer et",
       "sending": "Transfer ediliyor...",
       "cancel": "İptal"
@@ -429,6 +443,12 @@
       "generic": "Kimlik doğrulama başarısız. Lütfen tekrar deneyin."
     }
   },
+  "welcome": {
+    "subtitle": "Qubic Wallet'a hoş geldiniz",
+    "createWallet": "Yeni cüzdan oluştur",
+    "restoreSeed": "Özel seed ile geri yükle",
+    "importVault": "Vault yedeğini içe aktar"
+  },
   "unlock": {
     "title": "Cüzdanınızın Kilidini Açın",
     "subtitle": "Cüzdanınız güvenlik nedeniyle kilitlendi. Devam etmek için parolanızı girin."
@@ -468,14 +488,56 @@
     }
   },
   "onboarding": {
+    "errors": {
+      "seedInvalid": "Seed 55 küçük harf olmalıdır.",
+      "seedConfirmRequired": "Lütfen özel seed'inizi güvenli bir şekilde sakladığınızı onaylayın.",
+      "addressExists": "Bu adres zaten mevcut.",
+      "passphraseRequired": "Parola gereklidir.",
+      "passphraseReenter": "Lütfen parolanızı tekrar girin.",
+      "passphraseMismatch": "Parolalar eşleşmiyor.",
+      "passphraseTooShort": "Parola en az 12 karakter olmalıdır.",
+      "invalidVaultPassphrase": "Geçersiz vault parolası.",
+      "vaultValidationFailed": "Vault parolası doğrulanamadı.",
+      "createFailed": "Cüzdan oluşturulamadı.",
+      "importFailed": "Özel seed içe aktarılamadı."
+    },
+    "create": {
+      "title": "Yeni cüzdan oluştur",
+      "titleAddAddress": "Yeni adres ekle",
+      "readyTitle": "Oluşturmaya hazır",
+      "readySubtitle": "Vault oluşturmadan önce bilgilerinizi gözden geçirin.",
+      "seedWarning": "Özel seed'inizi sakladığınızdan emin olun. Bu seed'e sahip olan herkes fonlarınıza erişebilir.",
+      "createWallet": "Cüzdan oluştur",
+      "creating": "Oluşturuluyor...",
+      "addAddress": "Adres ekle",
+      "adding": "Ekleniyor..."
+    },
     "importSeed": {
       "title": "Özel seed içe aktar",
-      "titleAddAddress": "Adres seed'i içe aktar",
-      "step": "Adım {{current}} / {{total}}"
+      "titleAddAddress": "Özel seed içe aktar",
+      "pasteSeedTitle": "Özel seed'inizi yapıştırın",
+      "pasteSeedSubtitle": "İçe aktarmak istediğiniz 55 harflik özel seed'i girin.",
+      "seedValid": "Geçerli seed biçimi.",
+      "seedInvalidCount": "Seed 55 küçük harf olmalıdır ({{current}}/{{total}}).",
+      "labelSecureTitle": "Etiketle ve güvence altına al",
+      "labelSecureSubtitleAddress": "Bu adrese bir etiket verin ve mevcut vault parolasını girin.",
+      "labelSecureSubtitleWallet": "Bu cüzdana bir ad verin ve vault parolası belirleyin.",
+      "reviewTitle": "İçe aktarmayı gözden geçir",
+      "reviewSubtitle": "İçe aktarmadan önce bilgileri doğrulayın.",
+      "seedPrivacyNotice": "Özel seed'iniz bu cihazdan asla ayrılmaz. Her zaman gizli tutun.",
+      "importAddress": "Adresi içe aktar",
+      "importSeedAction": "Özel seed içe aktar",
+      "importing": "İçe aktarılıyor..."
+    },
+    "passphraseStep": {
+      "title": "Adlandır ve koru",
+      "subtitleAddress": "Bu cüzdana bir etiket verin ve mevcut vault parolasını girin.",
+      "subtitleWallet": "Bu cüzdana bir etiket verin ve vault parolası belirleyin.",
+      "minChars": "En az 12 karakter.",
+      "reenterPassphrase": "Vault parolasını tekrar girin"
     },
     "importVault": {
       "title": "Vault dosyasını içe aktar",
-      "step": "Adım {{current}} / {{total}}",
       "selectVault": {
         "title": "Vault dosyanızı seçin",
         "subtitle": "Bu uzantıdan veya Qubic web cüzdanından dışa aktarılmış bir vault dosyası yükleyin.",
@@ -500,9 +562,6 @@
         "addMoreLater": "Daha sonra Hesapları Yönet bölümünden daha fazla hesap ekleyebilirsiniz."
       },
       "actions": {
-        "back": "Geri",
-        "previous": "Önceki",
-        "continue": "Devam et",
         "import": "Vault içe aktar",
         "importing": "İçe aktarılıyor..."
       },
@@ -516,17 +575,17 @@
       }
     },
     "seedSecurity": {
-      "title": "Seed ifadenizi güvence altına alın",
-      "subtitle": "Bu 55 harflik seed ifadesini güvenli bir yere kaydedin. Cüzdanınızı geri yüklemek için buna ihtiyacınız olacak.",
-      "subtitleAddAddress": "Bu 55 harflik seed ifadesini güvenli bir yere kaydedin. Bu adresi geri yüklemek için buna ihtiyacınız olacak.",
-      "warningTitle": "Bu seed ifadesini güvenli bir şekilde saklayın.",
-      "seedLabel": "Seed",
+      "title": "Özel seed'inizi güvence altına alın",
+      "subtitle": "Bu 55 harflik özel seed'i güvenli bir yere kaydedin. Cüzdanınızı geri yüklemek için buna ihtiyacınız olacak.",
+      "subtitleAddAddress": "Bu 55 harflik özel seed'i güvenli bir yere kaydedin. Bu adresi geri yüklemek için buna ihtiyacınız olacak.",
+      "warningTitle": "Bu özel seed'i güvenli bir şekilde saklayın.",
+      "seedLabel": "Özel seed",
       "publicIdentityLabel": "Genel kimlik",
       "deriving": "Türetiliyor...",
       "generateNew": "Yeni seed oluştur",
-      "copySeed": "Seed kopyala",
-      "seedCopied": "Seed kopyalandı",
-      "confirmationLabel": "Bu seed ifadesini güvenli bir şekilde sakladığımı ve cüzdanı kurtarmak için gerekli olduğunu anlıyorum."
+      "copySeed": "Özel seed'i kopyala",
+      "seedCopied": "Özel seed kopyalandı",
+      "confirmationLabel": "Bu özel seed'i güvenli bir şekilde sakladığımı ve cüzdanı kurtarmak için gerekli olduğunu anlıyorum."
     }
   }
 }

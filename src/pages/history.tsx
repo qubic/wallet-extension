@@ -363,7 +363,7 @@ const History = () => {
               size="icon"
               variant="ghost"
               className="h-9 w-9"
-              aria-label="Refresh history"
+              aria-label={t('history.refresh')}
               onClick={() => transactions.refetch()}
               disabled={transactions.isFetching}
             >

@@ -149,7 +149,7 @@ const TransactionDetails = () => {
           onClick={() => navigate(-1)}
         >
           <ArrowLeftIcon className="h-3.5 w-3.5" />
-          {t('txDetails.back')}
+          {t('common.back')}
         </button>
         <TxDetailsHeader hash={hash} />
 

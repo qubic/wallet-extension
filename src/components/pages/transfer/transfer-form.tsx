@@ -327,7 +327,7 @@ const TransferForm = ({
             disabled={isWatchOnly || isAssetLoading || !recipient.trim() || !amount.trim()}
             onClick={onContinue}
           >
-            {t('transfer.actions.continue')}
+            {t('common.continue')}
           </Button>
         </div>
       </div>

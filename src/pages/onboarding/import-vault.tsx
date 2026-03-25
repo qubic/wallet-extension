@@ -189,7 +189,7 @@ const ImportVault = () => {
         <div className="space-y-3 text-center">
           <FlowHeader
             title={t('onboarding.importVault.title')}
-            stepLabel={t('onboarding.importVault.step', { current: step, total: TOTAL_STEPS })}
+            stepLabel={t('common.step', { current: step, total: TOTAL_STEPS })}
             progressValue={progressValue}
           />
         </div>
@@ -315,13 +315,11 @@ const ImportVault = () => {
         <div className="flex w-full gap-3">
           <Button size="lg" variant="ghost" onClick={handleBack} className="flex-1">
             <ArrowLeftIcon className="h-5 w-5" />
-            {step === 1
-              ? t('onboarding.importVault.actions.back')
-              : t('onboarding.importVault.actions.previous')}
+            {step === 1 ? t('common.back') : t('common.previous')}
           </Button>
           {step < TOTAL_STEPS ? (
             <Button size="lg" onClick={handleNext} className="flex-1">
-              {t('onboarding.importVault.actions.continue')}
+              {t('common.continue')}
               <ArrowRightIcon className="h-5 w-5" />
             </Button>
           ) : (

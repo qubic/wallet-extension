@@ -52,7 +52,7 @@ const AppHeader = ({
     errorDescription: t('home.toast.copyFailDesc'),
   })
   const [accountName, setAccountName] = useState(
-    localStorage.getItem('currentAccountName') ?? 'Main account',
+    localStorage.getItem('currentAccountName') ?? t('home.hero.defaultAccount'),
   )
   const [identity, setIdentity] = useState(getCurrentIdentity())
   const [accounts, setAccounts] = useState<
@@ -61,7 +61,8 @@ const AppHeader = ({
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   const refreshAccounts = useCallback(() => {
-    const nextAccountName = localStorage.getItem('currentAccountName') ?? 'Main account'
+    const nextAccountName =
+      localStorage.getItem('currentAccountName') ?? t('home.hero.defaultAccount')
     const nextIdentity = getCurrentIdentity()
     setAccountName(nextAccountName)
     setIdentity(nextIdentity)
@@ -90,7 +91,7 @@ const AppHeader = ({
       .filter(Boolean) as Array<{ name: string; identity: string; watchOnly?: boolean }>
     const remaining = entries.filter((entry) => !order.includes(entry.identity))
     setAccounts([...ordered, ...remaining])
-  }, [])
+  }, [t])
 
   const balanceQueries = useQueries({
     queries: accounts.map((account) => ({
@@ -224,7 +225,9 @@ const AppHeader = ({
                             <EyeIcon className="size-3 shrink-0 text-muted-foreground" />
                           )}
                           {account.identity === identity && (
-                            <span className="shrink-0 text-[11px] text-primary">Active</span>
+                            <span className="shrink-0 text-[11px] text-primary">
+                              {t('accounts.manage.active')}
+                            </span>
                           )}
                         </div>
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
