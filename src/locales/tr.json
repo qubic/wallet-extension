@@ -51,8 +51,7 @@
       "empty": "Ek varlık bulunamadı.",
       "emptyTitle": "Henüz varlık yok",
       "error": "Varlıklar yüklenemedi.",
-      "unknown": "Bilinmeyen varlık",
-      "manageRights": "Hakları yönet"
+      "unknown": "Bilinmeyen varlık"
     },
     "receive": {
       "title": "Qubic Al",

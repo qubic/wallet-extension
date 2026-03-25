@@ -51,8 +51,7 @@
       "empty": "未找到其他资产。",
       "emptyTitle": "暂无资产",
       "error": "无法加载资产。",
-      "unknown": "未知资产",
-      "manageRights": "管理权限"
+      "unknown": "未知资产"
     },
     "receive": {
       "title": "接收 Qubic",

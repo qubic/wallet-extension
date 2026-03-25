@@ -51,8 +51,7 @@
       "empty": "No additional assets found.",
       "emptyTitle": "No assets yet",
       "error": "Unable to load assets.",
-      "unknown": "Unknown asset",
-      "manageRights": "Manage rights"
+      "unknown": "Unknown asset"
     },
     "receive": {
       "title": "Receive Qubic",

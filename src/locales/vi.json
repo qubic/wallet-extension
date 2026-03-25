@@ -51,8 +51,7 @@
       "empty": "Không tìm thấy tài sản bổ sung.",
       "emptyTitle": "Chưa có tài sản",
       "error": "Không thể tải tài sản.",
-      "unknown": "Tài sản không xác định",
-      "manageRights": "Quản lý quyền"
+      "unknown": "Tài sản không xác định"
     },
     "receive": {
       "title": "Nhận Qubic",

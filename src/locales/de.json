@@ -51,8 +51,7 @@
       "empty": "Keine weiteren Vermögenswerte gefunden.",
       "emptyTitle": "Noch keine Vermögenswerte",
       "error": "Vermögenswerte konnten nicht geladen werden.",
-      "unknown": "Unbekannter Vermögenswert",
-      "manageRights": "Rechte verwalten"
+      "unknown": "Unbekannter Vermögenswert"
     },
     "receive": {
       "title": "Qubic empfangen",
