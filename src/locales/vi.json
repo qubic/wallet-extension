@@ -260,7 +260,7 @@
     "to": "Đến:",
     "from": "Từ:",
     "tick": "Tick",
-    "type": "Loại",
+    "txType": "Loại TX",
     "pending": "Đang chờ",
     "unconfirmed": "Chưa xác nhận",
     "unconfirmedMore": "+{{count}} chưa xác nhận khác",
@@ -282,7 +282,7 @@
     "txId": "ID giao dịch",
     "amount": "Số lượng",
     "tick": "Tick",
-    "inputType": "Loại đầu vào",
+    "txType": "TX Loại",
     "source": "Nguồn",
     "destination": "Đích",
     "timestamp": "Thời gian",
@@ -345,8 +345,7 @@
       "cancel": "Hủy"
     },
     "success": {
-      "title": "Chuyển khoản đã gửi",
-      "description": "Giao dịch của bạn đã được truyền và được lên lịch cho tick {{targetTick}}."
+      "title": "Chuyển khoản đã gửi"
     },
     "errors": {
       "networkError": "Lỗi mạng. Vui lòng thử lại.",
@@ -394,8 +393,7 @@
       "cancel": "Hủy"
     },
     "success": {
-      "title": "Quyền đã được chuyển",
-      "description": "Giao dịch của bạn đã được truyền và được lên lịch cho tick {{targetTick}}."
+      "title": "Quyền đã được chuyển"
     },
     "errors": {
       "networkError": "Lỗi mạng. Vui lòng thử lại.",
@@ -452,12 +450,13 @@
       "messageEmpty": "Không có bản xem trước tin nhắn.",
       "txTo": "Đến",
       "txAmount": "Số lượng",
-      "txInputType": "Loại đầu vào",
+      "txType": "TX Loại",
       "txTargetTick": "Tick mục tiêu",
       "txTargetTickOffset": "Độ lệch tick mục tiêu",
       "txInputBytes": "Dữ liệu đầu vào",
       "txInputBytesExpand": "Xem thêm",
       "txInputBytesCollapse": "Thu gọn",
+      "txBroadcastSuccess": "Giao dịch đã gửi",
       "approve": "Chấp thuận",
       "approveAndSend": "Chấp thuận và gửi",
       "reject": "Từ chối",
@@ -466,6 +465,10 @@
         "decisionFailed": "Không thể gửi quyết định của bạn."
       }
     }
+  },
+  "transaction": {
+    "broadcastDescription": "Giao dịch của bạn đã được truyền và được lên lịch cho tick {{targetTick}}.",
+    "txTypeTransfer": "Chuyển khoản"
   },
   "onboarding": {
     "importSeed": {

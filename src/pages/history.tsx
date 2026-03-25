@@ -2,7 +2,7 @@ import { useTransactions } from '@qubic-labs/react'
 import { HashIcon, RefreshCwIcon, XIcon } from 'lucide-react'
 import { getTransactionPresentation } from '@/lib/transaction-presentation'
 import { Button } from '@/components/ui/button'
-import { useProcedureName } from '@/hooks/use-procedure-name'
+import { useTxTypeDescription } from '@/hooks/use-tx-type-description'
 import AddressLabel from '@/components/address-label'
 import {
   buildExplorerObjectUrl,
@@ -59,16 +59,9 @@ type HistoryRowTransaction = {
 
 type HistoryRowState = 'default' | 'pending' | 'failed'
 
-const InputTypeLabel = ({ destination, inputType }: { destination: string; inputType: number }) => {
-  const procedureName = useProcedureName(destination, inputType)
-  if (procedureName) {
-    return (
-      <span>
-        {inputType} ({procedureName})
-      </span>
-    )
-  }
-  return <span>{inputType.toString()}</span>
+const TxTypeLabel = ({ destination, inputType }: { destination: string; inputType: number }) => {
+  const description = useTxTypeDescription(destination, inputType)
+  return <span>{description}</span>
 }
 
 const History = () => {
@@ -293,8 +286,8 @@ const History = () => {
           </div>
           {Number(tx.inputType) !== 0 && (
             <div className="flex items-center gap-1 font-mono">
-              <span className="text-muted-foreground/70">{t('history.type')}</span>
-              <InputTypeLabel destination={tx.destination} inputType={Number(tx.inputType)} />
+              <span className="text-muted-foreground/70">{t('history.txType')}</span>
+              <TxTypeLabel destination={tx.destination} inputType={Number(tx.inputType)} />
             </div>
           )}
         </div>
@@ -494,8 +487,10 @@ const History = () => {
                           </div>
                           {Number(tx.inputType) !== 0 && (
                             <div className="flex items-center gap-1 font-mono">
-                              <span className="text-muted-foreground/70">{t('history.type')}</span>
-                              <InputTypeLabel
+                              <span className="text-muted-foreground/70">
+                                {t('history.txType')}
+                              </span>
+                              <TxTypeLabel
                                 destination={tx.destination}
                                 inputType={Number(tx.inputType)}
                               />

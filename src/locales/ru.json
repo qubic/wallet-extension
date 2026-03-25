@@ -260,7 +260,7 @@
     "to": "Кому:",
     "from": "От:",
     "tick": "Tick",
-    "type": "Тип",
+    "txType": "Тип TX",
     "pending": "В ожидании",
     "unconfirmed": "Не подтверждено",
     "unconfirmedMore": "+{{count}} еще не подтверждено",
@@ -282,7 +282,7 @@
     "txId": "ID транзакции",
     "amount": "Сумма",
     "tick": "Tick",
-    "inputType": "Тип ввода",
+    "txType": "TX Тип",
     "source": "Отправитель",
     "destination": "Получатель",
     "timestamp": "Дата",
@@ -345,8 +345,7 @@
       "cancel": "Отмена"
     },
     "success": {
-      "title": "Перевод отправлен",
-      "description": "Ваша транзакция отправлена в сеть и запланирована на тик {{targetTick}}."
+      "title": "Перевод отправлен"
     },
     "errors": {
       "networkError": "Ошибка сети. Попробуйте снова.",
@@ -394,8 +393,7 @@
       "cancel": "Отмена"
     },
     "success": {
-      "title": "Права переданы",
-      "description": "Ваша транзакция отправлена в сеть и запланирована на тик {{targetTick}}."
+      "title": "Права переданы"
     },
     "errors": {
       "networkError": "Ошибка сети. Попробуйте снова.",
@@ -452,12 +450,13 @@
       "messageEmpty": "Предварительный просмотр сообщения недоступен.",
       "txTo": "Кому",
       "txAmount": "Сумма",
-      "txInputType": "Тип ввода",
+      "txType": "TX Тип",
       "txTargetTick": "Целевой тик",
       "txTargetTickOffset": "Смещение целевого тика",
       "txInputBytes": "Входные данные",
       "txInputBytesExpand": "Показать больше",
       "txInputBytesCollapse": "Показать меньше",
+      "txBroadcastSuccess": "Транзакция отправлена",
       "approve": "Одобрить",
       "approveAndSend": "Одобрить и отправить",
       "reject": "Отклонить",
@@ -466,6 +465,10 @@
         "decisionFailed": "Не удалось отправить ваше решение."
       }
     }
+  },
+  "transaction": {
+    "broadcastDescription": "Ваша транзакция отправлена в сеть и запланирована на тик {{targetTick}}.",
+    "txTypeTransfer": "Перевод"
   },
   "onboarding": {
     "importSeed": {

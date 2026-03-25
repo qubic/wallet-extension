@@ -260,7 +260,7 @@
     "to": "A:",
     "from": "De:",
     "tick": "Tick",
-    "type": "Tipo",
+    "txType": "Tipo de TX",
     "pending": "Pendiente",
     "unconfirmed": "Sin confirmar",
     "unconfirmedMore": "+{{count}} más sin confirmar",
@@ -282,7 +282,7 @@
     "txId": "ID de TX",
     "amount": "Monto",
     "tick": "Tick",
-    "inputType": "Tipo de input",
+    "txType": "TX Tipo",
     "source": "Origen",
     "destination": "Destino",
     "timestamp": "Fecha",
@@ -345,8 +345,7 @@
       "cancel": "Cancelar"
     },
     "success": {
-      "title": "Transferencia enviada",
-      "description": "Tu transacción ha sido transmitida y está programada para el tick {{targetTick}}."
+      "title": "Transferencia enviada"
     },
     "errors": {
       "networkError": "Error de red. Intenta de nuevo.",
@@ -394,8 +393,7 @@
       "cancel": "Cancelar"
     },
     "success": {
-      "title": "Derechos transferidos",
-      "description": "Tu transacción ha sido transmitida y está programada para el tick {{targetTick}}."
+      "title": "Derechos transferidos"
     },
     "errors": {
       "networkError": "Error de red. Intenta de nuevo.",
@@ -452,12 +450,13 @@
       "messageEmpty": "No hay vista previa del mensaje.",
       "txTo": "Para",
       "txAmount": "Cantidad",
-      "txInputType": "Tipo de entrada",
+      "txType": "TX Tipo",
       "txTargetTick": "Tick objetivo",
       "txTargetTickOffset": "Offset del tick objetivo",
       "txInputBytes": "Datos de entrada",
       "txInputBytesExpand": "Ver más",
       "txInputBytesCollapse": "Ver menos",
+      "txBroadcastSuccess": "Transacción enviada",
       "approve": "Aprobar",
       "approveAndSend": "Aprobar y enviar",
       "reject": "Rechazar",
@@ -466,6 +465,10 @@
         "decisionFailed": "No se pudo enviar tu decisión."
       }
     }
+  },
+  "transaction": {
+    "broadcastDescription": "Tu transacción ha sido transmitida y está programada para el tick {{targetTick}}.",
+    "txTypeTransfer": "Transferencia"
   },
   "onboarding": {
     "importSeed": {

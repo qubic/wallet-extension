@@ -29,7 +29,11 @@ export const getTransactionPresentation = (tx: Transaction, identity: string, t:
   }
 
   const amountSign = tx.amount ? (isIncoming ? '+' : '-') : ''
-  const amountColorClass = !tx.amount || isIncoming ? 'text-primary' : 'text-[var(--destructive)]'
+  const amountColorClass = !tx.amount
+    ? 'text-muted-foreground'
+    : isIncoming
+      ? 'text-positive'
+      : 'text-[var(--destructive)]'
 
   return {
     isIncoming,

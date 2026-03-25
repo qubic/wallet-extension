@@ -260,7 +260,7 @@
     "to": "To:",
     "from": "From:",
     "tick": "Tick",
-    "type": "Type",
+    "txType": "TX Type",
     "pending": "Pending",
     "unconfirmed": "Unconfirmed",
     "unconfirmedMore": "+{{count}} more unconfirmed",
@@ -282,7 +282,7 @@
     "txId": "TX ID",
     "amount": "Amount",
     "tick": "Tick",
-    "inputType": "Input type",
+    "txType": "TX Type",
     "source": "Source",
     "destination": "Destination",
     "timestamp": "Timestamp",
@@ -345,8 +345,7 @@
       "cancel": "Cancel"
     },
     "success": {
-      "title": "Transfer sent",
-      "description": "Your transaction has been broadcast and is scheduled for tick {{targetTick}}."
+      "title": "Transfer sent"
     },
     "errors": {
       "networkError": "Network error. Please retry.",
@@ -394,8 +393,7 @@
       "cancel": "Cancel"
     },
     "success": {
-      "title": "Transfer rights sent",
-      "description": "Your transaction has been broadcast and is scheduled for tick {{targetTick}}."
+      "title": "Transfer rights sent"
     },
     "errors": {
       "networkError": "Network error. Please retry.",
@@ -452,12 +450,13 @@
       "messageEmpty": "No message preview available.",
       "txTo": "To",
       "txAmount": "Amount",
-      "txInputType": "Input type",
+      "txType": "TX Type",
       "txTargetTick": "Target tick",
       "txTargetTickOffset": "Target tick offset",
       "txInputBytes": "Input data",
       "txInputBytesExpand": "Show more",
       "txInputBytesCollapse": "Show less",
+      "txBroadcastSuccess": "Transaction submitted",
       "approve": "Approve",
       "approveAndSend": "Approve & Send",
       "reject": "Reject",
@@ -466,6 +465,10 @@
         "decisionFailed": "Could not submit your decision."
       }
     }
+  },
+  "transaction": {
+    "broadcastDescription": "Your transaction has been broadcast and is scheduled for tick {{targetTick}}.",
+    "txTypeTransfer": "Transfer"
   },
   "onboarding": {
     "importSeed": {

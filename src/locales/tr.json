@@ -260,7 +260,7 @@
     "to": "Alıcı:",
     "from": "Gönderen:",
     "tick": "Tick",
-    "type": "Tür",
+    "txType": "TX Türü",
     "pending": "Onay Bekliyor",
     "unconfirmed": "Onaylanmamış",
     "unconfirmedMore": "+{{count}} onaylanmamış işlem daha",
@@ -282,7 +282,7 @@
     "txId": "TX ID",
     "amount": "Miktar",
     "tick": "Tick",
-    "inputType": "Giriş türü",
+    "txType": "TX Türü",
     "source": "Kaynak",
     "destination": "Hedef",
     "timestamp": "Zaman damgası",
@@ -345,8 +345,7 @@
       "cancel": "İptal"
     },
     "success": {
-      "title": "Transfer gönderildi",
-      "description": "İşleminiz yayınlandı ve tick {{targetTick}} için planlandı."
+      "title": "Transfer gönderildi"
     },
     "errors": {
       "networkError": "Ağ hatası. Lütfen tekrar deneyin.",
@@ -394,8 +393,7 @@
       "cancel": "İptal"
     },
     "success": {
-      "title": "Hak transferi gönderildi",
-      "description": "İşleminiz yayınlandı ve tick {{targetTick}} için planlandı."
+      "title": "Hak transferi gönderildi"
     },
     "errors": {
       "networkError": "Ağ hatası. Lütfen tekrar deneyin.",
@@ -452,12 +450,13 @@
       "messageEmpty": "Mesaj önizlemesi mevcut değil.",
       "txTo": "Alıcı",
       "txAmount": "Miktar",
-      "txInputType": "Giriş türü",
+      "txType": "TX Türü",
       "txTargetTick": "Hedef tick",
       "txTargetTickOffset": "Hedef tick ofseti",
       "txInputBytes": "Giriş verisi",
       "txInputBytesExpand": "Daha fazla göster",
       "txInputBytesCollapse": "Daha az göster",
+      "txBroadcastSuccess": "İşlem gönderildi",
       "approve": "Onayla",
       "approveAndSend": "Onayla ve Gönder",
       "reject": "Reddet",
@@ -466,6 +465,10 @@
         "decisionFailed": "Kararınız gönderilemedi."
       }
     }
+  },
+  "transaction": {
+    "broadcastDescription": "İşleminiz yayınlandı ve tick {{targetTick}} için planlandı.",
+    "txTypeTransfer": "Transfer"
   },
   "onboarding": {
     "importSeed": {

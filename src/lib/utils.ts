@@ -50,6 +50,24 @@ export const formatNumber = (value: number | bigint): string => {
 }
 
 /**
+ * Format an integer-like value (number, bigint, or numeric string) for display.
+ * Returns '--' for null/undefined/non-finite values.
+ */
+export const formatIntegerLike = (value: unknown): string => {
+  if (value === null || value === undefined) return '--'
+  if (typeof value === 'bigint') return formatNumber(value)
+  if (typeof value === 'number') {
+    if (!Number.isFinite(value)) return '--'
+    return formatNumber(Math.trunc(value))
+  }
+  if (typeof value === 'string') {
+    const normalized = value.trim()
+    if (/^-?\d+$/.test(normalized)) return formatNumber(BigInt(normalized))
+  }
+  return String(value)
+}
+
+/**
  * Format balance for display with full precision (standard notation)
  */
 export const formatBalance = (value: bigint): string => {

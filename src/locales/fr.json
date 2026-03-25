@@ -260,7 +260,7 @@
     "to": "À :",
     "from": "De :",
     "tick": "Tick",
-    "type": "Type",
+    "txType": "Type de TX",
     "pending": "En attente",
     "unconfirmed": "Non confirmé",
     "unconfirmedMore": "+{{count}} non confirmées supplémentaires",
@@ -282,7 +282,7 @@
     "txId": "ID de TX",
     "amount": "Montant",
     "tick": "Tick",
-    "inputType": "Type d'entrée",
+    "txType": "TX Type",
     "source": "Source",
     "destination": "Destination",
     "timestamp": "Horodatage",
@@ -345,8 +345,7 @@
       "cancel": "Annuler"
     },
     "success": {
-      "title": "Transfert envoyé",
-      "description": "Votre transaction a été diffusée et est programmée pour le tick {{targetTick}}."
+      "title": "Transfert envoyé"
     },
     "errors": {
       "networkError": "Erreur réseau. Veuillez réessayer.",
@@ -394,8 +393,7 @@
       "cancel": "Annuler"
     },
     "success": {
-      "title": "Transfert de droits envoyé",
-      "description": "Votre transaction a été diffusée et est programmée pour le tick {{targetTick}}."
+      "title": "Transfert de droits envoyé"
     },
     "errors": {
       "networkError": "Erreur réseau. Veuillez réessayer.",
@@ -452,12 +450,13 @@
       "messageEmpty": "Aucun aperçu du message disponible.",
       "txTo": "À",
       "txAmount": "Montant",
-      "txInputType": "Type d'entrée",
+      "txType": "TX Type",
       "txTargetTick": "Tick cible",
       "txTargetTickOffset": "Décalage du tick cible",
       "txInputBytes": "Données d'entrée",
       "txInputBytesExpand": "Voir plus",
       "txInputBytesCollapse": "Voir moins",
+      "txBroadcastSuccess": "Transaction soumise",
       "approve": "Approuver",
       "approveAndSend": "Approuver et envoyer",
       "reject": "Rejeter",
@@ -466,6 +465,10 @@
         "decisionFailed": "Impossible de soumettre votre décision."
       }
     }
+  },
+  "transaction": {
+    "broadcastDescription": "Votre transaction a été diffusée et est programmée pour le tick {{targetTick}}.",
+    "txTypeTransfer": "Transfert"
   },
   "onboarding": {
     "importSeed": {

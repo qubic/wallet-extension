@@ -10,29 +10,12 @@ import {
   usePendingTransactionsVersion,
 } from '@/lib/pending-transactions'
 import { useAddressName } from '@/hooks/use-address-name'
-import { useProcedureName } from '@/hooks/use-procedure-name'
+import { useTxTypeDescription } from '@/hooks/use-tx-type-description'
 import { useClipboardCopy } from '@/hooks/use-clipboard-copy'
-import { formatAddressLabel, formatNumber } from '@/lib/utils'
+import { formatAddressLabel, formatIntegerLike, formatNumber } from '@/lib/utils'
+import { NATIVE_TOKEN_SYMBOL } from '@/lib/config/constants'
 import TxDetailsHeader from '@/components/pages/transaction-details/tx-details-header'
 import TxDetailsRow, { formatValue } from '@/components/pages/transaction-details/tx-details-row'
-
-const formatIntegerLike = (value: unknown): string => {
-  if (value === null || value === undefined) return '--'
-
-  if (typeof value === 'bigint') return formatNumber(value)
-
-  if (typeof value === 'number') {
-    if (!Number.isFinite(value)) return '--'
-    return formatNumber(Math.trunc(value))
-  }
-
-  if (typeof value === 'string') {
-    const normalized = value.trim()
-    if (/^-?\d+$/.test(normalized)) return formatNumber(BigInt(normalized))
-  }
-
-  return formatValue(value)
-}
 
 const TX_DETAILS_SKELETON_IDS = ['a', 'b', 'c', 'd', 'e', 'f'] as const
 
@@ -71,7 +54,7 @@ const TransactionDetails = () => {
   const destAddress = (details?.destination as string) ?? ''
   const sourceName = useAddressName(sourceAddress)
   const destName = useAddressName(destAddress)
-  const procedureName = useProcedureName(destAddress, Number(details?.inputType ?? 0))
+  const txTypeDescription = useTxTypeDescription(destAddress, Number(details?.inputType ?? 0))
 
   const formatTimestamp = (ts: unknown): string => {
     if (ts === null || ts === undefined) return '--'
@@ -99,26 +82,15 @@ const TransactionDetails = () => {
     {
       key: 'amount',
       label: t('txDetails.amount'),
-      value: formatIntegerLike(details?.amount),
-    },
-    {
-      key: 'timestamp',
-      label: t('txDetails.timestamp'),
-      value: formatTimestamp(details?.timestamp),
-    },
-    {
-      key: 'tick',
-      label: t('txDetails.tick'),
-      value: (() => {
-        const tick = details?.tickNumber ?? details?.tick ?? pending?.targetTick
-        if (tick === null || tick === undefined) return '--'
-        return formatNumber(Number(tick))
-      })(),
+      value:
+        details?.amount != null
+          ? `${formatIntegerLike(details.amount)} ${NATIVE_TOKEN_SYMBOL}`
+          : '--',
     },
     {
       key: 'inputType',
-      label: t('txDetails.inputType'),
-      value: procedureName ? `${details?.inputType} (${procedureName})` : details?.inputType,
+      label: t('txDetails.txType'),
+      value: txTypeDescription,
     },
     {
       key: 'source',
@@ -133,6 +105,20 @@ const TransactionDetails = () => {
       value: destName ? formatAddressLabel(destAddress, destName.name) : details?.destination,
       copyable: true,
       copyText: destAddress,
+    },
+    {
+      key: 'tick',
+      label: t('txDetails.tick'),
+      value: (() => {
+        const tick = details?.tickNumber ?? details?.tick ?? pending?.targetTick
+        if (tick === null || tick === undefined) return '--'
+        return formatNumber(Number(tick))
+      })(),
+    },
+    {
+      key: 'timestamp',
+      label: t('txDetails.timestamp'),
+      value: formatTimestamp(details?.timestamp),
     },
   ]
 
