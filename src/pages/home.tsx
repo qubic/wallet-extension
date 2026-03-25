@@ -1,17 +1,11 @@
 import { useBalance, useTransactions } from '@qubic-labs/react'
-import {
-  ArrowRightLeftIcon,
-  CopyIcon,
-  EyeIcon,
-  Loader2Icon,
-  PackageIcon,
-  RefreshCwIcon,
-} from 'lucide-react'
+import { CopyIcon, EyeIcon, Loader2Icon, PackageIcon, RefreshCwIcon } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import QRCode from 'qrcode'
 import { useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
+import TransferRightsButton from '@/components/transfer-rights-button'
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer'
 import { ReceiveIcon } from '@/components/icons/receive-icon'
 import { SendIcon } from '@/components/icons/send-icon'
@@ -309,7 +303,14 @@ const Home = () => {
                             : HIDDEN_BALANCE}
                         </span>
                         {!isWatchOnly && (
-                          <ArrowRightLeftIcon className="h-3.5 w-3.5 text-muted-foreground opacity-0 transition-all group-hover:opacity-100" />
+                          <TransferRightsButton
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              navigate(
+                                `/transfer/manage-rights?asset=${encodeURIComponent(assetKey)}`,
+                              )
+                            }}
+                          />
                         )}
                       </div>
                     </Wrapper>

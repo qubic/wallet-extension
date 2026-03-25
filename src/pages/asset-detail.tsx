@@ -1,8 +1,8 @@
 import { useMemo } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ArrowLeftIcon, ArrowRightLeftIcon, CopyIcon, Loader2Icon, PackageIcon } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { ArrowLeftIcon, CopyIcon, Loader2Icon, PackageIcon } from 'lucide-react'
+import TransferRightsButton from '@/components/transfer-rights-button'
 import { useCurrentIdentity } from '@/hooks/use-current-identity'
 import { useClipboardCopy } from '@/hooks/use-clipboard-copy'
 import { formatAssetUnits, getAssetsPerContract, useOwnedAssets } from '@/lib/assets'
@@ -197,19 +197,14 @@ const AssetDetail = () => {
                       : HIDDEN_BALANCE}
                   </div>
                 </div>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="ml-2 h-8 shrink-0 gap-1.5 text-xs text-muted-foreground"
+                <TransferRightsButton
+                  className="ml-2"
                   onClick={() =>
                     navigate(
                       `/transfer/manage-rights?asset=${encodeURIComponent(decodedAssetKey)}&contractIndex=${contract.contractIndex}`,
                     )
                   }
-                >
-                  <ArrowRightLeftIcon className="h-3.5 w-3.5" />
-                  {t('assetDetail.transferRights')}
-                </Button>
+                />
               </div>
             ))}
           </div>
