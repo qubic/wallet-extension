@@ -403,6 +403,18 @@
       "generic": "Hak transferi başarısız. Lütfen tekrar deneyin."
     }
   },
+  "assetDetail": {
+    "title": "Varlık Detayları",
+    "issuer": "Yayıncı Kimliği",
+    "issuerCopied": "Yayıncı kimliği kopyalandı",
+    "copyFailed": "Kopyalama başarısız",
+    "managingContracts": "Yönetim sözleşmeleri",
+    "noContracts": "Yönetim sözleşmesi bulunamadı.",
+    "unknownContract": "Sözleşme #{{index}}",
+    "transferRights": "Yönetim Haklarını Transfer Et",
+    "notFound": "Varlık bulunamadı.",
+    "error": "Varlık detayları yüklenemedi."
+  },
   "passphraseAuth": {
     "title": "Kimlik Doğrulama Gerekli",
     "subtitle": "Bu işleme devam etmek için vault parolanızı girin.",

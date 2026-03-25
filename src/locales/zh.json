@@ -403,6 +403,18 @@
       "generic": "权限转移失败，请重试。"
     }
   },
+  "assetDetail": {
+    "title": "资产详情",
+    "issuer": "发行者身份",
+    "issuerCopied": "发行者身份已复制",
+    "copyFailed": "复制失败",
+    "managingContracts": "管理合约",
+    "noContracts": "未找到管理合约。",
+    "unknownContract": "合约 #{{index}}",
+    "transferRights": "转移管理权限",
+    "notFound": "未找到资产。",
+    "error": "无法加载资产详情。"
+  },
   "passphraseAuth": {
     "title": "需要身份验证",
     "subtitle": "输入 vault 密码以继续此操作。",

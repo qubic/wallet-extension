@@ -411,7 +411,7 @@
     "managingContracts": "Contratos de gestión",
     "noContracts": "No se encontraron contratos de gestión.",
     "unknownContract": "Contrato #{{index}}",
-    "transferRights": "Transferir derechos",
+    "transferRights": "Transferir derechos de gestión",
     "notFound": "Activo no encontrado.",
     "error": "Error al cargar los detalles del activo."
   },

@@ -403,6 +403,18 @@
       "generic": "Échec du transfert de droits. Veuillez réessayer."
     }
   },
+  "assetDetail": {
+    "title": "Détails de l'actif",
+    "issuer": "Identité de l'émetteur",
+    "issuerCopied": "Identité de l'émetteur copiée",
+    "copyFailed": "Échec de la copie",
+    "managingContracts": "Contrats de gestion",
+    "noContracts": "Aucun contrat de gestion trouvé.",
+    "unknownContract": "Contrat #{{index}}",
+    "transferRights": "Transférer les droits de gestion",
+    "notFound": "Actif introuvable.",
+    "error": "Impossible de charger les détails de l'actif."
+  },
   "passphraseAuth": {
     "title": "Authentification requise",
     "subtitle": "Entrez le mot de passe de votre vault pour continuer cette action.",

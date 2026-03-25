@@ -411,7 +411,7 @@
     "managingContracts": "Managing contracts",
     "noContracts": "No managing contracts found.",
     "unknownContract": "Contract #{{index}}",
-    "transferRights": "Transfer rights",
+    "transferRights": "Transfer Management Rights",
     "notFound": "Asset not found.",
     "error": "Failed to load asset details."
   },

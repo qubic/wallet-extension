@@ -403,6 +403,18 @@
       "generic": "Chuyển quyền thất bại. Vui lòng thử lại."
     }
   },
+  "assetDetail": {
+    "title": "Chi tiết tài sản",
+    "issuer": "Danh tính nhà phát hành",
+    "issuerCopied": "Đã sao chép danh tính nhà phát hành",
+    "copyFailed": "Sao chép thất bại",
+    "managingContracts": "Hợp đồng quản lý",
+    "noContracts": "Không tìm thấy hợp đồng quản lý.",
+    "unknownContract": "Hợp đồng #{{index}}",
+    "transferRights": "Chuyển quyền quản lý",
+    "notFound": "Không tìm thấy tài sản.",
+    "error": "Không thể tải chi tiết tài sản."
+  },
   "passphraseAuth": {
     "title": "Yêu cầu xác thực",
     "subtitle": "Nhập mật khẩu vault của bạn để tiếp tục hành động này.",

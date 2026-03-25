@@ -403,6 +403,18 @@
       "generic": "Rechteübertragung fehlgeschlagen. Bitte erneut versuchen."
     }
   },
+  "assetDetail": {
+    "title": "Asset-Details",
+    "issuer": "Emittenten-Identität",
+    "issuerCopied": "Emittenten-Identität kopiert",
+    "copyFailed": "Kopieren fehlgeschlagen",
+    "managingContracts": "Verwaltungsverträge",
+    "noContracts": "Keine Verwaltungsverträge gefunden.",
+    "unknownContract": "Vertrag #{{index}}",
+    "transferRights": "Verwaltungsrechte übertragen",
+    "notFound": "Asset nicht gefunden.",
+    "error": "Asset-Details konnten nicht geladen werden."
+  },
   "passphraseAuth": {
     "title": "Authentifizierung erforderlich",
     "subtitle": "Gib deine Vault-Passphrase ein, um mit dieser Aktion fortzufahren.",
