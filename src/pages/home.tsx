@@ -282,12 +282,15 @@ const Home = () => {
               <div className="space-y-2">
                 {aggregatedAssets.map((asset) => {
                   const assetKey = `${asset.issuerIdentity}-${asset.name}`
+                  const Wrapper = isWatchOnly ? 'div' : 'button'
                   return (
-                    <button
+                    <Wrapper
                       key={assetKey}
-                      type="button"
-                      className="group flex w-full cursor-pointer items-center justify-between rounded-lg border border-border/40 bg-transparent px-3 py-2.5 text-left transition-colors hover:border-primary/30 hover:bg-background/40"
-                      onClick={() => navigate(`/asset/${encodeURIComponent(assetKey)}`)}
+                      {...(!isWatchOnly && { type: 'button' as const })}
+                      className={`group flex w-full items-center justify-between rounded-lg border border-border/40 bg-transparent px-3 py-2.5 text-left transition-colors ${isWatchOnly ? '' : 'cursor-pointer hover:border-primary/30 hover:bg-background/40'}`}
+                      {...(!isWatchOnly && {
+                        onClick: () => navigate(`/asset/${encodeURIComponent(assetKey)}`),
+                      })}
                     >
                       <div className="min-w-0 flex flex-col">
                         <span className="truncate text-sm font-semibold leading-none text-foreground">
@@ -305,9 +308,11 @@ const Home = () => {
                             ? formatAssetUnits(asset.numberOfUnits, asset.decimals)
                             : HIDDEN_BALANCE}
                         </span>
-                        <ArrowRightLeftIcon className="h-3.5 w-3.5 text-muted-foreground opacity-0 transition-all group-hover:opacity-100" />
+                        {!isWatchOnly && (
+                          <ArrowRightLeftIcon className="h-3.5 w-3.5 text-muted-foreground opacity-0 transition-all group-hover:opacity-100" />
+                        )}
                       </div>
-                    </button>
+                    </Wrapper>
                   )
                 })}
               </div>
