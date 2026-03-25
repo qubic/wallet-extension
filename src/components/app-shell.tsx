@@ -215,7 +215,7 @@ const AppShell = ({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1], delay: 0.03 }}
             className={`relative z-20 grid h-[56px] shrink-0 items-center gap-0 overflow-visible rounded-t-2xl border-t border-border/60 bg-background/95 px-0 py-0 shadow-[0_-10px_25px_-18px_hsl(var(--primary)/0.45)] backdrop-blur supports-[backdrop-filter]:bg-background/82 ${
-              filteredNavItems.length === 4 ? 'grid-cols-4' : 'grid-cols-5'
+              filteredNavItems.length === 3 ? 'grid-cols-3' : 'grid-cols-4'
             }`}
           >
             <motion.div
