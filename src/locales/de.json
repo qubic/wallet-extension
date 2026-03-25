@@ -1,4 +1,17 @@
 {
+  "common": {
+    "back": "Zurück",
+    "previous": "Vorheriger",
+    "continue": "Weiter",
+    "step": "Schritt {{current}} von {{total}}",
+    "accountName": "Kontoname",
+    "addressLabel": "Adressbezeichnung",
+    "vaultPassphrase": "Tresor-Passwort",
+    "currentVaultPassphrase": "Aktuelles Tresor-Passwort",
+    "seedLabel": "Privater Seed",
+    "seedLength": "Seed-Länge: {{length}}",
+    "identity": "Identität"
+  },
   "app": {
     "sidepanel": "Seitenleiste öffnen",
     "closeSidepanel": "Seitenleiste schließen"
@@ -58,7 +71,8 @@
       "title": "Qubic empfangen",
       "description": "Teile diesen QR-Code oder kopiere deine öffentliche Adresse.",
       "generating": "QR-Code wird erstellt...",
-      "copy": "Adresse kopieren"
+      "copy": "Adresse kopieren",
+      "qrAlt": "QR-Code der öffentlichen Identität"
     },
     "toast": {
       "copySuccess": "Adresse kopiert",
@@ -70,17 +84,18 @@
       "title": "Watch-Only-Konto",
       "description": "Senden ist für diese Adresse deaktiviert."
     },
+    "refresh": "Aktualisieren",
     "price": {
       "label": "QUBIC Preis"
     },
     "accounts": {
       "title": "Konten",
       "selectLabel": "Konto auswählen",
-      "passphrasePlaceholder": "Vault-Passphrase",
-      "passphraseRequired": "Gib deine Vault-Passphrase ein, um Konten anzuzeigen.",
+      "passphrasePlaceholder": "Tresor-Passwort",
+      "passphraseRequired": "Gib dein Tresor-Passwort ein, um Konten anzuzeigen.",
       "unlock": "Konten entsperren",
       "unlocking": "Wird entsperrt...",
-      "unlockFailed": "Vault konnte nicht entsperrt werden. Überprüfe deine Passphrase.",
+      "unlockFailed": "Tresor konnte nicht entsperrt werden. Überprüfe dein Passwort.",
       "empty": "Keine weiteren Konten gefunden.",
       "create": "Neues Konto erstellen"
     }
@@ -100,16 +115,16 @@
       "immediately": "Sofort"
     },
     "exportVault": {
-      "button": "Vault exportieren",
-      "drawerTitle": "Vault-Datei exportieren",
-      "drawerDescription": "Lade deinen Vault in einem Format herunter, das mit dem Qubic Web-Wallet kompatibel ist.",
-      "passphrase": "Vault-Passphrase",
-      "confirm": "Vault exportieren",
+      "button": "Tresor exportieren",
+      "drawerTitle": "Tresor-Datei exportieren",
+      "drawerDescription": "Lade deinen Tresor in einem Format herunter, das mit dem Qubic Web-Wallet kompatibel ist.",
+      "passphrase": "Tresor-Passwort",
+      "confirm": "Tresor exportieren",
       "exporting": "Wird exportiert...",
       "errors": {
-        "passphraseRequired": "Passphrase ist erforderlich.",
-        "invalidPassphrase": "Ungültige Passphrase.",
-        "exportFailed": "Vault konnte nicht exportiert werden."
+        "passphraseRequired": "Passwort ist erforderlich.",
+        "invalidPassphrase": "Ungültiges Passwort.",
+        "exportFailed": "Tresor konnte nicht exportiert werden."
       }
     },
     "categories": {
@@ -120,7 +135,7 @@
       "security": "Sicherheit",
       "securityDesc": "Passwort, Auto-Lock und Zurücksetzen",
       "backup": "Sicherung",
-      "backupDesc": "Vault-Datei exportieren",
+      "backupDesc": "Tresor-Datei exportieren",
       "accounts": "Konten verwalten",
       "accountsDesc": "Identitäten anzeigen, sortieren und verwalten",
       "support": "Support",
@@ -147,34 +162,34 @@
       "title": "Sicherheit",
       "back": "Einstellungen",
       "changePassword": "Passwort ändern",
-      "changePasswordDesc": "Vault-Passphrase aktualisieren",
+      "changePasswordDesc": "Tresor-Passwort aktualisieren",
       "changePasswordDrawerTitle": "Passwort ändern",
-      "changePasswordDrawerDesc": "Gib deine aktuelle Passphrase ein und wähle eine neue.",
-      "currentPassphrase": "Aktuelle Passphrase",
-      "newPassphrase": "Neue Passphrase",
-      "confirmPassphrase": "Neue Passphrase bestätigen",
+      "changePasswordDrawerDesc": "Gib dein aktuelles Passwort ein und wähle ein neues.",
+      "currentPassphrase": "Aktuelles Passwort",
+      "newPassphrase": "Neues Passwort",
+      "confirmPassphrase": "Neues Passwort bestätigen",
       "minChars": "Mindestens 12 Zeichen.",
       "save": "Neues Passwort speichern",
       "saving": "Wird gespeichert...",
       "cancel": "Abbrechen",
       "resetApp": "Wallet löschen",
       "resetAppTitle": "Wallet löschen?",
-      "resetAppDesc": "Dadurch werden alle Daten einschließlich Vault, Konten und Einstellungen gelöscht. Diese Aktion kann nicht rückgängig gemacht werden. Stelle sicher, dass du deine Seeds gesichert hast.",
+      "resetAppDesc": "Dadurch werden alle Daten einschließlich Tresor, Konten und Einstellungen gelöscht. Diese Aktion kann nicht rückgängig gemacht werden. Stelle sicher, dass du deine Seeds gesichert hast.",
       "resetAppConfirm": "Wallet löschen",
       "errors": {
-        "currentRequired": "Aktuelle Passphrase ist erforderlich.",
-        "newRequired": "Neue Passphrase ist erforderlich.",
-        "confirmRequired": "Bitte bestätige deine neue Passphrase.",
-        "tooShort": "Passphrase muss mindestens 12 Zeichen lang sein.",
-        "mismatch": "Passphrasen stimmen nicht überein.",
-        "invalidCurrent": "Aktuelle Passphrase ist falsch.",
+        "currentRequired": "Aktuelles Passwort ist erforderlich.",
+        "newRequired": "Neues Passwort ist erforderlich.",
+        "confirmRequired": "Bitte bestätige dein neues Passwort.",
+        "tooShort": "Passwort muss mindestens 12 Zeichen lang sein.",
+        "mismatch": "Passwörter stimmen nicht überein.",
+        "invalidCurrent": "Aktuelles Passwort ist falsch.",
         "changeFailed": "Passwort konnte nicht geändert werden. Bitte versuche es erneut."
       }
     },
     "support": {
       "title": "Support",
       "warningTitle": "Vorsicht vor Betrügern",
-      "warningDescription": "Mitglieder des Qubic-Teams werden dich niemals nach deinem Seed oder deiner Passphrase fragen. Teile deine privaten Schlüssel niemals mit jemandem.",
+      "warningDescription": "Mitglieder des Qubic-Teams werden dich niemals nach deinem Seed oder deinem Passwort fragen. Teile deine privaten Schlüssel niemals mit jemandem.",
       "discord": "Discord-Community",
       "github": "Problem auf GitHub melden"
     },
@@ -182,22 +197,23 @@
       "title": "Über",
       "appVersion": "App-Version",
       "extensionName": "Erweiterung",
+      "extensionFullName": "Qubic Wallet",
       "versionLabel": "v{{version}}"
     }
   },
   "accounts": {
     "watchOnly": {
       "title": "Watch-Only-Adresse hinzufügen",
-      "subtitle": "Beobachte eine öffentliche Adresse, ohne deren Seed zu importieren.",
+      "subtitle": "Beobachte eine öffentliche Adresse, ohne deren privaten Seed zu importieren.",
       "submit": "Watch-Only hinzufügen"
     },
     "manage": {
       "title": "Konten verwalten",
       "subtitle": "Identitäten anzeigen, sortieren und verwalten.",
-      "passphrase": "Vault-Passphrase",
-      "passphraseTitle": "Vault entsperren",
+      "passphrase": "Tresor-Passwort",
+      "passphraseTitle": "Tresor entsperren",
       "load": "Konten laden",
-      "unlock": "Vault entsperren",
+      "unlock": "Tresor entsperren",
       "loading": "Lädt...",
       "empty": "Noch keine Konten geladen.",
       "active": "Aktiv",
@@ -214,17 +230,17 @@
       "remove": "Entfernen",
       "removeTitle": "Konto entfernen",
       "removeDesc": "Diese Aktion entfernt das Konto von diesem Gerät. Dies kann nicht rückgängig gemacht werden.",
-      "reveal": "Seed anzeigen",
-      "revealTitle": "Seed-Phrase",
-      "copySeed": "Seed kopieren",
-      "seedCopied": "Seed kopiert",
-      "qrAlt": "Seed-QR-Code",
-      "qrLabel": "Scannen, um Seed zu importieren",
+      "reveal": "Privaten Seed anzeigen",
+      "revealTitle": "Privater Seed für \"{{name}}\"",
+      "copySeed": "Privaten Seed kopieren",
+      "seedCopied": "Privater Seed kopiert",
+      "qrAlt": "QR-Code des privaten Seeds",
+      "qrLabel": "Scannen, um privaten Seed zu importieren",
       "done": "Fertig",
       "addTitle": "Konto hinzufügen",
       "addNewDesc": "Füge diesem Wallet eine weitere Adresse hinzu.",
       "addCreate": "Neue Adresse erstellen",
-      "addImport": "Seed importieren",
+      "addImport": "Privaten Seed importieren",
       "watchOnlyTitle": "Watch-Only-Konto",
       "watchOnlyName": "Kontoname",
       "watchOnlyIdentity": "Öffentliche Adresse",
@@ -233,16 +249,16 @@
       "defaultNamePrefix": "Konto",
       "close": "Schließen",
       "errors": {
-        "load": "Vault konnte nicht geöffnet werden.",
+        "load": "Tresor konnte nicht geöffnet werden.",
         "remove": "Konto konnte nicht entfernt werden.",
         "rename": "Konto konnte nicht umbenannt werden.",
-        "reveal": "Seed konnte nicht angezeigt werden.",
+        "reveal": "Privater Seed konnte nicht angezeigt werden.",
         "nameRequired": "Kontoname ist erforderlich.",
-        "passphraseRequired": "Passphrase ist erforderlich.",
-        "invalidPassphrase": "Ungültige Passphrase.",
+        "passphraseRequired": "Passwort ist erforderlich.",
+        "invalidPassphrase": "Ungültiges Passwort.",
         "nameDuplicate": "Ein Konto mit diesem Namen existiert bereits.",
         "lastAccount": "Das letzte Konto kann nicht entfernt werden.",
-        "watchOnlySeed": "Watch-Only-Konten haben keinen Seed.",
+        "watchOnlySeed": "Watch-Only-Konten haben keinen privaten Seed.",
         "watchOnlyRequired": "Name und Adresse sind erforderlich.",
         "watchOnlyInvalid": "Ungültiges Adressformat.",
         "watchOnlyDuplicate": "Diese Adresse wurde bereits hinzugefügt."
@@ -251,6 +267,7 @@
   },
   "history": {
     "title": "Verlauf",
+    "refresh": "Verlauf aktualisieren",
     "loading": "Verlauf wird geladen...",
     "empty": "Keine Transaktionen gefunden.",
     "incoming": "Eingehend",
@@ -275,7 +292,6 @@
     "title": "Transaktionsdetails",
     "loading": "Transaktion wird geladen...",
     "error": "Transaktionsdetails konnten nicht geladen werden.",
-    "back": "Zurück",
     "copy": "Kopieren",
     "copied": "Kopiert",
     "copyFailed": "Kopieren fehlgeschlagen",
@@ -304,7 +320,7 @@
       "max": "Max",
       "feeValue": "Gebühr: {{fee}} QUBIC",
       "quBalance": "Kontostand: {{balance}} QUBIC",
-      "recipientHint": "Verwende eine 60-stellige Adresse oder wähle eine aus deinem Vault.",
+      "recipientHint": "Verwende eine 60-stellige Adresse oder wähle eine aus deinem Tresor.",
       "available": "Verfügbar: {{balance}} {{token}}",
       "availableQx": "Verfügbar (von Qx verwaltet): {{balance}} {{token}}",
       "totalBalanceHint": "* Gesamtguthaben: {{balance}} {{token}}. Um das übertragbare Guthaben zu erhöhen, verschiebe mehr zu QX über \"Verwaltungsrechte übertragen\" in Assets.",
@@ -339,7 +355,6 @@
       "feeLabel": "Netzwerkgebühr"
     },
     "actions": {
-      "continue": "Fortfahren",
       "confirm": "Bestätigen & senden",
       "sending": "Wird gesendet...",
       "cancel": "Abbrechen"
@@ -387,7 +402,6 @@
       "insufficientQuForFee": "Unzureichendes QUBIC-Guthaben zur Deckung der {{fee}} QU Gebühr."
     },
     "actions": {
-      "continue": "Fortfahren",
       "confirm": "Bestätigen & übertragen",
       "sending": "Wird übertragen...",
       "cancel": "Abbrechen"
@@ -404,17 +418,17 @@
   },
   "passphraseAuth": {
     "title": "Authentifizierung erforderlich",
-    "subtitle": "Gib deine Vault-Passphrase ein, um mit dieser Aktion fortzufahren.",
+    "subtitle": "Gib dein Tresor-Passwort ein, um mit dieser Aktion fortzufahren.",
     "form": {
-      "passphrase": "Vault-Passphrase",
-      "passphrasePlaceholder": "Passphrase eingeben",
-      "showPassphrase": "Passphrase anzeigen",
-      "hidePassphrase": "Passphrase verbergen"
+      "passphrase": "Tresor-Passwort",
+      "passphrasePlaceholder": "Passwort eingeben",
+      "showPassphrase": "Passwort anzeigen",
+      "hidePassphrase": "Passwort verbergen"
     },
     "validation": {
-      "required": "Passphrase ist erforderlich."
+      "required": "Passwort ist erforderlich."
     },
-    "securityNote": "Deine Passphrase wird lokal verwendet, um deinen Vault zu entschlüsseln und Transaktionen zu signieren. Sie wird niemals über das Netzwerk übertragen.",
+    "securityNote": "Dein Passwort wird lokal verwendet, um deinen Tresor zu entschlüsseln und Transaktionen zu signieren. Es wird niemals über das Netzwerk übertragen.",
     "actions": {
       "back": "Zurück",
       "cancel": "Abbrechen",
@@ -422,14 +436,20 @@
       "unlocking": "Wird entsperrt..."
     },
     "errors": {
-      "invalidPassphrase": "Ungültige Passphrase. Bitte versuche es erneut.",
-      "accountNotFound": "Konto nicht im Vault gefunden.",
+      "invalidPassphrase": "Ungültiges Passwort. Bitte versuche es erneut.",
+      "accountNotFound": "Konto nicht im Tresor gefunden.",
       "generic": "Authentifizierung fehlgeschlagen. Bitte versuche es erneut."
     }
   },
   "unlock": {
     "title": "Wallet entsperren",
-    "subtitle": "Dein Wallet ist aus Sicherheitsgründen gesperrt. Gib deine Passphrase ein, um fortzufahren."
+    "subtitle": "Dein Wallet ist aus Sicherheitsgründen gesperrt. Gib dein Passwort ein, um fortzufahren."
+  },
+  "welcome": {
+    "subtitle": "Willkommen bei Qubic Wallet",
+    "createWallet": "Neues Wallet erstellen",
+    "restoreSeed": "Mit privatem Seed wiederherstellen",
+    "importVault": "Tresor-Sicherung importieren"
   },
   "dapp": {
     "approval": {
@@ -471,65 +491,104 @@
     "txTypeTransfer": "Überweisung"
   },
   "onboarding": {
+    "errors": {
+      "seedInvalid": "Seed muss aus 55 Kleinbuchstaben bestehen.",
+      "seedConfirmRequired": "Bitte bestätige, dass du deinen privaten Seed sicher aufbewahrt hast.",
+      "addressExists": "Diese Adresse existiert bereits.",
+      "passphraseRequired": "Passwort ist erforderlich.",
+      "passphraseReenter": "Bitte gib dein Passwort erneut ein.",
+      "passphraseMismatch": "Passwörter stimmen nicht überein.",
+      "passphraseTooShort": "Passwort muss mindestens 12 Zeichen lang sein.",
+      "invalidVaultPassphrase": "Ungültiges Tresor-Passwort.",
+      "vaultValidationFailed": "Tresor-Passwort konnte nicht validiert werden.",
+      "createFailed": "Wallet konnte nicht erstellt werden.",
+      "importFailed": "Privater Seed konnte nicht importiert werden."
+    },
+    "create": {
+      "title": "Neues Wallet erstellen",
+      "titleAddAddress": "Neue Adresse hinzufügen",
+      "readyTitle": "Bereit zur Erstellung",
+      "readySubtitle": "Überprüfe deine Angaben, bevor der Tresor erstellt wird.",
+      "seedWarning": "Stelle sicher, dass du deinen privaten Seed gespeichert hast. Jeder mit diesem Seed kann auf dein Guthaben zugreifen.",
+      "createWallet": "Wallet erstellen",
+      "creating": "Wird erstellt...",
+      "addAddress": "Adresse hinzufügen",
+      "adding": "Wird hinzugefügt..."
+    },
     "importSeed": {
       "title": "Privaten Seed importieren",
-      "titleAddAddress": "Adress-Seed importieren",
-      "step": "Schritt {{current}} von {{total}}"
+      "titleAddAddress": "Privaten Seed importieren",
+      "pasteSeedTitle": "Privaten Seed einfügen",
+      "pasteSeedSubtitle": "Gib den 55-stelligen privaten Seed ein, den du importieren möchtest.",
+      "seedValid": "Gültiges Seed-Format.",
+      "seedInvalidCount": "Seed muss aus 55 Kleinbuchstaben bestehen ({{current}}/{{total}}).",
+      "labelSecureTitle": "Bezeichnung und Sicherung",
+      "labelSecureSubtitleAddress": "Gib dieser Adresse eine Bezeichnung und gib das aktuelle Tresor-Passwort ein.",
+      "labelSecureSubtitleWallet": "Gib diesem Wallet einen Namen und lege ein Tresor-Passwort fest.",
+      "reviewTitle": "Import überprüfen",
+      "reviewSubtitle": "Bestätige die Details vor dem Import.",
+      "seedPrivacyNotice": "Dein privater Seed verlässt niemals dieses Gerät. Halte ihn jederzeit privat.",
+      "importAddress": "Adresse importieren",
+      "importSeedAction": "Privaten Seed importieren",
+      "importing": "Wird importiert..."
+    },
+    "passphraseStep": {
+      "title": "Benennen und schützen",
+      "subtitleAddress": "Gib diesem Wallet eine Bezeichnung und gib das aktuelle Tresor-Passwort ein.",
+      "subtitleWallet": "Gib diesem Wallet eine Bezeichnung und lege ein Tresor-Passwort fest.",
+      "minChars": "Mindestens 12 Zeichen.",
+      "reenterPassphrase": "Tresor-Passwort erneut eingeben"
     },
     "importVault": {
-      "title": "Vault-Datei importieren",
-      "step": "Schritt {{current}} von {{total}}",
+      "title": "Tresor-Datei importieren",
       "selectVault": {
-        "title": "Vault auswählen",
-        "subtitle": "Lade eine Vault-Datei hoch, die aus dieser Erweiterung oder dem Qubic Web-Wallet exportiert wurde.",
-        "label": "Vault-Datei",
-        "dropText": "Vault-Datei hierher ziehen",
+        "title": "Tresor auswählen",
+        "subtitle": "Lade eine Tresor-Datei hoch, die aus dieser Erweiterung oder dem Qubic Web-Wallet exportiert wurde.",
+        "label": "Tresor-Datei",
+        "dropText": "Tresor-Datei hierher ziehen",
         "browseText": "oder klicken zum Durchsuchen (.json, .qubic-vault)"
       },
       "unlockSecure": {
         "title": "Entsperren und sichern",
-        "subtitle": "Lege eine neue Passphrase für dieses Gerät fest und gib bei Bedarf die Quell-Passphrase ein.",
-        "newPassphrase": "Neue Vault-Passphrase",
-        "sourcePassphrase": "Quell-Vault-Passphrase"
+        "subtitle": "Lege ein neues Passwort für dieses Gerät fest und gib bei Bedarf das Quell-Passwort ein.",
+        "newPassphrase": "Neues Tresor-Passwort",
+        "sourcePassphrase": "Quell-Tresor-Passwort"
       },
       "review": {
         "title": "Import überprüfen",
-        "subtitle": "Bestätige die Datei- und Passphrase-Details vor dem Import.",
-        "vaultFile": "Vault-Datei",
+        "subtitle": "Bestätige die Datei- und Passwort-Details vor dem Import.",
+        "vaultFile": "Tresor-Datei",
         "notSelected": "Nicht ausgewählt",
         "sourcePassphraseProvided": "Angegeben",
         "sourcePassphraseSame": "Gleich wie neue",
-        "sourcePassphraseLabel": "Quell-Passphrase",
+        "sourcePassphraseLabel": "Quell-Passwort",
         "addMoreLater": "Du kannst später weitere Konten unter Konten verwalten hinzufügen."
       },
       "actions": {
-        "back": "Zurück",
-        "previous": "Vorherige",
-        "continue": "Fortfahren",
-        "import": "Vault importieren",
+        "import": "Tresor importieren",
         "importing": "Wird importiert..."
       },
       "errors": {
-        "fileTooLarge": "Die ausgewählte Datei ist zu groß für eine gültige Vault-Datei.",
-        "selectFile": "Wähle eine Vault-Datei aus.",
-        "passphraseRequired": "Passphrase ist erforderlich.",
-        "importFailed": "Web-Wallet-Vault konnte nicht importiert werden.",
-        "noEntries": "Vault importiert, aber keine Einträge gefunden.",
-        "generic": "Vault konnte nicht importiert werden."
+        "fileTooLarge": "Die ausgewählte Datei ist zu groß für eine gültige Tresor-Datei.",
+        "selectFile": "Wähle eine Tresor-Datei aus.",
+        "passphraseRequired": "Passwort ist erforderlich.",
+        "importFailed": "Web-Wallet-Tresor konnte nicht importiert werden.",
+        "noEntries": "Tresor importiert, aber keine Einträge gefunden.",
+        "generic": "Tresor konnte nicht importiert werden."
       }
     },
     "seedSecurity": {
-      "title": "Seed sichern",
-      "subtitle": "Bewahre diesen 55-stelligen Seed an einem sicheren Ort auf. Du benötigst ihn, um dein Wallet wiederherzustellen.",
-      "subtitleAddAddress": "Bewahre diesen 55-stelligen Seed an einem sicheren Ort auf. Du benötigst ihn, um diese Adresse wiederherzustellen.",
-      "warningTitle": "Bewahre diesen Seed sicher auf.",
-      "seedLabel": "Seed",
+      "title": "Privaten Seed sichern",
+      "subtitle": "Bewahre diesen 55-stelligen privaten Seed an einem sicheren Ort auf. Du benötigst ihn, um dein Wallet wiederherzustellen.",
+      "subtitleAddAddress": "Bewahre diesen 55-stelligen privaten Seed an einem sicheren Ort auf. Du benötigst ihn, um diese Adresse wiederherzustellen.",
+      "warningTitle": "Bewahre diesen privaten Seed sicher auf.",
+      "seedLabel": "Privater Seed",
       "publicIdentityLabel": "Öffentliche Adresse",
       "deriving": "Wird abgeleitet...",
       "generateNew": "Neuen Seed generieren",
-      "copySeed": "Seed kopieren",
-      "seedCopied": "Seed kopiert",
-      "confirmationLabel": "Ich habe diesen Seed sicher aufbewahrt und verstehe, dass er zur Wiederherstellung dieses Wallets erforderlich ist."
+      "copySeed": "Privaten Seed kopieren",
+      "seedCopied": "Privater Seed kopiert",
+      "confirmationLabel": "Ich habe diesen privaten Seed sicher aufbewahrt und verstehe, dass er zur Wiederherstellung dieses Wallets erforderlich ist."
     }
   }
 }

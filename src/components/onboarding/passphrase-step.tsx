@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/ui/password-input'
@@ -21,19 +22,21 @@ const PassphraseStep = ({
   onPassphraseChange,
   onConfirmPassphraseChange,
 }: PassphraseStepProps) => {
+  const { t } = useTranslation()
+
   return (
     <div className="space-y-4">
       <div className="space-y-1">
-        <h3 className="text-sm font-semibold">Name and protect it</h3>
+        <h3 className="text-sm font-semibold">{t('onboarding.passphraseStep.title')}</h3>
         <p className="text-xs text-muted-foreground">
           {variant === 'add-address'
-            ? 'Give this wallet a label and enter the current vault passphrase.'
-            : 'Give this wallet a label and set a vault passphrase.'}
+            ? t('onboarding.passphraseStep.subtitleAddress')
+            : t('onboarding.passphraseStep.subtitleWallet')}
         </p>
       </div>
       <div className="space-y-2">
         <Label htmlFor="wallet-name">
-          {variant === 'add-address' ? 'Address label' : 'Wallet name'}
+          {variant === 'add-address' ? t('common.addressLabel') : t('common.accountName')}
         </Label>
         <Input
           id="wallet-name"
@@ -43,7 +46,9 @@ const PassphraseStep = ({
       </div>
       <div className="space-y-2">
         <Label htmlFor="passphrase">
-          {variant === 'add-address' ? 'Current vault passphrase' : 'Vault passphrase'}
+          {variant === 'add-address'
+            ? t('common.currentVaultPassphrase')
+            : t('common.vaultPassphrase')}
         </Label>
         <PasswordInput
           id="passphrase"
@@ -51,12 +56,14 @@ const PassphraseStep = ({
           onChange={(event) => onPassphraseChange(event.target.value)}
         />
         {variant !== 'add-address' && (
-          <p className="text-xs text-muted-foreground">Minimum 12 characters.</p>
+          <p className="text-xs text-muted-foreground">{t('onboarding.passphraseStep.minChars')}</p>
         )}
       </div>
       {variant !== 'add-address' && (
         <div className="space-y-2">
-          <Label htmlFor="confirm-passphrase">Re-enter vault passphrase</Label>
+          <Label htmlFor="confirm-passphrase">
+            {t('onboarding.passphraseStep.reenterPassphrase')}
+          </Label>
           <PasswordInput
             id="confirm-passphrase"
             value={confirmPassphrase}
