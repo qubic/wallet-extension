@@ -103,6 +103,11 @@ export const formatAddressLabel = (
 
 export type ExplorerObject = 'tx'
 
+export const compareBigIntDesc = (a: string, b: string): number => {
+  const diff = BigInt(b) - BigInt(a)
+  return diff > 0n ? 1 : diff < 0n ? -1 : 0
+}
+
 export function buildExplorerObjectUrl(object: ExplorerObject, id: string) {
   const pathMap: Record<ExplorerObject, string> = {
     tx: 'network/tx',

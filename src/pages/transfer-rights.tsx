@@ -45,7 +45,13 @@ import {
 import { addPendingTransaction, PENDING_SETTLED_EVENT } from '@/lib/pending-transactions'
 import { isWalletLocked } from '@/lib/lock'
 import { useTickInfo, fetchTickInfo } from '@/lib/network-stats'
-import { formatBalance, formatNumber, normalizeBalance, parseAmount } from '@/lib/utils'
+import {
+  compareBigIntDesc,
+  formatBalance,
+  formatNumber,
+  normalizeBalance,
+  parseAmount,
+} from '@/lib/utils'
 
 type Step = 'select-asset' | 'form' | 'auth'
 type FormErrors = {
@@ -160,7 +166,7 @@ const TransferRights = () => {
     }
 
     for (const group of groupMap.values()) {
-      group.contracts.sort((a, b) => Number(BigInt(b.numberOfUnits) - BigInt(a.numberOfUnits)))
+      group.contracts.sort((a, b) => compareBigIntDesc(a.numberOfUnits, b.numberOfUnits))
     }
 
     return [...groupMap.values()]

@@ -7,7 +7,7 @@ import { useCurrentIdentity } from '@/hooks/use-current-identity'
 import { useClipboardCopy } from '@/hooks/use-clipboard-copy'
 import { formatAssetUnits, getAssetsPerContract, useOwnedAssets } from '@/lib/assets'
 import { useSmartContracts } from '@/lib/qubic-static'
-import { truncateString } from '@/lib/utils'
+import { compareBigIntDesc, truncateString } from '@/lib/utils'
 import { HIDDEN_BALANCE, useBalanceVisibility } from '@/lib/balance-visibility'
 
 type ContractBreakdown = {
@@ -62,7 +62,7 @@ const AssetDetail = () => {
           }),
         numberOfUnits: entry.numberOfUnits,
       }))
-      .sort((a, b) => Number(BigInt(b.numberOfUnits) - BigInt(a.numberOfUnits)))
+      .sort((a, b) => compareBigIntDesc(a.numberOfUnits, b.numberOfUnits))
 
     return {
       asset: {
@@ -128,7 +128,7 @@ const AssetDetail = () => {
     <section className="flex w-full justify-center pt-4">
       <div className="flex w-full max-w-sm flex-col gap-6 px-6 pb-6">
         {/* Header */}
-        <div className="relative flex items-center justify-center py-2">
+        <div className="relative flex items-center justify-center py-3">
           <button
             type="button"
             className="absolute left-0 cursor-pointer p-1 text-muted-foreground transition-colors hover:text-foreground"
