@@ -3,14 +3,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { useBalance, useSdk } from '@qubic-labs/react'
-import {
-  ArrowLeftIcon,
-  AlertTriangleIcon,
-  ChevronRightIcon,
-  RouteIcon,
-  SendIcon,
-  XIcon,
-} from 'lucide-react'
+import { AlertTriangleIcon, ChevronRightIcon, RouteIcon, SendIcon, XIcon } from 'lucide-react'
+import PageHeader from '@/components/page-header'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -514,17 +508,7 @@ const TransferRights = () => {
     <>
       <section className="flex w-full justify-center">
         <div className="flex min-h-[calc(100vh-64px)] w-full max-w-sm flex-col px-4">
-          {/* Header */}
-          <div className="relative flex items-center justify-center py-3">
-            <button
-              type="button"
-              className="absolute left-0 cursor-pointer p-1 text-muted-foreground transition-colors hover:text-foreground"
-              onClick={handleBack}
-            >
-              <ArrowLeftIcon className="h-5 w-5" />
-            </button>
-            <h2 className="text-lg font-semibold">{t('transferRights.title')}</h2>
-          </div>
+          <PageHeader title={t('transferRights.title')} onBack={handleBack} />
 
           {/* Form fields */}
           <div className="flex flex-1 flex-col gap-5">

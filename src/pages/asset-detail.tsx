@@ -1,7 +1,8 @@
 import { useMemo } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ArrowLeftIcon, CopyIcon, Loader2Icon, PackageIcon } from 'lucide-react'
+import { CopyIcon, Loader2Icon, PackageIcon } from 'lucide-react'
+import PageHeader from '@/components/page-header'
 import TransferRightsButton from '@/components/transfer-rights-button'
 import { useCurrentIdentity } from '@/hooks/use-current-identity'
 import { useClipboardCopy } from '@/hooks/use-clipboard-copy'
@@ -90,9 +91,12 @@ const AssetDetail = () => {
 
   if (isLoading) {
     return (
-      <section className="flex w-full justify-center pt-4">
-        <div className="flex w-full max-w-sm flex-col items-center gap-6 px-6 pt-12">
-          <Loader2Icon className="h-6 w-6 animate-spin text-muted-foreground" />
+      <section className="flex w-full justify-center">
+        <div className="flex w-full max-w-sm flex-col gap-6 px-6">
+          <PageHeader title={t('assetDetail.title')} onBack={() => navigate(-1)} />
+          <div className="flex justify-center pt-6">
+            <Loader2Icon className="h-6 w-6 animate-spin text-muted-foreground" />
+          </div>
         </div>
       </section>
     )
@@ -100,18 +104,9 @@ const AssetDetail = () => {
 
   if (!asset) {
     return (
-      <section className="flex w-full justify-center pt-4">
+      <section className="flex w-full justify-center">
         <div className="flex w-full max-w-sm flex-col gap-6 px-6">
-          <div className="relative flex items-center justify-center py-3">
-            <button
-              type="button"
-              className="absolute left-0 cursor-pointer p-1 text-muted-foreground transition-colors hover:text-foreground"
-              onClick={() => navigate(-1)}
-            >
-              <ArrowLeftIcon className="h-5 w-5" />
-            </button>
-            <h2 className="text-lg font-semibold">{t('assetDetail.title')}</h2>
-          </div>
+          <PageHeader title={t('assetDetail.title')} onBack={() => navigate(-1)} />
           {isError && <div className="text-xs text-destructive">{t('assetDetail.error')}</div>}
           {!isError && (
             <div className="flex items-center gap-3 rounded-lg border border-dashed border-border/60 bg-transparent px-3 py-3 text-xs text-muted-foreground">
@@ -125,19 +120,9 @@ const AssetDetail = () => {
   }
 
   return (
-    <section className="flex w-full justify-center pt-4">
+    <section className="flex w-full justify-center">
       <div className="flex w-full max-w-sm flex-col gap-6 px-6 pb-6">
-        {/* Header */}
-        <div className="relative flex items-center justify-center py-3">
-          <button
-            type="button"
-            className="absolute left-0 cursor-pointer p-1 text-muted-foreground transition-colors hover:text-foreground"
-            onClick={() => navigate(-1)}
-          >
-            <ArrowLeftIcon className="h-5 w-5" />
-          </button>
-          <h2 className="text-lg font-semibold">{t('assetDetail.title')}</h2>
-        </div>
+        <PageHeader title={t('assetDetail.title')} onBack={() => navigate(-1)} />
 
         {/* Asset summary */}
         <div className="space-y-3">
