@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { ArrowLeftIcon, RouteIcon } from 'lucide-react'
+import { RouteIcon } from 'lucide-react'
+import PageHeader from '@/components/page-header'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
@@ -105,19 +106,14 @@ const TransferForm = ({
   return (
     <section className="flex w-full justify-center">
       <div className="flex min-h-[calc(100vh-64px)] w-full max-w-sm flex-col px-4">
-        {/* Header */}
-        <div className="relative flex items-center justify-center py-3">
-          <button
-            type="button"
-            className="absolute left-0 cursor-pointer p-1 text-muted-foreground transition-colors hover:text-foreground"
-            onClick={() => navigate('/transfer')}
-          >
-            <ArrowLeftIcon className="h-5 w-5" />
-          </button>
-          <h2 className="text-lg font-semibold">
-            {t('transfer.title')} {selectedTokenLabel}
-          </h2>
-        </div>
+        <PageHeader
+          title={
+            <>
+              {t('transfer.title')} {selectedTokenLabel}
+            </>
+          }
+          onBack={() => navigate('/transfer')}
+        />
         {/* Form fields */}
         <div className="flex flex-1 flex-col gap-5">
           {/* Recipient */}

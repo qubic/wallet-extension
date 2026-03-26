@@ -19,6 +19,7 @@ import TransactionDetails from '../pages/transaction-details'
 import Unlock from '../pages/unlock'
 import Welcome from '../pages/welcome'
 import TransferRights from '../pages/transfer-rights'
+import AssetDetail from '../pages/asset-detail'
 import ImportWatchOnly from '../pages/accounts/import-watch-only'
 import {
   ensureUnlockTimestamp,
@@ -265,6 +266,14 @@ const AppRouter = () => {
             element={
               <AnimatedRoute>
                 <Transfer />
+              </AnimatedRoute>
+            }
+          />
+          <Route
+            path="/asset/:assetKey"
+            element={
+              <AnimatedRoute>
+                <AssetDetail />
               </AnimatedRoute>
             }
           />

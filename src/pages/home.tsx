@@ -1,17 +1,11 @@
 import { useBalance, useTransactions } from '@qubic-labs/react'
-import {
-  ArrowRightLeftIcon,
-  CopyIcon,
-  EyeIcon,
-  Loader2Icon,
-  PackageIcon,
-  RefreshCwIcon,
-} from 'lucide-react'
+import { CopyIcon, EyeIcon, Loader2Icon, PackageIcon, RefreshCwIcon } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import QRCode from 'qrcode'
 import { useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
+import TransferRightsButton from '@/components/transfer-rights-button'
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer'
 import { ReceiveIcon } from '@/components/icons/receive-icon'
 import { SendIcon } from '@/components/icons/send-icon'
@@ -282,10 +276,15 @@ const Home = () => {
               <div className="space-y-2">
                 {aggregatedAssets.map((asset) => {
                   const assetKey = `${asset.issuerIdentity}-${asset.name}`
+                  const Wrapper = isWatchOnly ? 'div' : 'button'
                   return (
-                    <div
+                    <Wrapper
                       key={assetKey}
-                      className="group flex items-center justify-between rounded-lg border border-border/40 bg-transparent px-3 py-2.5 transition-colors hover:border-primary/30 hover:bg-background/40"
+                      {...(!isWatchOnly && { type: 'button' as const })}
+                      className={`group flex w-full items-center justify-between rounded-lg border border-border/40 bg-transparent px-3 py-2.5 text-left transition-colors ${isWatchOnly ? '' : 'cursor-pointer hover:border-primary/30 hover:bg-background/40'}`}
+                      {...(!isWatchOnly && {
+                        onClick: () => navigate(`/asset/${encodeURIComponent(assetKey)}`),
+                      })}
                     >
                       <div className="min-w-0 flex flex-col">
                         <span className="truncate text-sm font-semibold leading-none text-foreground">
@@ -303,20 +302,18 @@ const Home = () => {
                             ? formatAssetUnits(asset.numberOfUnits, asset.decimals)
                             : HIDDEN_BALANCE}
                         </span>
-                        <button
-                          type="button"
-                          title={t('home.assets.manageRights')}
-                          className="cursor-pointer rounded-md p-1 text-muted-foreground opacity-0 transition-all hover:bg-primary/10 hover:text-primary group-hover:opacity-100"
-                          onClick={() =>
-                            navigate(
-                              `/transfer/manage-rights?asset=${encodeURIComponent(assetKey)}`,
-                            )
-                          }
-                        >
-                          <ArrowRightLeftIcon className="h-3.5 w-3.5" />
-                        </button>
+                        {!isWatchOnly && (
+                          <TransferRightsButton
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              navigate(
+                                `/transfer/manage-rights?asset=${encodeURIComponent(assetKey)}`,
+                              )
+                            }}
+                          />
+                        )}
                       </div>
-                    </div>
+                    </Wrapper>
                   )
                 })}
               </div>

@@ -64,8 +64,7 @@
       "empty": "No additional assets found.",
       "emptyTitle": "No assets yet",
       "error": "Unable to load assets.",
-      "unknown": "Unknown asset",
-      "manageRights": "Manage rights"
+      "unknown": "Unknown asset"
     },
     "receive": {
       "title": "Receive Qubic",
@@ -415,6 +414,18 @@
       "watchOnly": "Watch-only accounts cannot transfer rights.",
       "generic": "Transfer rights failed. Please retry."
     }
+  },
+  "assetDetail": {
+    "title": "Asset Details",
+    "issuer": "Issuer Identity",
+    "issuerCopied": "Issuer identity copied",
+    "copyFailed": "Copy failed",
+    "managingContracts": "Managing contracts",
+    "noContracts": "No managing contracts found.",
+    "unknownContract": "Contract #{{index}}",
+    "transferRights": "Transfer Management Rights",
+    "notFound": "Asset not found.",
+    "error": "Failed to load asset details."
   },
   "passphraseAuth": {
     "title": "Authentication Required",

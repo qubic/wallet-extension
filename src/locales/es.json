@@ -64,8 +64,7 @@
       "empty": "No hay activos adicionales.",
       "emptyTitle": "Sin activos aún",
       "error": "No se pudieron cargar los activos.",
-      "unknown": "Activo desconocido",
-      "manageRights": "Gestionar derechos"
+      "unknown": "Activo desconocido"
     },
     "receive": {
       "title": "Recibir Qubic",
@@ -415,6 +414,18 @@
       "watchOnly": "Las cuentas de solo lectura no pueden transferir derechos.",
       "generic": "Transferencia de derechos fallida. Intenta de nuevo."
     }
+  },
+  "assetDetail": {
+    "title": "Detalles del activo",
+    "issuer": "Identidad del emisor",
+    "issuerCopied": "Identidad del emisor copiada",
+    "copyFailed": "Error al copiar",
+    "managingContracts": "Contratos de gestión",
+    "noContracts": "No se encontraron contratos de gestión.",
+    "unknownContract": "Contrato #{{index}}",
+    "transferRights": "Transferir derechos de gestión",
+    "notFound": "Activo no encontrado.",
+    "error": "Error al cargar los detalles del activo."
   },
   "passphraseAuth": {
     "title": "Autenticación requerida",

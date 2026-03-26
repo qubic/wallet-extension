@@ -64,8 +64,7 @@
       "empty": "Keine weiteren Vermögenswerte gefunden.",
       "emptyTitle": "Noch keine Vermögenswerte",
       "error": "Vermögenswerte konnten nicht geladen werden.",
-      "unknown": "Unbekannter Vermögenswert",
-      "manageRights": "Rechte verwalten"
+      "unknown": "Unbekannter Vermögenswert"
     },
     "receive": {
       "title": "Qubic empfangen",
@@ -415,6 +414,18 @@
       "watchOnly": "Watch-Only-Konten können keine Rechte übertragen.",
       "generic": "Rechteübertragung fehlgeschlagen. Bitte erneut versuchen."
     }
+  },
+  "assetDetail": {
+    "title": "Asset-Details",
+    "issuer": "Emittenten-Identität",
+    "issuerCopied": "Emittenten-Identität kopiert",
+    "copyFailed": "Kopieren fehlgeschlagen",
+    "managingContracts": "Verwaltungsverträge",
+    "noContracts": "Keine Verwaltungsverträge gefunden.",
+    "unknownContract": "Vertrag #{{index}}",
+    "transferRights": "Verwaltungsrechte übertragen",
+    "notFound": "Asset nicht gefunden.",
+    "error": "Asset-Details konnten nicht geladen werden."
   },
   "passphraseAuth": {
     "title": "Authentifizierung erforderlich",

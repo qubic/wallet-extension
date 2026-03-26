@@ -64,8 +64,7 @@
       "empty": "Không tìm thấy tài sản bổ sung.",
       "emptyTitle": "Chưa có tài sản",
       "error": "Không thể tải tài sản.",
-      "unknown": "Tài sản không xác định",
-      "manageRights": "Quản lý quyền"
+      "unknown": "Tài sản không xác định"
     },
     "receive": {
       "title": "Nhận Qubic",
@@ -415,6 +414,18 @@
       "watchOnly": "Tài khoản chỉ xem không thể chuyển quyền.",
       "generic": "Chuyển quyền thất bại. Vui lòng thử lại."
     }
+  },
+  "assetDetail": {
+    "title": "Chi tiết tài sản",
+    "issuer": "Danh tính nhà phát hành",
+    "issuerCopied": "Đã sao chép danh tính nhà phát hành",
+    "copyFailed": "Sao chép thất bại",
+    "managingContracts": "Hợp đồng quản lý",
+    "noContracts": "Không tìm thấy hợp đồng quản lý.",
+    "unknownContract": "Hợp đồng #{{index}}",
+    "transferRights": "Chuyển quyền quản lý",
+    "notFound": "Không tìm thấy tài sản.",
+    "error": "Không thể tải chi tiết tài sản."
   },
   "passphraseAuth": {
     "title": "Yêu cầu xác thực",

@@ -64,8 +64,7 @@
       "empty": "Ek varlık bulunamadı.",
       "emptyTitle": "Henüz varlık yok",
       "error": "Varlıklar yüklenemedi.",
-      "unknown": "Bilinmeyen varlık",
-      "manageRights": "Hakları yönet"
+      "unknown": "Bilinmeyen varlık"
     },
     "receive": {
       "title": "Qubic Al",
@@ -415,6 +414,18 @@
       "watchOnly": "Yalnızca izleme hesapları hak transferi yapamaz.",
       "generic": "Hak transferi başarısız. Lütfen tekrar deneyin."
     }
+  },
+  "assetDetail": {
+    "title": "Varlık Detayları",
+    "issuer": "Yayıncı Kimliği",
+    "issuerCopied": "Yayıncı kimliği kopyalandı",
+    "copyFailed": "Kopyalama başarısız",
+    "managingContracts": "Yönetim sözleşmeleri",
+    "noContracts": "Yönetim sözleşmesi bulunamadı.",
+    "unknownContract": "Sözleşme #{{index}}",
+    "transferRights": "Yönetim Haklarını Transfer Et",
+    "notFound": "Varlık bulunamadı.",
+    "error": "Varlık detayları yüklenemedi."
   },
   "passphraseAuth": {
     "title": "Kimlik Doğrulama Gerekli",
