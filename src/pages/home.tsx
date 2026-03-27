@@ -297,7 +297,7 @@ const Home = () => {
                         )}
                       </div>
                       <div className="ml-3 flex shrink-0 items-center gap-2">
-                        <span className="text-right text-base font-semibold tabular-nums text-foreground">
+                        <span className="text-right text-base font-semibold text-foreground">
                           {isVisible
                             ? formatAssetUnits(asset.numberOfUnits, asset.decimals)
                             : HIDDEN_BALANCE}
