@@ -1,8 +1,10 @@
 import {
   type SeedVault,
+  type VaultSummary,
   type VaultStore,
   createLocalStorageVaultStore,
   openSeedVaultBrowser,
+  VaultEntryExistsError,
   VaultEntryNotFoundError,
   VaultInvalidPassphraseError,
 } from '@qubic-labs/sdk'
@@ -124,6 +126,100 @@ export const validateVaultPassphrase = async (
     }
     return { valid: false, reason: 'error' }
   }
+}
+
+type VaultAccountEntry = {
+  name: string
+  identity: string
+}
+
+const toTimestamp = (value: string): number => {
+  const parsed = Date.parse(value)
+  return Number.isFinite(parsed) ? parsed : Number.NEGATIVE_INFINITY
+}
+
+const compareVaultEntries = (
+  left: VaultSummary & { index: number },
+  right: VaultSummary & { index: number },
+) => {
+  const updatedDiff = toTimestamp(left.updatedAt) - toTimestamp(right.updatedAt)
+  if (updatedDiff !== 0) return updatedDiff
+
+  const createdDiff = toTimestamp(left.createdAt) - toTimestamp(right.createdAt)
+  if (createdDiff !== 0) return createdDiff
+
+  return left.index - right.index
+}
+
+const mapVaultAccounts = (entries: readonly VaultSummary[]): VaultAccountEntry[] =>
+  entries.map((entry) => ({ name: entry.name, identity: entry.identity }))
+
+export const repairDuplicateVaultEntries = async (
+  vault: SeedVault,
+): Promise<VaultAccountEntry[]> => {
+  const indexedEntries = vault.list().map((entry, index) => ({ ...entry, index }))
+  const entriesByIdentity = new Map<string, Array<VaultSummary & { index: number }>>()
+
+  for (const entry of indexedEntries) {
+    const existing = entriesByIdentity.get(entry.identity)
+    if (existing) {
+      existing.push(entry)
+    } else {
+      entriesByIdentity.set(entry.identity, [entry])
+    }
+  }
+
+  const duplicateEntriesToRemove: VaultSummary[] = []
+  for (const entries of entriesByIdentity.values()) {
+    if (entries.length <= 1) continue
+    let keeper = entries[0]
+    for (const entry of entries.slice(1)) {
+      if (compareVaultEntries(entry, keeper) > 0) {
+        keeper = entry
+      }
+    }
+    duplicateEntriesToRemove.push(...entries.filter((entry) => entry.name !== keeper.name))
+  }
+
+  if (duplicateEntriesToRemove.length === 0) {
+    return mapVaultAccounts(vault.list())
+  }
+
+  for (const entry of duplicateEntriesToRemove) {
+    await vault.remove(entry.name)
+  }
+  await vault.save()
+
+  return mapVaultAccounts(vault.list())
+}
+
+export const renameVaultAccountByIdentity = async (
+  vault: SeedVault,
+  identity: string,
+  nextName: string,
+): Promise<VaultAccountEntry[]> => {
+  const normalizedName = nextName.trim()
+  const entries = vault.list()
+  const currentEntry = entries.find((entry) => entry.identity === identity)
+  if (!currentEntry) {
+    throw new VaultEntryNotFoundError(identity)
+  }
+
+  const conflictingEntry = entries.find((entry) => entry.name === normalizedName)
+  if (conflictingEntry && conflictingEntry.identity !== identity) {
+    throw new VaultEntryExistsError(normalizedName)
+  }
+
+  if (currentEntry.name === normalizedName) {
+    return repairDuplicateVaultEntries(vault)
+  }
+
+  const seed = await vault.getSeed(identity)
+  await vault.remove(currentEntry.name)
+  await vault.addSeed({ name: normalizedName, seed, overwrite: false })
+  await vault.save()
+
+  return repairDuplicateVaultEntries(vault)
 }
 
 export const setOnboarded = (identity: string, name?: string) => {

@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { PasswordInput } from '@/components/ui/password-input'
 import { setUnlocked } from '@/lib/lock'
 import { saveCachedAccounts } from '@/lib/accounts'
-import { openBrowserVault } from '@/lib/vault'
+import { openBrowserVault, repairDuplicateVaultEntries } from '@/lib/vault'
 
 const Unlock = () => {
   const { t } = useTranslation()
@@ -34,7 +34,8 @@ const Unlock = () => {
       }
 
       await vault.getSeed(identityToValidate)
-      saveCachedAccounts(vault.list().map((e) => ({ name: e.name, identity: e.identity })))
+      const entries = await repairDuplicateVaultEntries(vault)
+      saveCachedAccounts(entries)
       setUnlocked()
       setPassphrase('')
       navigate('/home')
