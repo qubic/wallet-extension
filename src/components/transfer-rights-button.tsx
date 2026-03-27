@@ -1,6 +1,6 @@
-import { ArrowRightLeftIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
+import { TransferRightsIcon } from '@/components/icons/transfer-rights-icon'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
 
@@ -21,7 +21,7 @@ const TransferRightsButton = ({ onClick, className }: TransferRightsButtonProps)
           className={cn('h-8 w-8 shrink-0 text-muted-foreground', className)}
           onClick={onClick}
         >
-          <ArrowRightLeftIcon className="h-3.5 w-3.5" />
+          <TransferRightsIcon className="h-3.5 w-3.5" />
         </Button>
       </TooltipTrigger>
       <TooltipContent>{t('assetDetail.transferRights')}</TooltipContent>
