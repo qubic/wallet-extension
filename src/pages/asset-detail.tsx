@@ -132,7 +132,7 @@ const AssetDetail = () => {
             </div>
             <div className="min-w-0 flex-1">
               <div className="text-lg font-semibold text-foreground">{asset.name}</div>
-              <div className="text-2xl font-bold tabular-nums text-foreground">
+              <div className="text-2xl font-bold text-foreground">
                 {isVisible ? formatAssetUnits(asset.totalUnits, asset.decimals) : HIDDEN_BALANCE}
               </div>
             </div>
