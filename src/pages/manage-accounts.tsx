@@ -15,7 +15,13 @@ import {
   saveCachedAccounts,
   saveWatchOnlyAccounts,
 } from '@/lib/accounts'
-import { clearOnboarded, openBrowserVault, setOnboarded } from '@/lib/vault'
+import {
+  clearOnboarded,
+  openBrowserVault,
+  renameVaultAccountByIdentity,
+  repairDuplicateVaultEntries,
+  setOnboarded,
+} from '@/lib/vault'
 import AccountListItem from '@/components/pages/manage-accounts/account-list-item'
 import AddAccountDrawer from '@/components/pages/manage-accounts/add-account-drawer'
 import RenameAccountDrawer from '@/components/pages/manage-accounts/rename-account-drawer'
@@ -147,10 +153,7 @@ const ManageAccounts = () => {
     setLoading(true)
     try {
       const vault = await openBrowserVault(passphrase, false)
-      const entries = vault.list().map((entry) => ({
-        name: entry.name,
-        identity: entry.identity,
-      }))
+      const entries = await repairDuplicateVaultEntries(vault)
       saveCachedAccounts(entries)
       const watchOnly = getWatchOnlyAccounts()
       const merged = [
@@ -268,24 +271,30 @@ const ManageAccounts = () => {
           entry.identity === account.identity ? { ...entry, name: name.trim() } : entry,
         )
         saveWatchOnlyAccounts(watchOnly)
+        const updated = orderedAccounts.map((entry) =>
+          entry.identity === account.identity ? { ...entry, name: name.trim() } : entry,
+        )
+        setAccounts(updated)
         if (account.identity === currentIdentity) {
           setOnboarded(account.identity, name.trim())
         }
       } else {
         const vault = await openBrowserVault(passphrase, false)
-        const seed = await vault.getSeed(account.identity)
-        // Write first with overwrite to avoid losing the existing entry if an intermediate step fails.
-        await vault.addSeed({ name: name.trim(), seed, overwrite: true })
-        await vault.save()
+        const entries = await renameVaultAccountByIdentity(vault, account.identity, name.trim())
+        saveCachedAccounts(entries)
+        const watchOnly = getWatchOnlyAccounts()
+        setAccounts([
+          ...entries,
+          ...watchOnly.map((entry) => ({
+            name: entry.name,
+            identity: entry.identity,
+            watchOnly: true as const,
+          })),
+        ])
         if (account.identity === currentIdentity) {
           setOnboarded(account.identity, name.trim())
         }
       }
-      const updated = orderedAccounts.map((entry) =>
-        entry.identity === account.identity ? { ...entry, name: name.trim() } : entry,
-      )
-      saveCachedAccounts(updated.filter((entry) => !entry.watchOnly))
-      setAccounts(updated)
       setRenameTarget(null)
       setRenameValue('')
       setRenameError('')
