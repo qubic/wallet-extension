@@ -51,7 +51,6 @@ import {
 import { QUBIC_RPC_BASE_URL } from '@/lib/config/constants'
 import { upsertPendingTransactionInChromeStorage } from '@/lib/pending-transactions-storage'
 import { normalizeBalance } from '@/lib/utils'
-import { isWatchOnlyIdentity } from '@/lib/accounts'
 import { openBrowserVault, verifyVaultAccess } from '@/lib/vault'
 
 const sdk = createSdk({ baseUrl: QUBIC_RPC_BASE_URL })
@@ -73,6 +72,11 @@ const ensureConnected = (origin: string, permissions: DappPermissionsState) => {
     throw new DappProviderError('NOT_CONNECTED', 'Origin is not connected to wallet')
   }
 }
+
+const asDappVisibleAccount = (account: DappCurrentAccount) => ({
+  identity: account.identity,
+  name: account.name,
+})
 
 const ensureAccountApproved = (
   origin: string,
@@ -154,12 +158,7 @@ const enqueueApprovalRequest = async (request: DappExecutionRequest) => {
     origin: request.origin,
     createdAt: request.createdAt,
     params: buildApprovalParamsPreview(request.method, request.params, {
-      account: request.account
-        ? {
-            ...request.account,
-            watchOnly: isWatchOnlyIdentity(request.account.identity),
-          }
-        : undefined,
+      account: request.account,
     }),
   })
   await ensureApprovalWindow()
@@ -204,7 +203,7 @@ const getAccountForOrigin = async (origin: string) => {
   if (account && !isAccountApprovedForOrigin(origin, permissions, account.identity)) {
     return null
   }
-  return account
+  return account ? asDappVisibleAccount(account) : null
 }
 
 const requireCurrentAccount = async (): Promise<DappCurrentAccount> => {
@@ -418,9 +417,7 @@ const executeApprovedRequest = async (
     case 'signMessage':
     case 'signTransaction':
     case 'sendTransaction': {
-      const isWatchOnlyAccount = Boolean(
-        request.account?.identity && isWatchOnlyIdentity(request.account.identity),
-      )
+      const isWatchOnlyAccount = request.account?.watchOnly === true
       if (isWatchOnlyAccount) {
         return asDappFailure(request.id, 'WATCH_ONLY_ACCOUNT', 'Active account cannot sign')
       }

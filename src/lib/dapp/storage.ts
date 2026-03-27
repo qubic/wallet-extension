@@ -34,6 +34,7 @@ export const isAccountApprovedForOrigin = (
 export type DappCurrentAccount = Readonly<{
   identity: string
   name?: string
+  watchOnly?: boolean
 }>
 
 export type DappPendingRequest = Readonly<{
@@ -149,11 +150,12 @@ export const removeDappPermission = async (origin: string) => {
 export const getDappCurrentAccount = async (): Promise<DappCurrentAccount | null> => {
   const raw = await getLocalValue(DAPP_CURRENT_ACCOUNT_KEY)
   if (!raw || typeof raw !== 'object') return null
-  const entry = raw as { identity?: unknown; name?: unknown }
+  const entry = raw as { identity?: unknown; name?: unknown; watchOnly?: unknown }
   if (typeof entry.identity !== 'string' || !entry.identity) return null
   return {
     identity: entry.identity,
     name: typeof entry.name === 'string' ? entry.name : undefined,
+    watchOnly: entry.watchOnly === true ? true : undefined,
   }
 }
 
