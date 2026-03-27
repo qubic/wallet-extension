@@ -375,6 +375,7 @@
     "noDestinationContracts": "Không có hợp đồng đích đủ điều kiện.",
     "sourceContract": "Hợp đồng nguồn",
     "sourceContractPlaceholder": "Chọn hợp đồng nguồn",
+    "revokeOnlyHint": "* Tài sản được quản lý bởi {{contract}} chỉ có thể thu hồi về QX",
     "destinationContract": "Hợp đồng đích",
     "destinationContractPlaceholder": "Chọn hợp đồng đích",
     "numberOfSharesPlaceholder": "Nhập số lượng",

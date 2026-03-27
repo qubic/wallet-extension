@@ -375,6 +375,7 @@
     "noDestinationContracts": "Нет доступных контрактов назначения.",
     "sourceContract": "Исходный контракт",
     "sourceContractPlaceholder": "Выберите исходный контракт",
+    "revokeOnlyHint": "* Активы, управляемые {{contract}}, могут быть отозваны только в QX",
     "destinationContract": "Контракт назначения",
     "destinationContractPlaceholder": "Выберите контракт назначения",
     "numberOfSharesPlaceholder": "Введите количество",

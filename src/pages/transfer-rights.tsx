@@ -373,7 +373,6 @@ const TransferRights = () => {
           parsedShares,
         )
       } else {
-        if (!destinationContract) return
         payload = buildTransferRightsPayload(
           selectedGroup.issuerIdentity,
           selectedGroup.name,
@@ -626,6 +625,13 @@ const TransferRights = () => {
               )}
               {errors.destinationContract && (
                 <p className="text-xs text-destructive">{errors.destinationContract}</p>
+              )}
+              {sourceContract?.procedureType === PROCEDURE_TYPE_REVOKE && (
+                <p className="text-xs text-muted-foreground">
+                  {t('transferRights.revokeOnlyHint', {
+                    contract: sourceContract.contractName,
+                  })}
+                </p>
               )}
             </div>
 

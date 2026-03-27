@@ -375,6 +375,7 @@
     "noDestinationContracts": "Uygun hedef sözleşme bulunamadı.",
     "sourceContract": "Kaynak sözleşme",
     "sourceContractPlaceholder": "Kaynak sözleşmeyi seçin",
+    "revokeOnlyHint": "* {{contract}} tarafından yönetilen varlıklar yalnızca QX'e iptal edilebilir",
     "destinationContract": "Hedef sözleşme",
     "destinationContractPlaceholder": "Hedef sözleşmeyi seçin",
     "numberOfSharesPlaceholder": "Miktarı girin",

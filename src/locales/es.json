@@ -375,6 +375,7 @@
     "noDestinationContracts": "No hay contratos de destino elegibles disponibles.",
     "sourceContract": "Contrato de origen",
     "sourceContractPlaceholder": "Seleccionar contrato de origen",
+    "revokeOnlyHint": "* Los activos gestionados por {{contract}} solo pueden ser revocados a QX",
     "destinationContract": "Contrato de destino",
     "destinationContractPlaceholder": "Seleccionar contrato de destino",
     "numberOfSharesPlaceholder": "Ingresa la cantidad",

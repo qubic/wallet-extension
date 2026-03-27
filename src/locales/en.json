@@ -375,6 +375,7 @@
     "noDestinationContracts": "No eligible destination contracts available.",
     "sourceContract": "Source contract",
     "sourceContractPlaceholder": "Select source contract",
+    "revokeOnlyHint": "* Assets managed by {{contract}} can only be revoked to QX",
     "destinationContract": "Destination contract",
     "destinationContractPlaceholder": "Select destination contract",
     "numberOfSharesPlaceholder": "Enter the amount",

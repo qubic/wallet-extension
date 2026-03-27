@@ -375,6 +375,7 @@
     "noDestinationContracts": "没有可用的目标合约。",
     "sourceContract": "来源合约",
     "sourceContractPlaceholder": "选择来源合约",
+    "revokeOnlyHint": "* 由 {{contract}} 管理的资产只能撤销到 QX",
     "destinationContract": "目标合约",
     "destinationContractPlaceholder": "选择目标合约",
     "numberOfSharesPlaceholder": "输入数量",

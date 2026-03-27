@@ -375,6 +375,7 @@
     "noDestinationContracts": "Keine geeigneten Zielverträge verfügbar.",
     "sourceContract": "Quellvertrag",
     "sourceContractPlaceholder": "Quellvertrag auswählen",
+    "revokeOnlyHint": "* Von {{contract}} verwaltete Assets können nur an QX widerrufen werden",
     "destinationContract": "Zielvertrag",
     "destinationContractPlaceholder": "Zielvertrag auswählen",
     "numberOfSharesPlaceholder": "Gib die Menge ein",
