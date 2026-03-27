@@ -200,8 +200,8 @@ export const renameVaultAccountByIdentity = async (
 ): Promise<VaultAccountEntry[]> => {
   const normalizedName = nextName.trim()
   const entries = vault.list()
-  const currentEntry = entries.find((entry) => entry.identity === identity)
-  if (!currentEntry) {
+  const entriesForIdentity = entries.filter((entry) => entry.identity === identity)
+  if (entriesForIdentity.length === 0) {
     throw new VaultEntryNotFoundError(identity)
   }
 
@@ -210,13 +210,17 @@ export const renameVaultAccountByIdentity = async (
     throw new VaultEntryExistsError(normalizedName)
   }
 
-  if (currentEntry.name === normalizedName) {
+  const alreadyNamedEntry = entriesForIdentity.find((entry) => entry.name === normalizedName)
+  if (alreadyNamedEntry) {
     return repairDuplicateVaultEntries(vault)
   }
 
   const seed = await vault.getSeed(identity)
-  await vault.remove(currentEntry.name)
-  await vault.addSeed({ name: normalizedName, seed, overwrite: false })
+  await vault.addSeed({ name: normalizedName, seed, overwrite: true })
+  for (const entry of entriesForIdentity) {
+    if (entry.name === normalizedName) continue
+    await vault.remove(entry.name)
+  }
   await vault.save()
 
   return repairDuplicateVaultEntries(vault)
