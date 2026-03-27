@@ -476,6 +476,9 @@
       "signMessageSubtitle": "Ce site web souhaite que vous signiez un message.",
       "signTransactionSubtitle": "Ce site web souhaite que vous signiez une transaction.",
       "sendTransactionSubtitle": "Ce site web souhaite que vous signiez et diffusiez une transaction.",
+      "watchOnlySubtitle": "Cette demande ne peut pas être approuvée avec un compte en lecture seule.",
+      "watchOnlyTitle": "Les comptes en lecture seule ne peuvent pas signer",
+      "watchOnlyDescription": "{{accountName}} est un compte en lecture seule, donc ce portefeuille ne peut ni signer ni envoyer avec lui. Le site recevra une erreur de compte en lecture seule.",
       "genericSubtitle": "Vérifiez cette demande avant de continuer.",
       "messageLabel": "Message",
       "messageEmpty": "Aucun aperçu du message disponible.",
@@ -491,6 +494,7 @@
       "approve": "Approuver",
       "approveAndSend": "Approuver et envoyer",
       "reject": "Rejeter",
+      "watchOnlyDismiss": "Fermer",
       "errors": {
         "runtimeUnavailable": "L'environnement d'exécution de l'extension est indisponible.",
         "decisionFailed": "Impossible de soumettre votre décision."

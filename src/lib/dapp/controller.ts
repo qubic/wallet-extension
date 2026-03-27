@@ -73,6 +73,11 @@ const ensureConnected = (origin: string, permissions: DappPermissionsState) => {
   }
 }
 
+const asDappVisibleAccount = (account: DappCurrentAccount) => ({
+  identity: account.identity,
+  name: account.name,
+})
+
 const ensureAccountApproved = (
   origin: string,
   permissions: DappPermissionsState,
@@ -198,7 +203,7 @@ const getAccountForOrigin = async (origin: string) => {
   if (account && !isAccountApprovedForOrigin(origin, permissions, account.identity)) {
     return null
   }
-  return account
+  return account ? asDappVisibleAccount(account) : null
 }
 
 const requireCurrentAccount = async (): Promise<DappCurrentAccount> => {
@@ -412,6 +417,10 @@ const executeApprovedRequest = async (
     case 'signMessage':
     case 'signTransaction':
     case 'sendTransaction': {
+      const isWatchOnlyAccount = request.account?.watchOnly === true
+      if (isWatchOnlyAccount) {
+        return asDappFailure(request.id, 'WATCH_ONLY_ACCOUNT', 'Active account cannot sign')
+      }
       if (!decision.approved) {
         return asDappFailure(request.id, 'USER_REJECTED', 'Request was rejected by user')
       }

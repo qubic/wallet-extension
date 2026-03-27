@@ -476,6 +476,9 @@
       "signMessageSubtitle": "This website wants you to sign a message.",
       "signTransactionSubtitle": "This website wants you to sign a transaction.",
       "sendTransactionSubtitle": "This website wants you to sign and broadcast a transaction.",
+      "watchOnlySubtitle": "This request cannot be approved with a watch-only account.",
+      "watchOnlyTitle": "Watch-only accounts can't sign",
+      "watchOnlyDescription": "{{accountName}} is watch-only, so this wallet cannot sign or send with it. The website will receive a watch-only account error.",
       "genericSubtitle": "Review this request before continuing.",
       "messageLabel": "Message",
       "messageEmpty": "No message preview available.",
@@ -491,6 +494,7 @@
       "approve": "Approve",
       "approveAndSend": "Approve & Send",
       "reject": "Reject",
+      "watchOnlyDismiss": "Close",
       "errors": {
         "runtimeUnavailable": "Extension runtime is unavailable.",
         "decisionFailed": "Could not submit your decision."

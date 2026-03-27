@@ -1,3 +1,4 @@
+import { isWatchOnlyIdentity } from '@/lib/accounts'
 import { getChromeLocalStorage } from '@/lib/dapp/chrome-api'
 import { DAPP_CURRENT_ACCOUNT_KEY } from '@/lib/dapp/storage'
 
@@ -10,7 +11,11 @@ const readCurrentAccount = () => {
   const identity = localStorage.getItem('currentIdentity') ?? ''
   const name = localStorage.getItem('currentAccountName') ?? undefined
   if (!identity) return null
-  return { identity, name }
+  return {
+    identity,
+    name,
+    watchOnly: isWatchOnlyIdentity(identity) ? true : undefined,
+  }
 }
 
 export const syncDappCurrentAccountSnapshotFromLocalState = async () => {

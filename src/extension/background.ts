@@ -146,7 +146,13 @@ const broadcastAccountChangedPerOrigin = async () => {
     const isApproved =
       newAccount &&
       isAccountApprovedForOrigin(normalizedTabOrigin, permissions, newAccount.identity)
-    const eventPayload = isApproved ? newAccount : null
+    const eventPayload =
+      isApproved && newAccount
+        ? {
+            identity: newAccount.identity,
+            name: newAccount.name,
+          }
+        : null
 
     try {
       await chrome.tabs.sendMessage(tab.id, {
