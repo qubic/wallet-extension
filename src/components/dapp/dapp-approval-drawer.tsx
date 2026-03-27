@@ -18,6 +18,7 @@ import {
 } from '@/lib/dapp/storage'
 import { RUNTIME_APPROVAL_DECISION_TYPE } from '@/lib/dapp/protocol'
 import {
+  getApprovalAccountSummary,
   getApprovalConnectSummary,
   getApprovalMessagePreview,
   getApprovalTxSummary,
@@ -91,10 +92,21 @@ const DappApprovalDrawer = () => {
     () => getApprovalConnectSummary(current?.params),
     [current?.params],
   )
+  const accountSummary = useMemo(
+    () => getApprovalAccountSummary(current?.params),
+    [current?.params],
+  )
   const txSummary = useMemo(() => getApprovalTxSummary(current?.params), [current?.params])
   const txTypeDescription = useTxTypeDescription(
     txSummary?.toIdentity ?? '',
     Number(txSummary?.inputType ?? 0),
+  )
+  const isWatchOnlySigningRequest = Boolean(
+    current &&
+      (current.method === 'signMessage' ||
+        current.method === 'signTransaction' ||
+        current.method === 'sendTransaction') &&
+      accountSummary?.accountWatchOnly,
   )
 
   const title = useMemo(() => {
@@ -115,6 +127,9 @@ const DappApprovalDrawer = () => {
 
   const subtitle = useMemo(() => {
     if (!current) return ''
+    if (isWatchOnlySigningRequest) {
+      return t('dapp.approval.watchOnlySubtitle')
+    }
     switch (current.method) {
       case 'connect':
         return t('dapp.approval.connectSubtitle')
@@ -127,7 +142,7 @@ const DappApprovalDrawer = () => {
       default:
         return t('dapp.approval.genericSubtitle')
     }
-  }, [current, t])
+  }, [current, isWatchOnlySigningRequest, t])
 
   const faviconUrl = useMemo(() => {
     if (!current?.origin) return null
@@ -354,7 +369,20 @@ const DappApprovalDrawer = () => {
                   )}
                 </div>
               )}
-            {requiresPassphrase && (
+            {isWatchOnlySigningRequest && accountSummary && (
+              <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3">
+                <p className="text-sm font-medium text-foreground">
+                  {t('dapp.approval.watchOnlyTitle')}
+                </p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {t('dapp.approval.watchOnlyDescription', {
+                    accountName:
+                      accountSummary.accountName || t('dapp.approval.sharedAccountFallback'),
+                  })}
+                </p>
+              </div>
+            )}
+            {requiresPassphrase && !isWatchOnlySigningRequest && (
               <PasswordInput
                 id="dapp-passphrase"
                 groupClassName="h-12"
@@ -376,21 +404,25 @@ const DappApprovalDrawer = () => {
             variant="outline"
             onClick={() => void submitDecision(false)}
             disabled={loading || !current}
-            className="w-full gap-2"
+            className={`w-full gap-2 ${isWatchOnlySigningRequest ? 'col-span-2' : ''}`}
           >
             <Link2OffIcon className="h-4 w-4" />
-            {t('dapp.approval.reject')}
+            {isWatchOnlySigningRequest
+              ? t('dapp.approval.watchOnlyDismiss')
+              : t('dapp.approval.reject')}
           </Button>
-          <Button
-            onClick={() => void submitDecision(true)}
-            disabled={loading || !current}
-            className="w-full gap-2"
-          >
-            <LinkIcon className="h-4 w-4" />
-            {current?.method === 'sendTransaction'
-              ? t('dapp.approval.approveAndSend')
-              : t('dapp.approval.approve')}
-          </Button>
+          {!isWatchOnlySigningRequest && (
+            <Button
+              onClick={() => void submitDecision(true)}
+              disabled={loading || !current}
+              className="w-full gap-2"
+            >
+              <LinkIcon className="h-4 w-4" />
+              {current?.method === 'sendTransaction'
+                ? t('dapp.approval.approveAndSend')
+                : t('dapp.approval.approve')}
+            </Button>
+          )}
         </DrawerFooter>
       </DrawerContent>
     </Drawer>

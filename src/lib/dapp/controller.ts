@@ -51,6 +51,7 @@ import {
 import { QUBIC_RPC_BASE_URL } from '@/lib/config/constants'
 import { upsertPendingTransactionInChromeStorage } from '@/lib/pending-transactions-storage'
 import { normalizeBalance } from '@/lib/utils'
+import { isWatchOnlyIdentity } from '@/lib/accounts'
 import { openBrowserVault, verifyVaultAccess } from '@/lib/vault'
 
 const sdk = createSdk({ baseUrl: QUBIC_RPC_BASE_URL })
@@ -153,7 +154,12 @@ const enqueueApprovalRequest = async (request: DappExecutionRequest) => {
     origin: request.origin,
     createdAt: request.createdAt,
     params: buildApprovalParamsPreview(request.method, request.params, {
-      account: request.account,
+      account: request.account
+        ? {
+            ...request.account,
+            watchOnly: isWatchOnlyIdentity(request.account.identity),
+          }
+        : undefined,
     }),
   })
   await ensureApprovalWindow()
@@ -412,6 +418,12 @@ const executeApprovedRequest = async (
     case 'signMessage':
     case 'signTransaction':
     case 'sendTransaction': {
+      const isWatchOnlyAccount = Boolean(
+        request.account?.identity && isWatchOnlyIdentity(request.account.identity),
+      )
+      if (isWatchOnlyAccount) {
+        return asDappFailure(request.id, 'WATCH_ONLY_ACCOUNT', 'Active account cannot sign')
+      }
       if (!decision.approved) {
         return asDappFailure(request.id, 'USER_REJECTED', 'Request was rejected by user')
       }
