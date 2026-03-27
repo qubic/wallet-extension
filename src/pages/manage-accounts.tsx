@@ -295,12 +295,6 @@ const ManageAccounts = () => {
           setOnboarded(account.identity, name.trim())
         }
       }
-      if (account.watchOnly) {
-        const updated = orderedAccounts.map((entry) =>
-          entry.identity === account.identity ? { ...entry, name: name.trim() } : entry,
-        )
-        saveCachedAccounts(updated.filter((entry) => !entry.watchOnly))
-      }
       setRenameTarget(null)
       setRenameValue('')
       setRenameError('')
