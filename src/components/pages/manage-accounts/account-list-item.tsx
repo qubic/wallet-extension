@@ -80,7 +80,7 @@ const AccountListItem = ({
           <div className="flex items-center gap-2">
             <span className="truncate text-sm font-semibold text-foreground">{account.name}</span>
             {account.watchOnly && (
-              <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-1.5 py-0.5 text-[10px] text-amber-200">
+              <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-1.5 py-0.5 text-[10px] text-amber-700 dark:text-amber-200">
                 <EyeIcon className="h-2.5 w-2.5" />
                 {t('accounts.manage.watchOnly')}
               </span>
