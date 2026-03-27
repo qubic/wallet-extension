@@ -4,9 +4,10 @@ import { buildExplorerObjectUrl } from '@/lib/utils'
 
 type TxDetailsHeaderProps = {
   hash: string
+  tick?: number
 }
 
-const TxDetailsHeader = ({ hash }: TxDetailsHeaderProps) => {
+const TxDetailsHeader = ({ hash, tick }: TxDetailsHeaderProps) => {
   const { t } = useTranslation()
 
   return (
@@ -16,7 +17,7 @@ const TxDetailsHeader = ({ hash }: TxDetailsHeaderProps) => {
       </div>
       <div className="flex justify-end">
         <a
-          href={buildExplorerObjectUrl('tx', hash)}
+          href={buildExplorerObjectUrl('tx', hash, tick ? { tick } : undefined)}
           target="_blank"
           rel="noreferrer"
           className="inline-flex h-8 items-center gap-1 rounded-md border border-border/50 px-2 text-xs text-muted-foreground transition-colors hover:text-foreground"
