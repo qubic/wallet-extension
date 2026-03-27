@@ -4,7 +4,7 @@ import type { useTransactions } from '@qubic-labs/react'
 import { motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import AddressLabel from '@/components/address-label'
-import { formatBalanceCompact } from '@/lib/utils'
+import { formatBalanceCompact, toTimestampMs } from '@/lib/utils'
 import { getTransactionPresentation } from '@/lib/transaction-presentation'
 import { HIDDEN_BALANCE, useBalanceVisibility } from '@/lib/balance-visibility'
 import {
@@ -122,7 +122,7 @@ const TransactionsPreview = ({
                 if (isFailed) return t('history.failed')
                 const ts = Number(tx.timestamp)
                 if (!ts) return '--'
-                const date = new Date(ts > 1e12 ? ts : ts * 1000)
+                const date = new Date(toTimestampMs(ts))
                 const now = new Date()
                 if (date.toDateString() === now.toDateString()) return t('history.today')
                 const yesterday = new Date(now)

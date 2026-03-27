@@ -43,6 +43,14 @@ const compactFormatter = new Intl.NumberFormat('en', {
 })
 
 /**
+ * Normalize a numeric timestamp to milliseconds.
+ * Timestamps below 1e12 are treated as seconds and multiplied by 1000.
+ */
+const SECONDS_VS_MILLIS_THRESHOLD = 1e12
+export const toTimestampMs = (ts: number): number =>
+  ts > SECONDS_VS_MILLIS_THRESHOLD ? ts : ts * 1000
+
+/**
  * Format a number with commas (e.g. 1,000,000). Use for any numeric display.
  */
 export const formatNumber = (value: number | bigint): string => {
@@ -126,10 +134,21 @@ export const compareBigIntDesc = (a: string, b: string): number => {
   return diff > 0n ? 1 : diff < 0n ? -1 : 0
 }
 
-export function buildExplorerObjectUrl(object: ExplorerObject, id: string) {
+export function buildExplorerObjectUrl(
+  object: ExplorerObject,
+  id: string,
+  params?: Record<string, string | number>,
+) {
   const pathMap: Record<ExplorerObject, string> = {
     tx: 'network/tx',
   }
 
-  return `${QUBIC_EXPLORER_BASE_URL}/${pathMap[object]}/${id}`
+  const url = `${QUBIC_EXPLORER_BASE_URL}/${pathMap[object]}/${id}`
+  if (!params) return url
+
+  const searchParams = new URLSearchParams()
+  for (const [key, value] of Object.entries(params)) {
+    searchParams.set(key, String(value))
+  }
+  return `${url}?${searchParams.toString()}`
 }

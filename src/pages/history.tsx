@@ -8,6 +8,7 @@ import {
   buildExplorerObjectUrl,
   formatBalanceCompact,
   formatNumber,
+  toTimestampMs,
   truncateString,
 } from '@/lib/utils'
 import { useTranslation } from 'react-i18next'
@@ -155,7 +156,7 @@ const History = () => {
 
     for (const tx of apiItems) {
       const ts = Number(tx.timestamp)
-      const date = new Date(ts > 1e12 ? ts : ts * 1000)
+      const date = new Date(toTimestampMs(ts))
       const key = date.toDateString()
       const group = groupMap.get(key)
       if (group) {
