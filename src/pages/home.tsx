@@ -191,7 +191,7 @@ const Home = () => {
             </div>
             {isWatchOnly && (
               <div className="flex items-center justify-center gap-2">
-                <div className="inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-1 text-[11px] text-amber-200">
+                <div className="inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-1 text-[11px] text-amber-700 dark:text-amber-200">
                   <EyeIcon className="h-3.5 w-3.5" />
                   {t('home.watchOnly.title')}
                 </div>
