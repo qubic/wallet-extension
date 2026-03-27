@@ -476,6 +476,9 @@
       "signMessageSubtitle": "Diese Website möchte, dass du eine Nachricht signierst.",
       "signTransactionSubtitle": "Diese Website möchte, dass du eine Transaktion signierst.",
       "sendTransactionSubtitle": "Diese Website möchte, dass du eine Transaktion signierst und sendest.",
+      "watchOnlySubtitle": "Diese Anfrage kann mit einem Watch-Only-Konto nicht genehmigt werden.",
+      "watchOnlyTitle": "Watch-Only-Konten können nicht signieren",
+      "watchOnlyDescription": "{{accountName}} ist ein Watch-Only-Konto. Dieses Wallet kann damit weder signieren noch senden. Die Website erhält einen Watch-Only-Konto-Fehler.",
       "genericSubtitle": "Überprüfe diese Anfrage, bevor du fortfährst.",
       "messageLabel": "Nachricht",
       "messageEmpty": "Keine Nachrichtenvorschau verfügbar.",
@@ -491,6 +494,7 @@
       "approve": "Genehmigen",
       "approveAndSend": "Genehmigen & senden",
       "reject": "Ablehnen",
+      "watchOnlyDismiss": "Schließen",
       "errors": {
         "runtimeUnavailable": "Erweiterungs-Runtime ist nicht verfügbar.",
         "decisionFailed": "Entscheidung konnte nicht übermittelt werden."

@@ -476,6 +476,9 @@
       "signMessageSubtitle": "Bu web sitesi bir mesaj imzalamanızı istiyor.",
       "signTransactionSubtitle": "Bu web sitesi bir işlem imzalamanızı istiyor.",
       "sendTransactionSubtitle": "Bu web sitesi bir işlemi imzalayıp yayınlamanızı istiyor.",
+      "watchOnlySubtitle": "Bu istek salt izleme hesabıyla onaylanamaz.",
+      "watchOnlyTitle": "Salt izleme hesapları imzalayamaz",
+      "watchOnlyDescription": "{{accountName}} salt izleme hesabıdır, bu nedenle cüzdan bununla imza atamaz veya gönderim yapamaz. Web sitesi salt izleme hesabı hatası alacaktır.",
       "genericSubtitle": "Devam etmeden önce bu isteği gözden geçirin.",
       "messageLabel": "Mesaj",
       "messageEmpty": "Mesaj önizlemesi mevcut değil.",
@@ -491,6 +494,7 @@
       "approve": "Onayla",
       "approveAndSend": "Onayla ve Gönder",
       "reject": "Reddet",
+      "watchOnlyDismiss": "Kapat",
       "errors": {
         "runtimeUnavailable": "Uzantı çalışma ortamı kullanılamıyor.",
         "decisionFailed": "Kararınız gönderilemedi."

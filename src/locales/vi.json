@@ -476,6 +476,9 @@
       "signMessageSubtitle": "Trang web này muốn bạn ký một tin nhắn.",
       "signTransactionSubtitle": "Trang web này muốn bạn ký một giao dịch.",
       "sendTransactionSubtitle": "Trang web này muốn bạn ký và truyền một giao dịch.",
+      "watchOnlySubtitle": "Yêu cầu này không thể được chấp thuận bằng tài khoản chỉ xem.",
+      "watchOnlyTitle": "Tài khoản chỉ xem không thể ký",
+      "watchOnlyDescription": "{{accountName}} là tài khoản chỉ xem, vì vậy ví này không thể ký hoặc gửi bằng tài khoản đó. Trang web sẽ nhận lỗi tài khoản chỉ xem.",
       "genericSubtitle": "Xem lại yêu cầu này trước khi tiếp tục.",
       "messageLabel": "Tin nhắn",
       "messageEmpty": "Không có bản xem trước tin nhắn.",
@@ -491,6 +494,7 @@
       "approve": "Chấp thuận",
       "approveAndSend": "Chấp thuận và gửi",
       "reject": "Từ chối",
+      "watchOnlyDismiss": "Đóng",
       "errors": {
         "runtimeUnavailable": "Môi trường chạy của tiện ích mở rộng không khả dụng.",
         "decisionFailed": "Không thể gửi quyết định của bạn."

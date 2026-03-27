@@ -476,6 +476,9 @@
       "signMessageSubtitle": "此网站请求您签署一条消息。",
       "signTransactionSubtitle": "此网站请求您签署一笔交易。",
       "sendTransactionSubtitle": "此网站请求您签署并广播一笔交易。",
+      "watchOnlySubtitle": "此请求无法使用仅观察账户批准。",
+      "watchOnlyTitle": "仅观察账户无法签名",
+      "watchOnlyDescription": "{{accountName}} 是仅观察账户，因此此钱包无法使用它进行签名或发送。网站将收到仅观察账户错误。",
       "genericSubtitle": "继续前请审核此请求。",
       "messageLabel": "消息",
       "messageEmpty": "无消息预览。",
@@ -491,6 +494,7 @@
       "approve": "批准",
       "approveAndSend": "批准并发送",
       "reject": "拒绝",
+      "watchOnlyDismiss": "关闭",
       "errors": {
         "runtimeUnavailable": "扩展程序运行时不可用。",
         "decisionFailed": "无法提交您的决定。"

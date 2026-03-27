@@ -476,6 +476,9 @@
       "signMessageSubtitle": "Este sitio quiere que firmes un mensaje.",
       "signTransactionSubtitle": "Este sitio quiere que firmes una transacción.",
       "sendTransactionSubtitle": "Este sitio quiere que firmes y envíes una transacción a la red.",
+      "watchOnlySubtitle": "Esta solicitud no se puede aprobar con una cuenta de solo lectura.",
+      "watchOnlyTitle": "Las cuentas de solo lectura no pueden firmar",
+      "watchOnlyDescription": "{{accountName}} es una cuenta de solo lectura, por lo que esta wallet no puede firmar ni enviar con ella. El sitio web recibirá un error de cuenta de solo lectura.",
       "genericSubtitle": "Revisa esta solicitud antes de continuar.",
       "messageLabel": "Mensaje",
       "messageEmpty": "No hay vista previa del mensaje.",
@@ -491,6 +494,7 @@
       "approve": "Aprobar",
       "approveAndSend": "Aprobar y enviar",
       "reject": "Rechazar",
+      "watchOnlyDismiss": "Cerrar",
       "errors": {
         "runtimeUnavailable": "El runtime de la extensión no está disponible.",
         "decisionFailed": "No se pudo enviar tu decisión."
