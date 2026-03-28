@@ -1,6 +1,7 @@
 export type SmartContractProcedure = {
   id: number
   name: string
+  sourceIdentifier?: string
   fee?: number
 }
 

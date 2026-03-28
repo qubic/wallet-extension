@@ -8,6 +8,7 @@ import { useCurrentIdentity } from '@/hooks/use-current-identity'
 import { useClipboardCopy } from '@/hooks/use-clipboard-copy'
 import { formatAssetUnits, getAssetsPerContract, useOwnedAssets } from '@/lib/assets'
 import { useSmartContracts } from '@/lib/qubic-static'
+import { hasManagementRightsProcedure } from '@/lib/transfer-rights'
 import { compareBigIntDesc, truncateString } from '@/lib/utils'
 import { HIDDEN_BALANCE, useBalanceVisibility } from '@/lib/balance-visibility'
 
@@ -15,6 +16,7 @@ type ContractBreakdown = {
   contractIndex: number
   contractName: string
   numberOfUnits: string
+  hasManagementRights: boolean
 }
 
 const AssetDetail = () => {
@@ -29,9 +31,12 @@ const AssetDetail = () => {
   const { isVisible } = useBalanceVisibility()
 
   const contractsMap = useMemo(() => {
-    const map = new Map<number, string>()
+    const map = new Map<number, { name: string; hasManagementRights: boolean }>()
     for (const sc of smartContracts.data ?? []) {
-      map.set(sc.contractIndex, sc.name)
+      map.set(sc.contractIndex, {
+        name: sc.name,
+        hasManagementRights: hasManagementRightsProcedure(sc),
+      })
     }
     return map
   }, [smartContracts.data])
@@ -54,15 +59,19 @@ const AssetDetail = () => {
     const totalUnits = matching.reduce((sum, c) => sum + BigInt(c.numberOfUnits), 0n).toString()
 
     const breakdown: ContractBreakdown[] = matching
-      .map((entry) => ({
-        contractIndex: entry.managingContractIndex,
-        contractName:
-          contractsMap.get(entry.managingContractIndex) ??
-          t('assetDetail.unknownContract', {
-            index: entry.managingContractIndex,
-          }),
-        numberOfUnits: entry.numberOfUnits,
-      }))
+      .map((entry) => {
+        const sc = contractsMap.get(entry.managingContractIndex)
+        return {
+          contractIndex: entry.managingContractIndex,
+          contractName:
+            sc?.name ??
+            t('assetDetail.unknownContract', {
+              index: entry.managingContractIndex,
+            }),
+          numberOfUnits: entry.numberOfUnits,
+          hasManagementRights: sc?.hasManagementRights ?? false,
+        }
+      })
       .sort((a, b) => compareBigIntDesc(a.numberOfUnits, b.numberOfUnits))
 
     return {
@@ -184,14 +193,16 @@ const AssetDetail = () => {
                       : HIDDEN_BALANCE}
                   </div>
                 </div>
-                <TransferRightsButton
-                  className="ml-2"
-                  onClick={() =>
-                    navigate(
-                      `/transfer/manage-rights?asset=${encodeURIComponent(decodedAssetKey)}&contractIndex=${contract.contractIndex}`,
-                    )
-                  }
-                />
+                {contract.hasManagementRights && (
+                  <TransferRightsButton
+                    className="ml-2"
+                    onClick={() =>
+                      navigate(
+                        `/transfer/manage-rights?asset=${encodeURIComponent(decodedAssetKey)}&contractIndex=${contract.contractIndex}`,
+                      )
+                    }
+                  />
+                )}
               </div>
             ))}
           </div>

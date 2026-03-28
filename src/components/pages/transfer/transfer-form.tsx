@@ -232,9 +232,12 @@ const TransferForm = ({
 
           {/* Asset transfer fee info */}
           {selectedAsset && (
-            <div className="rounded-lg border border-border/40 px-3 py-2 text-xs text-muted-foreground">
-              <div>{t('transfer.form.feeValue', { fee: '100' })}</div>
-              <div>{t('transfer.form.quBalance', { balance: formatBalance(quBalance) })}</div>
+            <div className="space-y-1.5">
+              <div className="rounded-lg border border-border/40 px-3 py-2 text-xs text-muted-foreground">
+                <div>{t('transfer.form.feeValue', { fee: '100' })}</div>
+                <div>{t('transfer.form.quBalance', { balance: formatBalance(quBalance) })}</div>
+              </div>
+              {errors.fee && <p className="text-xs text-destructive">{errors.fee}</p>}
             </div>
           )}
 
