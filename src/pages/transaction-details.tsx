@@ -48,6 +48,7 @@ const TransactionDetails = () => {
   const archiverProcessedTick = lastProcessedTickQuery.data?.tickNumber
   const pending = getPendingTransaction(hash)
   const isPending = pending?.status === 'pending'
+  const isFailed = pending?.status === 'failed'
 
   const txQuery = useQuery({
     queryKey: ['qubic', 'tx-by-hash', hash],
@@ -163,6 +164,9 @@ const TransactionDetails = () => {
           <div className="animate-pulse text-xs text-amber-700 dark:text-amber-300">
             {t('txDetails.pendingHint')}
           </div>
+        )}
+        {isFailed && !details && (
+          <div className="text-xs text-destructive">{t('txDetails.failedHint')}</div>
         )}
 
         {(details || pending) && (

@@ -419,8 +419,9 @@ const History = () => {
                     return (
                       <motion.div
                         key={tx.hash}
-                        className="w-full space-y-3 rounded-xl border border-red-500/50 bg-red-500/10 px-3 py-3 text-left transition-colors"
+                        className="w-full cursor-pointer space-y-3 rounded-xl border border-red-500/50 bg-red-500/10 px-3 py-3 text-left transition-colors"
                         variants={itemMotion}
+                        onClick={() => navigate(`/tx/${tx.hash}`)}
                       >
                         <div className="flex items-center justify-between gap-3">
                           <div className="flex items-center gap-3">
@@ -446,11 +447,12 @@ const History = () => {
                                 <button
                                   type="button"
                                   className="cursor-pointer text-[11px] font-semibold uppercase tracking-wide text-primary hover:underline"
-                                  onClick={() =>
+                                  onClick={(e) => {
+                                    e.stopPropagation()
                                     navigate(
                                       `/transfer/send?recipient=${encodeURIComponent(tx.destination)}&amount=${encodeURIComponent(tx.amount.toString())}&token=${encodeURIComponent(tx.tokenKey ?? 'qu')}`,
                                     )
-                                  }
+                                  }}
                                 >
                                   {t('history.resend')}
                                 </button>
@@ -458,7 +460,10 @@ const History = () => {
                               <button
                                 type="button"
                                 className="cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
-                                onClick={() => removePendingTransaction(tx.hash)}
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  removePendingTransaction(tx.hash)
+                                }}
                                 aria-label={t('history.deleteFailed')}
                                 title={t('history.deleteFailed')}
                               >

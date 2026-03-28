@@ -303,7 +303,8 @@
     "timestamp": "Horodatage",
     "openExplorer": "Ouvrir dans l'explorateur",
     "pending": "En attente",
-    "pendingHint": "Cette transaction est toujours en attente de confirmation sur les ticks du réseau."
+    "pendingHint": "Cette transaction est encore en attente de confirmation sur les ticks du réseau.",
+    "failedHint": "Cette transaction n'a pas été confirmée dans le tick cible et a échoué."
   },
   "transfer": {
     "title": "Envoyer",
