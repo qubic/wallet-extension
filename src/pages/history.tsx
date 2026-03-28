@@ -58,7 +58,7 @@ type HistoryRowTransaction = {
   tokenKey?: string
 }
 
-type HistoryRowState = 'default' | 'pending' | 'failed'
+type HistoryRowState = 'default' | 'pending' | 'failed' | 'not-approved'
 
 const TxTypeLabel = ({ destination, inputType }: { destination: string; inputType: number }) => {
   const description = useTxTypeDescription(destination, inputType)
@@ -136,7 +136,7 @@ const History = () => {
     [pendingItems],
   )
   const failedTopItems = useMemo(
-    () => pendingItems.filter((tx) => tx.status === 'failed'),
+    () => pendingItems.filter((tx) => tx.status === 'failed' || tx.status === 'not-approved'),
     [pendingItems],
   )
 
@@ -409,6 +409,7 @@ const History = () => {
                   {failedTopItems.map((tx) => {
                     const { label, counterparty, Icon, addressPrefix, amountSign } =
                       getRowPresentation(tx)
+                    const isNotApproved = tx.status === 'not-approved'
                     const canResend = canResendPendingTransaction({
                       status: tx.status,
                       destinationIdentity: tx.destination,
@@ -435,6 +436,11 @@ const History = () => {
                                 prefix={addressPrefix}
                                 className="text-xs text-muted-foreground"
                               />
+                              {isNotApproved && (
+                                <span className="text-[11px] text-red-700 dark:text-red-300">
+                                  {t('history.notApproved')}
+                                </span>
+                              )}
                             </div>
                           </div>
                           <div className="flex items-center gap-2">

@@ -282,6 +282,7 @@
     "unconfirmedMore": "+{{count}} non confirmées supplémentaires",
     "confirmed": "Confirmé",
     "failed": "Échoué",
+    "notApproved": "Non approuvé",
     "resend": "Renvoyer",
     "deleteFailed": "Supprimer la transaction échouée",
     "today": "Aujourd'hui",
@@ -304,7 +305,8 @@
     "openExplorer": "Ouvrir dans l'explorateur",
     "pending": "En attente",
     "pendingHint": "Cette transaction est encore en attente de confirmation sur les ticks du réseau.",
-    "failedHint": "Cette transaction n'a pas été confirmée dans le tick cible et a échoué."
+    "failedHint": "Cette transaction n'a pas été confirmée dans le tick cible et a échoué.",
+    "notApprovedHint": "Cette transaction a été incluse dans un bloc mais n'a pas été approuvée par le réseau. Les fonds n'ont pas été transférés."
   },
   "transfer": {
     "title": "Envoyer",
