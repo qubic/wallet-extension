@@ -4,7 +4,7 @@ import type { useTransactions } from '@qubic-labs/react'
 import { motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import AddressLabel from '@/components/address-label'
-import { formatBalanceCompact } from '@/lib/utils'
+import { formatBalanceCompact, toTimestampMs } from '@/lib/utils'
 import { getTransactionPresentation } from '@/lib/transaction-presentation'
 import { HIDDEN_BALANCE, useBalanceVisibility } from '@/lib/balance-visibility'
 import {
@@ -122,7 +122,7 @@ const TransactionsPreview = ({
                 if (isFailed) return t('history.failed')
                 const ts = Number(tx.timestamp)
                 if (!ts) return '--'
-                const date = new Date(ts > 1e12 ? ts : ts * 1000)
+                const date = new Date(toTimestampMs(ts))
                 const now = new Date()
                 if (date.toDateString() === now.toDateString()) return t('history.today')
                 const yesterday = new Date(now)
@@ -157,7 +157,10 @@ const TransactionsPreview = ({
                 <button
                   type="button"
                   className="cursor-pointer text-[11px] font-semibold uppercase tracking-wide text-primary hover:underline"
-                  onClick={() => onResend(tx.hash, tx.destination, tx.amount, tx.tokenKey)}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onResend(tx.hash, tx.destination, tx.amount, tx.tokenKey)
+                  }}
                 >
                   {t('history.resend')}
                 </button>
@@ -165,7 +168,10 @@ const TransactionsPreview = ({
               <button
                 type="button"
                 className="cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
-                onClick={() => removePendingTransaction(tx.hash)}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  removePendingTransaction(tx.hash)
+                }}
                 aria-label={t('history.deleteFailed')}
                 title={t('history.deleteFailed')}
               >
@@ -174,14 +180,12 @@ const TransactionsPreview = ({
             </div>
           )}
         </div>
-        {!isFailed && (
-          <button
-            type="button"
-            className="absolute inset-0 cursor-pointer rounded-xl"
-            aria-label={t('txDetails.title')}
-            onClick={() => onOpenTx(tx.hash)}
-          />
-        )}
+        <button
+          type="button"
+          className="absolute inset-0 cursor-pointer rounded-xl"
+          aria-label={t('txDetails.title')}
+          onClick={() => onOpenTx(tx.hash)}
+        />
       </motion.div>
     )
   }

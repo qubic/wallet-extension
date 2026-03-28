@@ -303,7 +303,8 @@
     "timestamp": "Timestamp",
     "openExplorer": "Open in explorer",
     "pending": "Pending",
-    "pendingHint": "This transaction is still pending confirmation on network ticks."
+    "pendingHint": "This transaction is still pending confirmation on network ticks.",
+    "failedHint": "This transaction was not confirmed within the target tick and has failed."
   },
   "transfer": {
     "title": "Send",

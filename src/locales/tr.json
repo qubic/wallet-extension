@@ -303,7 +303,8 @@
     "timestamp": "Zaman damgası",
     "openExplorer": "Gezginde aç",
     "pending": "Onay Bekliyor",
-    "pendingHint": "Bu işlem hâlâ ağ tick'lerinde onay bekliyor."
+    "pendingHint": "Bu işlem hâlâ ağ tikleri üzerinde onay bekliyor.",
+    "failedHint": "Bu işlem hedef tick içinde onaylanmadı ve başarısız oldu."
   },
   "transfer": {
     "title": "Gönder",

@@ -303,7 +303,8 @@
     "timestamp": "Thời gian",
     "openExplorer": "Mở trong Explorer",
     "pending": "Đang chờ",
-    "pendingHint": "Giao dịch này vẫn đang chờ xác nhận trên các tick của mạng."
+    "pendingHint": "Giao dịch này vẫn đang chờ xác nhận trên các tick mạng.",
+    "failedHint": "Giao dịch này không được xác nhận trong tick mục tiêu và đã thất bại."
   },
   "transfer": {
     "title": "Gửi",

@@ -303,7 +303,8 @@
     "timestamp": "Zeitstempel",
     "openExplorer": "Im Explorer öffnen",
     "pending": "Ausstehend",
-    "pendingHint": "Diese Transaktion wartet noch auf Bestätigung in den Netzwerk-Ticks."
+    "pendingHint": "Diese Transaktion wartet noch auf Bestätigung in den Netzwerk-Ticks.",
+    "failedHint": "Diese Transaktion wurde nicht innerhalb des Ziel-Ticks bestätigt und ist fehlgeschlagen."
   },
   "transfer": {
     "title": "Senden",

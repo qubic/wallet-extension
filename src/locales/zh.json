@@ -303,7 +303,8 @@
     "timestamp": "时间戳",
     "openExplorer": "在浏览器中查看",
     "pending": "待确认",
-    "pendingHint": "此交易仍在等待网络 Tick 确认。"
+    "pendingHint": "此交易仍在等待网络 Tick 确认。",
+    "failedHint": "此交易未在目标 Tick 内确认，已失败。"
   },
   "transfer": {
     "title": "发送",
