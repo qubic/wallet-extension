@@ -21,12 +21,7 @@ export const getTransactionPresentation = (tx: Transaction, identity: string, t:
       : t('history.outgoing')
   const counterparty = isIncoming ? tx.source : tx.destination
   const Icon = isIncoming ? ReceiveIcon : SendIcon
-  let addressPrefix: string | undefined
-  if (!isIncoming) {
-    addressPrefix = t('history.to')
-  } else if (isSimpleTransfer) {
-    addressPrefix = t('history.from')
-  }
+  const addressPrefix = isIncoming ? t('history.from') : t('history.to')
 
   const amountSign = tx.amount ? (isIncoming ? '+' : '-') : ''
   const amountColorClass = !tx.amount
