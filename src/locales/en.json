@@ -282,7 +282,6 @@
     "unconfirmedMore": "+{{count}} more unconfirmed",
     "confirmed": "Confirmed",
     "failed": "Failed",
-    "notApproved": "Not Approved",
     "resend": "Resend",
     "deleteFailed": "Delete failed transaction",
     "today": "Today",
@@ -305,8 +304,7 @@
     "openExplorer": "Open in explorer",
     "pending": "Pending",
     "pendingHint": "This transaction is still pending confirmation on network ticks.",
-    "failedHint": "This transaction was not confirmed within the target tick and has failed.",
-    "notApprovedHint": "This transaction was included in a block but was not approved by the network. The funds were not transferred."
+    "failedHint": "This transaction was not confirmed within the target tick and has failed."
   },
   "transfer": {
     "title": "Send",

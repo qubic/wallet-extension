@@ -282,7 +282,6 @@
     "unconfirmedMore": "+{{count}} más sin confirmar",
     "confirmed": "Confirmadas",
     "failed": "Fallida",
-    "notApproved": "No Aprobada",
     "resend": "Reenviar",
     "deleteFailed": "Eliminar transacción fallida",
     "today": "Hoy",
@@ -305,8 +304,7 @@
     "openExplorer": "Abrir en explorador",
     "pending": "Pendiente",
     "pendingHint": "Esta transacción aún está pendiente de confirmación en los ticks de la red.",
-    "failedHint": "Esta transacción no fue confirmada dentro del tick objetivo y ha fallado.",
-    "notApprovedHint": "Esta transacción fue incluida en un bloque pero no fue aprobada por la red. Los fondos no fueron transferidos."
+    "failedHint": "Esta transacción no fue confirmada dentro del tick objetivo y ha fallado."
   },
   "transfer": {
     "title": "Enviar",

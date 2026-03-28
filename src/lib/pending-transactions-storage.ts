@@ -1,6 +1,6 @@
 import { getChromeApi, getChromeLocalStorage } from '@/lib/dapp/chrome-api'
 
-export type PendingTransactionStatus = 'pending' | 'failed' | 'not-approved'
+export type PendingTransactionStatus = 'pending' | 'failed'
 
 export type PendingTransaction = {
   hash: string
@@ -63,12 +63,7 @@ export const fromSerializedPendingTransaction = (value: unknown): PendingTransac
       tokenKey: data.tokenKey,
       targetTick: data.targetTick,
       createdAt: typeof data.createdAt === 'number' ? data.createdAt : Date.now(),
-      status:
-        data.status === 'failed'
-          ? 'failed'
-          : data.status === 'not-approved'
-            ? 'not-approved'
-            : 'pending',
+      status: data.status === 'failed' ? 'failed' : 'pending',
     }
   } catch {
     return null

@@ -9,7 +9,6 @@ import {
   writePendingTransactionsToChromeStorage,
   writePendingTransactionsToLocalStorage,
 } from '@/lib/pending-transactions-storage'
-import { computeTransactionStatus } from '@/lib/transaction-status'
 export type {
   PendingTransaction,
   PendingTransactionStatus,
@@ -177,14 +176,7 @@ export const isTransactionFailed = (hash: string) => {
   const key = normalizePendingTransactionHash(hash)
   if (!key) return false
   const pending = pendingByHash.get(key)
-  return Boolean(pending && (pending.status === 'failed' || pending.status === 'not-approved'))
-}
-
-export const isTransactionNotApproved = (hash: string) => {
-  const key = normalizePendingTransactionHash(hash)
-  if (!key) return false
-  const pending = pendingByHash.get(key)
-  return Boolean(pending && pending.status === 'not-approved')
+  return Boolean(pending && pending.status === 'failed')
 }
 
 export const getPendingTransaction = (hash: string) => {
@@ -209,7 +201,7 @@ export const getPendingTransactionsForIdentity = (identity: string) => {
 export const canResendPendingTransaction = (
   pending: Pick<PendingTransaction, 'status' | 'destinationIdentity' | 'inputType' | 'tokenKey'>,
 ) => {
-  if (pending.status !== 'failed' && pending.status !== 'not-approved') return false
+  if (pending.status !== 'failed') return false
   if (!pending.destinationIdentity) return false
   if (pending.inputType === 0 || pending.inputType === undefined) return true
   if (pending.inputType === QX_TRANSFER_ASSET_INPUT_TYPE) {
@@ -241,44 +233,22 @@ const parseProcessedTick = (value?: number | bigint | null) => {
 }
 
 export const resolvePendingTransactions = (
-  transactions: Array<{
-    hash: string
-    moneyFlew?: boolean
-    inputType?: number | bigint
-    amount?: number | bigint
-    destination?: string
-  }>,
+  transactions: Array<{ hash: string }>,
   processedTick?: number | bigint,
 ) => {
   if (pendingByHash.size === 0) return
   let changed = false
-  const confirmedByHash = new Map(
-    transactions.map((tx) => [normalizePendingTransactionHash(tx.hash), tx]),
+  const confirmedHashes = new Set(
+    transactions.map((tx) => normalizePendingTransactionHash(tx.hash)),
   )
 
-  for (const [key, tx] of confirmedByHash) {
-    const pending = pendingByHash.get(key)
-    if (!pending) continue
-
-    const inputType = Number(tx.inputType ?? pending.inputType ?? 0)
-    const amount = tx.amount ?? pending.amount ?? 0
-    const moneyFlew = tx.moneyFlew
-
-    // Check if this is a transaction type where moneyFlew is definitive
-    if (moneyFlew === false) {
-      const status = computeTransactionStatus(inputType, amount, false, tx.destination)
-      if (status === 'failure') {
-        // Transaction was included in a block but not approved
-        pendingByHash.set(key, { ...pending, status: 'not-approved' })
+  for (const key of confirmedHashes) {
+    if (pendingByHash.has(key)) {
+      const settled = pendingByHash.get(key)
+      if (settled && pendingByHash.delete(key)) {
+        schedulePendingSettledEvent(settled)
         changed = true
-        continue
       }
-    }
-
-    // Transaction confirmed (moneyFlew true, undefined, or non-definitive type)
-    if (pendingByHash.delete(key)) {
-      schedulePendingSettledEvent(pending)
-      changed = true
     }
   }
 

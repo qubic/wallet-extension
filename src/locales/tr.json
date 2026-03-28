@@ -282,7 +282,6 @@
     "unconfirmedMore": "+{{count}} onaylanmamış işlem daha",
     "confirmed": "Onaylandı",
     "failed": "Başarısız",
-    "notApproved": "Onaylanmadı",
     "resend": "Tekrar gönder",
     "deleteFailed": "Başarısız işlemi sil",
     "today": "Bugün",
@@ -305,8 +304,7 @@
     "openExplorer": "Gezginde aç",
     "pending": "Onay Bekliyor",
     "pendingHint": "Bu işlem hâlâ ağ tikleri üzerinde onay bekliyor.",
-    "failedHint": "Bu işlem hedef tick içinde onaylanmadı ve başarısız oldu.",
-    "notApprovedHint": "Bu işlem bir bloğa dahil edildi ancak ağ tarafından onaylanmadı. Fonlar transfer edilmedi."
+    "failedHint": "Bu işlem hedef tick içinde onaylanmadı ve başarısız oldu."
   },
   "transfer": {
     "title": "Gönder",
