@@ -2,7 +2,6 @@ import { useSyncExternalStore } from 'react'
 import { QX_TRANSFER_ASSET_INPUT_TYPE } from '@/lib/qx'
 import {
   type PendingTransaction,
-  type PendingTransactionStatus,
   normalizePendingTransactionHash,
   readPendingTransactionsFromChromeStorage,
   readPendingTransactionsFromLocalStorage,
@@ -10,7 +9,7 @@ import {
   writePendingTransactionsToChromeStorage,
   writePendingTransactionsToLocalStorage,
 } from '@/lib/pending-transactions-storage'
-import { computeTransactionStatus, hasDefinitiveStatus } from '@/lib/transaction-status'
+import { computeTransactionStatus } from '@/lib/transaction-status'
 export type {
   PendingTransaction,
   PendingTransactionStatus,
@@ -68,10 +67,7 @@ const mergePendingEntries = (items: PendingTransaction[]) => {
       pendingByHash.set(key, pending)
       continue
     }
-    if (
-      pending.createdAt === existing.createdAt &&
-      (pending.status === 'failed' || pending.status === 'not-approved')
-    ) {
+    if (pending.createdAt === existing.createdAt && pending.status === 'failed') {
       pendingByHash.set(key, pending)
     }
   }
@@ -170,6 +166,27 @@ export const removePendingTransaction = (hash: string) => {
   }
 }
 
+export const isTransactionPending = (hash: string) => {
+  const key = normalizePendingTransactionHash(hash)
+  if (!key) return false
+  const pending = pendingByHash.get(key)
+  return Boolean(pending && pending.status === 'pending')
+}
+
+export const isTransactionFailed = (hash: string) => {
+  const key = normalizePendingTransactionHash(hash)
+  if (!key) return false
+  const pending = pendingByHash.get(key)
+  return Boolean(pending && (pending.status === 'failed' || pending.status === 'not-approved'))
+}
+
+export const isTransactionNotApproved = (hash: string) => {
+  const key = normalizePendingTransactionHash(hash)
+  if (!key) return false
+  const pending = pendingByHash.get(key)
+  return Boolean(pending && pending.status === 'not-approved')
+}
+
 export const getPendingTransaction = (hash: string) => {
   const key = normalizePendingTransactionHash(hash)
   if (!key) return null
@@ -183,15 +200,9 @@ export const getPendingTransactionsForIdentity = (identity: string) => {
     if (pending.sourceIdentity !== identity) continue
     items.push(pending)
   }
-  const statusOrder: Record<PendingTransactionStatus, number> = {
-    pending: 0,
-    'not-approved': 1,
-    failed: 2,
-  }
   return items.sort((a, b) => {
-    const statusDiff = statusOrder[a.status] - statusOrder[b.status]
-    if (statusDiff !== 0) return statusDiff
-    return b.createdAt - a.createdAt
+    if (a.status === b.status) return b.createdAt - a.createdAt
+    return a.status === 'pending' ? -1 : 1
   })
 }
 
@@ -258,20 +269,13 @@ export const resolvePendingTransactions = (
       const status = computeTransactionStatus(inputType, amount, false, tx.destination)
       if (status === 'failure') {
         // Transaction was included in a block but not approved
-        if (pending.status !== 'not-approved') {
-          pendingByHash.set(key, { ...pending, status: 'not-approved' })
-          changed = true
-        }
+        pendingByHash.set(key, { ...pending, status: 'not-approved' })
+        changed = true
         continue
       }
     }
 
-    // For definitive types, wait until moneyFlew is resolved
-    if (moneyFlew === undefined && hasDefinitiveStatus(inputType, amount, tx.destination)) {
-      continue
-    }
-
-    // Transaction confirmed (moneyFlew true or non-definitive type)
+    // Transaction confirmed (moneyFlew true, undefined, or non-definitive type)
     if (pendingByHash.delete(key)) {
       schedulePendingSettledEvent(pending)
       changed = true

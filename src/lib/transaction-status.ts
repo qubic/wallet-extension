@@ -10,7 +10,7 @@ const QUTIL_ADDRESS = 'EAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAV
 /** QUTIL SendMany input type */
 const QUTIL_SENDMANY_INPUT_TYPE = 1
 
-export type ComputedTransactionStatus = 'success' | 'failure' | 'executed'
+export type ComputedTransactionStatus = 'pending' | 'success' | 'failure' | 'invalid' | 'executed'
 
 const isSimpleTransfer = (inputType: number, amount: number | bigint): boolean =>
   inputType === 0 && amount > 0

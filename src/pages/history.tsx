@@ -58,7 +58,7 @@ type HistoryRowTransaction = {
   tokenKey?: string
 }
 
-type HistoryRowState = 'default' | 'pending'
+type HistoryRowState = 'default' | 'pending' | 'failed' | 'not-approved'
 
 const TxTypeLabel = ({ destination, inputType }: { destination: string; inputType: number }) => {
   const description = useTxTypeDescription(destination, inputType)
@@ -463,20 +463,18 @@ const History = () => {
                                   {t('history.resend')}
                                 </button>
                               )}
-                              {!isNotApproved && (
-                                <button
-                                  type="button"
-                                  className="cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
-                                  onClick={(e) => {
-                                    e.stopPropagation()
-                                    removePendingTransaction(tx.hash)
-                                  }}
-                                  aria-label={t('history.deleteFailed')}
-                                  title={t('history.deleteFailed')}
-                                >
-                                  <XIcon className="h-3.5 w-3.5" />
-                                </button>
-                              )}
+                              <button
+                                type="button"
+                                className="cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  removePendingTransaction(tx.hash)
+                                }}
+                                aria-label={t('history.deleteFailed')}
+                                title={t('history.deleteFailed')}
+                              >
+                                <XIcon className="h-3.5 w-3.5" />
+                              </button>
                             </div>
                           </div>
                         </div>

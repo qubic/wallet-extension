@@ -10,7 +10,9 @@ import { HIDDEN_BALANCE, useBalanceVisibility } from '@/lib/balance-visibility'
 import {
   canResendPendingTransaction,
   type PendingTransaction,
-  getPendingTransaction,
+  isTransactionFailed,
+  isTransactionNotApproved,
+  isTransactionPending,
   removePendingTransaction,
 } from '@/lib/pending-transactions'
 
@@ -60,8 +62,11 @@ const TransactionsPreview = ({
       status: tx.status,
     }))
     const pendingHashes = new Set(pendingItems.map((tx) => tx.hash.toLowerCase()))
-    const unconfirmedTop = pendingItems.slice(0, 3)
-    const unconfirmedOverflow = pendingItems.length - unconfirmedTop.length
+    const allUnconfirmed = pendingItems.filter(
+      (tx) => tx.status === 'pending' || tx.status === 'failed',
+    )
+    const unconfirmedTop = allUnconfirmed.slice(0, 3)
+    const unconfirmedOverflow = allUnconfirmed.length - unconfirmedTop.length
     const recentChain: PreviewTransaction[] = items
       .filter((tx) => !pendingHashes.has(tx.hash.toLowerCase()))
       .slice(0, 3)
@@ -72,11 +77,9 @@ const TransactionsPreview = ({
   const renderRow = (tx: PreviewTransaction) => {
     const { isIncoming, label, counterparty, Icon, addressPrefix, amountSign, amountColorClass } =
       getTransactionPresentation(tx, identity, t)
-    const pendingStatus = getPendingTransaction(tx.hash)?.status
-    const isPending = pendingStatus === 'pending'
-    const isFailed = pendingStatus === 'failed'
-    const isNotApproved = pendingStatus === 'not-approved'
-    const isUnsuccessful = isFailed || isNotApproved
+    const isPending = isTransactionPending(tx.hash)
+    const isFailed = isTransactionFailed(tx.hash)
+    const isNotApproved = isTransactionNotApproved(tx.hash)
     const canResend = canResendPendingTransaction({
       status: tx.status ?? 'pending',
       destinationIdentity: tx.destination,
@@ -90,7 +93,7 @@ const TransactionsPreview = ({
         className={`group relative flex w-full items-center justify-between rounded-xl border px-3 py-2 text-left transition-colors ${
           isPending
             ? 'animate-pulse border-amber-500/50 bg-amber-500/10 text-amber-800 dark:text-amber-200'
-            : isUnsuccessful
+            : isFailed
               ? 'border-red-500/50 bg-red-500/10 text-red-800 dark:text-red-200'
               : 'border-border/40 bg-background/40 hover:border-primary/30 hover:bg-background/60'
         }`}
@@ -100,7 +103,7 @@ const TransactionsPreview = ({
             className={`flex h-9 w-9 items-center justify-center rounded-full border ${
               isPending
                 ? 'border-amber-500/40 bg-amber-500/15 text-amber-700 dark:text-amber-300'
-                : isUnsuccessful
+                : isFailed
                   ? 'border-red-500/40 bg-red-500/15 text-red-700 dark:text-red-300'
                   : isIncoming
                     ? 'border-positive/40 bg-positive/10 text-positive'
@@ -144,14 +147,14 @@ const TransactionsPreview = ({
                 ? 'text-muted-foreground'
                 : isPending
                   ? 'text-amber-700 dark:text-amber-300'
-                  : isUnsuccessful
+                  : isFailed
                     ? 'text-red-700 dark:text-red-300'
                     : amountColorClass
             }`}
           >
             {isVisible ? `${amountSign}${formatBalanceCompact(tx.amount)}` : HIDDEN_BALANCE}
           </span>
-          {isUnsuccessful && (
+          {isFailed && (
             <div className="flex items-center gap-1">
               {canResend && (
                 <button
@@ -165,31 +168,27 @@ const TransactionsPreview = ({
                   {t('history.resend')}
                 </button>
               )}
-              {isFailed && (
-                <button
-                  type="button"
-                  className="cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    removePendingTransaction(tx.hash)
-                  }}
-                  aria-label={t('history.deleteFailed')}
-                  title={t('history.deleteFailed')}
-                >
-                  <XIcon className="h-3.5 w-3.5" />
-                </button>
-              )}
+              <button
+                type="button"
+                className="cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  removePendingTransaction(tx.hash)
+                }}
+                aria-label={t('history.deleteFailed')}
+                title={t('history.deleteFailed')}
+              >
+                <XIcon className="h-3.5 w-3.5" />
+              </button>
             </div>
           )}
         </div>
-        {!isUnsuccessful && (
-          <button
-            type="button"
-            className="absolute inset-0 cursor-pointer rounded-xl"
-            aria-label={t('txDetails.title')}
-            onClick={() => onOpenTx(tx.hash)}
-          />
-        )}
+        <button
+          type="button"
+          className="absolute inset-0 cursor-pointer rounded-xl"
+          aria-label={t('txDetails.title')}
+          onClick={() => onOpenTx(tx.hash)}
+        />
       </motion.div>
     )
   }
