@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router-dom'
 import { ChevronDownIcon, ChevronUpIcon, GlobeIcon, Link2OffIcon, LinkIcon } from 'lucide-react'
+import AccountAvatar from '@/components/account-avatar'
 import { Button } from '@/components/ui/button'
 import {
   Drawer,
@@ -282,12 +283,21 @@ const DappApprovalDrawer = () => {
                 <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
                   {t('dapp.approval.sharedAccount')}
                 </p>
-                <p className="truncate text-sm font-medium text-foreground">
-                  {connectSummary.accountName || t('dapp.approval.sharedAccountFallback')}
-                </p>
-                <p className="truncate font-mono text-xs text-muted-foreground">
-                  {truncateString(connectSummary.accountIdentity)}
-                </p>
+                <div className="mt-2 flex items-center gap-3">
+                  <AccountAvatar
+                    identity={connectSummary.accountIdentity}
+                    name={connectSummary.accountName}
+                    size="md"
+                  />
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium text-foreground">
+                      {connectSummary.accountName || t('dapp.approval.sharedAccountFallback')}
+                    </p>
+                    <p className="truncate font-mono text-xs text-muted-foreground">
+                      {truncateString(connectSummary.accountIdentity)}
+                    </p>
+                  </div>
+                </div>
               </div>
             )}
             {current.method === 'signMessage' && (
@@ -371,15 +381,25 @@ const DappApprovalDrawer = () => {
               )}
             {isWatchOnlySigningRequest && accountSummary && (
               <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3">
-                <p className="text-sm font-medium text-foreground">
-                  {t('dapp.approval.watchOnlyTitle')}
-                </p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {t('dapp.approval.watchOnlyDescription', {
-                    accountName:
-                      accountSummary.accountName || t('dapp.approval.sharedAccountFallback'),
-                  })}
-                </p>
+                <div className="flex items-center gap-3">
+                  <AccountAvatar
+                    identity={accountSummary.accountIdentity}
+                    name={accountSummary.accountName}
+                    watchOnly={accountSummary.accountWatchOnly}
+                    size="md"
+                  />
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-foreground">
+                      {t('dapp.approval.watchOnlyTitle')}
+                    </p>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      {t('dapp.approval.watchOnlyDescription', {
+                        accountName:
+                          accountSummary.accountName || t('dapp.approval.sharedAccountFallback'),
+                      })}
+                    </p>
+                  </div>
+                </div>
               </div>
             )}
             {requiresPassphrase && !isWatchOnlySigningRequest && (

@@ -8,6 +8,7 @@ import {
   TrashIcon,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import AccountAvatar from '@/components/account-avatar'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -76,6 +77,12 @@ const AccountListItem = ({
       } ${isDragging ? 'opacity-60' : ''}`}
     >
       <div className="flex min-w-0 items-center gap-2">
+        <AccountAvatar
+          identity={account.identity}
+          name={account.name}
+          watchOnly={account.watchOnly}
+          size="sm"
+        />
         <div className="min-w-0">
           <div className="flex items-center gap-2">
             <span className="truncate text-sm font-semibold text-foreground">{account.name}</span>
