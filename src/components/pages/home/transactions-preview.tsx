@@ -11,6 +11,7 @@ import {
   canResendPendingTransaction,
   type PendingTransaction,
   isTransactionFailed,
+  isTransactionNotApproved,
   isTransactionPending,
   removePendingTransaction,
 } from '@/lib/pending-transactions'
@@ -78,6 +79,7 @@ const TransactionsPreview = ({
       getTransactionPresentation(tx, identity, t)
     const isPending = isTransactionPending(tx.hash)
     const isFailed = isTransactionFailed(tx.hash)
+    const isNotApproved = isTransactionNotApproved(tx.hash)
     const canResend = canResendPendingTransaction({
       status: tx.status ?? 'pending',
       destinationIdentity: tx.destination,
@@ -119,6 +121,7 @@ const TransactionsPreview = ({
             />
             <span className="text-[11px] text-muted-foreground/70">
               {(() => {
+                if (isNotApproved) return t('history.notApproved')
                 if (isFailed) return t('history.failed')
                 const ts = Number(tx.timestamp)
                 if (!ts) return '--'

@@ -48,6 +48,7 @@ const TransactionDetails = () => {
   const archiverProcessedTick = lastProcessedTickQuery.data?.tickNumber
   const pending = getPendingTransaction(hash)
   const isPending = pending?.status === 'pending'
+  const isNotApproved = pending?.status === 'not-approved'
   const isFailed = pending?.status === 'failed'
 
   const txQuery = useQuery({
@@ -59,7 +60,18 @@ const TransactionDetails = () => {
   useEffect(() => {
     if (!hash) return
     if (txQuery.data) {
-      resolvePendingTransactions([{ hash }], archiverProcessedTick)
+      resolvePendingTransactions(
+        [
+          {
+            hash,
+            moneyFlew: txQuery.data.moneyFlew,
+            inputType: txQuery.data.inputType,
+            amount: txQuery.data.amount,
+            destination: txQuery.data.destination,
+          },
+        ],
+        archiverProcessedTick,
+      )
       return
     }
     resolvePendingTransactions([], archiverProcessedTick)
@@ -155,7 +167,7 @@ const TransactionDetails = () => {
           </div>
         )}
 
-        {txQuery.error && !isPending && !pending && (
+        {txQuery.error && !isPending && !isFailed && !isNotApproved && (
           <div className="text-xs text-destructive">
             {txQuery.error instanceof Error ? txQuery.error.message : t('txDetails.error')}
           </div>
@@ -164,6 +176,9 @@ const TransactionDetails = () => {
           <div className="animate-pulse text-xs text-amber-700 dark:text-amber-300">
             {t('txDetails.pendingHint')}
           </div>
+        )}
+        {isNotApproved && (
+          <div className="text-xs text-destructive">{t('txDetails.notApprovedHint')}</div>
         )}
         {isFailed && !details && (
           <div className="text-xs text-destructive">{t('txDetails.failedHint')}</div>
