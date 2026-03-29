@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import NumericInput from '@/components/numeric-input'
 import { type AggregatedAsset, formatAssetUnits } from '@/lib/assets'
 import { NATIVE_TOKEN_SYMBOL } from '@/lib/config/constants'
 import { useAddressName } from '@/hooks/use-address-name'
@@ -100,7 +101,7 @@ const TransferForm = ({
 
   const handleMax = () => {
     if (availableUnits <= 0n) return
-    onAmountChange(availableUnits.toString())
+    onAmountChange(formatNumber(availableUnits))
   }
 
   return (
@@ -186,12 +187,11 @@ const TransferForm = ({
           {/* Amount with Max + token label */}
           <div className="space-y-1.5">
             <div className="relative">
-              <Input
+              <NumericInput
                 id="amount"
-                type="text"
                 placeholder={t('transfer.form.amountPlaceholder')}
                 value={amount}
-                onChange={(e) => onAmountChange(e.target.value.replace(/[^\d,]/g, ''))}
+                onChange={onAmountChange}
                 disabled={isWatchOnly}
                 className={`h-12 pr-28 text-sm ${errors.amount ? 'border-destructive' : ''}`}
               />
@@ -279,14 +279,9 @@ const TransferForm = ({
             </div>
             {isManualTargetTickEnabled && (
               <div className="space-y-1">
-                <Input
-                  type="number"
-                  min={1}
-                  step={1}
+                <NumericInput
                   value={manualTargetTick}
-                  onChange={(event) => {
-                    onManualTargetTickChange(event.target.value)
-                  }}
+                  onChange={onManualTargetTickChange}
                   className="h-12 w-full text-sm"
                   disabled={isWatchOnly}
                   placeholder={t('transfer.form.targetTickManualPlaceholder')}

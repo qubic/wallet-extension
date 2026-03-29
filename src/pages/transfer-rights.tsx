@@ -6,7 +6,7 @@ import { useBalance, useSdk } from '@qubic-labs/react'
 import { AlertTriangleIcon, ChevronRightIcon, RouteIcon, SendIcon, XIcon } from 'lucide-react'
 import PageHeader from '@/components/page-header'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import NumericInput from '@/components/numeric-input'
 import {
   Select,
   SelectContent,
@@ -280,7 +280,7 @@ const TransferRights = () => {
     }
 
     if (isManualTargetTickEnabled) {
-      const parsedManualTick = Number.parseInt(manualTargetTick.trim(), 10)
+      const parsedManualTick = Number(parseAmount(manualTargetTick) ?? Number.NaN)
       if (!Number.isFinite(parsedManualTick) || parsedManualTick < 1) {
         newErrors.targetTick = t('transfer.validation.targetTickManualInvalid')
       } else if (typeof currentTick === 'number' && parsedManualTick <= currentTick) {
@@ -337,7 +337,7 @@ const TransferRights = () => {
       const sendCurrentTick = freshTickInfo.tickInfo?.tick
 
       if (isManualTargetTickEnabled) {
-        const parsedManualTick = Number.parseInt(manualTargetTick.trim(), 10)
+        const parsedManualTick = Number(parseAmount(manualTargetTick) ?? Number.NaN)
         if (!Number.isFinite(parsedManualTick) || parsedManualTick < 1) {
           throw new Error(t('transfer.validation.targetTickManualInvalid'))
         }
@@ -467,7 +467,7 @@ const TransferRights = () => {
 
   const handleMax = () => {
     if (!sourceContract) return
-    setShares(sourceContract.numberOfUnits)
+    setShares(formatNumber(BigInt(sourceContract.numberOfUnits)))
   }
 
   // Asset selection screen
@@ -638,13 +638,12 @@ const TransferRights = () => {
             {/* Number of shares */}
             <div className="space-y-1.5">
               <div className="relative">
-                <Input
+                <NumericInput
                   id="shares"
-                  type="text"
                   placeholder={t('transferRights.numberOfSharesPlaceholder')}
                   value={shares}
-                  onChange={(e) => {
-                    setShares(e.target.value.replace(/[^\d,]/g, ''))
+                  onChange={(value) => {
+                    setShares(value)
                     if (errors.shares) {
                       setErrors((prev) => ({ ...prev, shares: undefined }))
                     }
@@ -732,7 +731,7 @@ const TransferRights = () => {
                   onClick={() => {
                     setIsManualTargetTickEnabled((prev) => !prev)
                     if (!isManualTargetTickEnabled && !manualTargetTick) {
-                      setManualTargetTick((currentTick ?? '').toString())
+                      setManualTargetTick(currentTick ? formatNumber(currentTick) : '')
                     }
                     if (errors.targetTick) {
                       setErrors((prev) => ({ ...prev, targetTick: undefined }))
@@ -744,13 +743,10 @@ const TransferRights = () => {
               </div>
               {isManualTargetTickEnabled && (
                 <div className="space-y-1">
-                  <Input
-                    type="number"
-                    min={1}
-                    step={1}
+                  <NumericInput
                     value={manualTargetTick}
-                    onChange={(event) => {
-                      setManualTargetTick(event.target.value)
+                    onChange={(value) => {
+                      setManualTargetTick(value)
                       if (errors.targetTick) {
                         setErrors((prev) => ({ ...prev, targetTick: undefined }))
                       }

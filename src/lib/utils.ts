@@ -36,6 +36,30 @@ export const parseAmount = (str: string): bigint | null => {
   return BigInt(cleaned)
 }
 
+/**
+ * Parse a formatted number string from various locale formats to an integer.
+ * Supports US (1,234), EU (1.234), and Swiss (1'234) thousand separators.
+ * Decimals are stripped (Qubic only supports integers).
+ * Returns null for invalid or empty values.
+ */
+export const parseFormattedInteger = (value: string): bigint | null => {
+  if (!value) return null
+  const trimmed = value.trim()
+  if (/^(\d{1,3}(,\d{3})*|\d+)(\.\d+)?$/.test(trimmed)) {
+    const integerPart = trimmed.split('.')[0]
+    return BigInt(integerPart.replace(/,/g, ''))
+  }
+  if (/^(\d{1,3}(\.\d{3})+|\d+)(,\d+)?$/.test(trimmed)) {
+    const integerPart = trimmed.split(',')[0]
+    return BigInt(integerPart.replace(/\./g, ''))
+  }
+  if (/^\d{1,3}('\d{3})+(\.\d+)?$/.test(trimmed)) {
+    const integerPart = trimmed.split('.')[0]
+    return BigInt(integerPart.replace(/'/g, ''))
+  }
+  return null
+}
+
 const standardFormatter = new Intl.NumberFormat('en', { notation: 'standard' })
 const compactFormatter = new Intl.NumberFormat('en', {
   notation: 'compact',
