@@ -1,3 +1,65 @@
+# [1.0.0-beta.5](https://github.com/qubic/wallet-extension/compare/v1.0.0-beta.4...v1.0.0-beta.5) (2026-03-29)
+
+
+### Bug Fixes
+
+* add contrast to watch only account badge in case of light mode ([927ffb8](https://github.com/qubic/wallet-extension/commit/927ffb88100f620cefe79a6b1f14c2057206bfc4))
+* **dapp:** block signing flow for watch-only accounts ([bab3681](https://github.com/qubic/wallet-extension/commit/bab368177ca549f0d384f2bc0846491e83932184))
+* **dapp:** improve transaction approval UI ([163c092](https://github.com/qubic/wallet-extension/commit/163c092871d37033fd52879f55cf43a0997c5d72))
+* **dapp:** only show target tick when explicitly assigned in request ([45cb257](https://github.com/qubic/wallet-extension/commit/45cb257874c7b295f151f8e5c2f8602658e2b7b5))
+* **dapp:** persist watch-only state for approvals ([5aee033](https://github.com/qubic/wallet-extension/commit/5aee033fab682dd31922c77647b654b4290ea6b8))
+* **dapp:** strict numeric validation and tick-in-past rejection ([e82e740](https://github.com/qubic/wallet-extension/commit/e82e7404e870dd0fe1c0f67f77a3759f5b7afbf3))
+* **i18n:** localize hardcoded strings and consolidate shared keys ([269fdaf](https://github.com/qubic/wallet-extension/commit/269fdafb2acb28a8d37aca118b5f067eae135b70))
+* make failed transactions clickable and show failed status hint ([d08a23d](https://github.com/qubic/wallet-extension/commit/d08a23def14774539e4d0b2225a11f26658a6a02))
+* prevent duplicate vault entries when renaming accounts ([#129](https://github.com/qubic/wallet-extension/issues/129)) ([979d984](https://github.com/qubic/wallet-extension/commit/979d984d2a738c1ad785d729548324357722e0c5))
+* remove tabular-nums from asset balances ([a65cdfc](https://github.com/qubic/wallet-extension/commit/a65cdfc5bd50e883769c6d66a1f6f40129d67415))
+* show From prefix for all incoming transactions ([bfb0cae](https://github.com/qubic/wallet-extension/commit/bfb0cae383c005f7470ad14e52ff8e60c9925e57))
+* show transaction details for pending and failed transactions ([d3900b2](https://github.com/qubic/wallet-extension/commit/d3900b25b50aa5e8eb0857d934eb952c4b2e8a8f))
+* **txDetails:** show native token symbol next to amount ([3f7d83d](https://github.com/qubic/wallet-extension/commit/3f7d83d4f1671e8f710fe2441531fac082e7fe03))
+* **txDetails:** show QU symbol and align field order with explorer ([a07fcce](https://github.com/qubic/wallet-extension/commit/a07fcceaae1380ae0f7e32b6e8645486555bdfba))
+* **ui:** show account name in reveal seed drawer title ([d93ed32](https://github.com/qubic/wallet-extension/commit/d93ed32511eebe3e0224f9b6f9930f0e6a61df41))
+* **ui:** use correct grid columns for watch-only nav bar ([8408669](https://github.com/qubic/wallet-extension/commit/8408669163619c64deb6d146b1665bf1fa6d40eb))
+* **ui:** use positive color for incoming amounts and fix failed tx layout ([f3b6165](https://github.com/qubic/wallet-extension/commit/f3b6165d92800bfb7b11298844dd603a2234e931))
+* use transfer-rights icon from wallet-app ([60fd9fa](https://github.com/qubic/wallet-extension/commit/60fd9fa7495d88be2bfd39990004a235598976b6))
+
+
+### Features
+
+* add asset details view ([#121](https://github.com/qubic/wallet-extension/issues/121)) ([3723aa5](https://github.com/qubic/wallet-extension/commit/3723aa5c3179086f94085f175f5cfedb1c5b5ac4))
+* add formatted number input for amounts and target tick ([f87960a](https://github.com/qubic/wallet-extension/commit/f87960a09b8213f6b89cec2b11d51dfceaa93d3d))
+* add revoke asset management rights support and improve UI labels ([#122](https://github.com/qubic/wallet-extension/issues/122)) ([81acf39](https://github.com/qubic/wallet-extension/commit/81acf392c6afe2d8aada46496a91c599d730af69))
+* **dapp:** add per-method approval titles and dApp favicon ([a7c29c3](https://github.com/qubic/wallet-extension/commit/a7c29c30469a076d0c353430eddbefd87fc5f507))
+* **dapp:** show toast notification after transaction broadcast ([d7d9cb7](https://github.com/qubic/wallet-extension/commit/d7d9cb715cc7155ea0796ce0471724dc7c9be079))
+
+
+---
+
+**Qubic Wallet — Beta Release**
+
+Manage your Qubic accounts, send transfers, transfer asset rights, and connect to dApps via the `window.qubic` provider API.
+
+This is a pre-release build — please report any issues on [GitHub Issues](https://github.com/qubic/wallet-extension/issues).
+
+## Install (Chrome / Chromium)
+
+### First time
+
+1. Download **wallet-extension-dist.zip** from the assets below
+2. Unzip to a permanent folder (e.g. `~/qubic-wallet`)
+3. Open `chrome://extensions`
+4. Enable **Developer mode** (top right)
+5. Click **Load unpacked** and select the unzipped folder
+6. Pin the extension from the puzzle icon in the toolbar
+
+### Updating
+
+1. Download the new **wallet-extension-dist.zip**
+2. Delete the contents of your existing extension folder
+3. Unzip the new files into the **same folder**
+4. Open `chrome://extensions` and click the **reload** button (↻) on the extension
+
+> **Important:** Always reuse the same folder. Loading from a different folder changes the extension ID and you will lose your wallet data.
+
 # [1.0.0-beta.4](https://github.com/qubic/wallet-extension/compare/v1.0.0-beta.3...v1.0.0-beta.4) (2026-03-19)
 
 
