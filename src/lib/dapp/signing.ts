@@ -2,6 +2,7 @@ import { privateKeyFromSeed, publicKeyFromSeed } from '@qubic-labs/core'
 import { sign as signSchnorr, k12 } from '@qubic-labs/schnorrq'
 import type { BuiltTransaction, TransactionHelpers } from '@qubic-labs/sdk'
 import { DappProviderError } from '@/lib/dapp/errors'
+import { parseOptionalInteger } from '@/lib/dapp/validators'
 import { base64ToBytes, bytesToBase64, bytesToHex, hexToBytes } from '@/lib/encoding'
 import { isValidIdentity, parseAmount } from '@/lib/utils'
 
@@ -32,22 +33,6 @@ const toBigInt = (value: unknown, field: string): bigint => {
     if (/^\d+$/.test(trimmed)) return BigInt(trimmed)
   }
   throw new DappProviderError('INVALID_PARAMS', `Invalid ${field}`)
-}
-
-const toNumberOrUndefined = (value: unknown, field: string): number | undefined => {
-  if (value === undefined || value === null) return undefined
-  const numeric =
-    typeof value === 'number'
-      ? value
-      : typeof value === 'bigint'
-        ? Number(value)
-        : typeof value === 'string'
-          ? Number.parseInt(value, 10)
-          : Number.NaN
-  if (!Number.isFinite(numeric)) {
-    throw new DappProviderError('INVALID_PARAMS', `Invalid ${field}`)
-  }
-  return Math.trunc(numeric)
 }
 
 const decodeInputBytes = (value: unknown): Uint8Array | undefined => {
@@ -101,7 +86,7 @@ export const parseSignTransactionParams = (params: unknown): ParsedSignTransacti
     throw new DappProviderError('INVALID_PARAMS', 'Invalid toIdentity')
   }
 
-  const inputType = toNumberOrUndefined(input.inputType, 'inputType')
+  const inputType = parseOptionalInteger(input.inputType, 'inputType')
   const parsedAmount =
     typeof input.amount === 'string' ? parseAmount(input.amount) : toBigInt(input.amount, 'amount')
   if (parsedAmount === null || parsedAmount < 0n) {
@@ -114,7 +99,10 @@ export const parseSignTransactionParams = (params: unknown): ParsedSignTransacti
     )
   }
 
-  const targetTick = toNumberOrUndefined(input.targetTick, 'targetTick')
+  const targetTick = parseOptionalInteger(input.targetTick, 'targetTick')
+  if (targetTick !== undefined && targetTick < 1) {
+    throw new DappProviderError('INVALID_PARAMS', 'Invalid targetTick')
+  }
   const inputBytes = decodeInputBytes(input.inputBytes)
 
   return {

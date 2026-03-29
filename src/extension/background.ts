@@ -53,7 +53,13 @@ chrome.runtime.onMessage.addListener((message: unknown, sender, sendResponse) =>
     const payload = parsed.data.payload
 
     void handleDappApprovalDecision(payload)
-      .then((ok) => sendResponse({ ok }))
+      .then((result) => {
+        if (typeof result === 'object') {
+          sendResponse(result)
+        } else {
+          sendResponse({ ok: result })
+        }
+      })
       .catch(() => sendResponse({ ok: false }))
     return true
   }
@@ -140,7 +146,13 @@ const broadcastAccountChangedPerOrigin = async () => {
     const isApproved =
       newAccount &&
       isAccountApprovedForOrigin(normalizedTabOrigin, permissions, newAccount.identity)
-    const eventPayload = isApproved ? newAccount : null
+    const eventPayload =
+      isApproved && newAccount
+        ? {
+            identity: newAccount.identity,
+            name: newAccount.name,
+          }
+        : null
 
     try {
       await chrome.tabs.sendMessage(tab.id, {

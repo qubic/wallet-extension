@@ -1,11 +1,13 @@
 import { KeyRoundIcon, PanelRightOpenIcon, PlusCircleIcon, UploadIcon } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useTheme } from 'next-themes'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 
 const Welcome = () => {
   const navigate = useNavigate()
   const { resolvedTheme } = useTheme()
+  const { t } = useTranslation()
 
   const openSidePanel = async () => {
     const chromeApi = (
@@ -55,13 +57,13 @@ const Welcome = () => {
           alt="Qubic"
           className="h-9"
         />
-        <p className="text-sm text-muted-foreground">Welcome to Qubic Wallet</p>
+        <p className="text-sm text-muted-foreground">{t('welcome.subtitle')}</p>
       </div>
 
       <div className="grid w-full max-w-xs gap-3">
         <Button size="lg" className="w-full" onClick={() => navigate('/onboarding/create')}>
           <PlusCircleIcon className="h-5 w-5" />
-          Create a new wallet
+          {t('welcome.createWallet')}
         </Button>
         <Button
           size="lg"
@@ -70,7 +72,7 @@ const Welcome = () => {
           onClick={() => navigate('/onboarding/import-seed')}
         >
           <KeyRoundIcon className="h-5 w-5" />
-          Restore with seed phrase
+          {t('welcome.restoreSeed')}
         </Button>
         <Button
           size="lg"
@@ -79,7 +81,7 @@ const Welcome = () => {
           onClick={() => navigate('/onboarding/import-vault')}
         >
           <UploadIcon className="h-5 w-5" />
-          Import vault backup
+          {t('welcome.importVault')}
         </Button>
       </div>
 
@@ -87,7 +89,7 @@ const Welcome = () => {
         size="icon"
         variant="ghost"
         className="absolute right-4 top-4 h-10 w-10"
-        aria-label="Open side panel"
+        aria-label={t('app.sidepanel')}
         onClick={openSidePanel}
       >
         <PanelRightOpenIcon className="h-5 w-5" />

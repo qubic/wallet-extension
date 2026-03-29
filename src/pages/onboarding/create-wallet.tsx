@@ -95,38 +95,38 @@ const CreateWallet = ({
     setStatus(null)
 
     if (step === 1 && !isSeedLike(seed)) {
-      setStatus('Seed must be 55 lowercase letters.')
+      setStatus(t('onboarding.errors.seedInvalid'))
       return
     }
 
     if (step === 1 && !hasConfirmedSeedBackup) {
-      setStatus('Please confirm you saved your seed securely.')
+      setStatus(t('onboarding.errors.seedConfirmRequired'))
       return
     }
 
     if (step === 1 && variant === 'add-address') {
       const cachedAccounts = getCachedAccounts()
       if (cachedAccounts.some((entry) => entry.identity === identity)) {
-        setStatus('This address already exists.')
+        setStatus(t('onboarding.errors.addressExists'))
         return
       }
     }
 
     if (step === 2 && !passphrase.trim()) {
-      setStatus('Passphrase is required.')
+      setStatus(t('onboarding.errors.passphraseRequired'))
       return
     }
     if (step === 2 && variant !== 'add-address') {
       if (!confirmPassphrase.trim()) {
-        setStatus('Please re-enter your passphrase.')
+        setStatus(t('onboarding.errors.passphraseReenter'))
         return
       }
       if (passphrase !== confirmPassphrase) {
-        setStatus('Passphrases do not match.')
+        setStatus(t('onboarding.errors.passphraseMismatch'))
         return
       }
       if (passphrase.length < 12) {
-        setStatus('Passphrase must be at least 12 characters.')
+        setStatus(t('onboarding.errors.passphraseTooShort'))
         return
       }
     }
@@ -139,8 +139,8 @@ const CreateWallet = ({
       if (!result.valid) {
         setStatus(
           result.reason === 'invalid'
-            ? 'Invalid vault passphrase.'
-            : 'Failed to validate vault passphrase.',
+            ? t('onboarding.errors.invalidVaultPassphrase')
+            : t('onboarding.errors.vaultValidationFailed'),
         )
         return
       }
@@ -163,29 +163,29 @@ const CreateWallet = ({
     setStatus(null)
 
     if (!isSeedLike(seed)) {
-      setStatus('Seed must be 55 lowercase letters.')
+      setStatus(t('onboarding.errors.seedInvalid'))
       setStep(1)
       return
     }
 
     if (!passphrase.trim()) {
-      setStatus('Passphrase is required.')
+      setStatus(t('onboarding.errors.passphraseRequired'))
       setStep(2)
       return
     }
     if (variant !== 'add-address') {
       if (!confirmPassphrase.trim()) {
-        setStatus('Please re-enter your passphrase.')
+        setStatus(t('onboarding.errors.passphraseReenter'))
         setStep(2)
         return
       }
       if (passphrase !== confirmPassphrase) {
-        setStatus('Passphrases do not match.')
+        setStatus(t('onboarding.errors.passphraseMismatch'))
         setStep(2)
         return
       }
       if (passphrase.length < 12) {
-        setStatus('Passphrase must be at least 12 characters.')
+        setStatus(t('onboarding.errors.passphraseTooShort'))
         setStep(2)
         return
       }
@@ -198,7 +198,7 @@ const CreateWallet = ({
       return
     }
     if (cachedAccounts.some((entry) => entry.identity === identity)) {
-      setStatus('This address already exists.')
+      setStatus(t('onboarding.errors.addressExists'))
       setStep(1)
       return
     }
@@ -209,7 +209,7 @@ const CreateWallet = ({
       if (variant === 'add-address') {
         const check = await verifyVaultAccess(vault)
         if (!check.valid) {
-          setStatus('Invalid vault passphrase.')
+          setStatus(t('onboarding.errors.invalidVaultPassphrase'))
           setIsSaving(false)
           return
         }
@@ -224,8 +224,8 @@ const CreateWallet = ({
       setOnboarded(entry.identity, entry.name)
       clearSensitiveState()
       navigate(onCompletePath)
-    } catch (error) {
-      setStatus(error instanceof Error ? error.message : 'Failed to create wallet.')
+    } catch {
+      setStatus(t('onboarding.errors.createFailed'))
       setIsSaving(false)
     }
   }
@@ -235,8 +235,12 @@ const CreateWallet = ({
       <div className="flex w-full max-w-sm flex-col justify-between gap-6">
         <div className="space-y-3 text-center">
           <FlowHeader
-            title={variant === 'add-address' ? 'Add new address' : 'Create new wallet'}
-            stepLabel={`Step ${step} of ${TOTAL_STEPS}`}
+            title={
+              variant === 'add-address'
+                ? t('onboarding.create.titleAddAddress')
+                : t('onboarding.create.title')
+            }
+            stepLabel={t('common.step', { current: step, total: TOTAL_STEPS })}
             progressValue={progressValue}
           />
         </div>
@@ -268,25 +272,27 @@ const CreateWallet = ({
           {step === 3 && (
             <div className="space-y-4">
               <div className="space-y-1">
-                <h3 className="text-sm font-semibold">Ready to create</h3>
+                <h3 className="text-sm font-semibold">{t('onboarding.create.readyTitle')}</h3>
                 <p className="text-xs text-muted-foreground">
-                  Review your details before creating the vault.
+                  {t('onboarding.create.readySubtitle')}
                 </p>
               </div>
               <div className="space-y-2 text-sm">
                 <div className="flex items-center justify-between text-xs text-muted-foreground">
-                  <span>{variant === 'add-address' ? 'Address label' : 'Wallet name'}</span>
+                  <span>
+                    {variant === 'add-address' ? t('common.addressLabel') : t('common.accountName')}
+                  </span>
                   <span className="text-foreground">{name || 'main'}</span>
                 </div>
-                <div className="text-xs text-muted-foreground">Seed length: {seed.length}</div>
                 <div className="text-xs text-muted-foreground">
-                  Identity:
+                  {t('common.seedLength', { length: seed.length })}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  {t('common.identity')}:
                   <div className="mt-1 break-all text-foreground">{identity || '...'}</div>
                 </div>
               </div>
-              <p className="text-xs text-muted-foreground">
-                Make sure you stored your seed. Anyone with this seed can access your funds.
-              </p>
+              <p className="text-xs text-muted-foreground">{t('onboarding.create.seedWarning')}</p>
             </div>
           )}
 
@@ -296,11 +302,11 @@ const CreateWallet = ({
         <div className="flex w-full gap-3">
           <Button size="lg" variant="ghost" onClick={handleBack} className="flex-1">
             <ArrowLeftIcon className="h-5 w-5" />
-            {step === 1 ? 'Back' : 'Previous'}
+            {step === 1 ? t('common.back') : t('common.previous')}
           </Button>
           {step < TOTAL_STEPS ? (
             <Button size="lg" onClick={handleNext} className="flex-1">
-              Continue
+              {t('common.continue')}
               <ArrowRightIcon className="h-5 w-5" />
             </Button>
           ) : (
@@ -308,11 +314,11 @@ const CreateWallet = ({
               <CheckCircleIcon className="h-5 w-5" />
               {variant === 'add-address'
                 ? isSaving
-                  ? 'Adding...'
-                  : 'Add address'
+                  ? t('onboarding.create.adding')
+                  : t('onboarding.create.addAddress')
                 : isSaving
-                  ? 'Creating...'
-                  : 'Create wallet'}
+                  ? t('onboarding.create.creating')
+                  : t('onboarding.create.createWallet')}
             </Button>
           )}
         </div>

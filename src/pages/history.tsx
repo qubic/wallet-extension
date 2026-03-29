@@ -2,12 +2,13 @@ import { useTransactions } from '@qubic-labs/react'
 import { HashIcon, RefreshCwIcon, XIcon } from 'lucide-react'
 import { getTransactionPresentation } from '@/lib/transaction-presentation'
 import { Button } from '@/components/ui/button'
-import { useProcedureName } from '@/hooks/use-procedure-name'
+import { useTxTypeDescription } from '@/hooks/use-tx-type-description'
 import AddressLabel from '@/components/address-label'
 import {
   buildExplorerObjectUrl,
   formatBalanceCompact,
   formatNumber,
+  toTimestampMs,
   truncateString,
 } from '@/lib/utils'
 import { useTranslation } from 'react-i18next'
@@ -59,16 +60,9 @@ type HistoryRowTransaction = {
 
 type HistoryRowState = 'default' | 'pending' | 'failed'
 
-const InputTypeLabel = ({ destination, inputType }: { destination: string; inputType: number }) => {
-  const procedureName = useProcedureName(destination, inputType)
-  if (procedureName) {
-    return (
-      <span>
-        {inputType} ({procedureName})
-      </span>
-    )
-  }
-  return <span>{inputType.toString()}</span>
+const TxTypeLabel = ({ destination, inputType }: { destination: string; inputType: number }) => {
+  const description = useTxTypeDescription(destination, inputType)
+  return <span>{description}</span>
 }
 
 const History = () => {
@@ -162,7 +156,7 @@ const History = () => {
 
     for (const tx of apiItems) {
       const ts = Number(tx.timestamp)
-      const date = new Date(ts > 1e12 ? ts : ts * 1000)
+      const date = new Date(toTimestampMs(ts))
       const key = date.toDateString()
       const group = groupMap.get(key)
       if (group) {
@@ -293,8 +287,8 @@ const History = () => {
           </div>
           {Number(tx.inputType) !== 0 && (
             <div className="flex items-center gap-1 font-mono">
-              <span className="text-muted-foreground/70">{t('history.type')}</span>
-              <InputTypeLabel destination={tx.destination} inputType={Number(tx.inputType)} />
+              <span className="text-muted-foreground/70">{t('history.txType')}</span>
+              <TxTypeLabel destination={tx.destination} inputType={Number(tx.inputType)} />
             </div>
           )}
         </div>
@@ -363,7 +357,7 @@ const History = () => {
               size="icon"
               variant="ghost"
               className="h-9 w-9"
-              aria-label="Refresh history"
+              aria-label={t('history.refresh')}
               onClick={() => transactions.refetch()}
               disabled={transactions.isFetching}
             >
@@ -425,8 +419,9 @@ const History = () => {
                     return (
                       <motion.div
                         key={tx.hash}
-                        className="w-full space-y-3 rounded-xl border border-red-500/50 bg-red-500/10 px-3 py-3 text-left transition-colors"
+                        className="w-full cursor-pointer space-y-3 rounded-xl border border-red-500/50 bg-red-500/10 px-3 py-3 text-left transition-colors"
                         variants={itemMotion}
+                        onClick={() => navigate(`/tx/${tx.hash}`)}
                       >
                         <div className="flex items-center justify-between gap-3">
                           <div className="flex items-center gap-3">
@@ -452,11 +447,12 @@ const History = () => {
                                 <button
                                   type="button"
                                   className="cursor-pointer text-[11px] font-semibold uppercase tracking-wide text-primary hover:underline"
-                                  onClick={() =>
+                                  onClick={(e) => {
+                                    e.stopPropagation()
                                     navigate(
                                       `/transfer/send?recipient=${encodeURIComponent(tx.destination)}&amount=${encodeURIComponent(tx.amount.toString())}&token=${encodeURIComponent(tx.tokenKey ?? 'qu')}`,
                                     )
-                                  }
+                                  }}
                                 >
                                   {t('history.resend')}
                                 </button>
@@ -464,7 +460,10 @@ const History = () => {
                               <button
                                 type="button"
                                 className="cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
-                                onClick={() => removePendingTransaction(tx.hash)}
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  removePendingTransaction(tx.hash)
+                                }}
                                 aria-label={t('history.deleteFailed')}
                                 title={t('history.deleteFailed')}
                               >
@@ -494,8 +493,10 @@ const History = () => {
                           </div>
                           {Number(tx.inputType) !== 0 && (
                             <div className="flex items-center gap-1 font-mono">
-                              <span className="text-muted-foreground/70">{t('history.type')}</span>
-                              <InputTypeLabel
+                              <span className="text-muted-foreground/70">
+                                {t('history.txType')}
+                              </span>
+                              <TxTypeLabel
                                 destination={tx.destination}
                                 inputType={Number(tx.inputType)}
                               />

@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { ArrowLeftIcon, RouteIcon } from 'lucide-react'
+import { RouteIcon } from 'lucide-react'
+import PageHeader from '@/components/page-header'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import NumericInput from '@/components/numeric-input'
 import { type AggregatedAsset, formatAssetUnits } from '@/lib/assets'
 import { NATIVE_TOKEN_SYMBOL } from '@/lib/config/constants'
 import { useAddressName } from '@/hooks/use-address-name'
@@ -99,25 +101,20 @@ const TransferForm = ({
 
   const handleMax = () => {
     if (availableUnits <= 0n) return
-    onAmountChange(availableUnits.toString())
+    onAmountChange(formatNumber(availableUnits))
   }
 
   return (
     <section className="flex w-full justify-center">
       <div className="flex min-h-[calc(100vh-64px)] w-full max-w-sm flex-col px-4">
-        {/* Header */}
-        <div className="relative flex items-center justify-center py-3">
-          <button
-            type="button"
-            className="absolute left-0 cursor-pointer p-1 text-muted-foreground transition-colors hover:text-foreground"
-            onClick={() => navigate('/transfer')}
-          >
-            <ArrowLeftIcon className="h-5 w-5" />
-          </button>
-          <h2 className="text-lg font-semibold">
-            {t('transfer.title')} {selectedTokenLabel}
-          </h2>
-        </div>
+        <PageHeader
+          title={
+            <>
+              {t('transfer.title')} {selectedTokenLabel}
+            </>
+          }
+          onBack={() => navigate('/transfer')}
+        />
         {/* Form fields */}
         <div className="flex flex-1 flex-col gap-5">
           {/* Recipient */}
@@ -190,12 +187,11 @@ const TransferForm = ({
           {/* Amount with Max + token label */}
           <div className="space-y-1.5">
             <div className="relative">
-              <Input
+              <NumericInput
                 id="amount"
-                type="text"
                 placeholder={t('transfer.form.amountPlaceholder')}
                 value={amount}
-                onChange={(e) => onAmountChange(e.target.value.replace(/[^\d,]/g, ''))}
+                onChange={onAmountChange}
                 disabled={isWatchOnly}
                 className={`h-12 pr-28 text-sm ${errors.amount ? 'border-destructive' : ''}`}
               />
@@ -236,9 +232,12 @@ const TransferForm = ({
 
           {/* Asset transfer fee info */}
           {selectedAsset && (
-            <div className="rounded-lg border border-border/40 px-3 py-2 text-xs text-muted-foreground">
-              <div>{t('transfer.form.feeValue', { fee: '100' })}</div>
-              <div>{t('transfer.form.quBalance', { balance: formatBalance(quBalance) })}</div>
+            <div className="space-y-1.5">
+              <div className="rounded-lg border border-border/40 px-3 py-2 text-xs text-muted-foreground">
+                <div>{t('transfer.form.feeValue', { fee: '100' })}</div>
+                <div>{t('transfer.form.quBalance', { balance: formatBalance(quBalance) })}</div>
+              </div>
+              {errors.fee && <p className="text-xs text-destructive">{errors.fee}</p>}
             </div>
           )}
 
@@ -280,14 +279,9 @@ const TransferForm = ({
             </div>
             {isManualTargetTickEnabled && (
               <div className="space-y-1">
-                <Input
-                  type="number"
-                  min={1}
-                  step={1}
+                <NumericInput
                   value={manualTargetTick}
-                  onChange={(event) => {
-                    onManualTargetTickChange(event.target.value)
-                  }}
+                  onChange={onManualTargetTickChange}
                   className="h-12 w-full text-sm"
                   disabled={isWatchOnly}
                   placeholder={t('transfer.form.targetTickManualPlaceholder')}
@@ -327,7 +321,7 @@ const TransferForm = ({
             disabled={isWatchOnly || isAssetLoading || !recipient.trim() || !amount.trim()}
             onClick={onContinue}
           >
-            {t('transfer.actions.continue')}
+            {t('common.continue')}
           </Button>
         </div>
       </div>

@@ -3,16 +3,10 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { useBalance, useSdk } from '@qubic-labs/react'
-import {
-  ArrowLeftIcon,
-  AlertTriangleIcon,
-  ChevronRightIcon,
-  RouteIcon,
-  SendIcon,
-  XIcon,
-} from 'lucide-react'
+import { AlertTriangleIcon, ChevronRightIcon, RouteIcon, SendIcon, XIcon } from 'lucide-react'
+import PageHeader from '@/components/page-header'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import NumericInput from '@/components/numeric-input'
 import {
   Select,
   SelectContent,
@@ -33,25 +27,36 @@ import PassphraseAuth from '@/pages/passphrase-auth'
 import { isWatchOnlyIdentity } from '@/lib/accounts'
 import { useCurrentIdentity } from '@/hooks/use-current-identity'
 import { formatAssetUnits, getAssetsPerContract, useOwnedAssets } from '@/lib/assets'
-import { QX_CONTRACT_INDEX } from '@/lib/config/constants'
 import { useSmartContracts } from '@/lib/qubic-static'
 import type { SmartContract } from '@/lib/qubic-static.types'
+import { QX_CONTRACT_INDEX } from '@/lib/config/constants'
+import type { ManagementRightsProcedureType } from '@/lib/transfer-rights'
 import {
+  PROCEDURE_TYPE_REVOKE,
+  buildRevokeRightsPayload,
   buildTransferRightsPayload,
   canReceiveTransferShares,
-  findTransferRightsProcedure,
-  hasTransferRightsProcedure,
+  findManagementRightsProcedure,
+  hasManagementRightsProcedure,
 } from '@/lib/transfer-rights'
 import { addPendingTransaction, PENDING_SETTLED_EVENT } from '@/lib/pending-transactions'
 import { isWalletLocked } from '@/lib/lock'
 import { useTickInfo, fetchTickInfo } from '@/lib/network-stats'
-import { formatBalance, formatNumber, normalizeBalance, parseAmount } from '@/lib/utils'
+import {
+  compareBigIntDesc,
+  formatBalance,
+  formatNumber,
+  normalizeBalance,
+  parseAmount,
+  truncateString,
+} from '@/lib/utils'
 
 type Step = 'select-asset' | 'form' | 'auth'
 type FormErrors = {
   sourceContract?: string
   destinationContract?: string
   shares?: string
+  fee?: string
   targetTick?: string
 }
 
@@ -66,6 +71,7 @@ type AssetGroup = {
     numberOfUnits: string
     procedureId: number
     procedureFee: number
+    procedureType: ManagementRightsProcedureType
   }>
 }
 
@@ -112,11 +118,11 @@ const TransferRights = () => {
   const onChainQuBalance = normalizeBalance(balance.data?.balance)
   const currentTick = tickInfo.data?.tickInfo?.tick
 
-  // Build source-eligible contracts map (contracts that have the procedure)
+  // Build source-eligible contracts map (contracts that have a management rights procedure)
   const contractsMap = useMemo(() => {
     const map = new Map<number, SmartContract>()
     for (const sc of smartContracts.data ?? []) {
-      if (hasTransferRightsProcedure(sc)) {
+      if (hasManagementRightsProcedure(sc)) {
         map.set(sc.contractIndex, sc)
       }
     }
@@ -134,8 +140,8 @@ const TransferRights = () => {
       const contract = contractsMap.get(entry.managingContractIndex)
       if (!contract) continue
 
-      const procedure = findTransferRightsProcedure(contract)
-      if (!procedure || procedure.fee === undefined || procedure.fee < 0) continue
+      const result = findManagementRightsProcedure(contract)
+      if (!result || result.procedure.fee == null || result.procedure.fee < 0) continue
 
       const key = `${entry.issuerIdentity}-${entry.name}`
       let group = groupMap.get(key)
@@ -154,9 +160,14 @@ const TransferRights = () => {
         contractName: contract.name,
         contractAddress: contract.address,
         numberOfUnits: entry.numberOfUnits,
-        procedureId: procedure.id,
-        procedureFee: procedure.fee,
+        procedureId: result.procedure.id,
+        procedureFee: result.procedure.fee,
+        procedureType: result.type,
       })
+    }
+
+    for (const group of groupMap.values()) {
+      group.contracts.sort((a, b) => compareBigIntDesc(a.numberOfUnits, b.numberOfUnits))
     }
 
     return [...groupMap.values()]
@@ -170,13 +181,25 @@ const TransferRights = () => {
     (c) => c.contractIndex === selectedSourceIndex,
   )
 
-  // Destination options: contracts with allowTransferShares, excluding the source
+  // Destination options depend on source contract's procedure type:
+  // - revoke: destination is only QX
+  // - transfer: destination is contracts with allowTransferShares + management rights procedure
   const destinationOptions = useMemo(() => {
     if (!smartContracts.data || selectedSourceIndex === null) return []
+
+    if (sourceContract?.procedureType === PROCEDURE_TYPE_REVOKE) {
+      return smartContracts.data.filter((sc) => sc.contractIndex === QX_CONTRACT_INDEX)
+    }
+
     return smartContracts.data
-      .filter((sc) => canReceiveTransferShares(sc) && sc.contractIndex !== selectedSourceIndex)
+      .filter(
+        (sc) =>
+          canReceiveTransferShares(sc) &&
+          hasManagementRightsProcedure(sc) &&
+          sc.contractIndex !== selectedSourceIndex,
+      )
       .sort((a, b) => a.name.localeCompare(b.name))
-  }, [smartContracts.data, selectedSourceIndex])
+  }, [smartContracts.data, selectedSourceIndex, sourceContract?.procedureType])
 
   const destinationContract = destinationOptions.find(
     (sc) => sc.contractIndex === selectedDestIndex,
@@ -192,11 +215,8 @@ const TransferRights = () => {
 
   useEffect(() => {
     if (selectedSourceIndex === null || selectedDestIndex !== null) return
-    if (selectedSourceIndex !== QX_CONTRACT_INDEX) {
-      const qx = destinationOptions.find((sc) => sc.contractIndex === QX_CONTRACT_INDEX)
-      if (qx) {
-        setSelectedDestIndex(QX_CONTRACT_INDEX)
-      }
+    if (destinationOptions.length === 1) {
+      setSelectedDestIndex(destinationOptions[0].contractIndex)
     }
   }, [selectedSourceIndex, selectedDestIndex, destinationOptions])
 
@@ -253,14 +273,14 @@ const TransferRights = () => {
     if (sourceContract) {
       const fee = BigInt(sourceContract.procedureFee)
       if (onChainQuBalance < fee) {
-        newErrors.shares = t('transferRights.validation.insufficientQuForFee', {
+        newErrors.fee = t('transferRights.validation.insufficientQuForFee', {
           fee: sourceContract.procedureFee.toString(),
         })
       }
     }
 
     if (isManualTargetTickEnabled) {
-      const parsedManualTick = Number.parseInt(manualTargetTick.trim(), 10)
+      const parsedManualTick = Number(parseAmount(manualTargetTick) ?? Number.NaN)
       if (!Number.isFinite(parsedManualTick) || parsedManualTick < 1) {
         newErrors.targetTick = t('transfer.validation.targetTickManualInvalid')
       } else if (typeof currentTick === 'number' && parsedManualTick <= currentTick) {
@@ -300,6 +320,8 @@ const TransferRights = () => {
     const seed = seedArg ?? seedRef.current
     if (!seed || !sourceContract || !destinationContract || !selectedGroup) return
 
+    const isRevoke = sourceContract.procedureType === PROCEDURE_TYPE_REVOKE
+
     setSending(true)
     setErrorMessage('')
 
@@ -315,7 +337,7 @@ const TransferRights = () => {
       const sendCurrentTick = freshTickInfo.tickInfo?.tick
 
       if (isManualTargetTickEnabled) {
-        const parsedManualTick = Number.parseInt(manualTargetTick.trim(), 10)
+        const parsedManualTick = Number(parseAmount(manualTargetTick) ?? Number.NaN)
         if (!Number.isFinite(parsedManualTick) || parsedManualTick < 1) {
           throw new Error(t('transfer.validation.targetTickManualInvalid'))
         }
@@ -343,12 +365,21 @@ const TransferRights = () => {
         throw new Error(t('transferRights.errors.networkError'))
       }
 
-      const payload = buildTransferRightsPayload(
-        selectedGroup.issuerIdentity,
-        selectedGroup.name,
-        parsedShares,
-        destinationContract.contractIndex,
-      )
+      let payload: Uint8Array
+      if (isRevoke) {
+        payload = buildRevokeRightsPayload(
+          selectedGroup.issuerIdentity,
+          selectedGroup.name,
+          parsedShares,
+        )
+      } else {
+        payload = buildTransferRightsPayload(
+          selectedGroup.issuerIdentity,
+          selectedGroup.name,
+          parsedShares,
+          destinationContract.contractIndex,
+        )
+      }
 
       const result = await sdk.transactions.send({
         fromSeed: seed,
@@ -374,7 +405,7 @@ const TransferRights = () => {
       setDrawerOpen(false)
 
       toast.success(t('transferRights.success.title'), {
-        description: t('transferRights.success.description', {
+        description: t('transaction.broadcastDescription', {
           targetTick: formatNumber(Number(result.targetTick)),
         }),
       })
@@ -436,7 +467,7 @@ const TransferRights = () => {
 
   const handleMax = () => {
     if (!sourceContract) return
-    setShares(sourceContract.numberOfUnits)
+    setShares(formatNumber(BigInt(sourceContract.numberOfUnits)))
   }
 
   // Asset selection screen
@@ -504,17 +535,7 @@ const TransferRights = () => {
     <>
       <section className="flex w-full justify-center">
         <div className="flex min-h-[calc(100vh-64px)] w-full max-w-sm flex-col px-4">
-          {/* Header */}
-          <div className="relative flex items-center justify-center py-3">
-            <button
-              type="button"
-              className="absolute left-0 cursor-pointer p-1 text-muted-foreground transition-colors hover:text-foreground"
-              onClick={handleBack}
-            >
-              <ArrowLeftIcon className="h-5 w-5" />
-            </button>
-            <h2 className="text-lg font-semibold">{t('transferRights.title')}</h2>
-          </div>
+          <PageHeader title={t('transferRights.title')} onBack={handleBack} />
 
           {/* Form fields */}
           <div className="flex flex-1 flex-col gap-5">
@@ -522,6 +543,11 @@ const TransferRights = () => {
             {selectedGroup && (
               <div className="rounded-lg border border-border/40 px-3 py-2 text-sm font-medium text-foreground">
                 {selectedGroup.name}
+                <span className="ml-2 text-xs font-normal text-muted-foreground">
+                  {t('transferRights.confirm.issuedBy', {
+                    issuer: truncateString(selectedGroup.issuerIdentity),
+                  })}
+                </span>
               </div>
             )}
 
@@ -535,9 +561,7 @@ const TransferRights = () => {
                 onValueChange={(value) => {
                   const idx = Number(value)
                   setSelectedSourceIndex(idx)
-                  if (selectedDestIndex === idx) {
-                    setSelectedDestIndex(null)
-                  }
+                  setSelectedDestIndex(null)
                   setShares('')
                   setErrors((prev) => ({
                     ...prev,
@@ -602,18 +626,24 @@ const TransferRights = () => {
               {errors.destinationContract && (
                 <p className="text-xs text-destructive">{errors.destinationContract}</p>
               )}
+              {sourceContract?.procedureType === PROCEDURE_TYPE_REVOKE && (
+                <p className="text-xs text-muted-foreground">
+                  {t('transferRights.revokeOnlyHint', {
+                    contract: sourceContract.contractName,
+                  })}
+                </p>
+              )}
             </div>
 
             {/* Number of shares */}
             <div className="space-y-1.5">
               <div className="relative">
-                <Input
+                <NumericInput
                   id="shares"
-                  type="text"
                   placeholder={t('transferRights.numberOfSharesPlaceholder')}
                   value={shares}
-                  onChange={(e) => {
-                    setShares(e.target.value.replace(/[^\d,]/g, ''))
+                  onChange={(value) => {
+                    setShares(value)
                     if (errors.shares) {
                       setErrors((prev) => ({ ...prev, shares: undefined }))
                     }
@@ -648,13 +678,16 @@ const TransferRights = () => {
 
             {/* Fee info */}
             {sourceContract && (
-              <div className="rounded-lg border border-border/40 px-3 py-2 text-xs text-muted-foreground">
-                <div>
-                  {t('transferRights.fee', { fee: sourceContract.procedureFee.toString() })}
+              <div className="space-y-1.5">
+                <div className="rounded-lg border border-border/40 px-3 py-2 text-xs text-muted-foreground">
+                  <div>
+                    {t('transferRights.fee', { fee: sourceContract.procedureFee.toString() })}
+                  </div>
+                  <div>
+                    {t('transferRights.quBalance', { balance: formatBalance(onChainQuBalance) })}
+                  </div>
                 </div>
-                <div>
-                  {t('transferRights.quBalance', { balance: formatBalance(onChainQuBalance) })}
-                </div>
+                {errors.fee && <p className="text-xs text-destructive">{errors.fee}</p>}
               </div>
             )}
 
@@ -698,7 +731,7 @@ const TransferRights = () => {
                   onClick={() => {
                     setIsManualTargetTickEnabled((prev) => !prev)
                     if (!isManualTargetTickEnabled && !manualTargetTick) {
-                      setManualTargetTick((currentTick ?? '').toString())
+                      setManualTargetTick(currentTick ? formatNumber(currentTick) : '')
                     }
                     if (errors.targetTick) {
                       setErrors((prev) => ({ ...prev, targetTick: undefined }))
@@ -710,13 +743,10 @@ const TransferRights = () => {
               </div>
               {isManualTargetTickEnabled && (
                 <div className="space-y-1">
-                  <Input
-                    type="number"
-                    min={1}
-                    step={1}
+                  <NumericInput
                     value={manualTargetTick}
-                    onChange={(event) => {
-                      setManualTargetTick(event.target.value)
+                    onChange={(value) => {
+                      setManualTargetTick(value)
                       if (errors.targetTick) {
                         setErrors((prev) => ({ ...prev, targetTick: undefined }))
                       }
@@ -757,7 +787,7 @@ const TransferRights = () => {
               }
               onClick={handleContinue}
             >
-              {t('transferRights.actions.continue')}
+              {t('common.continue')}
             </Button>
           </div>
         </div>
@@ -795,10 +825,21 @@ const TransferRights = () => {
 
           <div className="flex-1 space-y-4 overflow-y-auto px-4 pb-2">
             <div className="space-y-3">
-              <SummaryRow
-                label={t('transferRights.confirm.asset')}
-                value={selectedGroup?.name ?? ''}
-              />
+              <div className="space-y-1 first:border-t-0 first:pt-0">
+                <div className="text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
+                  {t('transferRights.confirm.asset')}
+                </div>
+                <div className="text-sm text-foreground">
+                  {selectedGroup?.name}
+                  {selectedGroup && (
+                    <span className="ml-1.5 text-xs text-muted-foreground">
+                      {t('transferRights.confirm.issuedBy', {
+                        issuer: truncateString(selectedGroup.issuerIdentity),
+                      })}
+                    </span>
+                  )}
+                </div>
+              </div>
               <SummaryRow
                 label={t('transferRights.confirm.from')}
                 value={sourceContract?.contractName ?? ''}
@@ -808,9 +849,8 @@ const TransferRights = () => {
                 value={destinationContract?.name ?? ''}
               />
               <SummaryRow
-                label={t('transferRights.confirm.shares')}
+                label={t('transferRights.confirm.amount')}
                 value={`${formatAssetUnits(String(parseAmount(shares) ?? 0n), selectedGroup?.decimals)} ${selectedTokenLabel}`}
-                emphasize
               />
               {sourceContract && (
                 <SummaryRow

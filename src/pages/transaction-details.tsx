@@ -10,31 +10,29 @@ import {
   usePendingTransactionsVersion,
 } from '@/lib/pending-transactions'
 import { useAddressName } from '@/hooks/use-address-name'
-import { useProcedureName } from '@/hooks/use-procedure-name'
+import { useTxTypeDescription } from '@/hooks/use-tx-type-description'
 import { useClipboardCopy } from '@/hooks/use-clipboard-copy'
-import { formatAddressLabel, formatNumber } from '@/lib/utils'
+import { formatAddressLabel, formatIntegerLike, formatNumber, toTimestampMs } from '@/lib/utils'
+import { NATIVE_TOKEN_SYMBOL } from '@/lib/config/constants'
 import TxDetailsHeader from '@/components/pages/transaction-details/tx-details-header'
 import TxDetailsRow, { formatValue } from '@/components/pages/transaction-details/tx-details-row'
 
-const formatIntegerLike = (value: unknown): string => {
-  if (value === null || value === undefined) return '--'
-
-  if (typeof value === 'bigint') return formatNumber(value)
-
-  if (typeof value === 'number') {
-    if (!Number.isFinite(value)) return '--'
-    return formatNumber(Math.trunc(value))
-  }
-
-  if (typeof value === 'string') {
-    const normalized = value.trim()
-    if (/^-?\d+$/.test(normalized)) return formatNumber(BigInt(normalized))
-  }
-
-  return formatValue(value)
-}
-
 const TX_DETAILS_SKELETON_IDS = ['a', 'b', 'c', 'd', 'e', 'f'] as const
+
+const formatTimestamp = (ts: unknown): string => {
+  if (ts === null || ts === undefined) return '--'
+  const num = Number(ts)
+  if (!num || Number.isNaN(num)) return '--'
+  const ms = toTimestampMs(num)
+  return new Date(ms).toLocaleString(undefined, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  })
+}
 
 const TransactionDetails = () => {
   const { t } = useTranslation()
@@ -50,6 +48,7 @@ const TransactionDetails = () => {
   const archiverProcessedTick = lastProcessedTickQuery.data?.tickNumber
   const pending = getPendingTransaction(hash)
   const isPending = pending?.status === 'pending'
+  const isFailed = pending?.status === 'failed'
 
   const txQuery = useQuery({
     queryKey: ['qubic', 'tx-by-hash', hash],
@@ -67,26 +66,17 @@ const TransactionDetails = () => {
   }, [hash, archiverProcessedTick, txQuery.data])
 
   const details = txQuery.data as Record<string, unknown> | undefined
-  const sourceAddress = (details?.source as string) ?? ''
-  const destAddress = (details?.destination as string) ?? ''
+  const sourceAddress = (details?.source as string) || pending?.sourceIdentity || ''
+  const destAddress = (details?.destination as string) || pending?.destinationIdentity || ''
   const sourceName = useAddressName(sourceAddress)
   const destName = useAddressName(destAddress)
-  const procedureName = useProcedureName(destAddress, Number(details?.inputType ?? 0))
+  const txTypeDescription = useTxTypeDescription(
+    destAddress,
+    Number(details?.inputType ?? pending?.inputType ?? 0),
+  )
 
-  const formatTimestamp = (ts: unknown): string => {
-    if (ts === null || ts === undefined) return '--'
-    const num = typeof ts === 'bigint' ? Number(ts) : Number(ts)
-    if (!num || Number.isNaN(num)) return '--'
-    const ms = num > 1e12 ? num : num * 1000
-    return new Date(ms).toLocaleString(undefined, {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-    })
-  }
+  const amount = details?.amount ?? pending?.amount
+  const tickNumber = details?.tickNumber ?? pending?.targetTick
 
   const rows: Array<{
     key: string
@@ -99,40 +89,38 @@ const TransactionDetails = () => {
     {
       key: 'amount',
       label: t('txDetails.amount'),
-      value: formatIntegerLike(details?.amount),
-    },
-    {
-      key: 'timestamp',
-      label: t('txDetails.timestamp'),
-      value: formatTimestamp(details?.timestamp),
-    },
-    {
-      key: 'tick',
-      label: t('txDetails.tick'),
-      value: (() => {
-        const tick = details?.tickNumber ?? details?.tick ?? pending?.targetTick
-        if (tick === null || tick === undefined) return '--'
-        return formatNumber(Number(tick))
-      })(),
+      value: amount != null ? `${formatIntegerLike(amount)} ${NATIVE_TOKEN_SYMBOL}` : '--',
     },
     {
       key: 'inputType',
-      label: t('txDetails.inputType'),
-      value: procedureName ? `${details?.inputType} (${procedureName})` : details?.inputType,
+      label: t('txDetails.txType'),
+      value: txTypeDescription,
     },
     {
       key: 'source',
       label: t('txDetails.source'),
-      value: sourceName ? formatAddressLabel(sourceAddress, sourceName.name) : details?.source,
-      copyable: true,
+      value: sourceName
+        ? formatAddressLabel(sourceAddress, sourceName.name)
+        : sourceAddress || '--',
+      copyable: Boolean(sourceAddress),
       copyText: sourceAddress,
     },
     {
       key: 'destination',
       label: t('txDetails.destination'),
-      value: destName ? formatAddressLabel(destAddress, destName.name) : details?.destination,
-      copyable: true,
+      value: destName ? formatAddressLabel(destAddress, destName.name) : destAddress || '--',
+      copyable: Boolean(destAddress),
       copyText: destAddress,
+    },
+    {
+      key: 'tick',
+      label: t('txDetails.tick'),
+      value: tickNumber != null ? formatNumber(Number(tickNumber)) : '--',
+    },
+    {
+      key: 'timestamp',
+      label: t('txDetails.timestamp'),
+      value: formatTimestamp(details?.timestamp),
     },
   ]
 
@@ -149,11 +137,11 @@ const TransactionDetails = () => {
           onClick={() => navigate(-1)}
         >
           <ArrowLeftIcon className="h-3.5 w-3.5" />
-          {t('txDetails.back')}
+          {t('common.back')}
         </button>
-        <TxDetailsHeader hash={hash} />
+        <TxDetailsHeader hash={hash} tick={tickNumber != null ? Number(tickNumber) : undefined} />
 
-        {txQuery.isLoading && (
+        {txQuery.isLoading && !pending && (
           <div className="space-y-2">
             <div className="text-xs text-muted-foreground">{t('txDetails.loading')}</div>
             <div className="divide-y divide-border/40">
@@ -167,7 +155,7 @@ const TransactionDetails = () => {
           </div>
         )}
 
-        {txQuery.error && !isPending && (
+        {txQuery.error && !isPending && !pending && (
           <div className="text-xs text-destructive">
             {txQuery.error instanceof Error ? txQuery.error.message : t('txDetails.error')}
           </div>
@@ -177,8 +165,11 @@ const TransactionDetails = () => {
             {t('txDetails.pendingHint')}
           </div>
         )}
+        {isFailed && !details && (
+          <div className="text-xs text-destructive">{t('txDetails.failedHint')}</div>
+        )}
 
-        {details && (
+        {(details || pending) && (
           <div className="divide-y divide-border/40">
             {rows.map((row) => (
               <TxDetailsRow key={row.key} row={row} copiedKey={copiedKey} onCopy={copyValue} />

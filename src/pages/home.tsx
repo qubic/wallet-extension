@@ -1,17 +1,11 @@
 import { useBalance, useTransactions } from '@qubic-labs/react'
-import {
-  ArrowRightLeftIcon,
-  CopyIcon,
-  EyeIcon,
-  Loader2Icon,
-  PackageIcon,
-  RefreshCwIcon,
-} from 'lucide-react'
+import { CopyIcon, EyeIcon, Loader2Icon, PackageIcon, RefreshCwIcon } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import QRCode from 'qrcode'
 import { useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
+import TransferRightsButton from '@/components/transfer-rights-button'
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer'
 import { ReceiveIcon } from '@/components/icons/receive-icon'
 import { SendIcon } from '@/components/icons/send-icon'
@@ -185,7 +179,7 @@ const Home = () => {
                 size="icon"
                 variant="ghost"
                 className="h-9 w-9 shrink-0"
-                aria-label="Refresh"
+                aria-label={t('home.refresh')}
                 onClick={handleRefresh}
                 disabled={isSyncingRaw}
               >
@@ -197,7 +191,7 @@ const Home = () => {
             </div>
             {isWatchOnly && (
               <div className="flex items-center justify-center gap-2">
-                <div className="inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-1 text-[11px] text-amber-200">
+                <div className="inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-1 text-[11px] text-amber-700 dark:text-amber-200">
                   <EyeIcon className="h-3.5 w-3.5" />
                   {t('home.watchOnly.title')}
                 </div>
@@ -282,10 +276,15 @@ const Home = () => {
               <div className="space-y-2">
                 {aggregatedAssets.map((asset) => {
                   const assetKey = `${asset.issuerIdentity}-${asset.name}`
+                  const Wrapper = isWatchOnly ? 'div' : 'button'
                   return (
-                    <div
+                    <Wrapper
                       key={assetKey}
-                      className="group flex items-center justify-between rounded-lg border border-border/40 bg-transparent px-3 py-2.5 transition-colors hover:border-primary/30 hover:bg-background/40"
+                      {...(!isWatchOnly && { type: 'button' as const })}
+                      className={`group flex w-full items-center justify-between rounded-lg border border-border/40 bg-transparent px-3 py-2.5 text-left transition-colors ${isWatchOnly ? '' : 'cursor-pointer hover:border-primary/30 hover:bg-background/40'}`}
+                      {...(!isWatchOnly && {
+                        onClick: () => navigate(`/asset/${encodeURIComponent(assetKey)}`),
+                      })}
                     >
                       <div className="min-w-0 flex flex-col">
                         <span className="truncate text-sm font-semibold leading-none text-foreground">
@@ -298,25 +297,23 @@ const Home = () => {
                         )}
                       </div>
                       <div className="ml-3 flex shrink-0 items-center gap-2">
-                        <span className="text-right text-base font-semibold tabular-nums text-foreground">
+                        <span className="text-right text-base font-semibold text-foreground">
                           {isVisible
                             ? formatAssetUnits(asset.numberOfUnits, asset.decimals)
                             : HIDDEN_BALANCE}
                         </span>
-                        <button
-                          type="button"
-                          title={t('home.assets.manageRights')}
-                          className="cursor-pointer rounded-md p-1 text-muted-foreground opacity-0 transition-all hover:bg-primary/10 hover:text-primary group-hover:opacity-100"
-                          onClick={() =>
-                            navigate(
-                              `/transfer/manage-rights?asset=${encodeURIComponent(assetKey)}`,
-                            )
-                          }
-                        >
-                          <ArrowRightLeftIcon className="h-3.5 w-3.5" />
-                        </button>
+                        {!isWatchOnly && (
+                          <TransferRightsButton
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              navigate(
+                                `/transfer/manage-rights?asset=${encodeURIComponent(assetKey)}`,
+                              )
+                            }}
+                          />
+                        )}
                       </div>
-                    </div>
+                    </Wrapper>
                   )
                 })}
               </div>
@@ -351,7 +348,7 @@ const Home = () => {
           <div className="mt-4 flex flex-col items-center gap-4 text-center">
             <div className="flex h-52 w-52 items-center justify-center rounded-lg bg-card">
               {qrCode ? (
-                <img src={qrCode} alt="Public identity QR code" className="h-48 w-48" />
+                <img src={qrCode} alt={t('home.receive.qrAlt')} className="h-48 w-48" />
               ) : (
                 <div className="text-xs text-muted-foreground">{t('home.receive.generating')}</div>
               )}

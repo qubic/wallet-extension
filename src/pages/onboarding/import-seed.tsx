@@ -63,8 +63,8 @@ const ImportSeed = ({
   const seedLength = seed.length
   const isSeedValid = isSeedLike(seed)
   const seedValidationMessage = isSeedValid
-    ? 'Valid seed format.'
-    : `Seed must be 55 lowercase letters (${seedLength}/${SEED_LENGTH}).`
+    ? t('onboarding.importSeed.seedValid')
+    : t('onboarding.importSeed.seedInvalidCount', { current: seedLength, total: SEED_LENGTH })
 
   const clearSensitiveState = () => {
     setSeed('')
@@ -74,7 +74,7 @@ const ImportSeed = ({
 
   const handleSeedChange = (value: string) => {
     setSeed(normalizeSeedInput(value))
-    if (status === 'Seed must be 55 lowercase letters.') {
+    if (step === 1 && status) {
       setStatus(null)
     }
   }
@@ -83,7 +83,7 @@ const ImportSeed = ({
     setStatus(null)
 
     if (step === 1 && !isSeedLike(seed)) {
-      setStatus('Seed must be 55 lowercase letters.')
+      setStatus(t('onboarding.errors.seedInvalid'))
       return
     }
 
@@ -93,17 +93,17 @@ const ImportSeed = ({
         setDerivedIdentity(identity)
         const cachedAccounts = getCachedAccounts()
         if (cachedAccounts.some((entry) => entry.identity === identity)) {
-          setStatus('This address already exists.')
+          setStatus(t('onboarding.errors.addressExists'))
           return
         }
       } catch {
-        setStatus('Seed must be 55 lowercase letters.')
+        setStatus(t('onboarding.errors.seedInvalid'))
         return
       }
     }
 
     if (step === 2 && !passphrase.trim()) {
-      setStatus('Passphrase is required.')
+      setStatus(t('onboarding.errors.passphraseRequired'))
       return
     }
     if (step === 2 && variant === 'add-address') {
@@ -115,8 +115,8 @@ const ImportSeed = ({
       if (!result.valid) {
         setStatus(
           result.reason === 'invalid'
-            ? 'Invalid vault passphrase.'
-            : 'Failed to validate vault passphrase.',
+            ? t('onboarding.errors.invalidVaultPassphrase')
+            : t('onboarding.errors.vaultValidationFailed'),
         )
         return
       }
@@ -139,13 +139,13 @@ const ImportSeed = ({
     setStatus(null)
 
     if (!isSeedLike(seed)) {
-      setStatus('Seed must be 55 lowercase letters.')
+      setStatus(t('onboarding.errors.seedInvalid'))
       setStep(1)
       return
     }
 
     if (!passphrase.trim()) {
-      setStatus('Passphrase is required.')
+      setStatus(t('onboarding.errors.passphraseRequired'))
       setStep(2)
       return
     }
@@ -163,7 +163,7 @@ const ImportSeed = ({
       if (variant === 'add-address') {
         const check = await verifyVaultAccess(vault)
         if (!check.valid) {
-          setStatus('Invalid vault passphrase.')
+          setStatus(t('onboarding.errors.invalidVaultPassphrase'))
           setIsSaving(false)
           return
         }
@@ -173,7 +173,7 @@ const ImportSeed = ({
         if (identityToCheck) {
           const existingIdentities = cachedAccounts.map((entry) => entry.identity)
           if (existingIdentities.includes(identityToCheck)) {
-            setStatus('This address already exists.')
+            setStatus(t('onboarding.errors.addressExists'))
             setIsSaving(false)
             setStep(1)
             return
@@ -190,8 +190,8 @@ const ImportSeed = ({
       }
       clearSensitiveState()
       navigate(onCompletePath)
-    } catch (error) {
-      setStatus(error instanceof Error ? error.message : 'Failed to import seed.')
+    } catch {
+      setStatus(t('onboarding.errors.importFailed'))
       setIsSaving(false)
     }
   }
@@ -206,7 +206,7 @@ const ImportSeed = ({
                 ? t('onboarding.importSeed.titleAddAddress')
                 : t('onboarding.importSeed.title')
             }
-            stepLabel={t('onboarding.importSeed.step', { current: step, total: TOTAL_STEPS })}
+            stepLabel={t('common.step', { current: step, total: TOTAL_STEPS })}
             progressValue={progressValue}
           />
         </div>
@@ -215,13 +215,15 @@ const ImportSeed = ({
           {step === 1 && (
             <div className="space-y-4">
               <div className="space-y-1">
-                <h3 className="text-sm font-semibold">Paste your seed</h3>
+                <h3 className="text-sm font-semibold">
+                  {t('onboarding.importSeed.pasteSeedTitle')}
+                </h3>
                 <p className="text-xs text-muted-foreground">
-                  Enter the 55-letter seed you want to import.
+                  {t('onboarding.importSeed.pasteSeedSubtitle')}
                 </p>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="seed">Seed</Label>
+                <Label htmlFor="seed">{t('common.seedLabel')}</Label>
                 <Textarea
                   id="seed"
                   rows={3}
@@ -239,16 +241,18 @@ const ImportSeed = ({
           {step === 2 && (
             <div className="space-y-4">
               <div className="space-y-1">
-                <h3 className="text-sm font-semibold">Label and secure</h3>
+                <h3 className="text-sm font-semibold">
+                  {t('onboarding.importSeed.labelSecureTitle')}
+                </h3>
                 <p className="text-xs text-muted-foreground">
                   {variant === 'add-address'
-                    ? 'Give this address a label and set a vault passphrase.'
-                    : 'Give this wallet a name and set a vault passphrase.'}
+                    ? t('onboarding.importSeed.labelSecureSubtitleAddress')
+                    : t('onboarding.importSeed.labelSecureSubtitleWallet')}
                 </p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="wallet-name">
-                  {variant === 'add-address' ? 'Address label' : 'Wallet name'}
+                  {variant === 'add-address' ? t('common.addressLabel') : t('common.accountName')}
                 </Label>
                 <Input
                   id="wallet-name"
@@ -258,7 +262,9 @@ const ImportSeed = ({
               </div>
               <div className="space-y-2">
                 <Label htmlFor="passphrase">
-                  {variant === 'add-address' ? 'Current vault passphrase' : 'Vault passphrase'}
+                  {variant === 'add-address'
+                    ? t('common.currentVaultPassphrase')
+                    : t('common.vaultPassphrase')}
                 </Label>
                 <PasswordInput
                   id="passphrase"
@@ -272,20 +278,24 @@ const ImportSeed = ({
           {step === 3 && (
             <div className="space-y-4">
               <div className="space-y-1">
-                <h3 className="text-sm font-semibold">Review import</h3>
+                <h3 className="text-sm font-semibold">{t('onboarding.importSeed.reviewTitle')}</h3>
                 <p className="text-xs text-muted-foreground">
-                  Confirm the details before importing.
+                  {t('onboarding.importSeed.reviewSubtitle')}
                 </p>
               </div>
               <div className="space-y-2 text-sm">
                 <div className="flex items-center justify-between text-xs text-muted-foreground">
-                  <span>{variant === 'add-address' ? 'Address label' : 'Wallet name'}</span>
+                  <span>
+                    {variant === 'add-address' ? t('common.addressLabel') : t('common.accountName')}
+                  </span>
                   <span className="text-foreground">{name || 'main'}</span>
                 </div>
-                <div className="text-xs text-muted-foreground">Seed length: {seed.length}</div>
+                <div className="text-xs text-muted-foreground">
+                  {t('common.seedLength', { length: seed.length })}
+                </div>
               </div>
               <p className="text-xs text-muted-foreground">
-                Your seed never leaves this device. Keep it private at all times.
+                {t('onboarding.importSeed.seedPrivacyNotice')}
               </p>
             </div>
           )}
@@ -296,7 +306,7 @@ const ImportSeed = ({
         <div className="flex w-full gap-3">
           <Button size="lg" variant="ghost" onClick={handleBack} className="flex-1">
             <ArrowLeftIcon className="h-5 w-5" />
-            {step === 1 ? 'Back' : 'Previous'}
+            {step === 1 ? t('common.back') : t('common.previous')}
           </Button>
           {step < TOTAL_STEPS ? (
             <Button
@@ -305,7 +315,7 @@ const ImportSeed = ({
               className="flex-1"
               disabled={step === 1 && !isSeedValid}
             >
-              Continue
+              {t('common.continue')}
               <ArrowRightIcon className="h-5 w-5" />
             </Button>
           ) : (
@@ -313,11 +323,11 @@ const ImportSeed = ({
               <KeyRoundIcon className="h-5 w-5" />
               {variant === 'add-address'
                 ? isSaving
-                  ? 'Importing...'
-                  : 'Import address'
+                  ? t('onboarding.importSeed.importing')
+                  : t('onboarding.importSeed.importAddress')
                 : isSaving
-                  ? 'Importing...'
-                  : 'Import seed'}
+                  ? t('onboarding.importSeed.importing')
+                  : t('onboarding.importSeed.importSeedAction')}
             </Button>
           )}
         </div>

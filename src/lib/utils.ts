@@ -36,6 +36,30 @@ export const parseAmount = (str: string): bigint | null => {
   return BigInt(cleaned)
 }
 
+/**
+ * Parse a formatted number string from various locale formats to an integer.
+ * Supports US (1,234), EU (1.234), and Swiss (1'234) thousand separators.
+ * Decimals are stripped (Qubic only supports integers).
+ * Returns null for invalid or empty values.
+ */
+export const parseFormattedInteger = (value: string): bigint | null => {
+  if (!value) return null
+  const trimmed = value.trim()
+  if (/^(\d{1,3}(,\d{3})*|\d+)(\.\d+)?$/.test(trimmed)) {
+    const integerPart = trimmed.split('.')[0]
+    return BigInt(integerPart.replace(/,/g, ''))
+  }
+  if (/^(\d{1,3}(\.\d{3})+|\d+)(,\d+)?$/.test(trimmed)) {
+    const integerPart = trimmed.split(',')[0]
+    return BigInt(integerPart.replace(/\./g, ''))
+  }
+  if (/^\d{1,3}('\d{3})+(\.\d+)?$/.test(trimmed)) {
+    const integerPart = trimmed.split('.')[0]
+    return BigInt(integerPart.replace(/'/g, ''))
+  }
+  return null
+}
+
 const standardFormatter = new Intl.NumberFormat('en', { notation: 'standard' })
 const compactFormatter = new Intl.NumberFormat('en', {
   notation: 'compact',
@@ -43,10 +67,36 @@ const compactFormatter = new Intl.NumberFormat('en', {
 })
 
 /**
+ * Normalize a numeric timestamp to milliseconds.
+ * Timestamps below 1e12 are treated as seconds and multiplied by 1000.
+ */
+const SECONDS_VS_MILLIS_THRESHOLD = 1e12
+export const toTimestampMs = (ts: number): number =>
+  ts > SECONDS_VS_MILLIS_THRESHOLD ? ts : ts * 1000
+
+/**
  * Format a number with commas (e.g. 1,000,000). Use for any numeric display.
  */
 export const formatNumber = (value: number | bigint): string => {
   return standardFormatter.format(value as number)
+}
+
+/**
+ * Format an integer-like value (number, bigint, or numeric string) for display.
+ * Returns '--' for null/undefined/non-finite values.
+ */
+export const formatIntegerLike = (value: unknown): string => {
+  if (value === null || value === undefined) return '--'
+  if (typeof value === 'bigint') return formatNumber(value)
+  if (typeof value === 'number') {
+    if (!Number.isFinite(value)) return '--'
+    return formatNumber(Math.trunc(value))
+  }
+  if (typeof value === 'string') {
+    const normalized = value.trim()
+    if (/^-?\d+$/.test(normalized)) return formatNumber(BigInt(normalized))
+  }
+  return String(value)
 }
 
 /**
@@ -103,10 +153,26 @@ export const formatAddressLabel = (
 
 export type ExplorerObject = 'tx'
 
-export function buildExplorerObjectUrl(object: ExplorerObject, id: string) {
+export const compareBigIntDesc = (a: string, b: string): number => {
+  const diff = BigInt(b) - BigInt(a)
+  return diff > 0n ? 1 : diff < 0n ? -1 : 0
+}
+
+export function buildExplorerObjectUrl(
+  object: ExplorerObject,
+  id: string,
+  params?: Record<string, string | number>,
+) {
   const pathMap: Record<ExplorerObject, string> = {
     tx: 'network/tx',
   }
 
-  return `${QUBIC_EXPLORER_BASE_URL}/${pathMap[object]}/${id}`
+  const url = `${QUBIC_EXPLORER_BASE_URL}/${pathMap[object]}/${id}`
+  if (!params) return url
+
+  const searchParams = new URLSearchParams()
+  for (const [key, value] of Object.entries(params)) {
+    searchParams.set(key, String(value))
+  }
+  return `${url}?${searchParams.toString()}`
 }

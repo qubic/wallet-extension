@@ -1,4 +1,17 @@
 {
+  "common": {
+    "back": "Retour",
+    "previous": "Précédent",
+    "continue": "Continuer",
+    "step": "Étape {{current}} sur {{total}}",
+    "accountName": "Nom du compte",
+    "addressLabel": "Libellé de l'adresse",
+    "vaultPassphrase": "Phrase secrète du coffre",
+    "currentVaultPassphrase": "Phrase secrète actuelle du coffre",
+    "seedLabel": "Seed privée",
+    "seedLength": "Longueur de la seed : {{length}}",
+    "identity": "Identité"
+  },
   "app": {
     "sidepanel": "Ouvrir le panneau latéral",
     "closeSidepanel": "Fermer le panneau latéral"
@@ -51,14 +64,14 @@
       "empty": "Aucun actif supplémentaire trouvé.",
       "emptyTitle": "Aucun actif",
       "error": "Impossible de charger les actifs.",
-      "unknown": "Actif inconnu",
-      "manageRights": "Gérer les droits"
+      "unknown": "Actif inconnu"
     },
     "receive": {
       "title": "Recevoir des Qubic",
       "description": "Partagez ce QR code ou copiez votre adresse d'identité publique.",
       "generating": "Génération du QR code...",
-      "copy": "Copier l'adresse"
+      "copy": "Copier l'adresse",
+      "qrAlt": "Code QR de l'identité publique"
     },
     "toast": {
       "copySuccess": "Adresse copiée",
@@ -70,6 +83,7 @@
       "title": "Compte en lecture seule",
       "description": "L'envoi est désactivé pour cette adresse."
     },
+    "refresh": "Actualiser",
     "price": {
       "label": "Prix QUBIC"
     },
@@ -182,13 +196,14 @@
       "title": "À propos",
       "appVersion": "Version de l'application",
       "extensionName": "Extension",
+      "extensionFullName": "Qubic Wallet",
       "versionLabel": "v{{version}}"
     }
   },
   "accounts": {
     "watchOnly": {
       "title": "Ajouter une adresse en lecture seule",
-      "subtitle": "Suivre une identité publique sans importer sa seed.",
+      "subtitle": "Suivre une identité publique sans importer sa seed privée.",
       "submit": "Ajouter en lecture seule"
     },
     "manage": {
@@ -214,17 +229,17 @@
       "remove": "Supprimer",
       "removeTitle": "Supprimer le compte",
       "removeDesc": "Cette action supprime le compte de cet appareil. Cette action est irréversible.",
-      "reveal": "Révéler la seed",
-      "revealTitle": "Phrase seed",
-      "copySeed": "Copier la seed",
-      "seedCopied": "Seed copiée",
-      "qrAlt": "QR code de la seed",
-      "qrLabel": "Scanner pour importer la seed",
+      "reveal": "Révéler la seed privée",
+      "revealTitle": "Seed privée de « {{name}} »",
+      "copySeed": "Copier la seed privée",
+      "seedCopied": "Seed privée copiée",
+      "qrAlt": "QR code de la seed privée",
+      "qrLabel": "Scanner pour importer la seed privée",
       "done": "Terminé",
       "addTitle": "Ajouter un compte",
       "addNewDesc": "Ajouter une nouvelle adresse à ce portefeuille.",
       "addCreate": "Ajouter une nouvelle adresse",
-      "addImport": "Importer une seed",
+      "addImport": "Importer une seed privée",
       "watchOnlyTitle": "Compte en lecture seule",
       "watchOnlyName": "Nom du compte",
       "watchOnlyIdentity": "Identité publique",
@@ -236,13 +251,13 @@
         "load": "Échec de l'ouverture du vault.",
         "remove": "Échec de la suppression du compte.",
         "rename": "Impossible de renommer le compte.",
-        "reveal": "Impossible de révéler la seed.",
+        "reveal": "Impossible de révéler la seed privée.",
         "nameRequired": "Le nom du compte est requis.",
         "passphraseRequired": "Le mot de passe est requis.",
         "invalidPassphrase": "Mot de passe invalide.",
         "nameDuplicate": "Un compte avec ce nom existe déjà.",
         "lastAccount": "Vous ne pouvez pas supprimer le dernier compte.",
-        "watchOnlySeed": "Les comptes en lecture seule n'ont pas de seed.",
+        "watchOnlySeed": "Les comptes en lecture seule n'ont pas de seed privée.",
         "watchOnlyRequired": "Le nom et l'identité sont requis.",
         "watchOnlyInvalid": "Le format de l'identité est invalide.",
         "watchOnlyDuplicate": "Cette identité est déjà ajoutée."
@@ -251,6 +266,7 @@
   },
   "history": {
     "title": "Historique",
+    "refresh": "Actualiser l'historique",
     "loading": "Chargement de l'historique...",
     "empty": "Aucune transaction trouvée.",
     "incoming": "Entrant",
@@ -260,7 +276,7 @@
     "to": "À :",
     "from": "De :",
     "tick": "Tick",
-    "type": "Type",
+    "txType": "Type de TX",
     "pending": "En attente",
     "unconfirmed": "Non confirmé",
     "unconfirmedMore": "+{{count}} non confirmées supplémentaires",
@@ -275,20 +291,20 @@
     "title": "Détails de la transaction",
     "loading": "Chargement de la transaction...",
     "error": "Impossible de charger les détails de la transaction.",
-    "back": "Retour",
     "copy": "Copier",
     "copied": "Copié",
     "copyFailed": "Échec de la copie",
     "txId": "ID de TX",
     "amount": "Montant",
     "tick": "Tick",
-    "inputType": "Type d'entrée",
+    "txType": "TX Type",
     "source": "Source",
     "destination": "Destination",
     "timestamp": "Horodatage",
     "openExplorer": "Ouvrir dans l'explorateur",
     "pending": "En attente",
-    "pendingHint": "Cette transaction est toujours en attente de confirmation sur les ticks du réseau."
+    "pendingHint": "Cette transaction est encore en attente de confirmation sur les ticks du réseau.",
+    "failedHint": "Cette transaction n'a pas été confirmée dans le tick cible et a échoué."
   },
   "transfer": {
     "title": "Envoyer",
@@ -339,14 +355,12 @@
       "feeLabel": "Frais réseau"
     },
     "actions": {
-      "continue": "Continuer",
       "confirm": "Confirmer et envoyer",
       "sending": "Envoi...",
       "cancel": "Annuler"
     },
     "success": {
-      "title": "Transfert envoyé",
-      "description": "Votre transaction a été diffusée et est programmée pour le tick {{targetTick}}."
+      "title": "Transfert envoyé"
     },
     "errors": {
       "networkError": "Erreur réseau. Veuillez réessayer.",
@@ -362,9 +376,10 @@
     "noDestinationContracts": "Aucun contrat de destination éligible disponible.",
     "sourceContract": "Contrat source",
     "sourceContractPlaceholder": "Sélectionner le contrat source",
+    "revokeOnlyHint": "* Les actifs gérés par {{contract}} ne peuvent être révoqués que vers QX",
     "destinationContract": "Contrat de destination",
     "destinationContractPlaceholder": "Sélectionner le contrat de destination",
-    "numberOfSharesPlaceholder": "Entrer le nombre de parts",
+    "numberOfSharesPlaceholder": "Entrez le montant",
     "available": "Disponible : {{balance}} {{token}}",
     "fee": "Frais : {{fee}} QUBIC",
     "quBalance": "Solde : {{balance}} QUBIC",
@@ -372,9 +387,10 @@
       "title": "Confirmer le transfert de droits",
       "description": "Vérifiez les détails avant de transférer les droits de gestion.",
       "asset": "Actif",
+      "issuedBy": "Émis par {{issuer}}",
       "from": "Du contrat",
       "to": "Vers le contrat",
-      "shares": "Parts",
+      "amount": "Montant",
       "feeLabel": "Frais",
       "warning": "Cette action est irréversible."
     },
@@ -382,20 +398,18 @@
       "sourceRequired": "Le contrat source est requis.",
       "destinationRequired": "Le contrat de destination est requis.",
       "sameContract": "Les contrats source et de destination doivent être différents.",
-      "sharesRequired": "Le nombre de parts est requis.",
-      "sharesInvalid": "Le nombre de parts doit être un nombre positif.",
-      "sharesExceedsBalance": "Le nombre de parts dépasse le solde disponible.",
+      "sharesRequired": "Le montant est requis.",
+      "sharesInvalid": "Le montant doit être un nombre positif.",
+      "sharesExceedsBalance": "Le montant dépasse le solde disponible.",
       "insufficientQuForFee": "Solde QUBIC insuffisant pour couvrir les frais de {{fee}} QU."
     },
     "actions": {
-      "continue": "Continuer",
       "confirm": "Confirmer et transférer",
       "sending": "Transfert...",
       "cancel": "Annuler"
     },
     "success": {
-      "title": "Transfert de droits envoyé",
-      "description": "Votre transaction a été diffusée et est programmée pour le tick {{targetTick}}."
+      "title": "Transfert de droits envoyé"
     },
     "errors": {
       "networkError": "Erreur réseau. Veuillez réessayer.",
@@ -403,6 +417,18 @@
       "watchOnly": "Les comptes en lecture seule ne peuvent pas transférer de droits.",
       "generic": "Échec du transfert de droits. Veuillez réessayer."
     }
+  },
+  "assetDetail": {
+    "title": "Détails de l'actif",
+    "issuer": "Identité de l'émetteur",
+    "issuerCopied": "Identité de l'émetteur copiée",
+    "copyFailed": "Échec de la copie",
+    "managingContracts": "Contrats de gestion",
+    "noContracts": "Aucun contrat de gestion trouvé.",
+    "unknownContract": "Contrat #{{index}}",
+    "transferRights": "Transférer les droits de gestion",
+    "notFound": "Actif introuvable.",
+    "error": "Impossible de charger les détails de l'actif."
   },
   "passphraseAuth": {
     "title": "Authentification requise",
@@ -429,6 +455,12 @@
       "generic": "Échec de l'authentification. Veuillez réessayer."
     }
   },
+  "welcome": {
+    "subtitle": "Bienvenue sur Qubic Wallet",
+    "createWallet": "Créer un nouveau portefeuille",
+    "restoreSeed": "Restaurer avec une seed privée",
+    "importVault": "Importer une sauvegarde vault"
+  },
   "unlock": {
     "title": "Déverrouiller votre portefeuille",
     "subtitle": "Votre portefeuille est verrouillé par sécurité. Entrez votre mot de passe pour continuer."
@@ -436,6 +468,10 @@
   "dapp": {
     "approval": {
       "title": "Demande de connexion",
+      "connectTitle": "Demande de connexion",
+      "signMessageTitle": "Signer un message",
+      "signTransactionTitle": "Signer une transaction",
+      "sendTransactionTitle": "Envoyer une transaction",
       "origin": "Site web",
       "sharedAccount": "Compte partagé",
       "sharedAccountFallback": "Compte sélectionné",
@@ -443,35 +479,86 @@
       "signMessageSubtitle": "Ce site web souhaite que vous signiez un message.",
       "signTransactionSubtitle": "Ce site web souhaite que vous signiez une transaction.",
       "sendTransactionSubtitle": "Ce site web souhaite que vous signiez et diffusiez une transaction.",
+      "watchOnlySubtitle": "Cette demande ne peut pas être approuvée avec un compte en lecture seule.",
+      "watchOnlyTitle": "Les comptes en lecture seule ne peuvent pas signer",
+      "watchOnlyDescription": "{{accountName}} est un compte en lecture seule, donc ce portefeuille ne peut ni signer ni envoyer avec lui. Le site recevra une erreur de compte en lecture seule.",
       "genericSubtitle": "Vérifiez cette demande avant de continuer.",
       "messageLabel": "Message",
       "messageEmpty": "Aucun aperçu du message disponible.",
       "txTo": "À",
       "txAmount": "Montant",
-      "txInputType": "Type d'entrée",
+      "txType": "TX Type",
       "txTargetTick": "Tick cible",
       "txTargetTickOffset": "Décalage du tick cible",
-      "txFee": "Frais",
-      "txFeeNone": "0",
-      "txFeeMayApply": "Possible",
+      "txInputBytes": "Données d'entrée",
+      "txInputBytesExpand": "Voir plus",
+      "txInputBytesCollapse": "Voir moins",
+      "txBroadcastSuccess": "Transaction soumise",
       "approve": "Approuver",
       "approveAndSend": "Approuver et envoyer",
       "reject": "Rejeter",
+      "watchOnlyDismiss": "Fermer",
       "errors": {
         "runtimeUnavailable": "L'environnement d'exécution de l'extension est indisponible.",
         "decisionFailed": "Impossible de soumettre votre décision."
       }
     }
   },
+  "transaction": {
+    "broadcastDescription": "Votre transaction a été diffusée et est programmée pour le tick {{targetTick}}.",
+    "txTypeTransfer": "Transfert"
+  },
   "onboarding": {
+    "errors": {
+      "seedInvalid": "La seed doit contenir 55 lettres minuscules.",
+      "seedConfirmRequired": "Veuillez confirmer que vous avez sauvegardé votre seed privée en lieu sûr.",
+      "addressExists": "Cette adresse existe déjà.",
+      "passphraseRequired": "La phrase secrète est requise.",
+      "passphraseReenter": "Veuillez ressaisir votre phrase secrète.",
+      "passphraseMismatch": "Les phrases secrètes ne correspondent pas.",
+      "passphraseTooShort": "La phrase secrète doit contenir au moins 12 caractères.",
+      "invalidVaultPassphrase": "Phrase secrète du coffre invalide.",
+      "vaultValidationFailed": "Échec de la validation de la phrase secrète du coffre.",
+      "createFailed": "Échec de la création du portefeuille.",
+      "importFailed": "Échec de l'importation de la seed privée."
+    },
+    "create": {
+      "title": "Créer un nouveau portefeuille",
+      "titleAddAddress": "Ajouter une nouvelle adresse",
+      "readyTitle": "Prêt à créer",
+      "readySubtitle": "Vérifiez vos informations avant de créer le coffre.",
+      "seedWarning": "Assurez-vous d'avoir sauvegardé votre seed privée. Toute personne possédant cette seed peut accéder à vos fonds.",
+      "createWallet": "Créer le portefeuille",
+      "creating": "Création...",
+      "addAddress": "Ajouter l'adresse",
+      "adding": "Ajout..."
+    },
     "importSeed": {
       "title": "Importer une seed privée",
-      "titleAddAddress": "Importer la seed d'une adresse",
-      "step": "Étape {{current}} sur {{total}}"
+      "titleAddAddress": "Importer une seed privée",
+      "pasteSeedTitle": "Collez votre seed privée",
+      "pasteSeedSubtitle": "Saisissez la seed privée de 55 lettres que vous souhaitez importer.",
+      "seedValid": "Format de seed valide.",
+      "seedInvalidCount": "La seed doit contenir 55 lettres minuscules ({{current}}/{{total}}).",
+      "labelSecureTitle": "Libellé et sécurité",
+      "labelSecureSubtitleAddress": "Donnez un libellé à cette adresse et saisissez la phrase secrète actuelle du coffre.",
+      "labelSecureSubtitleWallet": "Donnez un nom à ce portefeuille et définissez une phrase secrète pour le coffre.",
+      "reviewTitle": "Vérifier l'importation",
+      "reviewSubtitle": "Confirmez les détails avant d'importer.",
+      "seedPrivacyNotice": "Votre seed privée ne quitte jamais cet appareil. Gardez-la confidentielle en permanence.",
+      "importAddress": "Importer l'adresse",
+      "importSeedAction": "Importer la seed privée",
+      "importing": "Importation..."
+    },
+    "passphraseStep": {
+      "title": "Nommer et protéger",
+      "subtitleAddress": "Donnez un libellé à ce portefeuille et saisissez la phrase secrète actuelle du coffre.",
+      "subtitleWallet": "Donnez un libellé à ce portefeuille et définissez une phrase secrète pour le coffre.",
+      "minChars": "Minimum 12 caractères.",
+      "reenterPassphrase": "Ressaisir la phrase secrète du coffre"
     },
     "importVault": {
       "title": "Importer un fichier vault",
-      "step": "Étape {{current}} sur {{total}}",
       "selectVault": {
         "title": "Sélectionnez votre vault",
         "subtitle": "Téléversez un fichier vault exporté depuis cette extension ou le portefeuille web Qubic.",
@@ -496,9 +583,6 @@
         "addMoreLater": "Vous pourrez ajouter d'autres comptes plus tard dans Gérer les comptes."
       },
       "actions": {
-        "back": "Retour",
-        "previous": "Précédent",
-        "continue": "Continuer",
         "import": "Importer le vault",
         "importing": "Importation..."
       },
@@ -512,17 +596,17 @@
       }
     },
     "seedSecurity": {
-      "title": "Sécurisez votre seed",
-      "subtitle": "Sauvegardez cette seed de 55 lettres dans un endroit sûr. Vous en aurez besoin pour restaurer votre portefeuille.",
-      "subtitleAddAddress": "Sauvegardez cette seed de 55 lettres dans un endroit sûr. Vous en aurez besoin pour restaurer cette adresse.",
-      "warningTitle": "Sauvegardez cette seed en lieu sûr.",
-      "seedLabel": "Seed",
+      "title": "Sécurisez votre seed privée",
+      "subtitle": "Sauvegardez cette seed privée de 55 lettres dans un endroit sûr. Vous en aurez besoin pour restaurer votre portefeuille.",
+      "subtitleAddAddress": "Sauvegardez cette seed privée de 55 lettres dans un endroit sûr. Vous en aurez besoin pour restaurer cette adresse.",
+      "warningTitle": "Sauvegardez cette seed privée en lieu sûr.",
+      "seedLabel": "Seed privée",
       "publicIdentityLabel": "Identité publique",
       "deriving": "Dérivation...",
       "generateNew": "Générer une nouvelle seed",
-      "copySeed": "Copier la seed",
-      "seedCopied": "Seed copiée",
-      "confirmationLabel": "J'ai sauvegardé cette seed en lieu sûr et je comprends qu'elle est nécessaire pour récupérer ce portefeuille."
+      "copySeed": "Copier la seed privée",
+      "seedCopied": "Seed privée copiée",
+      "confirmationLabel": "J'ai sauvegardé cette seed privée en lieu sûr et je comprends qu'elle est nécessaire pour récupérer ce portefeuille."
     }
   }
 }

@@ -17,10 +17,11 @@ import { useClipboardCopy } from '@/hooks/use-clipboard-copy'
 type RevealSeedDrawerProps = {
   open: boolean
   seed: string
+  accountName: string
   onOpenChange: (open: boolean) => void
 }
 
-const RevealSeedDrawer = ({ open, seed, onOpenChange }: RevealSeedDrawerProps) => {
+const RevealSeedDrawer = ({ open, seed, accountName, onOpenChange }: RevealSeedDrawerProps) => {
   const { t } = useTranslation()
   const { copyText } = useClipboardCopy()
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null)
@@ -53,7 +54,7 @@ const RevealSeedDrawer = ({ open, seed, onOpenChange }: RevealSeedDrawerProps) =
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent>
         <DrawerHeader>
-          <DrawerTitle>{t('accounts.manage.revealTitle')}</DrawerTitle>
+          <DrawerTitle>{t('accounts.manage.revealTitle', { name: accountName })}</DrawerTitle>
         </DrawerHeader>
         <div className="flex flex-col items-center gap-4 px-4">
           {qrDataUrl && (

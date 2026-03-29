@@ -1,4 +1,17 @@
 {
+  "common": {
+    "back": "Back",
+    "previous": "Previous",
+    "continue": "Continue",
+    "step": "Step {{current}} of {{total}}",
+    "accountName": "Account name",
+    "addressLabel": "Address label",
+    "vaultPassphrase": "Vault password",
+    "currentVaultPassphrase": "Current vault password",
+    "seedLabel": "Private seed",
+    "seedLength": "Seed length: {{length}}",
+    "identity": "Identity"
+  },
   "app": {
     "sidepanel": "Open side panel",
     "closeSidepanel": "Close side panel"
@@ -51,14 +64,14 @@
       "empty": "No additional assets found.",
       "emptyTitle": "No assets yet",
       "error": "Unable to load assets.",
-      "unknown": "Unknown asset",
-      "manageRights": "Manage rights"
+      "unknown": "Unknown asset"
     },
     "receive": {
       "title": "Receive Qubic",
       "description": "Share this QR code or copy your public identity address.",
       "generating": "Generating QR code...",
-      "copy": "Copy address"
+      "copy": "Copy address",
+      "qrAlt": "Public identity QR code"
     },
     "toast": {
       "copySuccess": "Address copied",
@@ -70,17 +83,18 @@
       "title": "Watch-only account",
       "description": "Sending is disabled for this address."
     },
+    "refresh": "Refresh",
     "price": {
       "label": "QUBIC Price"
     },
     "accounts": {
       "title": "Accounts",
       "selectLabel": "Select account",
-      "passphrasePlaceholder": "Vault passphrase",
-      "passphraseRequired": "Enter your vault passphrase to view accounts.",
+      "passphrasePlaceholder": "Vault password",
+      "passphraseRequired": "Enter your vault password to view accounts.",
       "unlock": "Unlock accounts",
       "unlocking": "Unlocking...",
-      "unlockFailed": "Unable to unlock vault. Check your passphrase.",
+      "unlockFailed": "Unable to unlock vault. Check your password.",
       "empty": "No additional accounts found.",
       "create": "Create a new account"
     }
@@ -103,12 +117,12 @@
       "button": "Export vault",
       "drawerTitle": "Export vault file",
       "drawerDescription": "Download your vault in a format compatible with the Qubic web wallet.",
-      "passphrase": "Vault passphrase",
+      "passphrase": "Vault password",
       "confirm": "Export vault",
       "exporting": "Exporting...",
       "errors": {
-        "passphraseRequired": "Passphrase is required.",
-        "invalidPassphrase": "Invalid passphrase.",
+        "passphraseRequired": "Password is required.",
+        "invalidPassphrase": "Invalid password.",
         "exportFailed": "Failed to export vault."
       }
     },
@@ -147,12 +161,12 @@
       "title": "Security",
       "back": "Settings",
       "changePassword": "Change password",
-      "changePasswordDesc": "Update your vault passphrase",
+      "changePasswordDesc": "Update your vault password",
       "changePasswordDrawerTitle": "Change password",
-      "changePasswordDrawerDesc": "Enter your current passphrase and choose a new one.",
-      "currentPassphrase": "Current passphrase",
-      "newPassphrase": "New passphrase",
-      "confirmPassphrase": "Confirm new passphrase",
+      "changePasswordDrawerDesc": "Enter your current password and choose a new one.",
+      "currentPassphrase": "Current password",
+      "newPassphrase": "New password",
+      "confirmPassphrase": "Confirm new password",
       "minChars": "Minimum 12 characters.",
       "save": "Save new password",
       "saving": "Saving...",
@@ -162,19 +176,19 @@
       "resetAppDesc": "This will erase all data including your vault, accounts, and settings. This action cannot be undone. Make sure you have backed up your seeds.",
       "resetAppConfirm": "Delete wallet",
       "errors": {
-        "currentRequired": "Current passphrase is required.",
-        "newRequired": "New passphrase is required.",
-        "confirmRequired": "Please confirm your new passphrase.",
-        "tooShort": "Passphrase must be at least 12 characters.",
-        "mismatch": "Passphrases do not match.",
-        "invalidCurrent": "Current passphrase is incorrect.",
+        "currentRequired": "Current password is required.",
+        "newRequired": "New password is required.",
+        "confirmRequired": "Please confirm your new password.",
+        "tooShort": "Password must be at least 12 characters.",
+        "mismatch": "Passwords do not match.",
+        "invalidCurrent": "Current password is incorrect.",
         "changeFailed": "Failed to change password. Please try again."
       }
     },
     "support": {
       "title": "Support",
       "warningTitle": "Beware of scammers",
-      "warningDescription": "Qubic team members will never ask for your seed or passphrase. Never share your private keys with anyone.",
+      "warningDescription": "Qubic team members will never ask for your seed or password. Never share your private keys with anyone.",
       "discord": "Discord community",
       "github": "Report an issue on GitHub"
     },
@@ -182,19 +196,20 @@
       "title": "About",
       "appVersion": "App version",
       "extensionName": "Extension",
+      "extensionFullName": "Qubic Wallet",
       "versionLabel": "v{{version}}"
     }
   },
   "accounts": {
     "watchOnly": {
       "title": "Add watch-only address",
-      "subtitle": "Track a public identity without importing its seed.",
+      "subtitle": "Track a public identity without importing its private seed.",
       "submit": "Add watch-only"
     },
     "manage": {
       "title": "Manage accounts",
       "subtitle": "View, reorder, and manage your identities.",
-      "passphrase": "Vault passphrase",
+      "passphrase": "Vault password",
       "passphraseTitle": "Unlock vault",
       "load": "Load accounts",
       "unlock": "Unlock vault",
@@ -214,17 +229,17 @@
       "remove": "Remove",
       "removeTitle": "Remove account",
       "removeDesc": "This action removes the account from this device. This cannot be undone.",
-      "reveal": "Reveal seed",
-      "revealTitle": "Seed phrase",
-      "copySeed": "Copy seed",
-      "seedCopied": "Seed copied",
-      "qrAlt": "Seed QR code",
-      "qrLabel": "Scan to import seed",
+      "reveal": "Reveal private seed",
+      "revealTitle": "Private seed for \"{{name}}\"",
+      "copySeed": "Copy private seed",
+      "seedCopied": "Private seed copied",
+      "qrAlt": "Private seed QR code",
+      "qrLabel": "Scan to import private seed",
       "done": "Done",
       "addTitle": "Add account",
       "addNewDesc": "Add another address to this wallet.",
       "addCreate": "Add new address",
-      "addImport": "Import seed",
+      "addImport": "Import private seed",
       "watchOnlyTitle": "Watch-only account",
       "watchOnlyName": "Account name",
       "watchOnlyIdentity": "Public identity",
@@ -236,13 +251,13 @@
         "load": "Failed to open vault.",
         "remove": "Failed to remove account.",
         "rename": "Unable to rename account.",
-        "reveal": "Unable to reveal seed.",
+        "reveal": "Unable to reveal private seed.",
         "nameRequired": "Account name is required.",
-        "passphraseRequired": "Passphrase is required.",
-        "invalidPassphrase": "Invalid passphrase.",
+        "passphraseRequired": "Password is required.",
+        "invalidPassphrase": "Invalid password.",
         "nameDuplicate": "An account with this name already exists.",
         "lastAccount": "You cannot remove the last account.",
-        "watchOnlySeed": "Watch-only accounts do not have a seed.",
+        "watchOnlySeed": "Watch-only accounts do not have a private seed.",
         "watchOnlyRequired": "Name and identity are required.",
         "watchOnlyInvalid": "Identity format is invalid.",
         "watchOnlyDuplicate": "This identity is already added."
@@ -251,6 +266,7 @@
   },
   "history": {
     "title": "History",
+    "refresh": "Refresh history",
     "loading": "Loading history...",
     "empty": "No transactions found.",
     "incoming": "Incoming",
@@ -260,7 +276,7 @@
     "to": "To:",
     "from": "From:",
     "tick": "Tick",
-    "type": "Type",
+    "txType": "TX Type",
     "pending": "Pending",
     "unconfirmed": "Unconfirmed",
     "unconfirmedMore": "+{{count}} more unconfirmed",
@@ -275,20 +291,20 @@
     "title": "Transaction details",
     "loading": "Loading transaction...",
     "error": "Unable to load transaction details.",
-    "back": "Back",
     "copy": "Copy",
     "copied": "Copied",
     "copyFailed": "Copy failed",
     "txId": "TX ID",
     "amount": "Amount",
     "tick": "Tick",
-    "inputType": "Input type",
+    "txType": "TX Type",
     "source": "Source",
     "destination": "Destination",
     "timestamp": "Timestamp",
     "openExplorer": "Open in explorer",
     "pending": "Pending",
-    "pendingHint": "This transaction is still pending confirmation on network ticks."
+    "pendingHint": "This transaction is still pending confirmation on network ticks.",
+    "failedHint": "This transaction was not confirmed within the target tick and has failed."
   },
   "transfer": {
     "title": "Send",
@@ -339,14 +355,12 @@
       "feeLabel": "Network fee"
     },
     "actions": {
-      "continue": "Continue",
       "confirm": "Confirm & send",
       "sending": "Sending...",
       "cancel": "Cancel"
     },
     "success": {
-      "title": "Transfer sent",
-      "description": "Your transaction has been broadcast and is scheduled for tick {{targetTick}}."
+      "title": "Transfer sent"
     },
     "errors": {
       "networkError": "Network error. Please retry.",
@@ -362,9 +376,10 @@
     "noDestinationContracts": "No eligible destination contracts available.",
     "sourceContract": "Source contract",
     "sourceContractPlaceholder": "Select source contract",
+    "revokeOnlyHint": "* Assets managed by {{contract}} can only be revoked to QX",
     "destinationContract": "Destination contract",
     "destinationContractPlaceholder": "Select destination contract",
-    "numberOfSharesPlaceholder": "Enter number of shares",
+    "numberOfSharesPlaceholder": "Enter the amount",
     "available": "Available: {{balance}} {{token}}",
     "fee": "Fee: {{fee}} QUBIC",
     "quBalance": "Balance: {{balance}} QUBIC",
@@ -372,9 +387,10 @@
       "title": "Confirm transfer rights",
       "description": "Review the details before transferring management rights.",
       "asset": "Asset",
+      "issuedBy": "Issued by {{issuer}}",
       "from": "From contract",
       "to": "To contract",
-      "shares": "Shares",
+      "amount": "Amount",
       "feeLabel": "Fee",
       "warning": "This action cannot be undone."
     },
@@ -382,20 +398,18 @@
       "sourceRequired": "Source contract is required.",
       "destinationRequired": "Destination contract is required.",
       "sameContract": "Source and destination must be different contracts.",
-      "sharesRequired": "Number of shares is required.",
-      "sharesInvalid": "Number of shares must be a positive number.",
-      "sharesExceedsBalance": "Number of shares exceeds available balance.",
+      "sharesRequired": "Amount is required.",
+      "sharesInvalid": "Amount must be a positive number.",
+      "sharesExceedsBalance": "Amount exceeds available balance.",
       "insufficientQuForFee": "Insufficient QUBIC balance to cover the {{fee}} QU fee."
     },
     "actions": {
-      "continue": "Continue",
       "confirm": "Confirm & transfer",
       "sending": "Transferring...",
       "cancel": "Cancel"
     },
     "success": {
-      "title": "Transfer rights sent",
-      "description": "Your transaction has been broadcast and is scheduled for tick {{targetTick}}."
+      "title": "Transfer rights sent"
     },
     "errors": {
       "networkError": "Network error. Please retry.",
@@ -404,19 +418,31 @@
       "generic": "Transfer rights failed. Please retry."
     }
   },
+  "assetDetail": {
+    "title": "Asset Details",
+    "issuer": "Issuer Identity",
+    "issuerCopied": "Issuer identity copied",
+    "copyFailed": "Copy failed",
+    "managingContracts": "Managing contracts",
+    "noContracts": "No managing contracts found.",
+    "unknownContract": "Contract #{{index}}",
+    "transferRights": "Transfer Management Rights",
+    "notFound": "Asset not found.",
+    "error": "Failed to load asset details."
+  },
   "passphraseAuth": {
     "title": "Authentication Required",
-    "subtitle": "Enter your vault passphrase to continue with this action.",
+    "subtitle": "Enter your vault password to continue with this action.",
     "form": {
-      "passphrase": "Vault passphrase",
-      "passphrasePlaceholder": "Enter your passphrase",
-      "showPassphrase": "Show passphrase",
-      "hidePassphrase": "Hide passphrase"
+      "passphrase": "Vault password",
+      "passphrasePlaceholder": "Enter your password",
+      "showPassphrase": "Show password",
+      "hidePassphrase": "Hide password"
     },
     "validation": {
-      "required": "Passphrase is required."
+      "required": "Password is required."
     },
-    "securityNote": "Your passphrase is used locally to decrypt your vault and sign transactions. It is never transmitted over the network.",
+    "securityNote": "Your password is used locally to decrypt your vault and sign transactions. It is never transmitted over the network.",
     "actions": {
       "back": "Back",
       "cancel": "Cancel",
@@ -424,18 +450,28 @@
       "unlocking": "Unlocking..."
     },
     "errors": {
-      "invalidPassphrase": "Invalid passphrase. Please try again.",
+      "invalidPassphrase": "Invalid password. Please try again.",
       "accountNotFound": "Account not found in vault.",
       "generic": "Authentication failed. Please try again."
     }
   },
   "unlock": {
     "title": "Unlock Your Wallet",
-    "subtitle": "Your wallet is locked for safety. Enter your passphrase to proceed."
+    "subtitle": "Your wallet is locked for safety. Enter your password to proceed."
+  },
+  "welcome": {
+    "subtitle": "Welcome to Qubic Wallet",
+    "createWallet": "Create a new wallet",
+    "restoreSeed": "Restore with private seed",
+    "importVault": "Import vault backup"
   },
   "dapp": {
     "approval": {
       "title": "Connection request",
+      "connectTitle": "Connection request",
+      "signMessageTitle": "Sign message",
+      "signTransactionTitle": "Sign transaction",
+      "sendTransactionTitle": "Send transaction",
       "origin": "Website",
       "sharedAccount": "Shared account",
       "sharedAccountFallback": "Selected account",
@@ -443,35 +479,86 @@
       "signMessageSubtitle": "This website wants you to sign a message.",
       "signTransactionSubtitle": "This website wants you to sign a transaction.",
       "sendTransactionSubtitle": "This website wants you to sign and broadcast a transaction.",
+      "watchOnlySubtitle": "This request cannot be approved with a watch-only account.",
+      "watchOnlyTitle": "Watch-only accounts can't sign",
+      "watchOnlyDescription": "{{accountName}} is watch-only, so this wallet cannot sign or send with it. The website will receive a watch-only account error.",
       "genericSubtitle": "Review this request before continuing.",
       "messageLabel": "Message",
       "messageEmpty": "No message preview available.",
       "txTo": "To",
       "txAmount": "Amount",
-      "txInputType": "Input type",
+      "txType": "TX Type",
       "txTargetTick": "Target tick",
       "txTargetTickOffset": "Target tick offset",
-      "txFee": "Fee",
-      "txFeeNone": "0",
-      "txFeeMayApply": "May apply",
+      "txInputBytes": "Input data",
+      "txInputBytesExpand": "Show more",
+      "txInputBytesCollapse": "Show less",
+      "txBroadcastSuccess": "Transaction submitted",
       "approve": "Approve",
       "approveAndSend": "Approve & Send",
       "reject": "Reject",
+      "watchOnlyDismiss": "Close",
       "errors": {
         "runtimeUnavailable": "Extension runtime is unavailable.",
         "decisionFailed": "Could not submit your decision."
       }
     }
   },
+  "transaction": {
+    "broadcastDescription": "Your transaction has been broadcast and is scheduled for tick {{targetTick}}.",
+    "txTypeTransfer": "Transfer"
+  },
   "onboarding": {
+    "errors": {
+      "seedInvalid": "Seed must be 55 lowercase letters.",
+      "seedConfirmRequired": "Please confirm you saved your private seed securely.",
+      "addressExists": "This address already exists.",
+      "passphraseRequired": "Password is required.",
+      "passphraseReenter": "Please re-enter your password.",
+      "passphraseMismatch": "Passwords do not match.",
+      "passphraseTooShort": "Password must be at least 12 characters.",
+      "invalidVaultPassphrase": "Invalid vault password.",
+      "vaultValidationFailed": "Failed to validate vault password.",
+      "createFailed": "Failed to create wallet.",
+      "importFailed": "Failed to import private seed."
+    },
+    "create": {
+      "title": "Create new wallet",
+      "titleAddAddress": "Add new address",
+      "readyTitle": "Ready to create",
+      "readySubtitle": "Review your details before creating the vault.",
+      "seedWarning": "Make sure you stored your private seed. Anyone with this seed can access your funds.",
+      "createWallet": "Create wallet",
+      "creating": "Creating...",
+      "addAddress": "Add address",
+      "adding": "Adding..."
+    },
     "importSeed": {
       "title": "Import private seed",
-      "titleAddAddress": "Import address seed",
-      "step": "Step {{current}} of {{total}}"
+      "titleAddAddress": "Import private seed",
+      "pasteSeedTitle": "Paste your private seed",
+      "pasteSeedSubtitle": "Enter the 55-letter private seed you want to import.",
+      "seedValid": "Valid seed format.",
+      "seedInvalidCount": "Seed must be 55 lowercase letters ({{current}}/{{total}}).",
+      "labelSecureTitle": "Label and secure",
+      "labelSecureSubtitleAddress": "Give this address a label and enter the current vault password.",
+      "labelSecureSubtitleWallet": "Give this wallet a name and set a vault password.",
+      "reviewTitle": "Review import",
+      "reviewSubtitle": "Confirm the details before importing.",
+      "seedPrivacyNotice": "Your private seed never leaves this device. Keep it private at all times.",
+      "importAddress": "Import address",
+      "importSeedAction": "Import private seed",
+      "importing": "Importing..."
+    },
+    "passphraseStep": {
+      "title": "Name and protect it",
+      "subtitleAddress": "Give this wallet a label and enter the current vault password.",
+      "subtitleWallet": "Give this wallet a label and set a vault password.",
+      "minChars": "Minimum 12 characters.",
+      "reenterPassphrase": "Re-enter vault password"
     },
     "importVault": {
       "title": "Import vault file",
-      "step": "Step {{current}} of {{total}}",
       "selectVault": {
         "title": "Select your vault",
         "subtitle": "Upload a vault file exported from this extension or the Qubic web wallet.",
@@ -481,48 +568,45 @@
       },
       "unlockSecure": {
         "title": "Unlock and secure",
-        "subtitle": "Provide a new passphrase for this device and, if needed, the source passphrase.",
-        "newPassphrase": "New vault passphrase",
-        "sourcePassphrase": "Source vault passphrase"
+        "subtitle": "Provide a new password for this device and, if needed, the source password.",
+        "newPassphrase": "New vault password",
+        "sourcePassphrase": "Source vault password"
       },
       "review": {
         "title": "Review import",
-        "subtitle": "Confirm the file and passphrase details before importing.",
+        "subtitle": "Confirm the file and password details before importing.",
         "vaultFile": "Vault file",
         "notSelected": "Not selected",
         "sourcePassphraseProvided": "Provided",
         "sourcePassphraseSame": "Same as new",
-        "sourcePassphraseLabel": "Source passphrase",
+        "sourcePassphraseLabel": "Source password",
         "addMoreLater": "You can add more accounts later in Manage Accounts."
       },
       "actions": {
-        "back": "Back",
-        "previous": "Previous",
-        "continue": "Continue",
         "import": "Import vault",
         "importing": "Importing..."
       },
       "errors": {
         "fileTooLarge": "The selected file is too large to be a valid vault file.",
         "selectFile": "Select a vault file.",
-        "passphraseRequired": "Passphrase is required.",
+        "passphraseRequired": "Password is required.",
         "importFailed": "Failed to import web wallet vault.",
         "noEntries": "Vault imported but no entries were found.",
         "generic": "Failed to import vault."
       }
     },
     "seedSecurity": {
-      "title": "Secure your seed",
-      "subtitle": "Save this 55-letter seed in a safe place. You will need it to restore your wallet.",
-      "subtitleAddAddress": "Save this 55-letter seed in a safe place. You will need it to restore this address.",
-      "warningTitle": "Save this seed securely.",
-      "seedLabel": "Seed",
+      "title": "Secure your private seed",
+      "subtitle": "Save this 55-letter private seed in a safe place. You will need it to restore your wallet.",
+      "subtitleAddAddress": "Save this 55-letter private seed in a safe place. You will need it to restore this address.",
+      "warningTitle": "Save this private seed securely.",
+      "seedLabel": "Private seed",
       "publicIdentityLabel": "Public identity",
       "deriving": "Deriving...",
       "generateNew": "Generate new seed",
-      "copySeed": "Copy seed",
-      "seedCopied": "Seed copied",
-      "confirmationLabel": "I saved this seed securely and understand it is required to recover this wallet."
+      "copySeed": "Copy private seed",
+      "seedCopied": "Private seed copied",
+      "confirmationLabel": "I saved this private seed securely and understand it is required to recover this wallet."
     }
   }
 }

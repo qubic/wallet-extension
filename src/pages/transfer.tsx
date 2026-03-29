@@ -41,7 +41,7 @@ const Transfer = () => {
   const initialPrefillRecipient = (searchParams.get('recipient') ?? '').trim().toUpperCase()
   const initialPrefillAmount = (() => {
     const value = (searchParams.get('amount') ?? '').trim()
-    return /^\d+$/.test(value) ? value : ''
+    return /^\d+$/.test(value) ? formatNumber(BigInt(value)) : ''
   })()
   const selectedToken = (searchParams.get('token') ?? 'qu').trim()
   const [isWatchOnly, setIsWatchOnly] = useState(() => isWatchOnlyIdentity(getCurrentIdentity()))
@@ -150,7 +150,7 @@ const Transfer = () => {
           newErrors.amount = t('transfer.validation.amountExceedsBalance')
         }
         if (onChainQuBalance < QX_TRANSFER_ASSET_FEE) {
-          newErrors.amount = t('transfer.validation.insufficientQuForFee', { fee: '100' })
+          newErrors.fee = t('transfer.validation.insufficientQuForFee', { fee: '100' })
         }
       } else if (balance.isLoading) {
         newErrors.amount = t('transfer.validation.balanceLoading')
@@ -162,7 +162,7 @@ const Transfer = () => {
     }
 
     if (isManualTargetTickEnabled) {
-      const parsedManualTick = Number.parseInt(manualTargetTick.trim(), 10)
+      const parsedManualTick = Number(parseAmount(manualTargetTick) ?? Number.NaN)
       if (!Number.isFinite(parsedManualTick) || parsedManualTick < 1) {
         newErrors.targetTick = t('transfer.validation.targetTickManualInvalid')
       } else if (typeof currentTick === 'number' && parsedManualTick <= currentTick) {
@@ -219,7 +219,7 @@ const Transfer = () => {
       const sendCurrentTick = freshTickInfo.tickInfo?.tick
 
       if (isManualTargetTickEnabled) {
-        const parsedManualTick = Number.parseInt(manualTargetTick.trim(), 10)
+        const parsedManualTick = Number(parseAmount(manualTargetTick) ?? Number.NaN)
         if (!Number.isFinite(parsedManualTick) || parsedManualTick < 1) {
           throw new Error(t('transfer.validation.targetTickManualInvalid'))
         }
@@ -286,7 +286,7 @@ const Transfer = () => {
       setDrawerOpen(false)
 
       toast.success(t('transfer.success.title'), {
-        description: t('transfer.success.description', {
+        description: t('transaction.broadcastDescription', {
           targetTick: formatNumber(Number(result.targetTick)),
         }),
       })
@@ -368,7 +368,7 @@ const Transfer = () => {
   const handleManualTargetTickToggle = () => {
     setIsManualTargetTickEnabled((previous) => !previous)
     if (!isManualTargetTickEnabled && !manualTargetTick) {
-      setManualTargetTick((currentTick ?? '').toString())
+      setManualTargetTick(currentTick ? formatNumber(currentTick) : '')
     }
     if (errors.targetTick) {
       setErrors((prev) => ({ ...prev, targetTick: undefined }))

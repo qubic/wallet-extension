@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router-dom'
-import { GlobeIcon, Link2OffIcon, LinkIcon } from 'lucide-react'
+import { ChevronDownIcon, ChevronUpIcon, GlobeIcon, Link2OffIcon, LinkIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Drawer,
@@ -18,15 +18,20 @@ import {
 } from '@/lib/dapp/storage'
 import { RUNTIME_APPROVAL_DECISION_TYPE } from '@/lib/dapp/protocol'
 import {
+  getApprovalAccountSummary,
   getApprovalConnectSummary,
   getApprovalMessagePreview,
   getApprovalTxSummary,
 } from '@/lib/dapp/approval-preview'
 import { getChromeApi } from '@/lib/dapp/chrome-api'
 import { PasswordInput } from '@/components/ui/password-input'
-import { truncateString } from '@/lib/utils'
+import { formatIntegerLike, formatNumber, truncateString } from '@/lib/utils'
+import { NATIVE_TOKEN_SYMBOL } from '@/lib/config/constants'
+import AddressLabel from '@/components/address-label'
+import { useTxTypeDescription } from '@/hooks/use-tx-type-description'
 import { isWalletLocked } from '@/lib/lock'
 import { validateVaultPassphrase } from '@/lib/vault'
+import { toast } from 'sonner'
 
 const DappApprovalDrawer = () => {
   const { t } = useTranslation()
@@ -35,6 +40,8 @@ const DappApprovalDrawer = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [passphrase, setPassphrase] = useState('')
+  const [inputBytesExpanded, setInputBytesExpanded] = useState(false)
+  const [faviconError, setFaviconError] = useState<string | null>(null)
   const [locked, setLocked] = useState(() => isWalletLocked())
   const isDappApprovalPopup =
     window.location.pathname.endsWith('popup.html') &&
@@ -85,10 +92,44 @@ const DappApprovalDrawer = () => {
     () => getApprovalConnectSummary(current?.params),
     [current?.params],
   )
+  const accountSummary = useMemo(
+    () => getApprovalAccountSummary(current?.params),
+    [current?.params],
+  )
   const txSummary = useMemo(() => getApprovalTxSummary(current?.params), [current?.params])
+  const txTypeDescription = useTxTypeDescription(
+    txSummary?.toIdentity ?? '',
+    Number(txSummary?.inputType ?? 0),
+  )
+  const isWatchOnlySigningRequest = Boolean(
+    current &&
+      (current.method === 'signMessage' ||
+        current.method === 'signTransaction' ||
+        current.method === 'sendTransaction') &&
+      accountSummary?.accountWatchOnly,
+  )
+
+  const title = useMemo(() => {
+    if (!current) return ''
+    switch (current.method) {
+      case 'connect':
+        return t('dapp.approval.connectTitle')
+      case 'signMessage':
+        return t('dapp.approval.signMessageTitle')
+      case 'signTransaction':
+        return t('dapp.approval.signTransactionTitle')
+      case 'sendTransaction':
+        return t('dapp.approval.sendTransactionTitle')
+      default:
+        return t('dapp.approval.title')
+    }
+  }, [current, t])
 
   const subtitle = useMemo(() => {
     if (!current) return ''
+    if (isWatchOnlySigningRequest) {
+      return t('dapp.approval.watchOnlySubtitle')
+    }
     switch (current.method) {
       case 'connect':
         return t('dapp.approval.connectSubtitle')
@@ -101,7 +142,17 @@ const DappApprovalDrawer = () => {
       default:
         return t('dapp.approval.genericSubtitle')
     }
-  }, [current, t])
+  }, [current, isWatchOnlySigningRequest, t])
+
+  const faviconUrl = useMemo(() => {
+    if (!current?.origin) return null
+    try {
+      const url = new URL(current.origin)
+      return `${url.origin}/favicon.ico`
+    } catch {
+      return null
+    }
+  }, [current?.origin])
 
   const submitDecision = async (approved: boolean) => {
     if (!current) return
@@ -132,7 +183,11 @@ const DappApprovalDrawer = () => {
     setLoading(true)
     setError('')
     try {
-      const ok = await new Promise<boolean>((resolve) => {
+      const result = await new Promise<{
+        ok?: boolean
+        executed?: boolean
+        targetTick?: number
+      }>((resolve) => {
         runtime.sendMessage(
           {
             type: RUNTIME_APPROVAL_DECISION_TYPE,
@@ -142,15 +197,33 @@ const DappApprovalDrawer = () => {
               passphrase: approved && requiresPassphrase ? normalizedPassphrase : undefined,
             },
           },
-          (response?: { ok?: boolean }) => {
-            resolve(Boolean(response?.ok))
+          (response?: { ok?: boolean; executed?: boolean; targetTick?: number }) => {
+            resolve(response ?? { ok: false })
           },
         )
       })
-      if (!ok) {
+      if (!result.ok) {
         setError(t('dapp.approval.errors.decisionFailed'))
         return
       }
+      if (approved && current.method === 'sendTransaction') {
+        if (result.executed === true) {
+          const isSimpleTransfer = txSummary?.inputType === '0' && Number(txSummary?.amount) > 0
+          const targetTick =
+            result.targetTick && Number.isFinite(result.targetTick)
+              ? formatNumber(result.targetTick)
+              : undefined
+          toast.success(
+            isSimpleTransfer ? t('transfer.success.title') : t('dapp.approval.txBroadcastSuccess'),
+            targetTick
+              ? { description: t('transaction.broadcastDescription', { targetTick }) }
+              : undefined,
+          )
+        } else if (result.executed === false) {
+          toast.error(t('transfer.errors.broadcastFailed'))
+        }
+      }
+
       setRequests((prev) => prev.filter((request) => request.id !== current.id))
       setPassphrase('')
 
@@ -181,9 +254,18 @@ const DappApprovalDrawer = () => {
       >
         <DrawerHeader className="space-y-2 text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-            <GlobeIcon className="h-6 w-6 shrink-0 text-primary" />
+            {faviconUrl && faviconError !== faviconUrl ? (
+              <img
+                src={faviconUrl}
+                alt=""
+                className="h-6 w-6 shrink-0 rounded-sm"
+                onError={() => setFaviconError(faviconUrl)}
+              />
+            ) : (
+              <GlobeIcon className="h-6 w-6 shrink-0 text-primary" />
+            )}
           </div>
-          <DrawerTitle>{t('dapp.approval.title')}</DrawerTitle>
+          <DrawerTitle>{title}</DrawerTitle>
           <DrawerDescription>{subtitle}</DrawerDescription>
         </DrawerHeader>
 
@@ -226,50 +308,81 @@ const DappApprovalDrawer = () => {
               txSummary && (
                 <div className="space-y-2 rounded-xl border border-border/60 bg-background/40 p-3">
                   {txSummary.toIdentity && (
-                    <p className="text-xs text-muted-foreground">
-                      {t('dapp.approval.txTo')}:{' '}
-                      <span className="font-mono text-foreground" title={txSummary.toIdentity}>
-                        {truncateString(txSummary.toIdentity)}
-                      </span>
+                    <p className="text-xs text-muted-foreground" title={txSummary.toIdentity}>
+                      <AddressLabel
+                        address={txSummary.toIdentity}
+                        prefix={`${t('dapp.approval.txTo')}:`}
+                        className="text-foreground"
+                      />
                     </p>
                   )}
                   {txSummary.amount && (
                     <p className="text-xs text-muted-foreground">
                       {t('dapp.approval.txAmount')}:{' '}
-                      <span className="font-mono text-foreground">{txSummary.amount}</span>
+                      <span className="font-mono text-foreground">
+                        {formatIntegerLike(txSummary.amount)} {NATIVE_TOKEN_SYMBOL}
+                      </span>
                     </p>
                   )}
                   {txSummary.inputType && (
                     <p className="text-xs text-muted-foreground">
-                      {t('dapp.approval.txInputType')}:{' '}
-                      <span className="font-mono text-foreground">{txSummary.inputType}</span>
+                      {t('dapp.approval.txType')}:{' '}
+                      <span className="font-mono text-foreground">{txTypeDescription}</span>
                     </p>
                   )}
-                  {txSummary.targetTick && (
+                  {txSummary.targetTick && Number(txSummary.targetTick) > 0 && (
                     <p className="text-xs text-muted-foreground">
                       {t('dapp.approval.txTargetTick')}:{' '}
-                      <span className="font-mono text-foreground">{txSummary.targetTick}</span>
-                    </p>
-                  )}
-                  {txSummary.targetTickOffset && (
-                    <p className="text-xs text-muted-foreground">
-                      {t('dapp.approval.txTargetTickOffset')}:{' '}
                       <span className="font-mono text-foreground">
-                        +{txSummary.targetTickOffset}
+                        {formatNumber(Number(txSummary.targetTick))}
                       </span>
                     </p>
                   )}
-                  <p className="text-xs text-muted-foreground">
-                    {t('dapp.approval.txFee')}:{' '}
-                    <span className="font-mono text-foreground">
-                      {txSummary.fee === '0'
-                        ? t('dapp.approval.txFeeNone')
-                        : t('dapp.approval.txFeeMayApply')}
-                    </span>
-                  </p>
+                  {txSummary.inputBytes && (
+                    <div className="text-xs text-muted-foreground">
+                      <p>{t('dapp.approval.txInputBytes')}:</p>
+                      <p
+                        className={`mt-1 break-all rounded bg-muted/50 p-1.5 font-mono text-[11px] text-foreground ${inputBytesExpanded ? 'max-h-40 overflow-y-auto' : 'max-h-10 overflow-hidden'}`}
+                      >
+                        {txSummary.inputBytes}
+                      </p>
+                      {txSummary.inputBytes.length > 80 && (
+                        <button
+                          type="button"
+                          className="mt-1 flex items-center gap-0.5 text-primary"
+                          onClick={() => setInputBytesExpanded((prev) => !prev)}
+                        >
+                          {inputBytesExpanded ? (
+                            <>
+                              {t('dapp.approval.txInputBytesCollapse')}{' '}
+                              <ChevronUpIcon className="h-3 w-3" />
+                            </>
+                          ) : (
+                            <>
+                              {t('dapp.approval.txInputBytesExpand')}{' '}
+                              <ChevronDownIcon className="h-3 w-3" />
+                            </>
+                          )}
+                        </button>
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
-            {requiresPassphrase && (
+            {isWatchOnlySigningRequest && accountSummary && (
+              <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3">
+                <p className="text-sm font-medium text-foreground">
+                  {t('dapp.approval.watchOnlyTitle')}
+                </p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {t('dapp.approval.watchOnlyDescription', {
+                    accountName:
+                      accountSummary.accountName || t('dapp.approval.sharedAccountFallback'),
+                  })}
+                </p>
+              </div>
+            )}
+            {requiresPassphrase && !isWatchOnlySigningRequest && (
               <PasswordInput
                 id="dapp-passphrase"
                 groupClassName="h-12"
@@ -291,21 +404,25 @@ const DappApprovalDrawer = () => {
             variant="outline"
             onClick={() => void submitDecision(false)}
             disabled={loading || !current}
-            className="w-full gap-2"
+            className={`w-full gap-2 ${isWatchOnlySigningRequest ? 'col-span-2' : ''}`}
           >
             <Link2OffIcon className="h-4 w-4" />
-            {t('dapp.approval.reject')}
+            {isWatchOnlySigningRequest
+              ? t('dapp.approval.watchOnlyDismiss')
+              : t('dapp.approval.reject')}
           </Button>
-          <Button
-            onClick={() => void submitDecision(true)}
-            disabled={loading || !current}
-            className="w-full gap-2"
-          >
-            <LinkIcon className="h-4 w-4" />
-            {current?.method === 'sendTransaction'
-              ? t('dapp.approval.approveAndSend')
-              : t('dapp.approval.approve')}
-          </Button>
+          {!isWatchOnlySigningRequest && (
+            <Button
+              onClick={() => void submitDecision(true)}
+              disabled={loading || !current}
+              className="w-full gap-2"
+            >
+              <LinkIcon className="h-4 w-4" />
+              {current?.method === 'sendTransaction'
+                ? t('dapp.approval.approveAndSend')
+                : t('dapp.approval.approve')}
+            </Button>
+          )}
         </DrawerFooter>
       </DrawerContent>
     </Drawer>

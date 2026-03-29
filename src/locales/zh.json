@@ -1,4 +1,17 @@
 {
+  "common": {
+    "back": "返回",
+    "previous": "上一步",
+    "continue": "继续",
+    "step": "第 {{current}} 步，共 {{total}} 步",
+    "accountName": "账户名称",
+    "addressLabel": "地址标签",
+    "vaultPassphrase": "保险库密码",
+    "currentVaultPassphrase": "当前保险库密码",
+    "seedLabel": "私有种子",
+    "seedLength": "种子长度：{{length}}",
+    "identity": "身份"
+  },
   "app": {
     "sidepanel": "打开侧边栏",
     "closeSidepanel": "关闭侧边栏"
@@ -51,14 +64,14 @@
       "empty": "未找到其他资产。",
       "emptyTitle": "暂无资产",
       "error": "无法加载资产。",
-      "unknown": "未知资产",
-      "manageRights": "管理权限"
+      "unknown": "未知资产"
     },
     "receive": {
       "title": "接收 Qubic",
       "description": "分享此 QR 码或复制您的公共身份地址。",
       "generating": "生成 QR 码...",
-      "copy": "复制地址"
+      "copy": "复制地址",
+      "qrAlt": "公共身份二维码"
     },
     "toast": {
       "copySuccess": "地址已复制",
@@ -70,6 +83,7 @@
       "title": "仅观察账户",
       "description": "此地址已禁用发送功能。"
     },
+    "refresh": "刷新",
     "price": {
       "label": "QUBIC 价格"
     },
@@ -136,11 +150,11 @@
       "title": "已连接的网站",
       "back": "设置",
       "empty": "暂无已连接的网站。",
-      "disconnect": "断开连接",
-      "connectedAt": "连接时间：{{date}}",
       "authorizedAccounts": "已授权账户",
       "authorizedAccountsCount": "已授权账户（{{count}}）",
       "accountFallback": "账户",
+      "disconnect": "断开连接",
+      "connectedAt": "连接时间：{{date}}",
       "noAuthorizedAccounts": "没有已授权账户"
     },
     "security": {
@@ -182,13 +196,14 @@
       "title": "关于",
       "appVersion": "应用版本",
       "extensionName": "扩展程序",
+      "extensionFullName": "Qubic Wallet",
       "versionLabel": "v{{version}}"
     }
   },
   "accounts": {
     "watchOnly": {
       "title": "添加仅观察地址",
-      "subtitle": "跟踪公共身份，无需导入种子。",
+      "subtitle": "跟踪公共身份，无需导入私有种子。",
       "submit": "添加仅观察"
     },
     "manage": {
@@ -214,17 +229,17 @@
       "remove": "移除",
       "removeTitle": "移除账户",
       "removeDesc": "此操作将从本设备移除该账户，且无法撤销。",
-      "reveal": "显示种子",
-      "revealTitle": "种子短语",
-      "copySeed": "复制种子",
-      "seedCopied": "种子已复制",
-      "qrAlt": "种子 QR 码",
-      "qrLabel": "扫描以导入种子",
+      "reveal": "显示私有种子",
+      "revealTitle": "\"{{name}}\" 的私有种子",
+      "copySeed": "复制私有种子",
+      "seedCopied": "私有种子已复制",
+      "qrAlt": "私有种子 QR 码",
+      "qrLabel": "扫描以导入私有种子",
       "done": "完成",
       "addTitle": "添加账户",
       "addNewDesc": "向此钱包添加新地址。",
       "addCreate": "创建新地址",
-      "addImport": "导入种子",
+      "addImport": "导入私有种子",
       "watchOnlyTitle": "仅观察账户",
       "watchOnlyName": "账户名称",
       "watchOnlyIdentity": "公共身份",
@@ -236,13 +251,13 @@
         "load": "无法打开 vault。",
         "remove": "无法移除账户。",
         "rename": "无法重命名账户。",
-        "reveal": "无法显示种子。",
+        "reveal": "无法显示私有种子。",
         "nameRequired": "请输入账户名称。",
         "passphraseRequired": "请输入密码。",
         "invalidPassphrase": "密码无效。",
         "nameDuplicate": "已存在同名账户。",
         "lastAccount": "无法移除最后一个账户。",
-        "watchOnlySeed": "仅观察账户没有种子。",
+        "watchOnlySeed": "仅观察账户没有私有种子。",
         "watchOnlyRequired": "名称和身份为必填项。",
         "watchOnlyInvalid": "身份格式无效。",
         "watchOnlyDuplicate": "此身份已添加。"
@@ -251,6 +266,7 @@
   },
   "history": {
     "title": "记录",
+    "refresh": "刷新历史",
     "loading": "加载记录...",
     "empty": "未找到交易。",
     "incoming": "收入",
@@ -260,7 +276,7 @@
     "to": "收款方：",
     "from": "发送方：",
     "tick": "Tick",
-    "type": "类型",
+    "txType": "交易类型",
     "pending": "待确认",
     "unconfirmed": "未确认",
     "unconfirmedMore": "+{{count}} 笔未确认",
@@ -275,20 +291,20 @@
     "title": "交易详情",
     "loading": "加载交易...",
     "error": "无法加载交易详情。",
-    "back": "返回",
     "copy": "复制",
     "copied": "已复制",
     "copyFailed": "复制失败",
     "txId": "交易 ID",
     "amount": "金额",
     "tick": "Tick",
-    "inputType": "输入类型",
+    "txType": "TX 类型",
     "source": "发送方",
     "destination": "接收方",
     "timestamp": "时间戳",
     "openExplorer": "在浏览器中查看",
     "pending": "待确认",
-    "pendingHint": "此交易仍在等待网络 Tick 确认。"
+    "pendingHint": "此交易仍在等待网络 Tick 确认。",
+    "failedHint": "此交易未在目标 Tick 内确认，已失败。"
   },
   "transfer": {
     "title": "发送",
@@ -339,14 +355,12 @@
       "feeLabel": "网络手续费"
     },
     "actions": {
-      "continue": "继续",
       "confirm": "确认并发送",
       "sending": "发送中...",
       "cancel": "取消"
     },
     "success": {
-      "title": "转账已发送",
-      "description": "您的交易已广播，计划在 Tick {{targetTick}} 执行。"
+      "title": "转账已发送"
     },
     "errors": {
       "networkError": "网络错误，请重试。",
@@ -362,9 +376,10 @@
     "noDestinationContracts": "没有可用的目标合约。",
     "sourceContract": "来源合约",
     "sourceContractPlaceholder": "选择来源合约",
+    "revokeOnlyHint": "* 由 {{contract}} 管理的资产只能撤销到 QX",
     "destinationContract": "目标合约",
     "destinationContractPlaceholder": "选择目标合约",
-    "numberOfSharesPlaceholder": "输入份额数量",
+    "numberOfSharesPlaceholder": "输入数量",
     "available": "可用：{{balance}} {{token}}",
     "fee": "手续费：{{fee}} QUBIC",
     "quBalance": "余额：{{balance}} QUBIC",
@@ -372,9 +387,10 @@
       "title": "确认权限转移",
       "description": "转移管理权限前请核实以下详情。",
       "asset": "资产",
+      "issuedBy": "由 {{issuer}} 发行",
       "from": "来源合约",
       "to": "目标合约",
-      "shares": "份额",
+      "amount": "数量",
       "feeLabel": "手续费",
       "warning": "此操作无法撤销。"
     },
@@ -382,20 +398,18 @@
       "sourceRequired": "请选择来源合约。",
       "destinationRequired": "请选择目标合约。",
       "sameContract": "来源合约和目标合约不能相同。",
-      "sharesRequired": "请输入份额数量。",
-      "sharesInvalid": "份额数量必须为正数。",
-      "sharesExceedsBalance": "份额数量超出可用余额。",
+      "sharesRequired": "数量为必填项。",
+      "sharesInvalid": "数量必须为正数。",
+      "sharesExceedsBalance": "数量超过可用余额。",
       "insufficientQuForFee": "QUBIC 余额不足以支付 {{fee}} QU 的手续费。"
     },
     "actions": {
-      "continue": "继续",
       "confirm": "确认并转移",
       "sending": "转移中...",
       "cancel": "取消"
     },
     "success": {
-      "title": "权限转移已发送",
-      "description": "您的交易已广播，计划在 Tick {{targetTick}} 执行。"
+      "title": "权限转移已发送"
     },
     "errors": {
       "networkError": "网络错误，请重试。",
@@ -403,6 +417,18 @@
       "watchOnly": "仅观察账户无法转移权限。",
       "generic": "权限转移失败，请重试。"
     }
+  },
+  "assetDetail": {
+    "title": "资产详情",
+    "issuer": "发行者身份",
+    "issuerCopied": "发行者身份已复制",
+    "copyFailed": "复制失败",
+    "managingContracts": "管理合约",
+    "noContracts": "未找到管理合约。",
+    "unknownContract": "合约 #{{index}}",
+    "transferRights": "转移管理权限",
+    "notFound": "未找到资产。",
+    "error": "无法加载资产详情。"
   },
   "passphraseAuth": {
     "title": "需要身份验证",
@@ -429,6 +455,12 @@
       "generic": "身份验证失败，请重试。"
     }
   },
+  "welcome": {
+    "subtitle": "欢迎使用 Qubic Wallet",
+    "createWallet": "创建新钱包",
+    "restoreSeed": "使用私有种子恢复",
+    "importVault": "导入 vault 备份"
+  },
   "unlock": {
     "title": "解锁钱包",
     "subtitle": "为确保安全，您的钱包已锁定。请输入密码以继续。"
@@ -436,6 +468,10 @@
   "dapp": {
     "approval": {
       "title": "连接请求",
+      "connectTitle": "连接请求",
+      "signMessageTitle": "签署消息",
+      "signTransactionTitle": "签署交易",
+      "sendTransactionTitle": "发送交易",
       "origin": "网站",
       "sharedAccount": "共享账户",
       "sharedAccountFallback": "已选账户",
@@ -443,35 +479,86 @@
       "signMessageSubtitle": "此网站请求您签署一条消息。",
       "signTransactionSubtitle": "此网站请求您签署一笔交易。",
       "sendTransactionSubtitle": "此网站请求您签署并广播一笔交易。",
+      "watchOnlySubtitle": "此请求无法使用仅观察账户批准。",
+      "watchOnlyTitle": "仅观察账户无法签名",
+      "watchOnlyDescription": "{{accountName}} 是仅观察账户，因此此钱包无法使用它进行签名或发送。网站将收到仅观察账户错误。",
       "genericSubtitle": "继续前请审核此请求。",
       "messageLabel": "消息",
       "messageEmpty": "无消息预览。",
       "txTo": "收款方",
       "txAmount": "金额",
-      "txInputType": "输入类型",
+      "txType": "TX 类型",
       "txTargetTick": "目标 Tick",
       "txTargetTickOffset": "目标 Tick 偏移量",
-      "txFee": "手续费",
-      "txFeeNone": "0",
-      "txFeeMayApply": "可能收取",
+      "txInputBytes": "输入数据",
+      "txInputBytesExpand": "展开",
+      "txInputBytesCollapse": "收起",
+      "txBroadcastSuccess": "交易已提交",
       "approve": "批准",
       "approveAndSend": "批准并发送",
       "reject": "拒绝",
+      "watchOnlyDismiss": "关闭",
       "errors": {
         "runtimeUnavailable": "扩展程序运行时不可用。",
         "decisionFailed": "无法提交您的决定。"
       }
     }
   },
+  "transaction": {
+    "broadcastDescription": "您的交易已广播，计划在 Tick {{targetTick}} 执行。",
+    "txTypeTransfer": "转账"
+  },
   "onboarding": {
+    "errors": {
+      "seedInvalid": "种子必须为 55 个小写字母。",
+      "seedConfirmRequired": "请确认您已安全保存私有种子。",
+      "addressExists": "此地址已存在。",
+      "passphraseRequired": "请输入密码。",
+      "passphraseReenter": "请重新输入密码。",
+      "passphraseMismatch": "两次输入的密码不一致。",
+      "passphraseTooShort": "密码至少需要 12 个字符。",
+      "invalidVaultPassphrase": "vault 密码无效。",
+      "vaultValidationFailed": "验证 vault 密码失败。",
+      "createFailed": "创建钱包失败。",
+      "importFailed": "导入私有种子失败。"
+    },
+    "create": {
+      "title": "创建新钱包",
+      "titleAddAddress": "添加新地址",
+      "readyTitle": "准备创建",
+      "readySubtitle": "创建保险库前请核实您的信息。",
+      "seedWarning": "请确保已保存您的私有种子。任何拥有此种子的人都可以访问您的资金。",
+      "createWallet": "创建钱包",
+      "creating": "创建中...",
+      "addAddress": "添加地址",
+      "adding": "添加中..."
+    },
     "importSeed": {
-      "title": "导入私钥种子",
-      "titleAddAddress": "导入地址种子",
-      "step": "第 {{current}} 步，共 {{total}} 步"
+      "title": "导入私有种子",
+      "titleAddAddress": "导入私有种子",
+      "pasteSeedTitle": "粘贴您的私有种子",
+      "pasteSeedSubtitle": "输入您要导入的 55 位私有种子。",
+      "seedValid": "种子格式有效。",
+      "seedInvalidCount": "种子必须为 55 个小写字母（{{current}}/{{total}}）。",
+      "labelSecureTitle": "标签与安全",
+      "labelSecureSubtitleAddress": "为此地址添加标签并输入当前 vault 密码。",
+      "labelSecureSubtitleWallet": "为此钱包命名并设置 vault 密码。",
+      "reviewTitle": "审核导入",
+      "reviewSubtitle": "导入前请确认以下信息。",
+      "seedPrivacyNotice": "您的私有种子不会离开此设备。请始终妥善保管。",
+      "importAddress": "导入地址",
+      "importSeedAction": "导入私有种子",
+      "importing": "导入中..."
+    },
+    "passphraseStep": {
+      "title": "命名并保护",
+      "subtitleAddress": "为此钱包添加标签并输入当前 vault 密码。",
+      "subtitleWallet": "为此钱包添加标签并设置 vault 密码。",
+      "minChars": "至少 12 个字符。",
+      "reenterPassphrase": "重新输入 vault 密码"
     },
     "importVault": {
       "title": "导入 vault 文件",
-      "step": "第 {{current}} 步，共 {{total}} 步",
       "selectVault": {
         "title": "选择 vault 文件",
         "subtitle": "上传从此扩展程序或 Qubic 网页钱包导出的 vault 文件。",
@@ -496,9 +583,6 @@
         "addMoreLater": "您可以稍后在「管理账户」中添加更多账户。"
       },
       "actions": {
-        "back": "返回",
-        "previous": "上一步",
-        "continue": "继续",
         "import": "导入 vault",
         "importing": "导入中..."
       },
@@ -512,17 +596,17 @@
       }
     },
     "seedSecurity": {
-      "title": "保护您的种子",
-      "subtitle": "请将此 55 位种子保存在安全的地方。恢复钱包时需要使用它。",
-      "subtitleAddAddress": "请将此 55 位种子保存在安全的地方。恢复此地址时需要使用它。",
-      "warningTitle": "请妥善保管此种子。",
-      "seedLabel": "种子",
+      "title": "保护您的私有种子",
+      "subtitle": "请将此 55 位私有种子保存在安全的地方。恢复钱包时需要使用它。",
+      "subtitleAddAddress": "请将此 55 位私有种子保存在安全的地方。恢复此地址时需要使用它。",
+      "warningTitle": "请妥善保管此私有种子。",
+      "seedLabel": "私有种子",
       "publicIdentityLabel": "公共身份",
       "deriving": "正在派生...",
       "generateNew": "生成新种子",
-      "copySeed": "复制种子",
-      "seedCopied": "种子已复制",
-      "confirmationLabel": "我已安全保存此种子，并了解恢复钱包时需要使用它。"
+      "copySeed": "复制私有种子",
+      "seedCopied": "私有种子已复制",
+      "confirmationLabel": "我已安全保存此私有种子，并了解恢复钱包时需要使用它。"
     }
   }
 }

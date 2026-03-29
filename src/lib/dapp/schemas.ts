@@ -75,6 +75,7 @@ export const dappExecutionRequestSchema = z.object({
     .object({
       identity: z.string().min(1),
       name: z.string().optional(),
+      watchOnly: z.literal(true).optional(),
     })
     .optional(),
 })
