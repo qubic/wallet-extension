@@ -136,7 +136,7 @@ const History = () => {
     [pendingItems],
   )
   const failedTopItems = useMemo(
-    () => pendingItems.filter((tx) => tx.status === 'failed' || tx.status === 'not-approved'),
+    () => pendingItems.filter((tx) => tx.status === 'failed' || tx.status === 'invalid'),
     [pendingItems],
   )
 
@@ -409,7 +409,7 @@ const History = () => {
                   {failedTopItems.map((tx) => {
                     const { label, counterparty, Icon, addressPrefix, amountSign } =
                       getRowPresentation(tx)
-                    const isNotApproved = tx.status === 'not-approved'
+                    const isFailed = tx.status === 'failed'
                     const canResend = canResendPendingTransaction({
                       status: tx.status,
                       destinationIdentity: tx.destination,
@@ -436,9 +436,9 @@ const History = () => {
                                 prefix={addressPrefix}
                                 className="text-xs text-muted-foreground"
                               />
-                              {isNotApproved && (
+                              {isFailed && (
                                 <span className="text-[11px] text-red-700 dark:text-red-300">
-                                  {t('history.notApproved')}
+                                  {t('history.failed')}
                                 </span>
                               )}
                             </div>
@@ -463,7 +463,7 @@ const History = () => {
                                   {t('history.resend')}
                                 </button>
                               )}
-                              {!isNotApproved && (
+                              {tx.status === 'invalid' && (
                                 <button
                                   type="button"
                                   className="cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
@@ -471,8 +471,8 @@ const History = () => {
                                     e.stopPropagation()
                                     removePendingTransaction(tx.hash)
                                   }}
-                                  aria-label={t('history.deleteFailed')}
-                                  title={t('history.deleteFailed')}
+                                  aria-label={t('history.deleteInvalid')}
+                                  title={t('history.deleteInvalid')}
                                 >
                                   <XIcon className="h-3.5 w-3.5" />
                                 </button>

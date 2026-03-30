@@ -70,7 +70,7 @@ const mergePendingEntries = (items: PendingTransaction[]) => {
     }
     if (
       pending.createdAt === existing.createdAt &&
-      (pending.status === 'failed' || pending.status === 'not-approved')
+      (pending.status === 'invalid' || pending.status === 'failed')
     ) {
       pendingByHash.set(key, pending)
     }
@@ -185,8 +185,8 @@ export const getPendingTransactionsForIdentity = (identity: string) => {
   }
   const statusOrder: Record<PendingTransactionStatus, number> = {
     pending: 0,
-    'not-approved': 1,
-    failed: 2,
+    failed: 1,
+    invalid: 2,
   }
   return items.sort((a, b) => {
     const statusDiff = statusOrder[a.status] - statusOrder[b.status]
@@ -198,7 +198,7 @@ export const getPendingTransactionsForIdentity = (identity: string) => {
 export const canResendPendingTransaction = (
   pending: Pick<PendingTransaction, 'status' | 'destinationIdentity' | 'inputType' | 'tokenKey'>,
 ) => {
-  if (pending.status !== 'failed' && pending.status !== 'not-approved') return false
+  if (pending.status !== 'failed' && pending.status !== 'invalid') return false
   if (!pending.destinationIdentity) return false
   if (pending.inputType === 0 || pending.inputType === undefined) return true
   if (pending.inputType === QX_TRANSFER_ASSET_INPUT_TYPE) {
@@ -257,13 +257,16 @@ export const resolvePendingTransactions = (
     if (moneyFlew === false) {
       const status = computeTransactionStatus(inputType, amount, false, tx.destination)
       if (status === 'failure') {
-        // Transaction was included in a block but not approved
-        if (pending.status !== 'not-approved') {
-          pendingByHash.set(key, { ...pending, status: 'not-approved' })
+        // On-chain transaction with moneyFlew: false — funds were not transferred
+        if (pending.status !== 'failed') {
+          pendingByHash.set(key, { ...pending, status: 'failed' })
           changed = true
         }
         continue
       }
+      // Non-definitive types (SC calls) with moneyFlew: false fall through
+      // intentionally — we cannot determine success/failure so we treat them
+      // as confirmed ("executed") and remove from pending.
     }
 
     // For definitive types, wait until moneyFlew is resolved
@@ -283,7 +286,8 @@ export const resolvePendingTransactions = (
     for (const [key, pending] of pendingByHash.entries()) {
       if (pending.status !== 'pending') continue
       if (lastProcessedTick > pending.targetTick) {
-        pendingByHash.set(key, { ...pending, status: 'failed' })
+        // Local-only: transaction was never included in a block
+        pendingByHash.set(key, { ...pending, status: 'invalid' })
         changed = true
       }
     }

@@ -282,9 +282,9 @@
     "unconfirmedMore": "+{{count}} weitere unbestätigte",
     "confirmed": "Bestätigt",
     "failed": "Fehlgeschlagen",
-    "notApproved": "Nicht genehmigt",
+    "invalid": "Ungültig",
     "resend": "Erneut senden",
-    "deleteFailed": "Fehlgeschlagene Transaktion löschen",
+    "deleteInvalid": "Ungültige Transaktion löschen",
     "today": "Heute",
     "yesterday": "Gestern"
   },
@@ -305,8 +305,8 @@
     "openExplorer": "Im Explorer öffnen",
     "pending": "Ausstehend",
     "pendingHint": "Diese Transaktion wartet noch auf Bestätigung in den Netzwerk-Ticks.",
-    "failedHint": "Diese Transaktion wurde nicht innerhalb des Ziel-Ticks bestätigt und ist fehlgeschlagen.",
-    "notApprovedHint": "Diese Transaktion wurde in einen Block aufgenommen, aber nicht vom Netzwerk genehmigt. Die Mittel wurden nicht übertragen."
+    "failedHint": "Diese Transaktion wurde in einen Block aufgenommen, aber nicht vom Netzwerk genehmigt. Die Mittel wurden nicht übertragen.",
+    "invalidHint": "Diese Transaktion wurde nicht innerhalb des Ziel-Ticks bestätigt und ist ungültig."
   },
   "transfer": {
     "title": "Senden",

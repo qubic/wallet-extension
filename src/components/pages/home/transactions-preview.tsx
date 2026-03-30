@@ -75,8 +75,8 @@ const TransactionsPreview = ({
     const pendingStatus = getPendingTransaction(tx.hash)?.status
     const isPending = pendingStatus === 'pending'
     const isFailed = pendingStatus === 'failed'
-    const isNotApproved = pendingStatus === 'not-approved'
-    const isUnsuccessful = isFailed || isNotApproved
+    const isInvalid = pendingStatus === 'invalid'
+    const isUnsuccessful = isFailed || isInvalid
     const canResend = canResendPendingTransaction({
       status: tx.status ?? 'pending',
       destinationIdentity: tx.destination,
@@ -118,8 +118,8 @@ const TransactionsPreview = ({
             />
             <span className="text-[11px] text-muted-foreground/70">
               {(() => {
-                if (isNotApproved) return t('history.notApproved')
                 if (isFailed) return t('history.failed')
+                if (isInvalid) return t('history.invalid')
                 const ts = Number(tx.timestamp)
                 if (!ts) return '--'
                 const date = new Date(toTimestampMs(ts))
@@ -165,7 +165,7 @@ const TransactionsPreview = ({
                   {t('history.resend')}
                 </button>
               )}
-              {isFailed && (
+              {isInvalid && (
                 <button
                   type="button"
                   className="cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
@@ -173,8 +173,8 @@ const TransactionsPreview = ({
                     e.stopPropagation()
                     removePendingTransaction(tx.hash)
                   }}
-                  aria-label={t('history.deleteFailed')}
-                  title={t('history.deleteFailed')}
+                  aria-label={t('history.deleteInvalid')}
+                  title={t('history.deleteInvalid')}
                 >
                   <XIcon className="h-3.5 w-3.5" />
                 </button>
