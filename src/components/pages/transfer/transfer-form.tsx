@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import NumericInput from '@/components/numeric-input'
 import { type AggregatedAsset, formatAssetUnits } from '@/lib/assets'
-import { NATIVE_TOKEN_SYMBOL } from '@/lib/config/constants'
+import { NATIVE_TOKEN_NAME } from '@/lib/config/constants'
 import { useAddressName } from '@/hooks/use-address-name'
 import { formatBalance, formatNumber, truncateString } from '@/lib/utils'
 import type { FormErrors } from '@/components/pages/transfer/types'
@@ -66,7 +66,7 @@ const TransferForm = ({
   const { t } = useTranslation()
   const navigate = useNavigate()
   const currentBalance = quBalance
-  const selectedTokenLabel = selectedAsset?.name ?? NATIVE_TOKEN_SYMBOL
+  const selectedTokenLabel = selectedAsset?.name ?? NATIVE_TOKEN_NAME
   const usdEstimateDisplay = usdEstimate === '--' ? usdEstimate : `~${usdEstimate}`
   const availableBalanceText = selectedAsset
     ? formatAssetUnits(selectedAsset.numberOfUnits, selectedAsset.decimals)
