@@ -60,11 +60,16 @@ const TransactionsPreview = ({
       status: tx.status,
     }))
     const pendingHashes = new Set(pendingItems.map((tx) => tx.hash.toLowerCase()))
-    const unconfirmedTop = pendingItems.slice(0, 3)
-    const unconfirmedOverflow = pendingItems.length - unconfirmedTop.length
-    const recentChain: PreviewTransaction[] = items
-      .filter((tx) => !pendingHashes.has(tx.hash.toLowerCase()))
-      .slice(0, 3)
+    const unconfirmed = pendingItems.filter(
+      (tx) => tx.status === 'pending' || tx.status === 'invalid',
+    )
+    const failed = pendingItems.filter((tx) => tx.status === 'failed')
+    const unconfirmedTop = unconfirmed.slice(0, 3)
+    const unconfirmedOverflow = unconfirmed.length - unconfirmedTop.length
+    const chainItems: PreviewTransaction[] = items.filter(
+      (tx) => !pendingHashes.has(tx.hash.toLowerCase()),
+    )
+    const recentChain: PreviewTransaction[] = [...failed, ...chainItems].slice(0, 3)
 
     return { unconfirmedTop, unconfirmedOverflow, recentChain }
   }, [transactions.data, pendingTransactions])
@@ -116,11 +121,9 @@ const TransactionsPreview = ({
               prefix={addressPrefix}
               className="text-xs text-muted-foreground"
             />
-            <span className="text-[11px] text-muted-foreground/70">
-              {(() => {
-                if (isFailed) return t('history.failed')
-                if (isInvalid) return t('history.invalid')
-                const ts = Number(tx.timestamp)
+            {(() => {
+              const ts = Number(tx.timestamp)
+              const dateLabel = (() => {
                 if (!ts) return '--'
                 const date = new Date(toTimestampMs(ts))
                 const now = new Date()
@@ -133,8 +136,29 @@ const TransactionsPreview = ({
                   day: 'numeric',
                   year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined,
                 })
-              })()}
-            </span>
+              })()
+
+              return (
+                <span className="text-[11px] text-muted-foreground/70">
+                  {dateLabel}
+                  {isPending && (
+                    <span className="ml-1 text-amber-700 dark:text-amber-300">
+                      {t('history.pending')}
+                    </span>
+                  )}
+                  {isFailed && (
+                    <span className="ml-1 text-red-700 dark:text-red-300">
+                      {t('history.failed')}
+                    </span>
+                  )}
+                  {isInvalid && (
+                    <span className="ml-1 text-red-700 dark:text-red-300">
+                      {t('history.invalid')}
+                    </span>
+                  )}
+                </span>
+              )
+            })()}
           </div>
         </div>
         <div className="flex items-center gap-2">
