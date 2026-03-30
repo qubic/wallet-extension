@@ -13,6 +13,7 @@ import {
   getPendingTransaction,
   removePendingTransaction,
 } from '@/lib/pending-transactions'
+import { computeTransactionStatus } from '@/lib/transaction-status'
 
 type PreviewTransaction = {
   hash: string
@@ -24,6 +25,7 @@ type PreviewTransaction = {
   tokenKey?: string
   timestamp: bigint
   status?: PendingTransaction['status']
+  moneyFlew?: boolean
 }
 
 type TransactionsPreviewProps = {
@@ -59,17 +61,17 @@ const TransactionsPreview = ({
       timestamp: BigInt(tx.createdAt),
       status: tx.status,
     }))
-    const pendingHashes = new Set(pendingItems.map((tx) => tx.hash.toLowerCase()))
+    const unconfirmedHashes = new Set(
+      pendingItems.filter((tx) => tx.status !== 'failed').map((tx) => tx.hash.toLowerCase()),
+    )
     const unconfirmed = pendingItems.filter(
       (tx) => tx.status === 'pending' || tx.status === 'invalid',
     )
-    const failed = pendingItems.filter((tx) => tx.status === 'failed')
     const unconfirmedTop = unconfirmed.slice(0, 3)
     const unconfirmedOverflow = unconfirmed.length - unconfirmedTop.length
-    const chainItems: PreviewTransaction[] = items.filter(
-      (tx) => !pendingHashes.has(tx.hash.toLowerCase()),
-    )
-    const recentChain: PreviewTransaction[] = [...failed, ...chainItems].slice(0, 3)
+    const recentChain: PreviewTransaction[] = items
+      .filter((tx) => !unconfirmedHashes.has(tx.hash.toLowerCase()))
+      .slice(0, 3)
 
     return { unconfirmedTop, unconfirmedOverflow, recentChain }
   }, [transactions.data, pendingTransactions])
@@ -79,8 +81,13 @@ const TransactionsPreview = ({
       getTransactionPresentation(tx, identity, t)
     const pendingStatus = getPendingTransaction(tx.hash)?.status
     const isPending = pendingStatus === 'pending'
-    const isFailed = pendingStatus === 'failed'
     const isInvalid = pendingStatus === 'invalid'
+    const isFailed =
+      pendingStatus === 'failed' ||
+      (!pendingStatus &&
+        tx.moneyFlew === false &&
+        computeTransactionStatus(Number(tx.inputType), tx.amount, false, tx.destination) ===
+          'failure')
     const isUnsuccessful = isFailed || isInvalid
     const canResend = canResendPendingTransaction({
       status: tx.status ?? 'pending',

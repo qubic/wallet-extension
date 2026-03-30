@@ -28,6 +28,7 @@ import {
 import { getCurrentIdentity } from '@/lib/accounts'
 import HistoryEmptyState from '@/components/pages/history/history-empty-state'
 import { REFRESH_INTERVAL_ACTIVE_TRANSACTIONS } from '@/lib/config/refresh-intervals'
+import { computeTransactionStatus } from '@/lib/transaction-status'
 
 const HistoryRowSkeleton = () => (
   <div className="space-y-3 rounded-xl border border-border/40 bg-background/40 px-3 py-3">
@@ -58,6 +59,7 @@ type HistoryRowTransaction = {
   inputType: number | bigint
   tokenKey?: string
   status?: PendingTransactionStatus
+  moneyFlew?: boolean
 }
 
 type HistoryRowState = 'default' | 'pending' | 'failed' | 'invalid'
@@ -108,7 +110,8 @@ const History = () => {
     return getArchiverProcessedTick(transactions.data?.pages)
   }, [transactions.data])
   const pendingHashes = useMemo(
-    () => new Set(pending.map((tx) => tx.hash.toLowerCase())),
+    () =>
+      new Set(pending.filter((tx) => tx.status !== 'failed').map((tx) => tx.hash.toLowerCase())),
     [pending],
   )
   const pendingItems = useMemo(
@@ -137,11 +140,6 @@ const History = () => {
     () => pendingItems.filter((tx) => tx.status === 'pending' || tx.status === 'invalid'),
     [pendingItems],
   )
-  const failedItems = useMemo(
-    () => pendingItems.filter((tx) => tx.status === 'failed'),
-    [pendingItems],
-  )
-
   const grouped = useMemo(() => {
     const now = new Date()
     const todayKey = now.toDateString()
@@ -149,26 +147,12 @@ const History = () => {
     yesterday.setDate(yesterday.getDate() - 1)
     const yesterdayKey = yesterday.toDateString()
 
-    type GroupItem = HistoryRowTransaction & { _state?: HistoryRowState }
     const groups: Array<{
       key: string
       label: string
-      items: GroupItem[]
+      items: typeof apiItems
     }> = []
-    const groupMap = new Map<string, GroupItem[]>()
-
-    // Add failed pending items (on-chain, moneyFlew: false) into date groups
-    for (const tx of failedItems) {
-      const date = new Date(Number(tx.timestamp))
-      const key = date.toDateString()
-      const group = groupMap.get(key)
-      const item: GroupItem = { ...tx, _state: 'failed' as const }
-      if (group) {
-        group.push(item)
-      } else {
-        groupMap.set(key, [item])
-      }
-    }
+    const groupMap = new Map<string, typeof apiItems>()
 
     for (const tx of apiItems) {
       const ts = Number(tx.timestamp)
@@ -200,7 +184,7 @@ const History = () => {
     }
 
     return groups
-  }, [apiItems, failedItems, t])
+  }, [apiItems, t])
   const listMotion = {
     hidden: { opacity: 0, y: 10 },
     show: {
@@ -220,14 +204,19 @@ const History = () => {
     const { isIncoming, label, counterparty, Icon, addressPrefix, amountSign, amountColorClass } =
       getRowPresentation(tx)
     const isPending = state === 'pending'
-    const isFailed = state === 'failed'
     const isInvalid = state === 'invalid'
+    const isFailed =
+      state === 'failed' ||
+      (state === 'default' &&
+        tx.moneyFlew === false &&
+        computeTransactionStatus(Number(tx.inputType), tx.amount, false, tx.destination) ===
+          'failure')
     const isUnsuccessful = isFailed || isInvalid
     const hasExplorerLink = state === 'default' || isFailed
     const canResend =
       isUnsuccessful &&
       canResendPendingTransaction({
-        status: tx.status ?? (state === 'invalid' ? 'invalid' : 'failed'),
+        status: tx.status ?? (isInvalid ? 'invalid' : 'failed'),
         destinationIdentity: tx.destination,
         inputType: Number(tx.inputType),
         tokenKey: tx.tokenKey,
@@ -477,9 +466,7 @@ const History = () => {
               <span className="text-[11px] font-semibold uppercase text-muted-foreground/70">
                 {group.label}
               </span>
-              {group.items.map((tx) =>
-                renderHistoryRow(tx, ('_state' in tx && tx._state) || 'default'),
-              )}
+              {group.items.map((tx) => renderHistoryRow(tx, 'default'))}
             </motion.div>
           ))}
 
