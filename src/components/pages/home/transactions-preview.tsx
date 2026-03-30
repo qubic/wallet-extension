@@ -89,12 +89,14 @@ const TransactionsPreview = ({
         computeTransactionStatus(Number(tx.inputType), tx.amount, false, tx.destination) ===
           'failure')
     const isUnsuccessful = isFailed || isInvalid
-    const canResend = canResendPendingTransaction({
-      status: tx.status ?? 'pending',
-      destinationIdentity: tx.destination,
-      inputType: Number(tx.inputType),
-      tokenKey: tx.tokenKey,
-    })
+    const canResend =
+      isUnsuccessful &&
+      canResendPendingTransaction({
+        status: tx.status ?? (isInvalid ? 'invalid' : 'failed'),
+        destinationIdentity: tx.destination,
+        inputType: Number(tx.inputType),
+        tokenKey: tx.tokenKey,
+      })
 
     return (
       <motion.div
