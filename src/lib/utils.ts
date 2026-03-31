@@ -11,11 +11,7 @@ export function cn(...inputs: ClassValue[]) {
  * Validate Qubic identity format (60 uppercase letters A-Z)
  */
 export const isValidIdentity = (identity: string): boolean => {
-  if (identity.length !== 60) return false
-  for (const char of identity) {
-    if (char < 'A' || char > 'Z') return false
-  }
-  return verifyIdentity(identity)
+  return /^[A-Z]{60}$/.test(identity) && verifyIdentity(identity)
 }
 
 /**
