@@ -42,6 +42,7 @@ import {
 import { addPendingTransaction, PENDING_SETTLED_EVENT } from '@/lib/pending-transactions'
 import { isWalletLocked } from '@/lib/lock'
 import { useTickInfo, fetchTickInfo } from '@/lib/network-stats'
+import { isRequestedTargetTickExpiredNow } from '@/lib/target-tick'
 import {
   compareBigIntDesc,
   formatBalance,
@@ -324,14 +325,13 @@ const TransferRights = () => {
 
     setSending(true)
     setErrorMessage('')
+    let requestedTargetTick: bigint | number | undefined
 
     try {
       const parsedShares = parseAmount(shares)
       if (!parsedShares) {
         throw new Error(t('transferRights.validation.sharesInvalid'))
       }
-
-      let requestedTargetTick: bigint | number | undefined
 
       const freshTickInfo = await fetchTickInfo()
       const sendCurrentTick = freshTickInfo.tickInfo?.tick
@@ -418,7 +418,10 @@ const TransferRights = () => {
       let message = t('transferRights.errors.generic')
 
       if (error instanceof Error) {
-        if (error.message.includes('network') || error.message.includes('fetch')) {
+        const targetTickExpired = await isRequestedTargetTickExpiredNow(requestedTargetTick)
+        if (targetTickExpired) {
+          message = t('transferRights.errors.targetTickExpired')
+        } else if (error.message.includes('network') || error.message.includes('fetch')) {
           message = t('transferRights.errors.networkError')
         } else if (error.message.includes('broadcast')) {
           message = t('transferRights.errors.broadcastFailed')
