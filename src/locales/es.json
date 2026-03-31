@@ -317,7 +317,7 @@
     "form": {
       "recipientPlaceholder": "Identidad de 60 caracteres (A-Z)",
       "amountPlaceholder": "Ingresa el monto",
-      "max": "Máximo",
+      "max": "Max",
       "feeValue": "Comisión: {{fee}} QUBIC",
       "quBalance": "Saldo: {{balance}} QUBIC",
       "recipientHint": "Usa una identidad de 60 letras o elige una de tu vault.",
