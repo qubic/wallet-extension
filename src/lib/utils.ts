@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
+import { verifyIdentity } from '@qubic-labs/core'
 import { QUBIC_EXPLORER_BASE_URL } from './config/constants'
 
 export function cn(...inputs: ClassValue[]) {
@@ -14,7 +15,7 @@ export const isValidIdentity = (identity: string): boolean => {
   for (const char of identity) {
     if (char < 'A' || char > 'Z') return false
   }
-  return true
+  return verifyIdentity(identity)
 }
 
 /**
