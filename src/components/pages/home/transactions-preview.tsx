@@ -215,14 +215,12 @@ const TransactionsPreview = ({
             </div>
           )}
         </div>
-        {!isUnsuccessful && (
-          <button
-            type="button"
-            className="absolute inset-0 cursor-pointer rounded-xl"
-            aria-label={t('txDetails.title')}
-            onClick={() => onOpenTx(tx.hash)}
-          />
-        )}
+        <button
+          type="button"
+          className="absolute inset-0 cursor-pointer rounded-xl"
+          aria-label={t('txDetails.title')}
+          onClick={() => onOpenTx(tx.hash)}
+        />
       </motion.div>
     )
   }

@@ -227,12 +227,12 @@ const History = () => {
         key={tx.hash}
         className={`w-full space-y-3 rounded-xl border px-3 py-3 text-left transition-colors ${
           isPending
-            ? 'border-amber-500/50 bg-amber-500/10'
+            ? 'cursor-pointer border-amber-500/50 bg-amber-500/10'
             : isUnsuccessful
-              ? 'border-red-500/50 bg-red-500/10'
+              ? 'cursor-pointer border-red-500/50 bg-red-500/10'
               : 'cursor-pointer border-border/40 bg-background/40 hover:border-primary/30 hover:bg-background/60'
         }`}
-        onClick={isUnsuccessful ? undefined : () => navigate(`/tx/${tx.hash}`)}
+        onClick={() => navigate(`/tx/${tx.hash}`)}
         variants={itemMotion}
       >
         <div className="flex items-center justify-between gap-3">
