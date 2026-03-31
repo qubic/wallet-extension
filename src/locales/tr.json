@@ -334,7 +334,7 @@
     },
     "validation": {
       "recipientRequired": "Alıcı kimliği gereklidir.",
-      "recipientInvalid": "Kimlik 60 büyük harf (A-Z) olmalıdır.",
+      "recipientInvalid": "Geçersiz kimlik adresi.",
       "recipientSameAsSender": "Kendi kimliğinize gönderim yapılamaz.",
       "amountRequired": "Miktar gereklidir.",
       "amountInvalid": "Miktar pozitif bir sayı olmalıdır.",

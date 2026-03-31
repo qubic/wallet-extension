@@ -334,7 +334,7 @@
     },
     "validation": {
       "recipientRequired": "Empfängeradresse ist erforderlich.",
-      "recipientInvalid": "Adresse muss aus 60 Großbuchstaben bestehen (A-Z).",
+      "recipientInvalid": "Ungültige Identitätsadresse.",
       "recipientSameAsSender": "Senden an die eigene Adresse ist nicht möglich.",
       "amountRequired": "Betrag ist erforderlich.",
       "amountInvalid": "Betrag muss eine positive Zahl sein.",

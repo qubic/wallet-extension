@@ -8,7 +8,8 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /**
- * Validate Qubic identity format (60 uppercase letters A-Z)
+ * Validate a Qubic identity by checking both its 60-character uppercase format
+ * and checksum.
  */
 export const isValidIdentity = (identity: string): boolean => {
   return /^[A-Z]{60}$/.test(identity) && verifyIdentity(identity)

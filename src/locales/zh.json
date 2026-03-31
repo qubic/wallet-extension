@@ -334,7 +334,7 @@
     },
     "validation": {
       "recipientRequired": "请输入收款方身份。",
-      "recipientInvalid": "身份必须为 60 位大写字母（A-Z）。",
+      "recipientInvalid": "身份地址无效。",
       "recipientSameAsSender": "不能向自己的身份发送。",
       "amountRequired": "请输入金额。",
       "amountInvalid": "金额必须为正数。",

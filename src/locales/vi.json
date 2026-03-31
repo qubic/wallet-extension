@@ -334,7 +334,7 @@
     },
     "validation": {
       "recipientRequired": "Yêu cầu danh tính người nhận.",
-      "recipientInvalid": "Danh tính phải là 60 chữ cái viết hoa (A-Z).",
+      "recipientInvalid": "Địa chỉ danh tính không hợp lệ.",
       "recipientSameAsSender": "Không thể gửi đến danh tính của chính bạn.",
       "amountRequired": "Yêu cầu số lượng.",
       "amountInvalid": "Số lượng phải là số dương.",

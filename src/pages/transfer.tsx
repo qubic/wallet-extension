@@ -301,9 +301,7 @@ const Transfer = () => {
       let message = t('transfer.errors.generic')
 
       if (error instanceof Error) {
-        if (error.message.includes('identity60 checksum mismatch')) {
-          message = t('transfer.validation.recipientInvalid')
-        } else if (error.message.includes('network') || error.message.includes('fetch')) {
+        if (error.message.includes('network') || error.message.includes('fetch')) {
           message = t('transfer.errors.networkError')
         } else if (error.message.includes('broadcast')) {
           message = t('transfer.errors.broadcastFailed')
