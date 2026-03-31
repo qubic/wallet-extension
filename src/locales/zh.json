@@ -364,6 +364,7 @@
     },
     "errors": {
       "networkError": "网络错误，请重试。",
+      "targetTickExpired": "目标 Tick 已经过期。请使用更高的目标 Tick。",
       "broadcastFailed": "交易广播失败。",
       "watchOnly": "仅观察账户无法发送转账。",
       "generic": "转账失败，请重试。"
@@ -413,6 +414,7 @@
     },
     "errors": {
       "networkError": "网络错误，请重试。",
+      "targetTickExpired": "目标 Tick 已经过期。请使用更高的目标 Tick。",
       "broadcastFailed": "交易广播失败。",
       "watchOnly": "仅观察账户无法转移权限。",
       "generic": "权限转移失败，请重试。"

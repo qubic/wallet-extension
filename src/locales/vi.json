@@ -364,6 +364,7 @@
     },
     "errors": {
       "networkError": "Lỗi mạng. Vui lòng thử lại.",
+      "targetTickExpired": "Tick mục tiêu đã qua. Vui lòng dùng tick mục tiêu cao hơn.",
       "broadcastFailed": "Không thể truyền giao dịch.",
       "watchOnly": "Tài khoản chỉ xem không thể gửi chuyển khoản.",
       "generic": "Chuyển khoản thất bại. Vui lòng thử lại."
@@ -413,6 +414,7 @@
     },
     "errors": {
       "networkError": "Lỗi mạng. Vui lòng thử lại.",
+      "targetTickExpired": "Tick mục tiêu đã qua. Vui lòng dùng tick mục tiêu cao hơn.",
       "broadcastFailed": "Không thể truyền giao dịch.",
       "watchOnly": "Tài khoản chỉ xem không thể chuyển quyền.",
       "generic": "Chuyển quyền thất bại. Vui lòng thử lại."

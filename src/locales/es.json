@@ -364,6 +364,7 @@
     },
     "errors": {
       "networkError": "Error de red. Intenta de nuevo.",
+      "targetTickExpired": "El tick objetivo ya pasó. Usa un tick objetivo más alto.",
       "broadcastFailed": "Fallo al transmitir la transacción.",
       "watchOnly": "Las cuentas de solo lectura no pueden enviar transferencias.",
       "generic": "Transferencia fallida. Intenta de nuevo."
@@ -413,6 +414,7 @@
     },
     "errors": {
       "networkError": "Error de red. Intenta de nuevo.",
+      "targetTickExpired": "El tick objetivo ya pasó. Usa un tick objetivo más alto.",
       "broadcastFailed": "Fallo al transmitir la transacción.",
       "watchOnly": "Las cuentas de solo lectura no pueden transferir derechos.",
       "generic": "Transferencia de derechos fallida. Intenta de nuevo."

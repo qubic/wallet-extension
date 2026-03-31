@@ -364,6 +364,7 @@
     },
     "errors": {
       "networkError": "Ağ hatası. Lütfen tekrar deneyin.",
+      "targetTickExpired": "Hedef tick zaten geçti. Lütfen daha yüksek bir hedef tick kullanın.",
       "broadcastFailed": "İşlem yayınlanamadı.",
       "watchOnly": "Yalnızca izleme hesapları transfer gönderemez.",
       "generic": "Transfer başarısız. Lütfen tekrar deneyin."
@@ -413,6 +414,7 @@
     },
     "errors": {
       "networkError": "Ağ hatası. Lütfen tekrar deneyin.",
+      "targetTickExpired": "Hedef tick zaten geçti. Lütfen daha yüksek bir hedef tick kullanın.",
       "broadcastFailed": "İşlem yayınlanamadı.",
       "watchOnly": "Yalnızca izleme hesapları hak transferi yapamaz.",
       "generic": "Hak transferi başarısız. Lütfen tekrar deneyin."

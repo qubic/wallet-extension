@@ -364,6 +364,7 @@
     },
     "errors": {
       "networkError": "Erreur réseau. Veuillez réessayer.",
+      "targetTickExpired": "Le tick cible est déjà passé. Veuillez utiliser un tick cible plus élevé.",
       "broadcastFailed": "Échec de la diffusion de la transaction.",
       "watchOnly": "Les comptes en lecture seule ne peuvent pas envoyer de transferts.",
       "generic": "Échec du transfert. Veuillez réessayer."
@@ -413,6 +414,7 @@
     },
     "errors": {
       "networkError": "Erreur réseau. Veuillez réessayer.",
+      "targetTickExpired": "Le tick cible est déjà passé. Veuillez utiliser un tick cible plus élevé.",
       "broadcastFailed": "Échec de la diffusion de la transaction.",
       "watchOnly": "Les comptes en lecture seule ne peuvent pas transférer de droits.",
       "generic": "Échec du transfert de droits. Veuillez réessayer."

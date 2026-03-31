@@ -364,6 +364,7 @@
     },
     "errors": {
       "networkError": "Netzwerkfehler. Bitte erneut versuchen.",
+      "targetTickExpired": "Der Ziel-Tick ist bereits abgelaufen. Bitte einen höheren Ziel-Tick verwenden.",
       "broadcastFailed": "Transaktion konnte nicht gesendet werden.",
       "watchOnly": "Watch-Only-Konten können keine Überweisungen senden.",
       "generic": "Überweisung fehlgeschlagen. Bitte erneut versuchen."
@@ -413,6 +414,7 @@
     },
     "errors": {
       "networkError": "Netzwerkfehler. Bitte erneut versuchen.",
+      "targetTickExpired": "Der Ziel-Tick ist bereits abgelaufen. Bitte einen höheren Ziel-Tick verwenden.",
       "broadcastFailed": "Transaktion konnte nicht gesendet werden.",
       "watchOnly": "Watch-Only-Konten können keine Rechte übertragen.",
       "generic": "Rechteübertragung fehlgeschlagen. Bitte erneut versuchen."
