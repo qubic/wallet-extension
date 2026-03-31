@@ -24,6 +24,7 @@ import {
 import { addPendingTransaction, PENDING_SETTLED_EVENT } from '@/lib/pending-transactions'
 import { isWalletLocked } from '@/lib/lock'
 import { useLatestStats, useTickInfo, fetchTickInfo } from '@/lib/network-stats'
+import { isRequestedTargetTickExpiredNow } from '@/lib/target-tick'
 import ConfirmationDrawer from '@/components/pages/transfer/confirmation-drawer'
 import TransferForm from '@/components/pages/transfer/transfer-form'
 import type { FormErrors } from '@/components/pages/transfer/types'
@@ -204,6 +205,7 @@ const Transfer = () => {
 
     setSending(true)
     setErrorMessage('')
+    let requestedTargetTick: bigint | number | undefined
 
     try {
       const parsedAmount = parseAmount(amount)
@@ -212,7 +214,6 @@ const Transfer = () => {
       }
 
       let result: { txId: string; targetTick: bigint }
-      let requestedTargetTick: bigint | number | undefined
 
       // Fetch fresh tick info at send time
       const freshTickInfo = await fetchTickInfo()
@@ -301,7 +302,10 @@ const Transfer = () => {
       let message = t('transfer.errors.generic')
 
       if (error instanceof Error) {
-        if (error.message.includes('network') || error.message.includes('fetch')) {
+        const targetTickExpired = await isRequestedTargetTickExpiredNow(requestedTargetTick)
+        if (targetTickExpired) {
+          message = t('transfer.errors.targetTickExpired')
+        } else if (error.message.includes('network') || error.message.includes('fetch')) {
           message = t('transfer.errors.networkError')
         } else if (error.message.includes('broadcast')) {
           message = t('transfer.errors.broadcastFailed')
