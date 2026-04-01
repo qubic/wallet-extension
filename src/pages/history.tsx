@@ -28,7 +28,7 @@ import {
 import { getCurrentIdentity } from '@/lib/accounts'
 import HistoryEmptyState from '@/components/pages/history/history-empty-state'
 import { REFRESH_INTERVAL_ACTIVE_TRANSACTIONS } from '@/lib/config/refresh-intervals'
-import { computeTransactionStatus } from '@/lib/transaction-status'
+import { isTransactionFailed } from '@/lib/transaction-status'
 
 const HistoryRowSkeleton = () => (
   <div className="space-y-3 rounded-xl border border-border/40 bg-background/40 px-3 py-3">
@@ -205,12 +205,12 @@ const History = () => {
       getRowPresentation(tx)
     const isPending = state === 'pending'
     const isInvalid = state === 'invalid'
-    const isFailed =
-      state === 'failed' ||
-      (state === 'default' &&
-        tx.moneyFlew === false &&
-        computeTransactionStatus(Number(tx.inputType), tx.amount, false, tx.destination) ===
-          'failure')
+    const isFailed = isTransactionFailed({
+      moneyFlew: tx.moneyFlew,
+      inputType: tx.inputType,
+      amount: tx.amount,
+      destination: tx.destination,
+    })
     const isUnsuccessful = isFailed || isInvalid
     const hasExplorerLink = state === 'default' || isFailed
     const canResend =

@@ -13,7 +13,7 @@ import {
   getPendingTransaction,
   removePendingTransaction,
 } from '@/lib/pending-transactions'
-import { computeTransactionStatus } from '@/lib/transaction-status'
+import { isTransactionFailed } from '@/lib/transaction-status'
 
 type PreviewTransaction = {
   hash: string
@@ -82,12 +82,12 @@ const TransactionsPreview = ({
     const pendingStatus = getPendingTransaction(tx.hash)?.status
     const isPending = pendingStatus === 'pending'
     const isInvalid = pendingStatus === 'invalid'
-    const isFailed =
-      pendingStatus === 'failed' ||
-      (!pendingStatus &&
-        tx.moneyFlew === false &&
-        computeTransactionStatus(Number(tx.inputType), tx.amount, false, tx.destination) ===
-          'failure')
+    const isFailed = isTransactionFailed({
+      moneyFlew: tx.moneyFlew,
+      inputType: tx.inputType,
+      amount: tx.amount,
+      destination: tx.destination,
+    })
     const isUnsuccessful = isFailed || isInvalid
     const canResend =
       isUnsuccessful &&

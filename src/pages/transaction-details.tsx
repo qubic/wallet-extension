@@ -9,6 +9,7 @@ import {
   resolvePendingTransactions,
   usePendingTransactionsVersion,
 } from '@/lib/pending-transactions'
+import { isTransactionFailed } from '@/lib/transaction-status'
 import { useAddressName } from '@/hooks/use-address-name'
 import { useTxTypeDescription } from '@/hooks/use-tx-type-description'
 import { useClipboardCopy } from '@/hooks/use-clipboard-copy'
@@ -48,7 +49,6 @@ const TransactionDetails = () => {
   const archiverProcessedTick = lastProcessedTickQuery.data?.tickNumber
   const pending = getPendingTransaction(hash)
   const isPending = pending?.status === 'pending'
-  const isFailed = pending?.status === 'failed'
   const isInvalid = pending?.status === 'invalid'
 
   const txQuery = useQuery({
@@ -78,6 +78,12 @@ const TransactionDetails = () => {
   }, [hash, archiverProcessedTick, txQuery.data])
 
   const details = txQuery.data as Record<string, unknown> | undefined
+  const isFailed = isTransactionFailed({
+    moneyFlew: details?.moneyFlew as boolean | undefined,
+    inputType: details?.inputType as number | undefined,
+    amount: details?.amount as number | bigint | undefined,
+    destination: details?.destination as string | undefined,
+  })
   const sourceAddress = (details?.source as string) || pending?.sourceIdentity || ''
   const destAddress = (details?.destination as string) || pending?.destinationIdentity || ''
   const sourceName = useAddressName(sourceAddress)

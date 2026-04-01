@@ -44,3 +44,20 @@ export const computeTransactionStatus = (
   }
   return 'executed'
 }
+
+/**
+ * Determines if a transaction should be considered failed, checking both
+ * pending status and on-chain data (moneyFlew).
+ */
+export const isTransactionFailed = (tx: {
+  moneyFlew?: boolean
+  inputType?: number | bigint
+  amount?: number | bigint
+  destination?: string
+}): boolean => {
+  if (tx.moneyFlew !== false) return false
+  return (
+    computeTransactionStatus(Number(tx.inputType ?? 0), tx.amount ?? 0, false, tx.destination) ===
+    'failure'
+  )
+}
