@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import NumericInput from '@/components/numeric-input'
 import { type AggregatedAsset, formatAssetUnits } from '@/lib/assets'
-import { NATIVE_TOKEN_NAME } from '@/lib/config/constants'
+import { NATIVE_TOKEN_NAME, NATIVE_TOKEN_SYMBOL } from '@/lib/config/constants'
 import { useAddressName } from '@/hooks/use-address-name'
 import { formatBalance, formatNumber, truncateString } from '@/lib/utils'
 import type { FormErrors } from '@/components/pages/transfer/types'
@@ -66,7 +66,8 @@ const TransferForm = ({
   const { t } = useTranslation()
   const navigate = useNavigate()
   const currentBalance = quBalance
-  const selectedTokenLabel = selectedAsset?.name ?? NATIVE_TOKEN_NAME
+  const selectedTokenName = selectedAsset?.name ?? NATIVE_TOKEN_NAME
+  const selectedTokenSymbol = selectedAsset?.name ?? NATIVE_TOKEN_SYMBOL
   const usdEstimateDisplay = usdEstimate === '--' ? usdEstimate : `~${usdEstimate}`
   const availableBalanceText = selectedAsset
     ? formatAssetUnits(selectedAsset.numberOfUnits, selectedAsset.decimals)
@@ -75,6 +76,17 @@ const TransferForm = ({
   const recipientResolved = useAddressName(recipient.length === 60 ? recipient : '')
   const [isRecipientPickerOpen, setRecipientPickerOpen] = useState(false)
   const recipientPickerRef = useRef<HTMLDivElement | null>(null)
+  const amountSuffixRef = useRef<HTMLDivElement | null>(null)
+  const [amountSuffixWidth, setAmountSuffixWidth] = useState(112)
+
+  useEffect(() => {
+    if (!amountSuffixRef.current) return
+    const observer = new ResizeObserver(([entry]) => {
+      setAmountSuffixWidth(entry.contentRect.width)
+    })
+    observer.observe(amountSuffixRef.current)
+    return () => observer.disconnect()
+  }, [])
   const filteredVaultRecipients = useMemo(() => {
     const query = recipient.trim().toUpperCase()
     if (!query) return vaultRecipients
@@ -110,7 +122,7 @@ const TransferForm = ({
         <PageHeader
           title={
             <>
-              {t('transfer.title')} {selectedTokenLabel}
+              {t('transfer.title')} {selectedTokenName}
             </>
           }
           onBack={() => navigate('/transfer')}
@@ -193,10 +205,14 @@ const TransferForm = ({
                 value={amount}
                 onChange={onAmountChange}
                 disabled={isWatchOnly}
-                className={`h-12 pr-28 text-sm ${errors.amount ? 'border-destructive' : ''}`}
+                className={`h-12 text-sm ${errors.amount ? 'border-destructive' : ''}`}
+                style={{ paddingRight: amountSuffixWidth + 12 }}
               />
-              <div className="absolute right-2 top-1/2 flex -translate-y-1/2 items-center gap-1.5">
-                <span className="text-sm text-muted-foreground">{selectedTokenLabel}</span>
+              <div
+                ref={amountSuffixRef}
+                className="absolute right-2 top-1/2 flex -translate-y-1/2 items-center gap-1.5"
+              >
+                <span className="text-sm text-muted-foreground">{selectedTokenSymbol}</span>
                 <button
                   type="button"
                   className="cursor-pointer rounded-md bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary transition-colors hover:bg-primary/20 disabled:cursor-not-allowed disabled:opacity-50"
@@ -213,7 +229,7 @@ const TransferForm = ({
               <span className={selectedAsset ? 'ml-auto' : ''}>
                 {t(selectedAsset ? 'transfer.form.availableQx' : 'transfer.form.available', {
                   balance: availableBalanceText,
-                  token: selectedTokenLabel,
+                  token: selectedTokenSymbol,
                 })}
               </span>
             </div>
@@ -223,7 +239,7 @@ const TransferForm = ({
                 <p className="text-[11px] text-muted-foreground/70">
                   {t('transfer.form.totalBalanceHint', {
                     balance: formatAssetUnits(totalAssetUnits, selectedAsset.decimals),
-                    token: selectedTokenLabel,
+                    token: selectedTokenSymbol,
                   })}
                 </p>
               )}
