@@ -1,3 +1,4 @@
+import type React from 'react'
 import { CheckIcon, CopyIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
@@ -15,7 +16,14 @@ const formatValue = (value: unknown): string => {
 }
 
 type TxDetailsRowProps = {
-  row: { key: string; label: string; value: unknown; copyable?: boolean; copyText?: string }
+  row: {
+    key: string
+    label: string
+    value: unknown
+    copyable?: boolean
+    copyText?: string
+    icon?: React.ReactNode
+  }
   copiedKey: string | null
   onCopy: (key: string, value: unknown, copyText?: string) => void
 }
@@ -29,6 +37,7 @@ const TxDetailsRow = ({ row, copiedKey, onCopy }: TxDetailsRowProps) => {
         <span className="text-[11px] uppercase text-muted-foreground">{row.label}</span>
       </div>
       <div className="flex items-start gap-1.5">
+        {row.icon && <span className="mt-0.5 shrink-0">{row.icon}</span>}
         <div className="min-w-0 break-all font-mono text-xs text-foreground">
           {formatValue(row.value)}
         </div>
