@@ -1,7 +1,11 @@
 import { useLastProcessedTick, useSdk } from '@qubic-labs/react'
 import { useQuery } from '@tanstack/react-query'
 import { ArrowLeftIcon, ClockIcon } from 'lucide-react'
-import { XCircleFilledIcon } from '@/components/icons/tx-status-icons'
+import {
+  CheckCircleFilledIcon,
+  CheckCircleIcon,
+  XCircleFilledIcon,
+} from '@/components/icons/tx-status-icons'
 import type React from 'react'
 import { useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -11,7 +15,7 @@ import {
   resolvePendingTransactions,
   usePendingTransactionsVersion,
 } from '@/lib/pending-transactions'
-import { isTransactionFailed } from '@/lib/transaction-status'
+import { computeTransactionStatus, isTransactionFailed } from '@/lib/transaction-status'
 import { useAddressName } from '@/hooks/use-address-name'
 import { useTxTypeDescription } from '@/hooks/use-tx-type-description'
 import { useClipboardCopy } from '@/hooks/use-clipboard-copy'
@@ -98,10 +102,26 @@ const TransactionDetails = () => {
   const amount = details?.amount ?? pending?.amount
   const tickNumber = details?.tickNumber ?? pending?.targetTick
 
+  const confirmedStatus =
+    !isPending && !isInvalid && details
+      ? computeTransactionStatus(
+          Number(details.inputType ?? 0),
+          details.amount as number | bigint,
+          details.moneyFlew as boolean,
+          details.destination as string | undefined,
+        )
+      : undefined
+
   const statusIcon = isPending ? (
     <ClockIcon className="h-3.5 w-3.5 animate-pulse text-amber-700 dark:text-amber-300" />
-  ) : isFailed || isInvalid ? (
+  ) : isInvalid ? (
     <XCircleFilledIcon className="h-3.5 w-3.5 text-red-700 dark:text-red-300" />
+  ) : confirmedStatus === 'failure' ? (
+    <XCircleFilledIcon className="h-3.5 w-3.5 text-red-700 dark:text-red-300" />
+  ) : confirmedStatus === 'success' ? (
+    <CheckCircleFilledIcon className="h-3.5 w-3.5 text-positive" />
+  ) : confirmedStatus === 'executed' ? (
+    <CheckCircleIcon className="h-3.5 w-3.5 text-positive" />
   ) : undefined
 
   const rows: Array<{
