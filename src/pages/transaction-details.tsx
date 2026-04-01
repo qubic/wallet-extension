@@ -49,6 +49,7 @@ const TransactionDetails = () => {
   const pending = getPendingTransaction(hash)
   const isPending = pending?.status === 'pending'
   const isFailed = pending?.status === 'failed'
+  const isInvalid = pending?.status === 'invalid'
 
   const txQuery = useQuery({
     queryKey: ['qubic', 'tx-by-hash', hash],
@@ -59,7 +60,18 @@ const TransactionDetails = () => {
   useEffect(() => {
     if (!hash) return
     if (txQuery.data) {
-      resolvePendingTransactions([{ hash }], archiverProcessedTick)
+      resolvePendingTransactions(
+        [
+          {
+            hash,
+            moneyFlew: txQuery.data.moneyFlew,
+            inputType: txQuery.data.inputType,
+            amount: txQuery.data.amount,
+            destination: txQuery.data.destination,
+          },
+        ],
+        archiverProcessedTick,
+      )
       return
     }
     resolvePendingTransactions([], archiverProcessedTick)
@@ -155,7 +167,7 @@ const TransactionDetails = () => {
           </div>
         )}
 
-        {txQuery.error && !isPending && !pending && (
+        {txQuery.error && !isPending && !isFailed && !isInvalid && (
           <div className="text-xs text-destructive">
             {txQuery.error instanceof Error ? txQuery.error.message : t('txDetails.error')}
           </div>
@@ -165,8 +177,9 @@ const TransactionDetails = () => {
             {t('txDetails.pendingHint')}
           </div>
         )}
-        {isFailed && !details && (
-          <div className="text-xs text-destructive">{t('txDetails.failedHint')}</div>
+        {isFailed && <div className="text-xs text-destructive">{t('txDetails.failedHint')}</div>}
+        {isInvalid && !details && (
+          <div className="text-xs text-destructive">{t('txDetails.invalidHint')}</div>
         )}
 
         {(details || pending) && (

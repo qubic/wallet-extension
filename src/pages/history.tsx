@@ -23,10 +23,12 @@ import {
   removePendingTransaction,
   resolvePendingTransactions,
   usePendingTransactionsVersion,
+  type PendingTransactionStatus,
 } from '@/lib/pending-transactions'
 import { getCurrentIdentity } from '@/lib/accounts'
 import HistoryEmptyState from '@/components/pages/history/history-empty-state'
 import { REFRESH_INTERVAL_ACTIVE_TRANSACTIONS } from '@/lib/config/refresh-intervals'
+import { computeTransactionStatus } from '@/lib/transaction-status'
 
 const HistoryRowSkeleton = () => (
   <div className="space-y-3 rounded-xl border border-border/40 bg-background/40 px-3 py-3">
@@ -56,9 +58,11 @@ type HistoryRowTransaction = {
   tickNumber: number | bigint
   inputType: number | bigint
   tokenKey?: string
+  status?: PendingTransactionStatus
+  moneyFlew?: boolean
 }
 
-type HistoryRowState = 'default' | 'pending' | 'failed'
+type HistoryRowState = 'default' | 'pending' | 'failed' | 'invalid'
 
 const TxTypeLabel = ({ destination, inputType }: { destination: string; inputType: number }) => {
   const description = useTxTypeDescription(destination, inputType)
@@ -106,7 +110,8 @@ const History = () => {
     return getArchiverProcessedTick(transactions.data?.pages)
   }, [transactions.data])
   const pendingHashes = useMemo(
-    () => new Set(pending.map((tx) => tx.hash.toLowerCase())),
+    () =>
+      new Set(pending.filter((tx) => tx.status !== 'failed').map((tx) => tx.hash.toLowerCase())),
     [pending],
   )
   const pendingItems = useMemo(
@@ -131,15 +136,10 @@ const History = () => {
         .sort((a, b) => Number(b.tickNumber) - Number(a.tickNumber)),
     [items, pendingHashes],
   )
-  const pendingTopItems = useMemo(
-    () => pendingItems.filter((tx) => tx.status === 'pending'),
+  const unconfirmedItems = useMemo(
+    () => pendingItems.filter((tx) => tx.status === 'pending' || tx.status === 'invalid'),
     [pendingItems],
   )
-  const failedTopItems = useMemo(
-    () => pendingItems.filter((tx) => tx.status === 'failed'),
-    [pendingItems],
-  )
-
   const grouped = useMemo(() => {
     const now = new Date()
     const todayKey = now.toDateString()
@@ -204,16 +204,33 @@ const History = () => {
     const { isIncoming, label, counterparty, Icon, addressPrefix, amountSign, amountColorClass } =
       getRowPresentation(tx)
     const isPending = state === 'pending'
-    const isDefault = state === 'default'
+    const isInvalid = state === 'invalid'
+    const isFailed =
+      state === 'failed' ||
+      (state === 'default' &&
+        tx.moneyFlew === false &&
+        computeTransactionStatus(Number(tx.inputType), tx.amount, false, tx.destination) ===
+          'failure')
+    const isUnsuccessful = isFailed || isInvalid
+    const hasExplorerLink = state === 'default' || isFailed
+    const canResend =
+      isUnsuccessful &&
+      canResendPendingTransaction({
+        status: tx.status ?? (isInvalid ? 'invalid' : 'failed'),
+        destinationIdentity: tx.destination,
+        inputType: Number(tx.inputType),
+        tokenKey: tx.tokenKey,
+      })
 
     return (
-      <motion.button
-        type="button"
+      <motion.div
         key={tx.hash}
-        className={`w-full cursor-pointer space-y-3 rounded-xl border px-3 py-3 text-left transition-colors ${
+        className={`w-full space-y-3 rounded-xl border px-3 py-3 text-left transition-colors ${
           isPending
-            ? 'border-amber-500/50 bg-amber-500/10'
-            : 'border-border/40 bg-background/40 hover:border-primary/30 hover:bg-background/60'
+            ? 'cursor-pointer border-amber-500/50 bg-amber-500/10'
+            : isUnsuccessful
+              ? 'cursor-pointer border-red-500/50 bg-red-500/10'
+              : 'cursor-pointer border-border/40 bg-background/40 hover:border-primary/30 hover:bg-background/60'
         }`}
         onClick={() => navigate(`/tx/${tx.hash}`)}
         variants={itemMotion}
@@ -224,9 +241,11 @@ const History = () => {
               className={`flex h-9 w-9 items-center justify-center rounded-full border ${
                 isPending
                   ? 'border-amber-500/40 bg-amber-500/15 text-amber-700 dark:text-amber-300'
-                  : isIncoming
-                    ? 'border-positive/40 bg-positive/10 text-positive'
-                    : 'border-[var(--destructive)]/40 bg-[var(--destructive)]/10 text-[var(--destructive)]'
+                  : isUnsuccessful
+                    ? 'border-red-500/40 bg-red-500/15 text-red-700 dark:text-red-300'
+                    : isIncoming
+                      ? 'border-positive/40 bg-positive/10 text-positive'
+                      : 'border-[var(--destructive)]/40 bg-[var(--destructive)]/10 text-[var(--destructive)]'
               }`}
             >
               <Icon className="h-4 w-4" />
@@ -238,23 +257,67 @@ const History = () => {
                 prefix={addressPrefix}
                 className="text-xs text-muted-foreground"
               />
+              {isFailed && (
+                <span className="text-[11px] text-red-700 dark:text-red-300">
+                  {t('history.failed')}
+                </span>
+              )}
+              {isInvalid && (
+                <span className="text-[11px] text-red-700 dark:text-red-300">
+                  {t('history.invalid')}
+                </span>
+              )}
             </div>
           </div>
-          <span
-            className={`text-sm font-semibold ${
-              isPending ? 'text-amber-700 dark:text-amber-300' : amountColorClass
-            }`}
-          >
-            {amountSign}
-            {formatBalanceCompact(tx.amount)}
-          </span>
+          <div className="flex items-center gap-2">
+            <span
+              className={`text-sm font-semibold ${
+                isPending
+                  ? 'text-amber-700 dark:text-amber-300'
+                  : isUnsuccessful
+                    ? 'text-red-700 dark:text-red-300'
+                    : amountColorClass
+              }`}
+            >
+              {amountSign}
+              {formatBalanceCompact(tx.amount)}
+            </span>
+            {canResend && (
+              <button
+                type="button"
+                className="cursor-pointer text-[11px] font-semibold uppercase tracking-wide text-primary hover:underline"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  navigate(
+                    `/transfer/send?recipient=${encodeURIComponent(tx.destination)}&amount=${encodeURIComponent(tx.amount.toString())}&token=${encodeURIComponent(tx.tokenKey ?? 'qu')}`,
+                  )
+                }}
+              >
+                {t('history.resend')}
+              </button>
+            )}
+            {isInvalid && (
+              <button
+                type="button"
+                className="cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  removePendingTransaction(tx.hash)
+                }}
+                aria-label={t('history.deleteInvalid')}
+                title={t('history.deleteInvalid')}
+              >
+                <XIcon className="h-3.5 w-3.5" />
+              </button>
+            )}
+          </div>
         </div>
 
         <div className="flex flex-col gap-1 text-[11px] text-muted-foreground">
           <div className="flex items-center gap-2">
             <div className="flex min-w-0 items-center gap-2">
               <HashIcon className="h-3.5 w-3.5 shrink-0" />
-              {isDefault ? (
+              {hasExplorerLink ? (
                 <a
                   href={buildExplorerObjectUrl('tx', tx.hash)}
                   className="truncate font-mono text-primary hover:underline"
@@ -292,7 +355,7 @@ const History = () => {
             </div>
           )}
         </div>
-      </motion.button>
+      </motion.div>
     )
   }
 
@@ -381,132 +444,19 @@ const History = () => {
             </motion.div>
           )}
 
-          {!transactions.isLoading &&
-            pendingTopItems.length === 0 &&
-            failedTopItems.length === 0 &&
-            apiItems.length === 0 && (
-              <motion.div variants={itemMotion}>
-                <HistoryEmptyState />
-              </motion.div>
-            )}
+          {!transactions.isLoading && unconfirmedItems.length === 0 && grouped.length === 0 && (
+            <motion.div variants={itemMotion}>
+              <HistoryEmptyState />
+            </motion.div>
+          )}
 
-          {(pendingTopItems.length > 0 || failedTopItems.length > 0) && (
+          {unconfirmedItems.length > 0 && (
             <motion.div className="space-y-2" variants={itemMotion}>
-              {pendingTopItems.length > 0 && (
-                <div className="space-y-2">
-                  <span className="text-[11px] font-semibold uppercase text-muted-foreground/70">
-                    {t('history.pending')}
-                  </span>
-                  {pendingTopItems.map((tx) => renderHistoryRow(tx, 'pending'))}
-                </div>
-              )}
-
-              {failedTopItems.length > 0 && (
-                <div className="space-y-2">
-                  <span className="text-[11px] font-semibold uppercase text-muted-foreground/70">
-                    {t('history.failed')}
-                  </span>
-                  {failedTopItems.map((tx) => {
-                    const { label, counterparty, Icon, addressPrefix, amountSign } =
-                      getRowPresentation(tx)
-                    const canResend = canResendPendingTransaction({
-                      status: tx.status,
-                      destinationIdentity: tx.destination,
-                      inputType: Number(tx.inputType),
-                      tokenKey: tx.tokenKey,
-                    })
-
-                    return (
-                      <motion.div
-                        key={tx.hash}
-                        className="w-full cursor-pointer space-y-3 rounded-xl border border-red-500/50 bg-red-500/10 px-3 py-3 text-left transition-colors"
-                        variants={itemMotion}
-                        onClick={() => navigate(`/tx/${tx.hash}`)}
-                      >
-                        <div className="flex items-center justify-between gap-3">
-                          <div className="flex items-center gap-3">
-                            <div className="flex h-9 w-9 items-center justify-center rounded-full border border-red-500/40 bg-red-500/15 text-red-700 dark:text-red-300">
-                              <Icon className="h-4 w-4" />
-                            </div>
-                            <div className="flex flex-col">
-                              <span className="text-xs font-semibold text-foreground">{label}</span>
-                              <AddressLabel
-                                address={counterparty}
-                                prefix={addressPrefix}
-                                className="text-xs text-muted-foreground"
-                              />
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-semibold text-red-700 dark:text-red-300">
-                              {amountSign}
-                              {formatBalanceCompact(tx.amount)}
-                            </span>
-                            <div className="flex items-center gap-1">
-                              {canResend && (
-                                <button
-                                  type="button"
-                                  className="cursor-pointer text-[11px] font-semibold uppercase tracking-wide text-primary hover:underline"
-                                  onClick={(e) => {
-                                    e.stopPropagation()
-                                    navigate(
-                                      `/transfer/send?recipient=${encodeURIComponent(tx.destination)}&amount=${encodeURIComponent(tx.amount.toString())}&token=${encodeURIComponent(tx.tokenKey ?? 'qu')}`,
-                                    )
-                                  }}
-                                >
-                                  {t('history.resend')}
-                                </button>
-                              )}
-                              <button
-                                type="button"
-                                className="cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  removePendingTransaction(tx.hash)
-                                }}
-                                aria-label={t('history.deleteFailed')}
-                                title={t('history.deleteFailed')}
-                              >
-                                <XIcon className="h-3.5 w-3.5" />
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="flex flex-col gap-1 text-[11px] text-muted-foreground">
-                          <div className="flex items-center gap-2">
-                            <div className="flex min-w-0 items-center gap-2">
-                              <HashIcon className="h-3.5 w-3.5 shrink-0" />
-                              <span className="truncate font-mono">
-                                {truncateString(tx.hash, {
-                                  leading: 6,
-                                  trailing: 6,
-                                  minLength: 12,
-                                  emptyLabel: '',
-                                })}
-                              </span>
-                            </div>
-                            <div className="ml-auto flex items-center gap-1 font-mono">
-                              <span className="text-muted-foreground/70">{t('history.tick')}</span>
-                              <span>{formatNumber(Number(tx.tickNumber))}</span>
-                            </div>
-                          </div>
-                          {Number(tx.inputType) !== 0 && (
-                            <div className="flex items-center gap-1 font-mono">
-                              <span className="text-muted-foreground/70">
-                                {t('history.txType')}
-                              </span>
-                              <TxTypeLabel
-                                destination={tx.destination}
-                                inputType={Number(tx.inputType)}
-                              />
-                            </div>
-                          )}
-                        </div>
-                      </motion.div>
-                    )
-                  })}
-                </div>
+              <span className="text-[11px] font-semibold uppercase text-muted-foreground/70">
+                {t('history.unconfirmed')}
+              </span>
+              {unconfirmedItems.map((tx) =>
+                renderHistoryRow(tx, tx.status === 'invalid' ? 'invalid' : 'pending'),
               )}
             </motion.div>
           )}

@@ -282,8 +282,9 @@
     "unconfirmedMore": "+{{count}} chưa xác nhận khác",
     "confirmed": "Đã xác nhận",
     "failed": "Thất bại",
+    "invalid": "Không hợp lệ",
     "resend": "Gửi lại",
-    "deleteFailed": "Xóa giao dịch thất bại",
+    "deleteInvalid": "Xóa giao dịch không hợp lệ",
     "today": "Hôm nay",
     "yesterday": "Hôm qua"
   },
@@ -304,7 +305,8 @@
     "openExplorer": "Mở trong Explorer",
     "pending": "Đang chờ",
     "pendingHint": "Giao dịch này vẫn đang chờ xác nhận trên các tick mạng.",
-    "failedHint": "Giao dịch này không được xác nhận trong tick mục tiêu và đã thất bại."
+    "failedHint": "Giao dịch này đã được đưa vào khối nhưng không được mạng phê duyệt. Tiền không được chuyển.",
+    "invalidHint": "Giao dịch này không được xác nhận trong tick mục tiêu và không hợp lệ."
   },
   "transfer": {
     "title": "Gửi",

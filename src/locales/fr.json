@@ -282,8 +282,9 @@
     "unconfirmedMore": "+{{count}} non confirmées supplémentaires",
     "confirmed": "Confirmé",
     "failed": "Échoué",
+    "invalid": "Invalide",
     "resend": "Renvoyer",
-    "deleteFailed": "Supprimer la transaction échouée",
+    "deleteInvalid": "Supprimer la transaction invalide",
     "today": "Aujourd'hui",
     "yesterday": "Hier"
   },
@@ -304,7 +305,8 @@
     "openExplorer": "Ouvrir dans l'explorateur",
     "pending": "En attente",
     "pendingHint": "Cette transaction est encore en attente de confirmation sur les ticks du réseau.",
-    "failedHint": "Cette transaction n'a pas été confirmée dans le tick cible et a échoué."
+    "failedHint": "Cette transaction a été incluse dans un bloc mais n'a pas été approuvée par le réseau. Les fonds n'ont pas été transférés.",
+    "invalidHint": "Cette transaction n'a pas été confirmée dans le tick cible et est invalide."
   },
   "transfer": {
     "title": "Envoyer",

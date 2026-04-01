@@ -282,8 +282,9 @@
     "unconfirmedMore": "+{{count}} 笔未确认",
     "confirmed": "已确认",
     "failed": "失败",
+    "invalid": "无效",
     "resend": "重新发送",
-    "deleteFailed": "删除失败交易",
+    "deleteInvalid": "删除无效交易",
     "today": "今天",
     "yesterday": "昨天"
   },
@@ -304,7 +305,8 @@
     "openExplorer": "在浏览器中查看",
     "pending": "待确认",
     "pendingHint": "此交易仍在等待网络 Tick 确认。",
-    "failedHint": "此交易未在目标 Tick 内确认，已失败。"
+    "failedHint": "此交易已包含在区块中，但未被网络批准。资金未被转移。",
+    "invalidHint": "此交易未在目标 Tick 内确认，已无效。"
   },
   "transfer": {
     "title": "发送",
