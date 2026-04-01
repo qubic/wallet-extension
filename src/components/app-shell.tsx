@@ -8,6 +8,7 @@ import { ArrowLeftRightIcon, HistoryIcon, HomeIcon, SettingsIcon } from 'lucide-
 import AppHeader from '@/components/app-header'
 import DappApprovalDrawer from '@/components/dapp/dapp-approval-drawer'
 import { getWatchOnlyAccounts } from '@/lib/accounts'
+import { getExtensionViewKind, toggleCurrentWindowSidePanel } from '@/lib/side-panel'
 
 const AppShell = ({
   children,
@@ -16,10 +17,8 @@ const AppShell = ({
 }: PropsWithChildren<{ showNav?: boolean; showHeader?: boolean }>) => {
   const { t } = useTranslation()
   const { pathname } = useLocation()
-  const isPopupView =
-    typeof window !== 'undefined' && window.location.pathname.endsWith('popup.html')
-  const isSidePanelView =
-    typeof window !== 'undefined' && window.location.pathname.endsWith('sidepanel.html')
+  const extensionViewKind = getExtensionViewKind()
+  const isSidePanelView = extensionViewKind === 'sidepanel'
   const scrollContainerRef = useRef<HTMLDivElement | null>(null)
   const navRef = useRef<HTMLElement | null>(null)
   const navItemRefs = useRef<Array<HTMLAnchorElement | null>>([])
@@ -53,51 +52,8 @@ const AppShell = ({
     }
   }, [])
 
-  const openSidePanel = async () => {
-    const chromeApi = (
-      globalThis as typeof globalThis & {
-        chrome?: {
-          sidePanel?: { open?: (options: { windowId?: number }) => Promise<void> }
-          windows?: { getCurrent?: () => Promise<{ id?: number }>; WINDOW_ID_CURRENT?: number }
-        }
-      }
-    ).chrome
-
-    if (!chromeApi?.sidePanel?.open) {
-      return
-    }
-
-    let windowId: number | undefined
-
-    if (chromeApi.windows?.getCurrent) {
-      try {
-        const currentWindow = await chromeApi.windows.getCurrent()
-        windowId = currentWindow.id
-      } catch {
-        windowId = undefined
-      }
-    }
-
-    if (windowId == null) {
-      windowId = chromeApi.windows?.WINDOW_ID_CURRENT
-    }
-
-    if (windowId == null) {
-      return
-    }
-
-    await chromeApi.sidePanel.open({ windowId })
-  }
-
   const toggleSidePanel = async () => {
-    if (isSidePanelView) {
-      window.close()
-      return
-    }
-    await openSidePanel()
-    if (isPopupView) {
-      window.close()
-    }
+    await toggleCurrentWindowSidePanel()
   }
 
   const navItems = useMemo(

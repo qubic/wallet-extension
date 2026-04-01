@@ -3,47 +3,13 @@ import { useNavigate } from 'react-router-dom'
 import { useTheme } from 'next-themes'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
+import { getExtensionViewKind, toggleCurrentWindowSidePanel } from '@/lib/side-panel'
 
 const Welcome = () => {
   const navigate = useNavigate()
   const { resolvedTheme } = useTheme()
   const { t } = useTranslation()
-
-  const openSidePanel = async () => {
-    const chromeApi = (
-      globalThis as typeof globalThis & {
-        chrome?: {
-          sidePanel?: { open?: (options: { windowId?: number }) => Promise<void> }
-          windows?: { getCurrent?: () => Promise<{ id?: number }>; WINDOW_ID_CURRENT?: number }
-        }
-      }
-    ).chrome
-
-    if (!chromeApi?.sidePanel?.open) {
-      return
-    }
-
-    let windowId: number | undefined
-
-    if (chromeApi.windows?.getCurrent) {
-      try {
-        const currentWindow = await chromeApi.windows.getCurrent()
-        windowId = currentWindow.id
-      } catch {
-        windowId = undefined
-      }
-    }
-
-    if (windowId == null) {
-      windowId = chromeApi.windows?.WINDOW_ID_CURRENT
-    }
-
-    if (windowId == null) {
-      return
-    }
-
-    await chromeApi.sidePanel.open({ windowId })
-  }
+  const isSidePanelView = getExtensionViewKind() === 'sidepanel'
 
   return (
     <section className="flex h-full flex-col items-center justify-center gap-6 px-6 text-center">
@@ -89,8 +55,8 @@ const Welcome = () => {
         size="icon"
         variant="ghost"
         className="absolute right-4 top-4 h-10 w-10"
-        aria-label={t('app.sidepanel')}
-        onClick={openSidePanel}
+        aria-label={isSidePanelView ? t('app.closeSidepanel') : t('app.sidepanel')}
+        onClick={toggleCurrentWindowSidePanel}
       >
         <PanelRightOpenIcon className="h-5 w-5" />
       </Button>
