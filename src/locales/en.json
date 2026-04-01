@@ -334,7 +334,7 @@
     },
     "validation": {
       "recipientRequired": "Recipient identity is required.",
-      "recipientInvalid": "Identity must be 60 uppercase letters (A-Z).",
+      "recipientInvalid": "Invalid identity address.",
       "recipientSameAsSender": "Cannot send to your own identity.",
       "amountRequired": "Amount is required.",
       "amountInvalid": "Amount must be a positive number.",

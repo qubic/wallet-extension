@@ -334,7 +334,7 @@
     },
     "validation": {
       "recipientRequired": "L'identité du destinataire est requise.",
-      "recipientInvalid": "L'identité doit contenir 60 lettres majuscules (A-Z).",
+      "recipientInvalid": "Adresse d'identité invalide.",
       "recipientSameAsSender": "Impossible d'envoyer à votre propre identité.",
       "amountRequired": "Le montant est requis.",
       "amountInvalid": "Le montant doit être un nombre positif.",
