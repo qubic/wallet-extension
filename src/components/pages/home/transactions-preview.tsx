@@ -185,7 +185,7 @@ const TransactionsPreview = ({
             {isVisible ? `${amountSign}${formatBalanceCompact(tx.amount)}` : HIDDEN_BALANCE}
           </span>
           {isUnsuccessful && (
-            <div className="flex items-center gap-1">
+            <div className="relative z-10 flex items-center gap-1">
               {canResend && (
                 <button
                   type="button"
