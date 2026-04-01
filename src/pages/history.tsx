@@ -62,7 +62,7 @@ type HistoryRowTransaction = {
   moneyFlew?: boolean
 }
 
-type HistoryRowState = 'default' | 'pending' | 'failed' | 'invalid'
+type HistoryRowState = 'default' | 'pending' | 'invalid'
 
 const TxTypeLabel = ({ destination, inputType }: { destination: string; inputType: number }) => {
   const description = useTxTypeDescription(destination, inputType)

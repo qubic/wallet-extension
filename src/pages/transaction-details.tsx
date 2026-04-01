@@ -100,9 +100,7 @@ const TransactionDetails = () => {
 
   const statusIcon = isPending ? (
     <ClockIcon className="h-3.5 w-3.5 animate-pulse text-amber-700 dark:text-amber-300" />
-  ) : isFailed ? (
-    <XCircleFilledIcon className="h-3.5 w-3.5 text-red-700 dark:text-red-300" />
-  ) : isInvalid ? (
+  ) : isFailed || isInvalid ? (
     <XCircleFilledIcon className="h-3.5 w-3.5 text-red-700 dark:text-red-300" />
   ) : undefined
 
