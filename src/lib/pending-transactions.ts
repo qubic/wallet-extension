@@ -257,9 +257,10 @@ export const resolvePendingTransactions = (
     if (moneyFlew === false) {
       const status = computeTransactionStatus(inputType, amount, false, tx.destination)
       if (status === 'failure') {
-        // On-chain transaction with moneyFlew: false — funds were not transferred
-        if (pending.status !== 'failed') {
-          pendingByHash.set(key, { ...pending, status: 'failed' })
+        // On-chain transaction with moneyFlew: false — failed state is derived
+        // from moneyFlew when rendering, so remove from pending tracking
+        if (pendingByHash.delete(key)) {
+          schedulePendingSettledEvent(pending)
           changed = true
         }
         continue
