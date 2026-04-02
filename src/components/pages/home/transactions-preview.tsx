@@ -111,7 +111,7 @@ const TransactionsPreview = ({
       >
         <div className="flex items-center gap-3">
           <div
-            className={`flex h-9 w-9 items-center justify-center rounded-full border ${
+            className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border ${
               isPending
                 ? 'border-amber-500/40 bg-amber-500/15 text-amber-700 dark:text-amber-300'
                 : isUnsuccessful
