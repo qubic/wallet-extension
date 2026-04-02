@@ -24,7 +24,7 @@ import {
 import { addPendingTransaction, PENDING_SETTLED_EVENT } from '@/lib/pending-transactions'
 import { isWalletLocked } from '@/lib/lock'
 import { useLatestStats, useTickInfo, fetchTickInfo } from '@/lib/network-stats'
-import { isRequestedTargetTickExpiredNow } from '@/lib/target-tick'
+import { resolveTransactionSubmissionErrorMessage } from '@/lib/transaction-submission-errors'
 import ConfirmationDrawer from '@/components/pages/transfer/confirmation-drawer'
 import TransferForm from '@/components/pages/transfer/transfer-form'
 import type { FormErrors } from '@/components/pages/transfer/types'
@@ -299,20 +299,12 @@ const Transfer = () => {
 
       navigate('/')
     } catch (error) {
-      let message = t('transfer.errors.generic')
-
-      if (error instanceof Error) {
-        const targetTickExpired = await isRequestedTargetTickExpiredNow(requestedTargetTick)
-        if (targetTickExpired) {
-          message = t('transfer.errors.targetTickExpired')
-        } else if (error.message.includes('network') || error.message.includes('fetch')) {
-          message = t('transfer.errors.networkError')
-        } else if (error.message.includes('broadcast')) {
-          message = t('transfer.errors.broadcastFailed')
-        } else {
-          message = error.message
-        }
-      }
+      const message = await resolveTransactionSubmissionErrorMessage(error, requestedTargetTick, {
+        generic: t('transfer.errors.generic'),
+        targetTickExpired: t('transfer.errors.targetTickExpired'),
+        networkError: t('transfer.errors.networkError'),
+        broadcastFailed: t('transfer.errors.broadcastFailed'),
+      })
 
       seedRef.current = null
       setErrorMessage(message)

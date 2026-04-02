@@ -42,7 +42,7 @@ import {
 import { addPendingTransaction, PENDING_SETTLED_EVENT } from '@/lib/pending-transactions'
 import { isWalletLocked } from '@/lib/lock'
 import { useTickInfo, fetchTickInfo } from '@/lib/network-stats'
-import { isRequestedTargetTickExpiredNow } from '@/lib/target-tick'
+import { resolveTransactionSubmissionErrorMessage } from '@/lib/transaction-submission-errors'
 import {
   compareBigIntDesc,
   formatBalance,
@@ -415,20 +415,12 @@ const TransferRights = () => {
 
       navigate('/')
     } catch (error) {
-      let message = t('transferRights.errors.generic')
-
-      if (error instanceof Error) {
-        const targetTickExpired = await isRequestedTargetTickExpiredNow(requestedTargetTick)
-        if (targetTickExpired) {
-          message = t('transferRights.errors.targetTickExpired')
-        } else if (error.message.includes('network') || error.message.includes('fetch')) {
-          message = t('transferRights.errors.networkError')
-        } else if (error.message.includes('broadcast')) {
-          message = t('transferRights.errors.broadcastFailed')
-        } else {
-          message = error.message
-        }
-      }
+      const message = await resolveTransactionSubmissionErrorMessage(error, requestedTargetTick, {
+        generic: t('transferRights.errors.generic'),
+        targetTickExpired: t('transferRights.errors.targetTickExpired'),
+        networkError: t('transferRights.errors.networkError'),
+        broadcastFailed: t('transferRights.errors.broadcastFailed'),
+      })
 
       seedRef.current = null
       setErrorMessage(message)
