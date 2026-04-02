@@ -1,14 +1,25 @@
 import { fetchTickInfo } from '@/lib/network-stats'
 
-export const isRequestedTargetTickExpired = (
+const isRequestedTargetTickExpired = (
   requestedTargetTick: bigint | number | undefined,
   currentTick: number | undefined,
 ): boolean => {
-  if (requestedTargetTick === undefined || typeof currentTick !== 'number') return false
-  const normalizedTargetTick =
-    typeof requestedTargetTick === 'bigint' ? Number(requestedTargetTick) : requestedTargetTick
-  if (!Number.isFinite(normalizedTargetTick)) return false
-  return normalizedTargetTick <= currentTick
+  if (
+    requestedTargetTick === undefined ||
+    typeof currentTick !== 'number' ||
+    !Number.isInteger(currentTick)
+  ) {
+    return false
+  }
+
+  if (typeof requestedTargetTick === 'number' && !Number.isInteger(requestedTargetTick)) {
+    return false
+  }
+
+  const targetTick =
+    typeof requestedTargetTick === 'bigint' ? requestedTargetTick : BigInt(requestedTargetTick)
+
+  return targetTick < BigInt(currentTick)
 }
 
 export const isRequestedTargetTickExpiredNow = async (
