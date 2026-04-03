@@ -10,10 +10,10 @@ import { HIDDEN_BALANCE, useBalanceVisibility } from '@/lib/balance-visibility'
 import {
   canResendPendingTransaction,
   type PendingTransaction,
-  isTransactionFailed,
-  isTransactionPending,
+  getPendingTransaction,
   removePendingTransaction,
 } from '@/lib/pending-transactions'
+import { isTransactionFailed } from '@/lib/transaction-status'
 
 type PreviewTransaction = {
   hash: string
@@ -25,6 +25,7 @@ type PreviewTransaction = {
   tokenKey?: string
   timestamp: bigint
   status?: PendingTransaction['status']
+  moneyFlew?: boolean
 }
 
 type TransactionsPreviewProps = {
@@ -60,14 +61,16 @@ const TransactionsPreview = ({
       timestamp: BigInt(tx.createdAt),
       status: tx.status,
     }))
-    const pendingHashes = new Set(pendingItems.map((tx) => tx.hash.toLowerCase()))
-    const allUnconfirmed = pendingItems.filter(
-      (tx) => tx.status === 'pending' || tx.status === 'failed',
+    const unconfirmedHashes = new Set(
+      pendingItems.filter((tx) => tx.status !== 'failed').map((tx) => tx.hash.toLowerCase()),
     )
-    const unconfirmedTop = allUnconfirmed.slice(0, 3)
-    const unconfirmedOverflow = allUnconfirmed.length - unconfirmedTop.length
+    const unconfirmed = pendingItems.filter(
+      (tx) => tx.status === 'pending' || tx.status === 'invalid',
+    )
+    const unconfirmedTop = unconfirmed.slice(0, 3)
+    const unconfirmedOverflow = unconfirmed.length - unconfirmedTop.length
     const recentChain: PreviewTransaction[] = items
-      .filter((tx) => !pendingHashes.has(tx.hash.toLowerCase()))
+      .filter((tx) => !unconfirmedHashes.has(tx.hash.toLowerCase()))
       .slice(0, 3)
 
     return { unconfirmedTop, unconfirmedOverflow, recentChain }
@@ -76,14 +79,24 @@ const TransactionsPreview = ({
   const renderRow = (tx: PreviewTransaction) => {
     const { isIncoming, label, counterparty, Icon, addressPrefix, amountSign, amountColorClass } =
       getTransactionPresentation(tx, identity, t)
-    const isPending = isTransactionPending(tx.hash)
-    const isFailed = isTransactionFailed(tx.hash)
-    const canResend = canResendPendingTransaction({
-      status: tx.status ?? 'pending',
-      destinationIdentity: tx.destination,
-      inputType: Number(tx.inputType),
-      tokenKey: tx.tokenKey,
+    const pendingStatus = getPendingTransaction(tx.hash)?.status
+    const isPending = pendingStatus === 'pending'
+    const isInvalid = pendingStatus === 'invalid'
+    const isFailed = isTransactionFailed({
+      moneyFlew: tx.moneyFlew,
+      inputType: tx.inputType,
+      amount: tx.amount,
+      destination: tx.destination,
     })
+    const isUnsuccessful = isFailed || isInvalid
+    const canResend =
+      isUnsuccessful &&
+      canResendPendingTransaction({
+        status: tx.status ?? (isInvalid ? 'invalid' : 'failed'),
+        destinationIdentity: tx.destination,
+        inputType: Number(tx.inputType),
+        tokenKey: tx.tokenKey,
+      })
 
     return (
       <motion.div
@@ -91,17 +104,17 @@ const TransactionsPreview = ({
         className={`group relative flex w-full items-center justify-between rounded-xl border px-3 py-2 text-left transition-colors ${
           isPending
             ? 'animate-pulse border-amber-500/50 bg-amber-500/10 text-amber-800 dark:text-amber-200'
-            : isFailed
+            : isUnsuccessful
               ? 'border-red-500/50 bg-red-500/10 text-red-800 dark:text-red-200'
               : 'border-border/40 bg-background/40 hover:border-primary/30 hover:bg-background/60'
         }`}
       >
         <div className="flex items-center gap-3">
           <div
-            className={`flex h-9 w-9 items-center justify-center rounded-full border ${
+            className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border ${
               isPending
                 ? 'border-amber-500/40 bg-amber-500/15 text-amber-700 dark:text-amber-300'
-                : isFailed
+                : isUnsuccessful
                   ? 'border-red-500/40 bg-red-500/15 text-red-700 dark:text-red-300'
                   : isIncoming
                     ? 'border-positive/40 bg-positive/10 text-positive'
@@ -117,10 +130,9 @@ const TransactionsPreview = ({
               prefix={addressPrefix}
               className="text-xs text-muted-foreground"
             />
-            <span className="text-[11px] text-muted-foreground/70">
-              {(() => {
-                if (isFailed) return t('history.failed')
-                const ts = Number(tx.timestamp)
+            {(() => {
+              const ts = Number(tx.timestamp)
+              const dateLabel = (() => {
                 if (!ts) return '--'
                 const date = new Date(toTimestampMs(ts))
                 const now = new Date()
@@ -133,8 +145,29 @@ const TransactionsPreview = ({
                   day: 'numeric',
                   year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined,
                 })
-              })()}
-            </span>
+              })()
+
+              return (
+                <span className="text-[11px] text-muted-foreground/70">
+                  {dateLabel}
+                  {isPending && (
+                    <span className="ml-1 text-amber-700 dark:text-amber-300">
+                      {t('history.pending')}
+                    </span>
+                  )}
+                  {isFailed && (
+                    <span className="ml-1 text-red-700 dark:text-red-300">
+                      {t('history.failed')}
+                    </span>
+                  )}
+                  {isInvalid && (
+                    <span className="ml-1 text-red-700 dark:text-red-300">
+                      {t('history.invalid')}
+                    </span>
+                  )}
+                </span>
+              )
+            })()}
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -144,15 +177,15 @@ const TransactionsPreview = ({
                 ? 'text-muted-foreground'
                 : isPending
                   ? 'text-amber-700 dark:text-amber-300'
-                  : isFailed
+                  : isUnsuccessful
                     ? 'text-red-700 dark:text-red-300'
                     : amountColorClass
             }`}
           >
             {isVisible ? `${amountSign}${formatBalanceCompact(tx.amount)}` : HIDDEN_BALANCE}
           </span>
-          {isFailed && (
-            <div className="flex items-center gap-1">
+          {isUnsuccessful && (
+            <div className="relative z-10 flex items-center gap-1">
               {canResend && (
                 <button
                   type="button"
@@ -165,18 +198,20 @@ const TransactionsPreview = ({
                   {t('history.resend')}
                 </button>
               )}
-              <button
-                type="button"
-                className="cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  removePendingTransaction(tx.hash)
-                }}
-                aria-label={t('history.deleteFailed')}
-                title={t('history.deleteFailed')}
-              >
-                <XIcon className="h-3.5 w-3.5" />
-              </button>
+              {isInvalid && (
+                <button
+                  type="button"
+                  className="cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    removePendingTransaction(tx.hash)
+                  }}
+                  aria-label={t('history.deleteInvalid')}
+                  title={t('history.deleteInvalid')}
+                >
+                  <XIcon className="h-3.5 w-3.5" />
+                </button>
+              )}
             </div>
           )}
         </div>

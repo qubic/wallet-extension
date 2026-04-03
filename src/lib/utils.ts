@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
+import { verifyIdentity } from '@qubic-labs/core'
 import { QUBIC_EXPLORER_BASE_URL } from './config/constants'
 
 export function cn(...inputs: ClassValue[]) {
@@ -7,14 +8,11 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /**
- * Validate Qubic identity format (60 uppercase letters A-Z)
+ * Validate a Qubic identity by checking both its 60-character uppercase format
+ * and checksum.
  */
 export const isValidIdentity = (identity: string): boolean => {
-  if (identity.length !== 60) return false
-  for (const char of identity) {
-    if (char < 'A' || char > 'Z') return false
-  }
-  return true
+  return /^[A-Z]{60}$/.test(identity) && verifyIdentity(identity)
 }
 
 /**

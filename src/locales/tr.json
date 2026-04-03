@@ -282,8 +282,9 @@
     "unconfirmedMore": "+{{count}} onaylanmamış işlem daha",
     "confirmed": "Onaylandı",
     "failed": "Başarısız",
+    "invalid": "Geçersiz",
     "resend": "Tekrar gönder",
-    "deleteFailed": "Başarısız işlemi sil",
+    "deleteInvalid": "Geçersiz işlemi sil",
     "today": "Bugün",
     "yesterday": "Dün"
   },
@@ -304,7 +305,8 @@
     "openExplorer": "Gezginde aç",
     "pending": "Onay Bekliyor",
     "pendingHint": "Bu işlem hâlâ ağ tikleri üzerinde onay bekliyor.",
-    "failedHint": "Bu işlem hedef tick içinde onaylanmadı ve başarısız oldu."
+    "failedHint": "Bu işlem bir bloğa dahil edildi ancak ağ tarafından onaylanmadı. Fonlar transfer edilmedi.",
+    "invalidHint": "Bu işlem hedef tick içinde onaylanmadı ve geçersiz."
   },
   "transfer": {
     "title": "Gönder",
@@ -334,7 +336,7 @@
     },
     "validation": {
       "recipientRequired": "Alıcı kimliği gereklidir.",
-      "recipientInvalid": "Kimlik 60 büyük harf (A-Z) olmalıdır.",
+      "recipientInvalid": "Geçersiz kimlik adresi.",
       "recipientSameAsSender": "Kendi kimliğinize gönderim yapılamaz.",
       "amountRequired": "Miktar gereklidir.",
       "amountInvalid": "Miktar pozitif bir sayı olmalıdır.",

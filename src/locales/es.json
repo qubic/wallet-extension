@@ -282,8 +282,9 @@
     "unconfirmedMore": "+{{count}} más sin confirmar",
     "confirmed": "Confirmadas",
     "failed": "Fallida",
+    "invalid": "Inválida",
     "resend": "Reenviar",
-    "deleteFailed": "Eliminar transacción fallida",
+    "deleteInvalid": "Eliminar transacción inválida",
     "today": "Hoy",
     "yesterday": "Ayer"
   },
@@ -304,7 +305,8 @@
     "openExplorer": "Abrir en explorador",
     "pending": "Pendiente",
     "pendingHint": "Esta transacción aún está pendiente de confirmación en los ticks de la red.",
-    "failedHint": "Esta transacción no fue confirmada dentro del tick objetivo y ha fallado."
+    "failedHint": "Esta transacción fue incluida en un bloque pero no fue aprobada por la red. Los fondos no fueron transferidos.",
+    "invalidHint": "Esta transacción no fue confirmada dentro del tick objetivo y es inválida."
   },
   "transfer": {
     "title": "Enviar",
@@ -317,7 +319,7 @@
     "form": {
       "recipientPlaceholder": "Identidad de 60 caracteres (A-Z)",
       "amountPlaceholder": "Ingresa el monto",
-      "max": "Máximo",
+      "max": "Max",
       "feeValue": "Comisión: {{fee}} QUBIC",
       "quBalance": "Saldo: {{balance}} QUBIC",
       "recipientHint": "Usa una identidad de 60 letras o elige una de tu vault.",
@@ -334,7 +336,7 @@
     },
     "validation": {
       "recipientRequired": "La identidad del destinatario es requerida.",
-      "recipientInvalid": "La identidad debe ser 60 letras mayúsculas (A-Z).",
+      "recipientInvalid": "Dirección de identidad no válida.",
       "recipientSameAsSender": "No puedes enviar a tu propia identidad.",
       "amountRequired": "El monto es requerido.",
       "amountInvalid": "El monto debe ser un número positivo.",

@@ -282,8 +282,9 @@
     "unconfirmedMore": "+{{count}} 笔未确认",
     "confirmed": "已确认",
     "failed": "失败",
+    "invalid": "无效",
     "resend": "重新发送",
-    "deleteFailed": "删除失败交易",
+    "deleteInvalid": "删除无效交易",
     "today": "今天",
     "yesterday": "昨天"
   },
@@ -304,7 +305,8 @@
     "openExplorer": "在浏览器中查看",
     "pending": "待确认",
     "pendingHint": "此交易仍在等待网络 Tick 确认。",
-    "failedHint": "此交易未在目标 Tick 内确认，已失败。"
+    "failedHint": "此交易已包含在区块中，但未被网络批准。资金未被转移。",
+    "invalidHint": "此交易未在目标 Tick 内确认，已无效。"
   },
   "transfer": {
     "title": "发送",
@@ -334,7 +336,7 @@
     },
     "validation": {
       "recipientRequired": "请输入收款方身份。",
-      "recipientInvalid": "身份必须为 60 位大写字母（A-Z）。",
+      "recipientInvalid": "身份地址无效。",
       "recipientSameAsSender": "不能向自己的身份发送。",
       "amountRequired": "请输入金额。",
       "amountInvalid": "金额必须为正数。",

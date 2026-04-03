@@ -282,8 +282,9 @@
     "unconfirmedMore": "+{{count}} weitere unbestätigte",
     "confirmed": "Bestätigt",
     "failed": "Fehlgeschlagen",
+    "invalid": "Ungültig",
     "resend": "Erneut senden",
-    "deleteFailed": "Fehlgeschlagene Transaktion löschen",
+    "deleteInvalid": "Ungültige Transaktion löschen",
     "today": "Heute",
     "yesterday": "Gestern"
   },
@@ -304,7 +305,8 @@
     "openExplorer": "Im Explorer öffnen",
     "pending": "Ausstehend",
     "pendingHint": "Diese Transaktion wartet noch auf Bestätigung in den Netzwerk-Ticks.",
-    "failedHint": "Diese Transaktion wurde nicht innerhalb des Ziel-Ticks bestätigt und ist fehlgeschlagen."
+    "failedHint": "Diese Transaktion wurde in einen Block aufgenommen, aber nicht vom Netzwerk genehmigt. Die Mittel wurden nicht übertragen.",
+    "invalidHint": "Diese Transaktion wurde nicht innerhalb des Ziel-Ticks bestätigt und ist ungültig."
   },
   "transfer": {
     "title": "Senden",
@@ -334,7 +336,7 @@
     },
     "validation": {
       "recipientRequired": "Empfängeradresse ist erforderlich.",
-      "recipientInvalid": "Adresse muss aus 60 Großbuchstaben bestehen (A-Z).",
+      "recipientInvalid": "Ungültige Identitätsadresse.",
       "recipientSameAsSender": "Senden an die eigene Adresse ist nicht möglich.",
       "amountRequired": "Betrag ist erforderlich.",
       "amountInvalid": "Betrag muss eine positive Zahl sein.",
