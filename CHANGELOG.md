@@ -1,3 +1,58 @@
+# [1.0.0-beta.6](https://github.com/qubic/wallet-extension/compare/v1.0.0-beta.5...v1.0.0-beta.6) (2026-04-03)
+
+
+### Bug Fixes
+
+* add navigation for invalid and failed trxs ([e8b5c29](https://github.com/qubic/wallet-extension/commit/e8b5c295a7a1a2b8ccaae01c72a2e6c683d229f5))
+* **extension:** unify side panel toggle behavior ([0d8a708](https://github.com/qubic/wallet-extension/commit/0d8a70823f2c1f7a15ccd4d43f97f4c4e04c65e3))
+* fix and centralize failed transactions logic ([a15c46d](https://github.com/qubic/wallet-extension/commit/a15c46dbc7e9fc13b041917f8c3920bfaa53d38f))
+* localize invalid identity checksum error in transfer ([#140](https://github.com/qubic/wallet-extension/issues/140)) ([b46081a](https://github.com/qubic/wallet-extension/commit/b46081ae21f66b9cdc362d1460dd3f0263681b33))
+* make the failed transaction appears on their correct order in the list no necessart at the top ([93ee4d8](https://github.com/qubic/wallet-extension/commit/93ee4d8ed23f47172fa0ac1f0d5c48dcb1e92955))
+* prevent amount input text overlapping token label and Max button ([5824e2b](https://github.com/qubic/wallet-extension/commit/5824e2b0916004d131af4653e50990bd71f6a45b))
+* remove squeezing from icons if the transatcion row is taller ([12864bf](https://github.com/qubic/wallet-extension/commit/12864bf5cc7ef8390c6ae2db77f99b23cfb07438))
+* resolve stuck failed pending transactions ([55b9184](https://github.com/qubic/wallet-extension/commit/55b91842bc4944830d594b98c51d8954d542a4dd))
+* show QUBIC instead of QU in transfer form title ([43d3b21](https://github.com/qubic/wallet-extension/commit/43d3b2107132c59c8dc413b4ceeee6b6e149cb26))
+* show resend button for failed trx in home ([54ff596](https://github.com/qubic/wallet-extension/commit/54ff5967ee388f4d65a26d248fcd493d9997d141))
+* show the delete button for invalid trxs ([6aca00b](https://github.com/qubic/wallet-extension/commit/6aca00b303d1ff68999c52c40ee36718b76db278))
+
+
+### Features
+
+* add notApproved status ([7826b1d](https://github.com/qubic/wallet-extension/commit/7826b1d1e5e04e0f217f2d5b72bfc623bf008e65))
+* align history and home tansactions with wallet-app separation behavior (confirmed - unconfirmed) ([8d1f25b](https://github.com/qubic/wallet-extension/commit/8d1f25b772ace380856cf7210cee04a98b9fe3c9))
+* handle executed and confirmed transactions ([b39f042](https://github.com/qubic/wallet-extension/commit/b39f0429bcbd3ece2ac74417e31575fe48b44103))
+* remove redundant ternary ([6f2d9d3](https://github.com/qubic/wallet-extension/commit/6f2d9d3528c3b118c3673ebf8e5c87f53e058a85))
+* update failed/invalid icons to match explorer ([c623902](https://github.com/qubic/wallet-extension/commit/c623902f3a8787557865e2ff9de218cf60a4a378))
+
+
+---
+
+**Qubic Wallet — Beta Release**
+
+Manage your Qubic accounts, send transfers, transfer asset rights, and connect to dApps via the `window.qubic` provider API.
+
+This is a pre-release build — please report any issues on [GitHub Issues](https://github.com/qubic/wallet-extension/issues).
+
+## Install (Chrome / Chromium)
+
+### First time
+
+1. Download **wallet-extension-dist.zip** from the assets below
+2. Unzip to a permanent folder (e.g. `~/qubic-wallet`)
+3. Open `chrome://extensions`
+4. Enable **Developer mode** (top right)
+5. Click **Load unpacked** and select the unzipped folder
+6. Pin the extension from the puzzle icon in the toolbar
+
+### Updating
+
+1. Download the new **wallet-extension-dist.zip**
+2. Delete the contents of your existing extension folder
+3. Unzip the new files into the **same folder**
+4. Open `chrome://extensions` and click the **reload** button (↻) on the extension
+
+> **Important:** Always reuse the same folder. Loading from a different folder changes the extension ID and you will lose your wallet data.
+
 # [1.0.0-beta.5](https://github.com/qubic/wallet-extension/compare/v1.0.0-beta.4...v1.0.0-beta.5) (2026-03-29)
 
 
