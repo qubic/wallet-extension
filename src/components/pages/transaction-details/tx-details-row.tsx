@@ -20,6 +20,7 @@ type TxDetailsRowProps = {
     key: string
     label: string
     value: unknown
+    title?: string
     copyable?: boolean
     copyText?: string
     icon?: React.ReactNode
@@ -38,7 +39,7 @@ const TxDetailsRow = ({ row, copiedKey, onCopy }: TxDetailsRowProps) => {
       </div>
       <div className="flex items-start gap-1.5">
         {row.icon && <span className="mt-0.5 shrink-0">{row.icon}</span>}
-        <div className="min-w-0 break-all font-mono text-xs text-foreground">
+        <div className="min-w-0 break-all font-mono text-xs text-foreground" title={row.title}>
           {formatValue(row.value)}
         </div>
         {row.copyable && (

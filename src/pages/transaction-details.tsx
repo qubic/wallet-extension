@@ -19,7 +19,13 @@ import { computeTransactionStatus, isTransactionFailed } from '@/lib/transaction
 import { useAddressName } from '@/hooks/use-address-name'
 import { useTxTypeDescription } from '@/hooks/use-tx-type-description'
 import { useClipboardCopy } from '@/hooks/use-clipboard-copy'
-import { formatAddressLabel, formatIntegerLike, formatNumber, toTimestampMs } from '@/lib/utils'
+import {
+  formatAddressLabel,
+  formatIntegerLike,
+  formatNumber,
+  toTimestampMs,
+  truncateAccountName,
+} from '@/lib/utils'
 import { NATIVE_TOKEN_SYMBOL } from '@/lib/config/constants'
 import TxDetailsHeader from '@/components/pages/transaction-details/tx-details-header'
 import TxDetailsRow, { formatValue } from '@/components/pages/transaction-details/tx-details-row'
@@ -101,6 +107,22 @@ const TransactionDetails = () => {
 
   const amount = details?.amount ?? pending?.amount
   const tickNumber = details?.tickNumber ?? pending?.targetTick
+  const truncatedSourceAccountName =
+    sourceName?.type === 'account' ? truncateAccountName(sourceName.name) : null
+  const sourceLabel = sourceName
+    ? formatAddressLabel(sourceAddress, truncatedSourceAccountName?.text ?? sourceName.name)
+    : sourceAddress || '--'
+  const sourceLabelTitle = truncatedSourceAccountName?.isTruncated
+    ? formatAddressLabel(sourceAddress, sourceName?.name)
+    : undefined
+  const truncatedDestAccountName =
+    destName?.type === 'account' ? truncateAccountName(destName.name) : null
+  const destLabel = destName
+    ? formatAddressLabel(destAddress, truncatedDestAccountName?.text ?? destName.name)
+    : destAddress || '--'
+  const destLabelTitle = truncatedDestAccountName?.isTruncated
+    ? formatAddressLabel(destAddress, destName?.name)
+    : undefined
 
   const confirmedStatus =
     !isPending && !isInvalid && details
@@ -128,6 +150,7 @@ const TransactionDetails = () => {
     key: string
     label: string
     value: unknown
+    title?: string
     copyable?: boolean
     copyText?: string
     icon?: React.ReactNode
@@ -146,16 +169,16 @@ const TransactionDetails = () => {
     {
       key: 'source',
       label: t('txDetails.source'),
-      value: sourceName
-        ? formatAddressLabel(sourceAddress, sourceName.name)
-        : sourceAddress || '--',
+      value: sourceLabel,
+      title: sourceLabelTitle,
       copyable: Boolean(sourceAddress),
       copyText: sourceAddress,
     },
     {
       key: 'destination',
       label: t('txDetails.destination'),
-      value: destName ? formatAddressLabel(destAddress, destName.name) : destAddress || '--',
+      value: destLabel,
+      title: destLabelTitle,
       copyable: Boolean(destAddress),
       copyText: destAddress,
     },
