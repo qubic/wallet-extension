@@ -48,9 +48,10 @@ Use this when you want live updates without reloading from scratch.
 ## Project structure
 ```txt
 public/
-  manifest.json              # Chrome MV3 manifest
+  _locales/                  # Chrome Web Store listing strings (__MSG_*__ lookups)
   branding/                  # logos and brand assets
   icons/                     # extension icons
+manifest.config.ts           # source of truth for manifest.json (generated at build)
 src/
   app/                       # app providers/setup
   components/                # reusable UI and feature components
@@ -66,6 +67,15 @@ src/
 popup.html                   # popup entry point
 sidepanel.html               # sidepanel entry point
 ```
+
+## Manifest
+
+`manifest.json` is generated at build time from [manifest.config.ts](manifest.config.ts), in two variants:
+
+- **Production** (`bun run build`) — name/description resolved via `__MSG_*__` from `public/_locales/<lang>/messages.json` with `default_locale: "en"`.
+- **Development** (`bun run dev:extension`) — literal `"Qubic Wallet (Dev)"` name so the unpacked build coexists with the store install.
+
+The manifest `version` is synced from `package.json`. Semver prerelease counters are mapped to Chrome's 4th version segment (e.g. `1.0.0-beta.7` → `version: "1.0.0.7"`), and the original string is preserved as `version_name`.
 
 ## Architecture notes
 - Routing uses `HashRouter` for extension-safe navigation.
