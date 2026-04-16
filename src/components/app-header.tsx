@@ -1,22 +1,21 @@
 import {
   CopyIcon,
   EyeIcon,
-  XIcon,
   PanelRightOpenIcon,
   PlusIcon,
   UsersIcon,
   WalletIcon,
+  XIcon,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { truncateString } from '@/lib/utils'
+import { formatBalanceCompact, truncateAccountName, truncateString } from '@/lib/utils'
 import { setOnboarded } from '@/lib/vault'
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useClipboardCopy } from '@/hooks/use-clipboard-copy'
 import { useQueries } from '@tanstack/react-query'
 import { useSdk } from '@qubic-labs/react'
-import { formatBalanceCompact } from '@/lib/utils'
 import { HIDDEN_BALANCE, useBalanceVisibility } from '@/lib/balance-visibility'
 import {
   getAccountOrder,
@@ -112,6 +111,7 @@ const AppHeader = ({
     })
     return map
   }, [accounts, balanceQueries])
+  const currentAccountName = truncateAccountName(accountName)
 
   const handleCopyIdentity = async () => {
     await copyText(identity)
@@ -164,8 +164,11 @@ const AppHeader = ({
                 <WalletIcon className="h-5 w-5 text-primary" />
               </div>
               <div className="flex min-w-0 flex-col">
-                <span className="truncate text-sm font-semibold text-foreground">
-                  {accountName}
+                <span
+                  className="truncate text-sm font-semibold text-foreground"
+                  title={currentAccountName.isTruncated ? accountName : undefined}
+                >
+                  {currentAccountName.text}
                 </span>
                 <div className="flex items-center gap-1">
                   <span className="text-xs text-muted-foreground">{truncateString(identity)}</span>
@@ -207,44 +210,51 @@ const AppHeader = ({
               )}
               {accounts.length > 0 && (
                 <div className="max-h-[50vh] space-y-1 overflow-y-auto">
-                  {accounts.map((account) => (
-                    <button
-                      key={account.identity}
-                      type="button"
-                      onClick={() => handleSelectAccount(account)}
-                      className={`flex w-full items-center rounded-md px-2 py-2 text-left text-sm transition hover:bg-muted/30 ${
-                        account.identity === identity ? 'bg-muted/20' : ''
-                      }`}
-                    >
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2">
-                          <span className="truncate font-medium text-foreground">
-                            {account.name}
-                          </span>
-                          {account.watchOnly && (
-                            <EyeIcon className="size-3 shrink-0 text-muted-foreground" />
-                          )}
-                          {account.identity === identity && (
-                            <span className="shrink-0 text-[11px] text-primary">
-                              {t('accounts.manage.active')}
+                  {accounts.map((account) => {
+                    const truncatedAccountName = truncateAccountName(account.name)
+
+                    return (
+                      <button
+                        key={account.identity}
+                        type="button"
+                        onClick={() => handleSelectAccount(account)}
+                        className={`flex w-full items-center rounded-md px-2 py-2 text-left text-sm transition hover:bg-muted/30 ${
+                          account.identity === identity ? 'bg-muted/20' : ''
+                        }`}
+                      >
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2">
+                            <span
+                              className="truncate font-medium text-foreground"
+                              title={truncatedAccountName.isTruncated ? account.name : undefined}
+                            >
+                              {truncatedAccountName.text}
                             </span>
-                          )}
+                            {account.watchOnly && (
+                              <EyeIcon className="size-3 shrink-0 text-muted-foreground" />
+                            )}
+                            {account.identity === identity && (
+                              <span className="shrink-0 text-[11px] text-primary">
+                                {t('accounts.manage.active')}
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <span className="truncate">{truncateString(account.identity)}</span>
+                            <span className="shrink-0 text-[11px] font-semibold text-foreground">
+                              {isVisible
+                                ? balanceByIdentity.has(account.identity)
+                                  ? formatBalanceCompact(
+                                      balanceByIdentity.get(account.identity) ?? 0n,
+                                    )
+                                  : '--'
+                                : HIDDEN_BALANCE}
+                            </span>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                          <span className="truncate">{truncateString(account.identity)}</span>
-                          <span className="shrink-0 text-[11px] font-semibold text-foreground">
-                            {isVisible
-                              ? balanceByIdentity.has(account.identity)
-                                ? formatBalanceCompact(
-                                    balanceByIdentity.get(account.identity) ?? 0n,
-                                  )
-                                : '--'
-                              : HIDDEN_BALANCE}
-                          </span>
-                        </div>
-                      </div>
-                    </button>
-                  ))}
+                      </button>
+                    )
+                  })}
                 </div>
               )}
             </div>

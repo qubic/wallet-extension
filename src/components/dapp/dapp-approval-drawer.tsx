@@ -25,7 +25,7 @@ import {
 } from '@/lib/dapp/approval-preview'
 import { getChromeApi } from '@/lib/dapp/chrome-api'
 import { PasswordInput } from '@/components/ui/password-input'
-import { formatIntegerLike, formatNumber, truncateString } from '@/lib/utils'
+import { formatIntegerLike, formatNumber, truncateAccountName, truncateString } from '@/lib/utils'
 import { NATIVE_TOKEN_SYMBOL } from '@/lib/config/constants'
 import AddressLabel from '@/components/address-label'
 import { useTxTypeDescription } from '@/hooks/use-tx-type-description'
@@ -101,6 +101,12 @@ const DappApprovalDrawer = () => {
     txSummary?.toIdentity ?? '',
     Number(txSummary?.inputType ?? 0),
   )
+  const sharedAccountName = connectSummary?.accountName
+    ? truncateAccountName(connectSummary.accountName)
+    : null
+  const watchOnlyAccountName = accountSummary?.accountName
+    ? truncateAccountName(accountSummary.accountName)
+    : null
   const isWatchOnlySigningRequest = Boolean(
     current &&
       (current.method === 'signMessage' ||
@@ -282,8 +288,11 @@ const DappApprovalDrawer = () => {
                 <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
                   {t('dapp.approval.sharedAccount')}
                 </p>
-                <p className="truncate text-sm font-medium text-foreground">
-                  {connectSummary.accountName || t('dapp.approval.sharedAccountFallback')}
+                <p
+                  className="truncate text-sm font-medium text-foreground"
+                  title={sharedAccountName?.isTruncated ? connectSummary.accountName : undefined}
+                >
+                  {sharedAccountName?.text || t('dapp.approval.sharedAccountFallback')}
                 </p>
                 <p className="truncate font-mono text-xs text-muted-foreground">
                   {truncateString(connectSummary.accountIdentity)}
@@ -374,10 +383,19 @@ const DappApprovalDrawer = () => {
                 <p className="text-sm font-medium text-foreground">
                   {t('dapp.approval.watchOnlyTitle')}
                 </p>
-                <p className="mt-1 text-sm text-muted-foreground">
+                <p
+                  className="mt-1 text-sm text-muted-foreground"
+                  title={
+                    watchOnlyAccountName?.isTruncated
+                      ? t('dapp.approval.watchOnlyDescription', {
+                          accountName: accountSummary.accountName,
+                        })
+                      : undefined
+                  }
+                >
                   {t('dapp.approval.watchOnlyDescription', {
                     accountName:
-                      accountSummary.accountName || t('dapp.approval.sharedAccountFallback'),
+                      watchOnlyAccountName?.text || t('dapp.approval.sharedAccountFallback'),
                   })}
                 </p>
               </div>

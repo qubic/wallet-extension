@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/drawer'
 import { Textarea } from '@/components/ui/textarea'
 import { useClipboardCopy } from '@/hooks/use-clipboard-copy'
+import { truncateAccountName } from '@/lib/utils'
 
 type RevealSeedDrawerProps = {
   open: boolean
@@ -25,6 +26,7 @@ const RevealSeedDrawer = ({ open, seed, accountName, onOpenChange }: RevealSeedD
   const { t } = useTranslation()
   const { copyText } = useClipboardCopy()
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null)
+  const truncatedAccountName = truncateAccountName(accountName)
 
   useEffect(() => {
     let cancelled = false
@@ -54,7 +56,15 @@ const RevealSeedDrawer = ({ open, seed, accountName, onOpenChange }: RevealSeedD
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent>
         <DrawerHeader>
-          <DrawerTitle>{t('accounts.manage.revealTitle', { name: accountName })}</DrawerTitle>
+          <DrawerTitle
+            title={
+              truncatedAccountName.isTruncated
+                ? t('accounts.manage.revealTitle', { name: accountName })
+                : undefined
+            }
+          >
+            {t('accounts.manage.revealTitle', { name: truncatedAccountName.text })}
+          </DrawerTitle>
         </DrawerHeader>
         <div className="flex flex-col items-center gap-4 px-4">
           {qrDataUrl && (

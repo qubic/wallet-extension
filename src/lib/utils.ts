@@ -131,12 +131,37 @@ type TruncateStringOptions = {
   emptyLabel?: string
 }
 
+export type TruncateAccountNameOptions = {
+  maxLength?: number
+}
+
+export type TruncateAccountNameResult = {
+  text: string
+  isTruncated: boolean
+}
+
 export function truncateString(value: string, options: TruncateStringOptions = {}) {
   const { leading = 6, trailing = 6, minLength = 12, emptyLabel = 'No identity' } = options
 
   if (!value) return emptyLabel
   if (value.length <= minLength) return value
   return `${value.slice(0, leading)}…${value.slice(-trailing)}`
+}
+
+export function truncateAccountName(
+  value: string,
+  options: TruncateAccountNameOptions = {},
+): TruncateAccountNameResult {
+  const { maxLength = 24 } = options
+
+  if (value.length <= maxLength) {
+    return { text: value, isTruncated: false }
+  }
+
+  return {
+    text: `${value.slice(0, Math.max(0, maxLength - 1))}…`,
+    isTruncated: true,
+  }
 }
 
 export const formatAddressLabel = (
