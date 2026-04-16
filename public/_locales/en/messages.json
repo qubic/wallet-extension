@@ -1,0 +1,10 @@
+{
+  "appName": {
+    "message": "Qubic Wallet",
+    "description": "Extension name shown in the Chrome Web Store and browser chrome."
+  },
+  "appDescription": {
+    "message": "Self-custodial Qubic wallet. Manage accounts, send QUBIC, transfer assets, and connect to Qubic dApps from your browser.",
+    "description": "Short description shown on the Chrome Web Store listing card."
+  }
+}
