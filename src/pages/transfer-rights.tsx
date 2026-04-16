@@ -326,6 +326,7 @@ const TransferRights = () => {
     setSending(true)
     setErrorMessage('')
     let requestedTargetTick: bigint | number | undefined
+    let reachedSubmitStage = false
 
     try {
       const parsedShares = parseAmount(shares)
@@ -381,6 +382,8 @@ const TransferRights = () => {
         )
       }
 
+      reachedSubmitStage = true
+
       const result = await sdk.transactions.send({
         fromSeed: seed,
         toIdentity: sourceContract.contractAddress,
@@ -415,12 +418,17 @@ const TransferRights = () => {
 
       navigate('/')
     } catch (error) {
-      const message = await resolveTransactionSubmissionErrorMessage(error, requestedTargetTick, {
-        generic: t('transferRights.errors.generic'),
-        targetTickExpired: t('transferRights.errors.targetTickExpired'),
-        networkError: t('transferRights.errors.networkError'),
-        broadcastFailed: t('transferRights.errors.broadcastFailed'),
-      })
+      const message = await resolveTransactionSubmissionErrorMessage(
+        error,
+        requestedTargetTick,
+        {
+          generic: t('transferRights.errors.generic'),
+          targetTickExpired: t('transferRights.errors.targetTickExpired'),
+          networkError: t('transferRights.errors.networkError'),
+          broadcastFailed: t('transferRights.errors.broadcastFailed'),
+        },
+        { allowTickExpiryHeuristic: reachedSubmitStage },
+      )
 
       seedRef.current = null
       setErrorMessage(message)

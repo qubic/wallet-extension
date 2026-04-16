@@ -206,6 +206,7 @@ const Transfer = () => {
     setSending(true)
     setErrorMessage('')
     let requestedTargetTick: bigint | number | undefined
+    let reachedSubmitStage = false
 
     try {
       const parsedAmount = parseAmount(amount)
@@ -215,7 +216,6 @@ const Transfer = () => {
 
       let result: { txId: string; targetTick: bigint }
 
-      // Fetch fresh tick info at send time
       const freshTickInfo = await fetchTickInfo()
       const sendCurrentTick = freshTickInfo.tickInfo?.tick
 
@@ -247,6 +247,8 @@ const Transfer = () => {
       if (requestedTargetTick === undefined) {
         throw new Error(t('transfer.errors.networkError'))
       }
+
+      reachedSubmitStage = true
 
       if (selectedAsset) {
         const payload = buildAssetTransferPayload(
@@ -299,12 +301,17 @@ const Transfer = () => {
 
       navigate('/')
     } catch (error) {
-      const message = await resolveTransactionSubmissionErrorMessage(error, requestedTargetTick, {
-        generic: t('transfer.errors.generic'),
-        targetTickExpired: t('transfer.errors.targetTickExpired'),
-        networkError: t('transfer.errors.networkError'),
-        broadcastFailed: t('transfer.errors.broadcastFailed'),
-      })
+      const message = await resolveTransactionSubmissionErrorMessage(
+        error,
+        requestedTargetTick,
+        {
+          generic: t('transfer.errors.generic'),
+          targetTickExpired: t('transfer.errors.targetTickExpired'),
+          networkError: t('transfer.errors.networkError'),
+          broadcastFailed: t('transfer.errors.broadcastFailed'),
+        },
+        { allowTickExpiryHeuristic: reachedSubmitStage },
+      )
 
       seedRef.current = null
       setErrorMessage(message)
