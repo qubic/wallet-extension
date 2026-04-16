@@ -9,7 +9,7 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from '@/components/ui/drawer'
-import { formatAddressLabel, formatBalance, parseAmount } from '@/lib/utils'
+import { formatAddressLabel, formatBalance, parseAmount, truncateAccountName } from '@/lib/utils'
 import { useAddressName } from '@/hooks/use-address-name'
 import { NATIVE_TOKEN_SYMBOL } from '@/lib/config/constants'
 import SummaryRow from '@/components/pages/transfer/summary-row'
@@ -41,6 +41,24 @@ const ConfirmationDrawer = ({
   const parsed = parseAmount(amount) || 0n
   const sourceName = useAddressName(sourceIdentity)
   const recipientName = useAddressName(recipient)
+  const truncatedSourceAccountName =
+    sourceName?.type === 'account' ? truncateAccountName(sourceName.name) : null
+  const sourceLabel = formatAddressLabel(
+    sourceIdentity,
+    truncatedSourceAccountName?.text ?? sourceName?.name,
+  )
+  const sourceLabelTitle = truncatedSourceAccountName?.isTruncated
+    ? formatAddressLabel(sourceIdentity, sourceName?.name)
+    : undefined
+  const truncatedRecipientAccountName =
+    recipientName?.type === 'account' ? truncateAccountName(recipientName.name) : null
+  const recipientLabel = formatAddressLabel(
+    recipient,
+    truncatedRecipientAccountName?.text ?? recipientName?.name,
+  )
+  const recipientLabelTitle = truncatedRecipientAccountName?.isTruncated
+    ? formatAddressLabel(recipient, recipientName?.name)
+    : undefined
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
@@ -58,12 +76,14 @@ const ConfirmationDrawer = ({
           <div className="space-y-3">
             <SummaryRow
               label={t('transfer.confirm.from')}
-              value={formatAddressLabel(sourceIdentity, sourceName?.name)}
+              value={sourceLabel}
+              valueTitle={sourceLabelTitle}
               mono
             />
             <SummaryRow
               label={t('transfer.confirm.to')}
-              value={formatAddressLabel(recipient, recipientName?.name)}
+              value={recipientLabel}
+              valueTitle={recipientLabelTitle}
               mono
             />
             <SummaryRow
