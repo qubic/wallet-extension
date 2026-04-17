@@ -172,7 +172,9 @@ const TransferForm = ({
                           setRecipientPickerOpen(false)
                         }}
                       >
-                        <span className="truncate">{entry.name}</span>
+                        <span className="min-w-0 flex-1 truncate" title={entry.name}>
+                          {entry.name}
+                        </span>
                         <span className="shrink-0 font-mono text-[11px] text-muted-foreground">
                           {truncateString(entry.identity)}
                         </span>
@@ -191,7 +193,9 @@ const TransferForm = ({
               <span>{recipient.length}/60</span>
             </div>
             {recipientResolved && (
-              <p className="text-[11px] text-primary">{recipientResolved.name}</p>
+              <p className="truncate text-[11px] text-primary" title={recipientResolved.name}>
+                {recipientResolved.name}
+              </p>
             )}
             {errors.recipient && <p className="text-xs text-destructive">{errors.recipient}</p>}
           </div>

@@ -236,7 +236,7 @@ const History = () => {
         variants={itemMotion}
       >
         <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
+          <div className="flex min-w-0 flex-1 items-center gap-3">
             <div
               className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border ${
                 isPending
@@ -250,12 +250,12 @@ const History = () => {
             >
               <Icon className="h-4 w-4" />
             </div>
-            <div className="flex flex-col">
-              <span className="text-xs font-semibold text-foreground">{label}</span>
+            <div className="min-w-0 flex flex-1 flex-col">
+              <span className="truncate text-xs font-semibold text-foreground">{label}</span>
               <AddressLabel
                 address={counterparty}
                 prefix={addressPrefix}
-                className="text-xs text-muted-foreground"
+                className="block truncate text-xs text-muted-foreground"
               />
               {isFailed && (
                 <span className="text-[11px] text-red-700 dark:text-red-300">
@@ -269,7 +269,7 @@ const History = () => {
               )}
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="shrink-0 flex items-center gap-2">
             <span
               className={`text-sm font-semibold ${
                 isPending

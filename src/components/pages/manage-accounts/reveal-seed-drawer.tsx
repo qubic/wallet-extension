@@ -54,7 +54,9 @@ const RevealSeedDrawer = ({ open, seed, accountName, onOpenChange }: RevealSeedD
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent>
         <DrawerHeader>
-          <DrawerTitle>{t('accounts.manage.revealTitle', { name: accountName })}</DrawerTitle>
+          <DrawerTitle className="break-words">
+            {t('accounts.manage.revealTitle', { name: accountName })}
+          </DrawerTitle>
         </DrawerHeader>
         <div className="flex flex-col items-center gap-4 px-4">
           {qrDataUrl && (

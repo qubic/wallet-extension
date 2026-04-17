@@ -1,22 +1,21 @@
 import {
   CopyIcon,
   EyeIcon,
-  XIcon,
   PanelRightOpenIcon,
   PlusIcon,
   UsersIcon,
   WalletIcon,
+  XIcon,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { truncateString } from '@/lib/utils'
+import { formatBalanceCompact, truncateString } from '@/lib/utils'
 import { setOnboarded } from '@/lib/vault'
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useClipboardCopy } from '@/hooks/use-clipboard-copy'
 import { useQueries } from '@tanstack/react-query'
 import { useSdk } from '@qubic-labs/react'
-import { formatBalanceCompact } from '@/lib/utils'
 import { HIDDEN_BALANCE, useBalanceVisibility } from '@/lib/balance-visibility'
 import {
   getAccountOrder,
@@ -112,7 +111,6 @@ const AppHeader = ({
     })
     return map
   }, [accounts, balanceQueries])
-
   const handleCopyIdentity = async () => {
     await copyText(identity)
   }
@@ -164,7 +162,10 @@ const AppHeader = ({
                 <WalletIcon className="h-5 w-5 text-primary" />
               </div>
               <div className="flex min-w-0 flex-col">
-                <span className="truncate text-sm font-semibold text-foreground">
+                <span
+                  className="truncate text-sm font-semibold text-foreground"
+                  title={accountName}
+                >
                   {accountName}
                 </span>
                 <div className="flex items-center gap-1">
@@ -217,8 +218,8 @@ const AppHeader = ({
                       }`}
                     >
                       <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2">
-                          <span className="truncate font-medium text-foreground">
+                        <div className="flex min-w-0 items-center gap-2">
+                          <span className="min-w-0 flex-1 truncate font-medium text-foreground">
                             {account.name}
                           </span>
                           {account.watchOnly && (

@@ -282,7 +282,10 @@ const DappApprovalDrawer = () => {
                 <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
                   {t('dapp.approval.sharedAccount')}
                 </p>
-                <p className="truncate text-sm font-medium text-foreground">
+                <p
+                  className="truncate text-sm font-medium text-foreground"
+                  title={connectSummary.accountName}
+                >
                   {connectSummary.accountName || t('dapp.approval.sharedAccountFallback')}
                 </p>
                 <p className="truncate font-mono text-xs text-muted-foreground">
@@ -374,7 +377,7 @@ const DappApprovalDrawer = () => {
                 <p className="text-sm font-medium text-foreground">
                   {t('dapp.approval.watchOnlyTitle')}
                 </p>
-                <p className="mt-1 text-sm text-muted-foreground">
+                <p className="mt-1 break-words text-sm text-muted-foreground">
                   {t('dapp.approval.watchOnlyDescription', {
                     accountName:
                       accountSummary.accountName || t('dapp.approval.sharedAccountFallback'),
