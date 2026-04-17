@@ -9,7 +9,7 @@ import NumericInput from '@/components/numeric-input'
 import { type AggregatedAsset, formatAssetUnits } from '@/lib/assets'
 import { NATIVE_TOKEN_NAME, NATIVE_TOKEN_SYMBOL } from '@/lib/config/constants'
 import { useAddressName } from '@/hooks/use-address-name'
-import { formatBalance, formatNumber, truncateAccountName, truncateString } from '@/lib/utils'
+import { formatBalance, formatNumber, truncateString } from '@/lib/utils'
 import type { FormErrors } from '@/components/pages/transfer/types'
 
 type TransferFormProps = {
@@ -115,8 +115,6 @@ const TransferForm = ({
     if (availableUnits <= 0n) return
     onAmountChange(formatNumber(availableUnits))
   }
-  const resolvedRecipientAccountName =
-    recipientResolved?.type === 'account' ? truncateAccountName(recipientResolved.name) : null
 
   return (
     <section className="flex w-full justify-center">
@@ -164,31 +162,24 @@ const TransferForm = ({
                 </div>
                 <div className="max-h-52 overflow-y-auto py-1">
                   {filteredVaultRecipients.length > 0 ? (
-                    filteredVaultRecipients.map((entry) => {
-                      const accountName = truncateAccountName(entry.name)
-
-                      return (
-                        <button
-                          key={`recipient-${entry.identity}`}
-                          type="button"
-                          className="flex w-full cursor-pointer items-center justify-between gap-2 px-3 py-2 text-left text-xs text-foreground transition-colors hover:bg-accent/60"
-                          onClick={() => {
-                            onSelectVaultRecipient(entry.identity)
-                            setRecipientPickerOpen(false)
-                          }}
-                        >
-                          <span
-                            className="truncate"
-                            title={accountName.isTruncated ? entry.name : undefined}
-                          >
-                            {accountName.text}
-                          </span>
-                          <span className="shrink-0 font-mono text-[11px] text-muted-foreground">
-                            {truncateString(entry.identity)}
-                          </span>
-                        </button>
-                      )
-                    })
+                    filteredVaultRecipients.map((entry) => (
+                      <button
+                        key={`recipient-${entry.identity}`}
+                        type="button"
+                        className="flex w-full cursor-pointer items-center justify-between gap-2 px-3 py-2 text-left text-xs text-foreground transition-colors hover:bg-accent/60"
+                        onClick={() => {
+                          onSelectVaultRecipient(entry.identity)
+                          setRecipientPickerOpen(false)
+                        }}
+                      >
+                        <span className="min-w-0 flex-1 truncate" title={entry.name}>
+                          {entry.name}
+                        </span>
+                        <span className="shrink-0 font-mono text-[11px] text-muted-foreground">
+                          {truncateString(entry.identity)}
+                        </span>
+                      </button>
+                    ))
                   ) : (
                     <div className="px-3 py-2 text-xs text-muted-foreground">
                       {t('transfer.form.vaultRecipientsManual')}
@@ -202,13 +193,8 @@ const TransferForm = ({
               <span>{recipient.length}/60</span>
             </div>
             {recipientResolved && (
-              <p
-                className="text-[11px] text-primary"
-                title={
-                  resolvedRecipientAccountName?.isTruncated ? recipientResolved.name : undefined
-                }
-              >
-                {resolvedRecipientAccountName?.text ?? recipientResolved.name}
+              <p className="truncate text-[11px] text-primary" title={recipientResolved.name}>
+                {recipientResolved.name}
               </p>
             )}
             {errors.recipient && <p className="text-xs text-destructive">{errors.recipient}</p>}

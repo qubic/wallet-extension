@@ -17,7 +17,7 @@ import {
   removeDappPermission,
 } from '@/lib/dapp/storage'
 import { useAccountNames } from '@/hooks/use-account-names'
-import { truncateAccountName, truncateString } from '@/lib/utils'
+import { truncateString } from '@/lib/utils'
 
 const ConnectedSites = () => {
   const { t } = useTranslation()
@@ -120,24 +120,14 @@ const ConnectedSites = () => {
                       </AccordionTrigger>
                       <AccordionContent className="pb-1">
                         <div className="space-y-1">
-                          {site.approvedIdentities?.map((id) => {
-                            const accountName = accountNames[id]
-                              ? truncateAccountName(accountNames[id])
-                              : null
-
-                            return (
-                              <p key={id} className="truncate text-xs text-muted-foreground">
-                                <span
-                                  className="text-foreground"
-                                  title={accountName?.isTruncated ? accountNames[id] : undefined}
-                                >
-                                  {accountName?.text ??
-                                    t('settings.connectedSites.accountFallback')}
-                                </span>{' '}
-                                <span className="font-mono">({truncateString(id)})</span>
-                              </p>
-                            )
-                          })}
+                          {site.approvedIdentities?.map((id) => (
+                            <p key={id} className="truncate text-xs text-muted-foreground">
+                              <span className="text-foreground">
+                                {accountNames[id] ?? t('settings.connectedSites.accountFallback')}
+                              </span>{' '}
+                              <span className="font-mono">({truncateString(id)})</span>
+                            </p>
+                          ))}
                         </div>
                       </AccordionContent>
                     </AccordionItem>

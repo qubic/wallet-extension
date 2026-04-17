@@ -3,7 +3,6 @@ import { CopyIcon } from 'lucide-react'
 type SummaryRowProps = {
   label: string
   value: string
-  valueTitle?: string
   mono?: boolean
   emphasize?: boolean
   copyLabel?: string
@@ -13,7 +12,6 @@ type SummaryRowProps = {
 const SummaryRow = ({
   label,
   value,
-  valueTitle,
   mono = false,
   emphasize = false,
   copyLabel,
@@ -34,7 +32,6 @@ const SummaryRow = ({
       )}
     </div>
     <div
-      title={valueTitle}
       className={`break-all ${mono ? 'font-mono' : ''} ${
         emphasize ? 'text-lg font-semibold tabular-nums text-foreground' : 'text-sm text-foreground'
       }`}
