@@ -71,6 +71,7 @@ export const buildManifest = (mode: ManifestMode) => {
       ...base,
       name: 'Qubic Wallet (Dev)',
       description: 'Development build of the Qubic Wallet extension.',
+      default_locale: 'en',
     }
   }
 
