@@ -6,6 +6,7 @@ import {
   CheckCircleIcon,
   XCircleFilledIcon,
 } from '@/components/icons/tx-status-icons'
+import { SmartContractIcon } from '@/components/icons/smart-contract-icon'
 import type React from 'react'
 import { useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -22,7 +23,9 @@ import { useClipboardCopy } from '@/hooks/use-clipboard-copy'
 import { formatAddressLabel, formatIntegerLike, formatNumber, toTimestampMs } from '@/lib/utils'
 import { NATIVE_TOKEN_SYMBOL } from '@/lib/config/constants'
 import TxDetailsHeader from '@/components/pages/transaction-details/tx-details-header'
-import TxDetailsRow, { formatValue } from '@/components/pages/transaction-details/tx-details-row'
+import TxDetailsRow, {
+  formatValueAsString,
+} from '@/components/pages/transaction-details/tx-details-row'
 
 const TX_DETAILS_SKELETON_IDS = ['a', 'b', 'c', 'd', 'e', 'f'] as const
 
@@ -146,16 +149,34 @@ const TransactionDetails = () => {
     {
       key: 'source',
       label: t('txDetails.source'),
-      value: sourceName
-        ? formatAddressLabel(sourceAddress, sourceName.name)
-        : sourceAddress || '--',
+      value:
+        sourceName?.type === 'smartContract' ? (
+          <span className="inline-flex items-center gap-1">
+            <SmartContractIcon className="h-3.5 w-3.5 shrink-0" />
+            {formatAddressLabel(sourceAddress, sourceName.name)}
+          </span>
+        ) : sourceName ? (
+          formatAddressLabel(sourceAddress, sourceName.name)
+        ) : (
+          sourceAddress || '--'
+        ),
       copyable: Boolean(sourceAddress),
       copyText: sourceAddress,
     },
     {
       key: 'destination',
       label: t('txDetails.destination'),
-      value: destName ? formatAddressLabel(destAddress, destName.name) : destAddress || '--',
+      value:
+        destName?.type === 'smartContract' ? (
+          <span className="inline-flex items-center gap-1">
+            <SmartContractIcon className="h-3.5 w-3.5 shrink-0" />
+            {formatAddressLabel(destAddress, destName.name)}
+          </span>
+        ) : destName ? (
+          formatAddressLabel(destAddress, destName.name)
+        ) : (
+          destAddress || '--'
+        ),
       copyable: Boolean(destAddress),
       copyText: destAddress,
     },
@@ -172,7 +193,7 @@ const TransactionDetails = () => {
   ]
 
   const copyValue = async (key: string, value: unknown, rawText?: string) => {
-    await copyText(rawText ?? formatValue(value), { key })
+    await copyText(rawText ?? formatValueAsString(value), { key })
   }
 
   return (
