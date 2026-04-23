@@ -2,6 +2,7 @@ import { publicKeyFromIdentity } from '@qubic-labs/core'
 import type { SmartContract, SmartContractProcedure } from './qubic-static.types'
 
 const TRANSFER_SHARE_MANAGEMENT_RIGHTS_IDENTIFIER = 'transfersharemanagementrights'
+const TRANSFER_SHARES_MANAGEMENT_RIGHTS_IDENTIFIER = 'transfersharesmanagementrights'
 const REVOKE_ASSET_MANAGEMENT_RIGHTS_IDENTIFIER = 'revokeassetmanagementrights'
 
 export const PROCEDURE_TYPE_TRANSFER = 'transfer' as const
@@ -17,9 +18,12 @@ type ManagementRightsProcedureResult = {
 
 const findProcedureByIdentifier = (
   contract: SmartContract,
-  identifier: string,
+  ...identifiers: string[]
 ): SmartContractProcedure | undefined => {
-  return contract.procedures.find((p) => p.sourceIdentifier?.toLowerCase() === identifier)
+  return contract.procedures.find((p) => {
+    const id = p.sourceIdentifier?.toLowerCase()
+    return identifiers.some((i) => id === i)
+  })
 }
 
 /**
@@ -32,6 +36,7 @@ export const findManagementRightsProcedure = (
   const transferProc = findProcedureByIdentifier(
     contract,
     TRANSFER_SHARE_MANAGEMENT_RIGHTS_IDENTIFIER,
+    TRANSFER_SHARES_MANAGEMENT_RIGHTS_IDENTIFIER,
   )
   if (transferProc) return { procedure: transferProc, type: PROCEDURE_TYPE_TRANSFER }
   const revokeProc = findProcedureByIdentifier(contract, REVOKE_ASSET_MANAGEMENT_RIGHTS_IDENTIFIER)
