@@ -1,3 +1,47 @@
+# [1.0.0-beta.7](https://github.com/qubic/wallet-extension/compare/v1.0.0-beta.6...v1.0.0-beta.7) (2026-04-27)
+
+
+### Bug Fixes
+
+* add default_locale to dev manifest ([9e52463](https://github.com/qubic/wallet-extension/commit/9e524637d471bddc44cffd764d51d8e607c2d794))
+* **manifest:** prepare extension for Chrome Web Store submission ([#145](https://github.com/qubic/wallet-extension/issues/145)) ([1f57a19](https://github.com/qubic/wallet-extension/commit/1f57a197457b71f09de276e494ed52bed6588560))
+* **transfer-rights:** match both singular and plural procedure identifiers ([7815b07](https://github.com/qubic/wallet-extension/commit/7815b07a67922542ed78f348eeb6aad183f37320))
+* truncate long account names across wallet UI ([#146](https://github.com/qubic/wallet-extension/issues/146)) ([e78c762](https://github.com/qubic/wallet-extension/commit/e78c7626e9578468102faf61f0c6a5be40d56937))
+
+
+### Features
+
+* show smart contract icon next to identified addresses ([b8a66eb](https://github.com/qubic/wallet-extension/commit/b8a66eb3eaf45b886c3f4739cceb9761acda3055))
+
+
+---
+
+**Qubic Wallet — Beta Release**
+
+Manage your Qubic accounts, send transfers, transfer asset rights, and connect to dApps via the `window.qubic` provider API.
+
+This is a pre-release build — please report any issues on [GitHub Issues](https://github.com/qubic/wallet-extension/issues).
+
+## Install (Chrome / Chromium)
+
+### First time
+
+1. Download **wallet-extension-dist.zip** from the assets below
+2. Unzip to a permanent folder (e.g. `~/qubic-wallet`)
+3. Open `chrome://extensions`
+4. Enable **Developer mode** (top right)
+5. Click **Load unpacked** and select the unzipped folder
+6. Pin the extension from the puzzle icon in the toolbar
+
+### Updating
+
+1. Download the new **wallet-extension-dist.zip**
+2. Delete the contents of your existing extension folder
+3. Unzip the new files into the **same folder**
+4. Open `chrome://extensions` and click the **reload** button (↻) on the extension
+
+> **Important:** Always reuse the same folder. Loading from a different folder changes the extension ID and you will lose your wallet data.
+
 # [1.0.0-beta.6](https://github.com/qubic/wallet-extension/compare/v1.0.0-beta.5...v1.0.0-beta.6) (2026-04-03)
 
 
