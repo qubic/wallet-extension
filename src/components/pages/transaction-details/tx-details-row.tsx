@@ -1,8 +1,9 @@
 import type React from 'react'
+import { isValidElement } from 'react'
 import { CheckIcon, CopyIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
-const formatValue = (value: unknown): string => {
+const formatValueAsString = (value: unknown): string => {
   if (value === null || value === undefined) return '--'
   if (typeof value === 'bigint') return value.toString()
   if (typeof value === 'object') {
@@ -13,6 +14,11 @@ const formatValue = (value: unknown): string => {
     }
   }
   return String(value)
+}
+
+const formatValue = (value: unknown): React.ReactNode => {
+  if (isValidElement(value)) return value
+  return formatValueAsString(value)
 }
 
 type TxDetailsRowProps = {
@@ -38,7 +44,7 @@ const TxDetailsRow = ({ row, copiedKey, onCopy }: TxDetailsRowProps) => {
       </div>
       <div className="flex items-start gap-1.5">
         {row.icon && <span className="mt-0.5 shrink-0">{row.icon}</span>}
-        <div className="min-w-0 break-all font-mono text-xs text-foreground">
+        <div className="min-w-0 flex-1 break-all font-mono text-xs text-foreground">
           {formatValue(row.value)}
         </div>
         {row.copyable && (
@@ -61,4 +67,4 @@ const TxDetailsRow = ({ row, copiedKey, onCopy }: TxDetailsRowProps) => {
 }
 
 export default TxDetailsRow
-export { formatValue }
+export { formatValue, formatValueAsString }

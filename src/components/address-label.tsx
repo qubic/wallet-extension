@@ -1,4 +1,5 @@
 import { useAddressName } from '@/hooks/use-address-name'
+import { SmartContractIcon } from '@/components/icons/smart-contract-icon'
 import { truncateString } from '@/lib/utils'
 
 type AddressLabelProps = {
@@ -12,9 +13,14 @@ const AddressLabel = ({ address, className, prefix }: AddressLabelProps) => {
 
   if (resolved) {
     return (
-      <span className={className}>
+      <span className={`inline-flex items-center gap-1 ${className ?? ''}`}>
         {prefix && `${prefix} `}
-        {resolved.name} <span className="font-mono">({truncateString(address)})</span>
+        {resolved.type === 'smartContract' && (
+          <SmartContractIcon className="h-3.5 w-3.5 shrink-0" />
+        )}
+        <span className="truncate">
+          {resolved.name} <span className="font-mono">({truncateString(address)})</span>
+        </span>
       </span>
     )
   }
