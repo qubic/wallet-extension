@@ -52,22 +52,24 @@ const RevealSeedDrawer = ({ open, seed, accountName, onOpenChange }: RevealSeedD
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent>
+      <DrawerContent className="max-h-[90vh] border-none bg-background">
         <DrawerHeader>
           <DrawerTitle className="break-words">
             {t('accounts.manage.revealTitle', { name: accountName })}
           </DrawerTitle>
         </DrawerHeader>
-        <div className="flex flex-col items-center gap-4 px-4">
-          {qrDataUrl && (
-            <div className="flex flex-col items-center gap-1">
-              <img src={qrDataUrl} alt={t('accounts.manage.qrAlt')} className="h-48 w-48" />
-              <p className="text-muted-foreground text-xs">{t('accounts.manage.qrLabel')}</p>
-            </div>
-          )}
-          <Textarea value={seed} rows={3} readOnly className="resize-none" />
+        <div className="app-scrollbar min-h-0 flex-1 overflow-y-auto px-4 pb-2">
+          <div className="flex flex-col items-center gap-4">
+            {qrDataUrl && (
+              <div className="flex flex-col items-center gap-1">
+                <img src={qrDataUrl} alt={t('accounts.manage.qrAlt')} className="h-48 w-48" />
+                <p className="text-muted-foreground text-xs">{t('accounts.manage.qrLabel')}</p>
+              </div>
+            )}
+            <Textarea value={seed} rows={3} readOnly className="resize-none" />
+          </div>
         </div>
-        <DrawerFooter>
+        <DrawerFooter className="border-t border-border/60 bg-background">
           <Button variant="outline" onClick={handleCopy}>
             <CopyIcon className="h-4 w-4" />
             {t('accounts.manage.copySeed')}
