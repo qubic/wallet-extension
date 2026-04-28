@@ -117,8 +117,8 @@ const TransferForm = ({
   }
 
   return (
-    <section className="flex w-full justify-center">
-      <div className="flex min-h-[calc(100vh-64px)] w-full max-w-sm flex-col px-4">
+    <section className="flex w-full justify-center pt-4">
+      <div className="flex min-h-full w-full max-w-sm flex-col px-4 pb-4">
         <PageHeader
           title={
             <>
@@ -128,7 +128,7 @@ const TransferForm = ({
           onBack={() => navigate('/transfer')}
         />
         {/* Form fields */}
-        <div className="flex flex-1 flex-col gap-5">
+        <div className="flex flex-1 flex-col gap-5 pb-4">
           {/* Recipient */}
           <div ref={recipientPickerRef} className="relative space-y-1.5">
             <Input
@@ -326,7 +326,7 @@ const TransferForm = ({
         </div>
 
         {/* Bottom buttons */}
-        <div className="sticky bottom-0 flex gap-3 bg-background pb-4 pt-3">
+        <div className="sticky bottom-0 -mx-4 mt-auto flex gap-3 border-t border-border/60 bg-background px-4 pb-4 pt-3">
           <Button
             variant="outline"
             size="lg"
