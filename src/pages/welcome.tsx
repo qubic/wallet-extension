@@ -12,7 +12,7 @@ const Welcome = () => {
   const isSidePanelView = getExtensionViewKind() === 'sidepanel'
 
   return (
-    <section className="flex h-full flex-col items-center justify-center gap-6 px-6 text-center">
+    <section className="flex min-h-full flex-col items-center justify-center gap-6 px-6 py-6 text-center">
       <div className="flex flex-col items-center gap-3">
         <img
           src={

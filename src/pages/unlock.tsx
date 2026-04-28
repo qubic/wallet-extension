@@ -67,7 +67,7 @@ const Unlock = () => {
 
   return (
     <section className="flex min-h-full w-full justify-center">
-      <div className="flex min-h-full w-full max-w-sm flex-col px-4 pb-6 pt-4">
+      <div className="flex min-h-full w-full max-w-sm flex-col px-4 pb-6 pt-6">
         <div className="mt-8 flex flex-col items-center gap-4 text-center">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
             <ShieldCheckIcon className="h-8 w-8 text-primary" />
