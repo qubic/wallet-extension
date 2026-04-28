@@ -109,20 +109,6 @@ const VerifyMessage = () => {
           )}
         </div>
 
-        <Button onClick={handleVerify} disabled={!hasInput || verifying} className="gap-2">
-          {verifying ? (
-            <>
-              <Loader2Icon className="h-4 w-4 animate-spin" />
-              {t('verifyMessage.actions.verifying')}
-            </>
-          ) : (
-            <>
-              <ShieldCheckIcon className="h-4 w-4" />
-              {t('verifyMessage.actions.verify')}
-            </>
-          )}
-        </Button>
-
         {status.kind === 'valid' && (
           <div className="rounded-lg border border-green-500/40 bg-green-500/10 p-3">
             <div className="flex items-center gap-2">
@@ -164,6 +150,20 @@ const VerifyMessage = () => {
             <p className="text-sm text-destructive">{errorMessage(status.code)}</p>
           </div>
         )}
+
+        <Button onClick={handleVerify} disabled={!hasInput || verifying} className="gap-2">
+          {verifying ? (
+            <>
+              <Loader2Icon className="h-4 w-4 animate-spin" />
+              {t('verifyMessage.actions.verifying')}
+            </>
+          ) : (
+            <>
+              <ShieldCheckIcon className="h-4 w-4" />
+              {t('verifyMessage.actions.verify')}
+            </>
+          )}
+        </Button>
       </div>
     </section>
   )
