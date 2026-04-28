@@ -27,7 +27,8 @@
     "actions": {
       "send": "Send",
       "receive": "Receive",
-      "history": "History"
+      "history": "History",
+      "sign": "Sign"
     },
     "balance": {
       "label": "Balance",
@@ -140,7 +141,9 @@
       "support": "Support",
       "supportDesc": "Get help and report issues",
       "about": "About",
-      "aboutDesc": "App version and info"
+      "aboutDesc": "App version and info",
+      "verifyMessage": "Verify message",
+      "verifyMessageDesc": "Check a signature produced by a Qubic wallet"
     },
     "general": {
       "title": "Preferences",
@@ -609,6 +612,53 @@
       "copySeed": "Copy private seed",
       "seedCopied": "Private seed copied",
       "confirmationLabel": "I saved this private seed securely and understand it is required to recover this wallet."
+    }
+  },
+  "signMessage": {
+    "back": "Back",
+    "title": "Sign message",
+    "fromAccount": "Signing with \"{{name}}\"",
+    "watchOnly": "This is a watch-only account and cannot sign messages.",
+    "messageLabel": "Message",
+    "messagePlaceholder": "Enter the message to sign",
+    "outputLabel": "Signed output (JSON)",
+    "authTitle": "Authorize signing",
+    "authSubtitle": "Enter your password to sign this message.",
+    "copied": "Copied to clipboard",
+    "actions": {
+      "sign": "Sign",
+      "signing": "Signing…",
+      "copy": "Copy"
+    },
+    "errors": {
+      "signFailed": "Failed to sign message",
+      "copyFailed": "Failed to copy"
+    }
+  },
+  "verifyMessage": {
+    "back": "Back",
+    "title": "Verify message",
+    "description": "Paste a signed message to confirm it was signed by the claimed identity.",
+    "inputLabel": "Signed message (JSON)",
+    "inputPlaceholder": "Paste the signed JSON with identity, message, and signature fields",
+    "actions": {
+      "verify": "Verify",
+      "verifying": "Verifying…",
+      "clear": "Clear"
+    },
+    "result": {
+      "valid": "Valid signature",
+      "signedBy": "Signed by {{identity}}",
+      "messageLabel": "Message",
+      "invalid": "Invalid signature",
+      "invalidDescription": "The signature does not match the given message and identity."
+    },
+    "errors": {
+      "parse": "Could not parse the input. Expected JSON with identity, message, and signature fields.",
+      "identity": "Invalid identity. Expected 60 uppercase A–Z characters.",
+      "signature": "Invalid signature format.",
+      "checksum": "Signature checksum does not match.",
+      "invalid": "Could not verify the signature."
     }
   }
 }

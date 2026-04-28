@@ -27,7 +27,8 @@
     "actions": {
       "send": "发送",
       "receive": "接收",
-      "history": "记录"
+      "history": "记录",
+      "sign": "签名"
     },
     "balance": {
       "label": "余额",
@@ -140,7 +141,9 @@
       "support": "支持",
       "supportDesc": "获取帮助和报告问题",
       "about": "关于",
-      "aboutDesc": "应用版本与信息"
+      "aboutDesc": "应用版本与信息",
+      "verifyMessage": "验证消息",
+      "verifyMessageDesc": "检查由 Qubic 钱包生成的签名"
     },
     "general": {
       "title": "偏好设置",
@@ -609,6 +612,53 @@
       "copySeed": "复制私有种子",
       "seedCopied": "私有种子已复制",
       "confirmationLabel": "我已安全保存此私有种子，并了解恢复钱包时需要使用它。"
+    }
+  },
+  "signMessage": {
+    "back": "返回",
+    "title": "签名消息",
+    "fromAccount": "使用 \"{{name}}\" 签名",
+    "watchOnly": "这是只读账户，无法签名消息。",
+    "messageLabel": "消息",
+    "messagePlaceholder": "输入要签名的消息",
+    "outputLabel": "签名输出 (JSON)",
+    "authTitle": "授权签名",
+    "authSubtitle": "输入密码以签名此消息。",
+    "copied": "已复制到剪贴板",
+    "actions": {
+      "sign": "签名",
+      "signing": "签名中…",
+      "copy": "复制"
+    },
+    "errors": {
+      "signFailed": "签名消息失败",
+      "copyFailed": "复制失败"
+    }
+  },
+  "verifyMessage": {
+    "back": "返回",
+    "title": "验证消息",
+    "description": "粘贴已签名的消息以确认它是由所声明的身份签名的。",
+    "inputLabel": "已签名消息 (JSON)",
+    "inputPlaceholder": "粘贴包含 identity、message 和 signature 字段的已签名 JSON",
+    "actions": {
+      "verify": "验证",
+      "verifying": "验证中…",
+      "clear": "清除"
+    },
+    "result": {
+      "valid": "签名有效",
+      "signedBy": "由 {{identity}} 签名",
+      "messageLabel": "消息",
+      "invalid": "签名无效",
+      "invalidDescription": "签名与给定的消息和身份不匹配。"
+    },
+    "errors": {
+      "parse": "无法解析输入。需要包含 identity、message 和 signature 字段的 JSON。",
+      "identity": "身份无效。需要 60 个大写 A–Z 字符。",
+      "signature": "签名格式无效。",
+      "checksum": "签名校验和不匹配。",
+      "invalid": "无法验证签名。"
     }
   }
 }
