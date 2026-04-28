@@ -27,7 +27,8 @@
     "actions": {
       "send": "Enviar",
       "receive": "Recibir",
-      "history": "Historial"
+      "history": "Historial",
+      "sign": "Firmar"
     },
     "balance": {
       "label": "Saldo",
@@ -140,7 +141,9 @@
       "support": "Soporte",
       "supportDesc": "Obtener ayuda y reportar problemas",
       "about": "Acerca de",
-      "aboutDesc": "Versión de la aplicación e información"
+      "aboutDesc": "Versión de la aplicación e información",
+      "verifyMessage": "Verificar mensaje",
+      "verifyMessageDesc": "Comprueba una firma generada por una wallet Qubic"
     },
     "general": {
       "title": "Preferencias",
@@ -609,6 +612,53 @@
       "copySeed": "Copiar semilla privada",
       "seedCopied": "Semilla privada copiada",
       "confirmationLabel": "Guardé esta semilla privada de forma segura y entiendo que es necesaria para recuperar esta billetera."
+    }
+  },
+  "signMessage": {
+    "back": "Atrás",
+    "title": "Firmar mensaje",
+    "fromAccount": "Firmando con \"{{name}}\"",
+    "watchOnly": "Esta es una cuenta solo de visualización y no puede firmar mensajes.",
+    "messageLabel": "Mensaje",
+    "messagePlaceholder": "Introduce el mensaje a firmar",
+    "outputLabel": "Salida firmada (JSON)",
+    "authTitle": "Autorizar firma",
+    "authSubtitle": "Introduce tu contraseña para firmar este mensaje.",
+    "copied": "Copiado al portapapeles",
+    "actions": {
+      "sign": "Firmar",
+      "signing": "Firmando…",
+      "copy": "Copiar"
+    },
+    "errors": {
+      "signFailed": "No se pudo firmar el mensaje",
+      "copyFailed": "No se pudo copiar"
+    }
+  },
+  "verifyMessage": {
+    "back": "Atrás",
+    "title": "Verificar mensaje",
+    "description": "Pega un mensaje firmado para confirmar que fue firmado por la identidad indicada.",
+    "inputLabel": "Mensaje firmado (JSON)",
+    "inputPlaceholder": "Pega el JSON firmado con los campos identity, message y signature",
+    "actions": {
+      "verify": "Verificar",
+      "verifying": "Verificando…",
+      "clear": "Limpiar"
+    },
+    "result": {
+      "valid": "Firma válida",
+      "signedBy": "Firmado por {{identity}}",
+      "messageLabel": "Mensaje",
+      "invalid": "Firma inválida",
+      "invalidDescription": "La firma no coincide con el mensaje e identidad indicados."
+    },
+    "errors": {
+      "parse": "No se pudo analizar la entrada. Se esperaba JSON con los campos identity, message y signature.",
+      "identity": "Identidad inválida. Se esperan 60 caracteres A–Z en mayúsculas.",
+      "signature": "Formato de firma inválido.",
+      "checksum": "La suma de comprobación de la firma no coincide.",
+      "invalid": "No se pudo verificar la firma."
     }
   }
 }

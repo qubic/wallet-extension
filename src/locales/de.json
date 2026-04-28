@@ -27,7 +27,8 @@
     "actions": {
       "send": "Senden",
       "receive": "Empfangen",
-      "history": "Verlauf"
+      "history": "Verlauf",
+      "sign": "Signieren"
     },
     "balance": {
       "label": "Kontostand",
@@ -140,7 +141,9 @@
       "support": "Support",
       "supportDesc": "Hilfe erhalten und Probleme melden",
       "about": "Über",
-      "aboutDesc": "App-Version und Informationen"
+      "aboutDesc": "App-Version und Informationen",
+      "verifyMessage": "Nachricht verifizieren",
+      "verifyMessageDesc": "Eine von einer Qubic-Wallet erzeugte Signatur prüfen"
     },
     "general": {
       "title": "Einstellungen",
@@ -609,6 +612,53 @@
       "copySeed": "Privaten Seed kopieren",
       "seedCopied": "Privater Seed kopiert",
       "confirmationLabel": "Ich habe diesen privaten Seed sicher aufbewahrt und verstehe, dass er zur Wiederherstellung dieses Wallets erforderlich ist."
+    }
+  },
+  "signMessage": {
+    "back": "Zurück",
+    "title": "Nachricht signieren",
+    "fromAccount": "Signiere mit „{{name}}\"",
+    "watchOnly": "Dies ist ein reines Beobachtungskonto und kann keine Nachrichten signieren.",
+    "messageLabel": "Nachricht",
+    "messagePlaceholder": "Gib die zu signierende Nachricht ein",
+    "outputLabel": "Signierte Ausgabe (JSON)",
+    "authTitle": "Signatur autorisieren",
+    "authSubtitle": "Gib dein Passwort ein, um diese Nachricht zu signieren.",
+    "copied": "In die Zwischenablage kopiert",
+    "actions": {
+      "sign": "Signieren",
+      "signing": "Signiere…",
+      "copy": "Kopieren"
+    },
+    "errors": {
+      "signFailed": "Nachricht konnte nicht signiert werden",
+      "copyFailed": "Kopieren fehlgeschlagen"
+    }
+  },
+  "verifyMessage": {
+    "back": "Zurück",
+    "title": "Nachricht verifizieren",
+    "description": "Füge eine signierte Nachricht ein, um zu bestätigen, dass sie von der angegebenen Identität signiert wurde.",
+    "inputLabel": "Signierte Nachricht (JSON)",
+    "inputPlaceholder": "Füge das signierte JSON mit identity, message und signature ein",
+    "actions": {
+      "verify": "Verifizieren",
+      "verifying": "Verifiziere…",
+      "clear": "Leeren"
+    },
+    "result": {
+      "valid": "Gültige Signatur",
+      "signedBy": "Signiert von {{identity}}",
+      "messageLabel": "Nachricht",
+      "invalid": "Ungültige Signatur",
+      "invalidDescription": "Die Signatur stimmt nicht mit der angegebenen Nachricht und Identität überein."
+    },
+    "errors": {
+      "parse": "Eingabe konnte nicht geparst werden. JSON mit den Feldern identity, message und signature erwartet.",
+      "identity": "Ungültige Identität. 60 Großbuchstaben A–Z erwartet.",
+      "signature": "Ungültiges Signaturformat.",
+      "checksum": "Prüfsumme der Signatur stimmt nicht überein.",
+      "invalid": "Signatur konnte nicht verifiziert werden."
     }
   }
 }

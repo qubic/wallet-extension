@@ -8,6 +8,7 @@ import {
   ChevronRightIcon,
   DownloadIcon,
   ExternalLinkIcon,
+  FileCheck2Icon,
   InfoIcon,
   LifeBuoyIcon,
   Link2Icon,
@@ -120,6 +121,13 @@ const Settings = () => {
       label: t('settings.categories.security'),
       description: t('settings.categories.securityDesc'),
       action: () => navigate('/settings/security'),
+    },
+    {
+      key: 'verifyMessage',
+      icon: FileCheck2Icon,
+      label: t('settings.categories.verifyMessage'),
+      description: t('settings.categories.verifyMessageDesc'),
+      action: () => navigate('/settings/verify-message'),
     },
     {
       key: 'backup',
