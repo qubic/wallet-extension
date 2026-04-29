@@ -655,7 +655,7 @@
     },
     "errors": {
       "parse": "Impossible d'analyser l'entrée. JSON attendu avec les champs identity, message et signature.",
-      "identity": "Identité invalide. 60 caractères A–Z en majuscules attendus.",
+      "identity": "Identité invalide. Veuillez vérifier la valeur et réessayer.",
       "signature": "Format de signature invalide.",
       "checksum": "La somme de contrôle de la signature ne correspond pas.",
       "invalid": "Impossible de vérifier la signature."

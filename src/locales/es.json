@@ -655,7 +655,7 @@
     },
     "errors": {
       "parse": "No se pudo analizar la entrada. Se esperaba JSON con los campos identity, message y signature.",
-      "identity": "Identidad inválida. Se esperan 60 caracteres A–Z en mayúsculas.",
+      "identity": "Identidad inválida. Comprueba el valor e inténtalo de nuevo.",
       "signature": "Formato de firma inválido.",
       "checksum": "La suma de comprobación de la firma no coincide.",
       "invalid": "No se pudo verificar la firma."
