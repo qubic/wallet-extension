@@ -655,7 +655,7 @@
     },
     "errors": {
       "parse": "Could not parse the input. Expected JSON with identity, message, and signature fields.",
-      "identity": "Invalid identity. Expected 60 uppercase A–Z characters.",
+      "identity": "Invalid identity. Please check the value and try again.",
       "signature": "Invalid signature format.",
       "checksum": "Signature checksum does not match.",
       "invalid": "Could not verify the signature."

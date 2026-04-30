@@ -655,7 +655,7 @@
     },
     "errors": {
       "parse": "Không thể phân tích đầu vào. Cần JSON có các trường identity, message và signature.",
-      "identity": "Danh tính không hợp lệ. Cần 60 ký tự A–Z viết hoa.",
+      "identity": "Danh tính không hợp lệ. Vui lòng kiểm tra giá trị và thử lại.",
       "signature": "Định dạng chữ ký không hợp lệ.",
       "checksum": "Tổng kiểm tra chữ ký không khớp.",
       "invalid": "Không thể xác minh chữ ký."

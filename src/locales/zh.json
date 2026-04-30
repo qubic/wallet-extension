@@ -655,7 +655,7 @@
     },
     "errors": {
       "parse": "无法解析输入。需要包含 identity、message 和 signature 字段的 JSON。",
-      "identity": "身份无效。需要 60 个大写 A–Z 字符。",
+      "identity": "身份无效。请检查该值并重试。",
       "signature": "签名格式无效。",
       "checksum": "签名校验和不匹配。",
       "invalid": "无法验证签名。"

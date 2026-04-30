@@ -655,7 +655,7 @@
     },
     "errors": {
       "parse": "Giriş çözümlenemedi. identity, message ve signature alanlarını içeren JSON bekleniyor.",
-      "identity": "Geçersiz kimlik. 60 büyük A–Z harfi bekleniyor.",
+      "identity": "Geçersiz kimlik. Lütfen değeri kontrol edip tekrar deneyin.",
       "signature": "Geçersiz imza biçimi.",
       "checksum": "İmza sağlama toplamı eşleşmiyor.",
       "invalid": "İmza doğrulanamadı."

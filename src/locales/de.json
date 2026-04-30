@@ -655,7 +655,7 @@
     },
     "errors": {
       "parse": "Eingabe konnte nicht geparst werden. JSON mit den Feldern identity, message und signature erwartet.",
-      "identity": "Ungültige Identität. 60 Großbuchstaben A–Z erwartet.",
+      "identity": "Ungültige Identität. Bitte überprüfen Sie den Wert und versuchen Sie es erneut.",
       "signature": "Ungültiges Signaturformat.",
       "checksum": "Prüfsumme der Signatur stimmt nicht überein.",
       "invalid": "Signatur konnte nicht verifiziert werden."
