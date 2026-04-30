@@ -1,0 +1,8 @@
+{
+  "appName": {
+    "message": "Qubic Wallet"
+  },
+  "appDescription": {
+    "message": "自托管 Qubic 钱包。在浏览器中管理账户、发送 QUBIC、转移资产并连接 Qubic dApp。"
+  }
+}

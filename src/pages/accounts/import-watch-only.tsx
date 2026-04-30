@@ -4,10 +4,11 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import PageHeader from '@/components/page-header'
 import { isValidIdentity } from '@/lib/utils'
 import {
-  getCachedAccounts,
   getWatchOnlyAccounts,
+  isAccountNameTaken,
   saveWatchOnlyAccounts,
   type WatchOnlyAccount,
 } from '@/lib/accounts'
@@ -27,10 +28,7 @@ const ImportWatchOnly = () => {
       setStatus(t('accounts.manage.errors.watchOnlyRequired'))
       return
     }
-    const nameExists = [...getCachedAccounts(), ...getWatchOnlyAccounts()].some(
-      (entry) => entry.name.toLowerCase() === trimmedName.toLowerCase(),
-    )
-    if (nameExists) {
+    if (isAccountNameTaken(trimmedName)) {
       setStatus(t('accounts.manage.errors.nameDuplicate'))
       return
     }
@@ -54,8 +52,8 @@ const ImportWatchOnly = () => {
   return (
     <section className="flex min-h-full w-full justify-center pb-6 pt-4">
       <div className="flex w-full max-w-sm flex-col gap-6 px-4">
-        <div className="space-y-1 text-center">
-          <h2 className="text-xl font-semibold">{t('accounts.watchOnly.title')}</h2>
+        <div className="space-y-3">
+          <PageHeader title={t('accounts.watchOnly.title')} onBack={() => navigate('/accounts')} />
           <p className="text-sm text-muted-foreground">{t('accounts.watchOnly.subtitle')}</p>
         </div>
         <div className="space-y-4">

@@ -24,8 +24,21 @@ import {
 } from '@/components/ui/drawer'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
-import { getLockTimeoutMinutes, lockWallet, setLockTimeoutMinutes } from '@/lib/lock'
+import {
+  getLockTimeoutMinutes,
+  LOCK_TIMEOUT_OPTIONS_MINUTES,
+  lockWallet,
+  setLockTimeoutMinutes,
+} from '@/lib/lock'
+import { clearWalletStorage } from '@/lib/storage'
 import { changeVaultPassphrase } from '@/lib/vault-password'
 
 const Security = () => {
@@ -49,14 +62,9 @@ const Security = () => {
 
   const handleTimeoutChange = (value: string) => {
     const parsed = Number(value)
-    if (!Number.isFinite(parsed)) {
-      setLockMinutes(0)
-      return
-    }
+    if (!Number.isFinite(parsed)) return
     setLockMinutes(parsed)
-    if (parsed > 0) {
-      setLockTimeoutMinutes(parsed)
-    }
+    setLockTimeoutMinutes(parsed)
   }
 
   const resetChangePasswordForm = () => {
@@ -110,7 +118,7 @@ const Security = () => {
   }
 
   const handleResetApp = () => {
-    localStorage.clear()
+    clearWalletStorage()
     window.location.reload()
   }
 
@@ -152,19 +160,20 @@ const Security = () => {
             <Label htmlFor="lock-timeout" className="text-sm text-muted-foreground">
               {t('settings.lockTimeout.label')}
             </Label>
-            <Input
-              id="lock-timeout"
-              type="number"
-              min={1}
-              max={120}
-              value={Number.isFinite(lockMinutes) ? lockMinutes : ''}
-              onChange={(event) => handleTimeoutChange(event.target.value)}
-              onBlur={() => {
-                if (lockMinutes <= 0) {
-                  setLockMinutes(getLockTimeoutMinutes())
-                }
-              }}
-            />
+            <Select value={lockMinutes.toString()} onValueChange={handleTimeoutChange}>
+              <SelectTrigger id="lock-timeout" className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {LOCK_TIMEOUT_OPTIONS_MINUTES.map((minutes) => (
+                  <SelectItem key={minutes} value={minutes.toString()}>
+                    {minutes === 0
+                      ? t('settings.lockTimeout.immediately')
+                      : t('settings.lockTimeout.option', { minutes })}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             <p className="text-xs text-muted-foreground">{t('settings.lockTimeout.helper')}</p>
           </div>
 
@@ -190,12 +199,12 @@ const Security = () => {
           }
         }}
       >
-        <DrawerContent>
+        <DrawerContent className="max-h-[90vh] border-none bg-background">
           <DrawerHeader>
             <DrawerTitle>{t('settings.security.changePasswordDrawerTitle')}</DrawerTitle>
             <DrawerDescription>{t('settings.security.changePasswordDrawerDesc')}</DrawerDescription>
           </DrawerHeader>
-          <div className="space-y-3 px-4">
+          <div className="app-scrollbar min-h-0 flex-1 space-y-3 overflow-y-auto px-4 pb-2">
             <div className="space-y-2">
               <Label htmlFor="current-passphrase">{t('settings.security.currentPassphrase')}</Label>
               <Input
@@ -242,7 +251,7 @@ const Security = () => {
               <p className="text-xs text-destructive">{changePasswordError}</p>
             )}
           </div>
-          <DrawerFooter>
+          <DrawerFooter className="border-t border-border/60 bg-background">
             <Button
               onClick={handleChangePassword}
               disabled={

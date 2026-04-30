@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { useTheme } from 'next-themes'
-import { ArrowLeftIcon } from 'lucide-react'
 import { Label } from '@/components/ui/label'
+import PageHeader from '@/components/page-header'
 import {
   Select,
   SelectContent,
@@ -19,17 +19,8 @@ const General = () => {
 
   return (
     <section className="flex w-full justify-center pt-4">
-      <div className="flex w-full max-w-sm flex-col gap-6 px-4">
-        <button
-          type="button"
-          onClick={() => navigate('/settings')}
-          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
-        >
-          <ArrowLeftIcon className="h-4 w-4" />
-          {t('settings.general.back')}
-        </button>
-
-        <h2 className="text-base font-semibold">{t('settings.general.title')}</h2>
+      <div className="flex w-full max-w-sm flex-col gap-6 px-4 pb-4">
+        <PageHeader title={t('settings.general.title')} onBack={() => navigate('/settings')} />
 
         <div className="space-y-3">
           <Label htmlFor="language" className="text-sm text-muted-foreground">
@@ -37,14 +28,20 @@ const General = () => {
           </Label>
           <Select
             value={i18n.language}
-            onValueChange={(value) => setLanguage(value as 'en' | 'es')}
+            onValueChange={(value) => setLanguage(value as Parameters<typeof setLanguage>[0])}
           >
             <SelectTrigger id="language" className="h-9 w-full text-sm">
               <SelectValue placeholder="English" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="en">English</SelectItem>
+              <SelectItem value="de">Deutsch</SelectItem>
               <SelectItem value="es">Español</SelectItem>
+              <SelectItem value="fr">Français</SelectItem>
+              <SelectItem value="ru">Русский</SelectItem>
+              <SelectItem value="tr">Türkçe</SelectItem>
+              <SelectItem value="vi">Tiếng Việt</SelectItem>
+              <SelectItem value="zh">中文</SelectItem>
             </SelectContent>
           </Select>
         </div>

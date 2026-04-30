@@ -1,0 +1,352 @@
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { RouteIcon } from 'lucide-react'
+import PageHeader from '@/components/page-header'
+import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import NumericInput from '@/components/numeric-input'
+import { type AggregatedAsset, formatAssetUnits } from '@/lib/assets'
+import { NATIVE_TOKEN_NAME, NATIVE_TOKEN_SYMBOL } from '@/lib/config/constants'
+import { useAddressName } from '@/hooks/use-address-name'
+import { formatBalance, formatNumber, truncateString } from '@/lib/utils'
+import type { FormErrors } from '@/components/pages/transfer/types'
+
+type TransferFormProps = {
+  recipient: string
+  amount: string
+  errors: FormErrors
+  errorMessage: string
+  isWatchOnly: boolean
+  isAssetLoading: boolean
+  vaultRecipients: Array<{ name: string; identity: string }>
+  selectedAsset: AggregatedAsset | null
+  totalAssetUnits?: string
+  targetTickOffset: number
+  manualTargetTick: string
+  isManualTargetTickEnabled: boolean
+  currentTick?: number
+  onSelectVaultRecipient: (identity: string) => void
+  onRecipientChange: (value: string) => void
+  onAmountChange: (value: string) => void
+  onTargetTickOffsetChange: (value: number) => void
+  onManualTargetTickChange: (value: string) => void
+  onManualTargetTickToggle: () => void
+  quBalance: bigint
+  usdEstimate: string
+  onContinue: () => void
+  quickTargetTickOffsets: readonly number[]
+}
+
+const TransferForm = ({
+  recipient,
+  amount,
+  errors,
+  errorMessage,
+  isWatchOnly,
+  isAssetLoading,
+  vaultRecipients,
+  selectedAsset,
+  totalAssetUnits,
+  quBalance,
+  usdEstimate,
+  targetTickOffset,
+  manualTargetTick,
+  isManualTargetTickEnabled,
+  currentTick,
+  onSelectVaultRecipient,
+  onRecipientChange,
+  onAmountChange,
+  onTargetTickOffsetChange,
+  onManualTargetTickChange,
+  onManualTargetTickToggle,
+  onContinue,
+  quickTargetTickOffsets,
+}: TransferFormProps) => {
+  const { t } = useTranslation()
+  const navigate = useNavigate()
+  const currentBalance = quBalance
+  const selectedTokenName = selectedAsset?.name ?? NATIVE_TOKEN_NAME
+  const selectedTokenSymbol = selectedAsset?.name ?? NATIVE_TOKEN_SYMBOL
+  const usdEstimateDisplay = usdEstimate === '--' ? usdEstimate : `~${usdEstimate}`
+  const availableBalanceText = selectedAsset
+    ? formatAssetUnits(selectedAsset.numberOfUnits, selectedAsset.decimals)
+    : formatBalance(currentBalance)
+  const availableUnits = selectedAsset ? BigInt(selectedAsset.numberOfUnits) : currentBalance
+  const recipientResolved = useAddressName(recipient.length === 60 ? recipient : '')
+  const [isRecipientPickerOpen, setRecipientPickerOpen] = useState(false)
+  const recipientPickerRef = useRef<HTMLDivElement | null>(null)
+  const amountSuffixRef = useRef<HTMLDivElement | null>(null)
+  const [amountSuffixWidth, setAmountSuffixWidth] = useState(112)
+
+  useEffect(() => {
+    if (!amountSuffixRef.current) return
+    const observer = new ResizeObserver(([entry]) => {
+      setAmountSuffixWidth(entry.contentRect.width)
+    })
+    observer.observe(amountSuffixRef.current)
+    return () => observer.disconnect()
+  }, [])
+  const filteredVaultRecipients = useMemo(() => {
+    const query = recipient.trim().toUpperCase()
+    if (!query) return vaultRecipients
+    return vaultRecipients.filter((entry) => {
+      const identity = entry.identity.toUpperCase()
+      const label = entry.name.toUpperCase()
+      return identity.includes(query) || label.includes(query)
+    })
+  }, [recipient, vaultRecipients])
+
+  useEffect(() => {
+    if (!isRecipientPickerOpen) return undefined
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node | null
+      if (!target) return
+      if (recipientPickerRef.current?.contains(target)) return
+      setRecipientPickerOpen(false)
+    }
+    window.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      window.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isRecipientPickerOpen])
+
+  const handleMax = () => {
+    if (availableUnits <= 0n) return
+    onAmountChange(formatNumber(availableUnits))
+  }
+
+  return (
+    <section className="flex w-full justify-center pt-4">
+      <div className="flex min-h-full w-full max-w-sm flex-col px-4 pb-4">
+        <PageHeader
+          title={
+            <>
+              {t('transfer.title')} {selectedTokenName}
+            </>
+          }
+          onBack={() => navigate('/transfer')}
+        />
+        {/* Form fields */}
+        <div className="flex flex-1 flex-col gap-5 pb-4">
+          {/* Recipient */}
+          <div ref={recipientPickerRef} className="relative space-y-1.5">
+            <Input
+              id="recipient"
+              placeholder={t('transfer.form.recipientPlaceholder')}
+              value={recipient}
+              onChange={(e) => {
+                onRecipientChange(e.target.value.toUpperCase())
+                if (vaultRecipients.length > 0) {
+                  setRecipientPickerOpen(true)
+                }
+              }}
+              onFocus={() => {
+                if (vaultRecipients.length > 0) {
+                  setRecipientPickerOpen(true)
+                }
+              }}
+              onKeyDown={(event) => {
+                if (event.key === 'Escape') {
+                  setRecipientPickerOpen(false)
+                }
+              }}
+              className={`h-12 text-sm ${errors.recipient ? 'border-destructive' : ''}`}
+              disabled={isWatchOnly}
+            />
+
+            {vaultRecipients.length > 0 && isRecipientPickerOpen && (
+              <div className="absolute z-30 mt-1 w-full overflow-hidden rounded-md border border-border/60 bg-popover shadow-md">
+                <div className="border-b border-border/40 px-3 py-2 text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+                  {t('transfer.form.vaultRecipients')}
+                </div>
+                <div className="max-h-52 overflow-y-auto py-1">
+                  {filteredVaultRecipients.length > 0 ? (
+                    filteredVaultRecipients.map((entry) => (
+                      <button
+                        key={`recipient-${entry.identity}`}
+                        type="button"
+                        className="flex w-full cursor-pointer items-center justify-between gap-2 px-3 py-2 text-left text-xs text-foreground transition-colors hover:bg-accent/60"
+                        onClick={() => {
+                          onSelectVaultRecipient(entry.identity)
+                          setRecipientPickerOpen(false)
+                        }}
+                      >
+                        <span className="min-w-0 flex-1 truncate" title={entry.name}>
+                          {entry.name}
+                        </span>
+                        <span className="shrink-0 font-mono text-[11px] text-muted-foreground">
+                          {truncateString(entry.identity)}
+                        </span>
+                      </button>
+                    ))
+                  ) : (
+                    <div className="px-3 py-2 text-xs text-muted-foreground">
+                      {t('transfer.form.vaultRecipientsManual')}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+            <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+              <span>{t('transfer.form.recipientHint')}</span>
+              <span>{recipient.length}/60</span>
+            </div>
+            {recipientResolved && (
+              <p className="truncate text-[11px] text-primary" title={recipientResolved.name}>
+                {recipientResolved.name}
+              </p>
+            )}
+            {errors.recipient && <p className="text-xs text-destructive">{errors.recipient}</p>}
+          </div>
+
+          {/* Amount with Max + token label */}
+          <div className="space-y-1.5">
+            <div className="relative">
+              <NumericInput
+                id="amount"
+                placeholder={t('transfer.form.amountPlaceholder')}
+                value={amount}
+                onChange={onAmountChange}
+                disabled={isWatchOnly}
+                className={`h-12 text-sm ${errors.amount ? 'border-destructive' : ''}`}
+                style={{ paddingRight: amountSuffixWidth + 12 }}
+              />
+              <div
+                ref={amountSuffixRef}
+                className="absolute right-2 top-1/2 flex -translate-y-1/2 items-center gap-1.5"
+              >
+                <span className="text-sm text-muted-foreground">{selectedTokenSymbol}</span>
+                <button
+                  type="button"
+                  className="cursor-pointer rounded-md bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary transition-colors hover:bg-primary/20 disabled:cursor-not-allowed disabled:opacity-50"
+                  disabled={isWatchOnly || availableUnits <= 0n}
+                  onClick={handleMax}
+                >
+                  {t('transfer.form.max')}
+                </button>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between px-0.5 text-xs text-muted-foreground">
+              {!selectedAsset && <span>{usdEstimateDisplay}</span>}
+              <span className={selectedAsset ? 'ml-auto' : ''}>
+                {t(selectedAsset ? 'transfer.form.availableQx' : 'transfer.form.available', {
+                  balance: availableBalanceText,
+                  token: selectedTokenSymbol,
+                })}
+              </span>
+            </div>
+            {selectedAsset &&
+              totalAssetUnits &&
+              BigInt(totalAssetUnits) > BigInt(selectedAsset.numberOfUnits) && (
+                <p className="text-[11px] text-muted-foreground/70">
+                  {t('transfer.form.totalBalanceHint', {
+                    balance: formatAssetUnits(totalAssetUnits, selectedAsset.decimals),
+                    token: selectedTokenSymbol,
+                  })}
+                </p>
+              )}
+            {errors.amount && <p className="text-xs text-destructive">{errors.amount}</p>}
+          </div>
+
+          {/* Asset transfer fee info */}
+          {selectedAsset && (
+            <div className="space-y-1.5">
+              <div className="rounded-lg border border-border/40 px-3 py-2 text-xs text-muted-foreground">
+                <div>{t('transfer.form.feeValue', { fee: '100' })}</div>
+                <div>{t('transfer.form.quBalance', { balance: formatBalance(quBalance) })}</div>
+              </div>
+              {errors.fee && <p className="text-xs text-destructive">{errors.fee}</p>}
+            </div>
+          )}
+
+          {/* Target tick */}
+          <div className="space-y-2">
+            <div className="text-xs text-muted-foreground">
+              {isManualTargetTickEnabled
+                ? t('transfer.form.targetTickManual')
+                : t('transfer.form.targetTickOffset')}
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {quickTargetTickOffsets.map((offset) => (
+                <button
+                  key={`target-offset-${offset}`}
+                  type="button"
+                  className={`cursor-pointer rounded-full border px-3 py-1 text-xs font-semibold transition-colors ${
+                    !isManualTargetTickEnabled && targetTickOffset === offset
+                      ? 'border-primary/60 bg-primary/10 text-foreground'
+                      : 'border-border/60 text-muted-foreground hover:border-primary/40 hover:text-foreground'
+                  }`}
+                  disabled={isWatchOnly}
+                  onClick={() => onTargetTickOffsetChange(offset)}
+                >
+                  +{offset}
+                </button>
+              ))}
+              <button
+                type="button"
+                className={`cursor-pointer rounded-full border px-3 py-1 text-xs font-semibold transition-colors ${
+                  isManualTargetTickEnabled
+                    ? 'border-primary/60 bg-primary/10 text-foreground'
+                    : 'border-border/60 text-muted-foreground hover:border-primary/40 hover:text-foreground'
+                }`}
+                disabled={isWatchOnly}
+                onClick={onManualTargetTickToggle}
+              >
+                {t('transfer.form.targetTickOffsetManual')}
+              </button>
+            </div>
+            {isManualTargetTickEnabled && (
+              <div className="space-y-1">
+                <NumericInput
+                  value={manualTargetTick}
+                  onChange={onManualTargetTickChange}
+                  className="h-12 w-full text-sm"
+                  disabled={isWatchOnly}
+                  placeholder={t('transfer.form.targetTickManualPlaceholder')}
+                />
+                <div className="text-[11px] text-muted-foreground">
+                  {t('transfer.form.targetTickCurrentHint', {
+                    tick: typeof currentTick === 'number' ? formatNumber(currentTick) : '--',
+                  })}
+                </div>
+              </div>
+            )}
+            {errors.targetTick && <p className="text-xs text-destructive">{errors.targetTick}</p>}
+          </div>
+
+          {isWatchOnly && (
+            <div className="flex items-start gap-2 text-xs text-muted-foreground">
+              <RouteIcon className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+              <span>{t('transfer.errors.watchOnly')}</span>
+            </div>
+          )}
+          {errorMessage && <p className="text-sm text-destructive">{errorMessage}</p>}
+        </div>
+
+        {/* Bottom buttons */}
+        <div className="sticky bottom-0 -mx-4 mt-auto flex gap-3 border-t border-border/60 bg-background px-4 pb-4 pt-3">
+          <Button
+            variant="outline"
+            size="lg"
+            className="flex-1"
+            onClick={() => navigate('/transfer')}
+          >
+            {t('transfer.actions.cancel')}
+          </Button>
+          <Button
+            size="lg"
+            className="flex-1"
+            disabled={isWatchOnly || isAssetLoading || !recipient.trim() || !amount.trim()}
+            onClick={onContinue}
+          >
+            {t('common.continue')}
+          </Button>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+export default TransferForm

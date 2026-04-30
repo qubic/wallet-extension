@@ -1,19 +1,18 @@
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
+import { verifyIdentity } from '@qubic-labs/core'
+import { QUBIC_EXPLORER_BASE_URL } from './config/constants'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
 /**
- * Validate Qubic identity format (60 uppercase letters A-Z)
+ * Validate a Qubic identity by checking both its 60-character uppercase format
+ * and checksum.
  */
 export const isValidIdentity = (identity: string): boolean => {
-  if (identity.length !== 60) return false
-  for (const char of identity) {
-    if (char < 'A' || char > 'Z') return false
-  }
-  return true
+  return /^[A-Z]{60}$/.test(identity) && verifyIdentity(identity)
 }
 
 /**
@@ -36,22 +35,93 @@ export const parseAmount = (str: string): bigint | null => {
 }
 
 /**
+ * Parse a formatted number string from various locale formats to an integer.
+ * Supports US (1,234), EU (1.234), and Swiss (1'234) thousand separators.
+ * Decimals are stripped (Qubic only supports integers).
+ * Returns null for invalid or empty values.
+ */
+export const parseFormattedInteger = (value: string): bigint | null => {
+  if (!value) return null
+  const trimmed = value.trim()
+  if (/^(\d{1,3}(,\d{3})*|\d+)(\.\d+)?$/.test(trimmed)) {
+    const integerPart = trimmed.split('.')[0]
+    return BigInt(integerPart.replace(/,/g, ''))
+  }
+  if (/^(\d{1,3}(\.\d{3})+|\d+)(,\d+)?$/.test(trimmed)) {
+    const integerPart = trimmed.split(',')[0]
+    return BigInt(integerPart.replace(/\./g, ''))
+  }
+  if (/^\d{1,3}('\d{3})+(\.\d+)?$/.test(trimmed)) {
+    const integerPart = trimmed.split('.')[0]
+    return BigInt(integerPart.replace(/'/g, ''))
+  }
+  return null
+}
+
+const standardFormatter = new Intl.NumberFormat('en', { notation: 'standard' })
+const compactFormatter = new Intl.NumberFormat('en', {
+  notation: 'compact',
+  maximumFractionDigits: 2,
+})
+
+/**
+ * Normalize a numeric timestamp to milliseconds.
+ * Timestamps below 1e12 are treated as seconds and multiplied by 1000.
+ */
+const SECONDS_VS_MILLIS_THRESHOLD = 1e12
+export const toTimestampMs = (ts: number): number =>
+  ts > SECONDS_VS_MILLIS_THRESHOLD ? ts : ts * 1000
+
+/**
+ * Format a number with commas (e.g. 1,000,000). Use for any numeric display.
+ */
+export const formatNumber = (value: number | bigint): string => {
+  return standardFormatter.format(value as number)
+}
+
+/**
+ * Format an integer-like value (number, bigint, or numeric string) for display.
+ * Returns '--' for null/undefined/non-finite values.
+ */
+export const formatIntegerLike = (value: unknown): string => {
+  if (value === null || value === undefined) return '--'
+  if (typeof value === 'bigint') return formatNumber(value)
+  if (typeof value === 'number') {
+    if (!Number.isFinite(value)) return '--'
+    return formatNumber(Math.trunc(value))
+  }
+  if (typeof value === 'string') {
+    const normalized = value.trim()
+    if (/^-?\d+$/.test(normalized)) return formatNumber(BigInt(normalized))
+  }
+  return String(value)
+}
+
+/**
  * Format balance for display with full precision (standard notation)
  */
 export const formatBalance = (value: bigint): string => {
-  return new Intl.NumberFormat('en', {
-    notation: 'standard',
-  }).format(value)
+  return formatNumber(value)
 }
 
 /**
  * Format balance for display with compact notation (e.g., 1.5B, 2.3M)
  */
 export const formatBalanceCompact = (value: bigint): string => {
-  return new Intl.NumberFormat('en', {
-    notation: 'compact',
-    maximumFractionDigits: 2,
-  }).format(Number(value))
+  return compactFormatter.format(Number(value))
+}
+
+const usdFormatter = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  maximumFractionDigits: 2,
+})
+
+/**
+ * Format a number as USD currency (e.g. $1,234.56)
+ */
+export const formatUsd = (value: number): string => {
+  return usdFormatter.format(value)
 }
 
 type TruncateStringOptions = {
@@ -69,14 +139,38 @@ export function truncateString(value: string, options: TruncateStringOptions = {
   return `${value.slice(0, leading)}…${value.slice(-trailing)}`
 }
 
-export const EXPLORER_BASE_URL = 'https://explorer.qubic.org'
+export const formatAddressLabel = (
+  address: string,
+  name?: string,
+  options?: TruncateStringOptions,
+): string => {
+  const truncated = truncateString(address, options)
+  if (!name) return truncated
+  return `${name} (${truncated})`
+}
 
 export type ExplorerObject = 'tx'
 
-export function buildExplorerObjectUrl(object: ExplorerObject, id: string) {
+export const compareBigIntDesc = (a: string, b: string): number => {
+  const diff = BigInt(b) - BigInt(a)
+  return diff > 0n ? 1 : diff < 0n ? -1 : 0
+}
+
+export function buildExplorerObjectUrl(
+  object: ExplorerObject,
+  id: string,
+  params?: Record<string, string | number>,
+) {
   const pathMap: Record<ExplorerObject, string> = {
     tx: 'network/tx',
   }
 
-  return `${EXPLORER_BASE_URL}/${pathMap[object]}/${id}`
+  const url = `${QUBIC_EXPLORER_BASE_URL}/${pathMap[object]}/${id}`
+  if (!params) return url
+
+  const searchParams = new URLSearchParams()
+  for (const [key, value] of Object.entries(params)) {
+    searchParams.set(key, String(value))
+  }
+  return `${url}?${searchParams.toString()}`
 }

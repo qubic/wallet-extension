@@ -1,44 +1,47 @@
-import { useSdk } from '@qubic-labs/react'
+import { useLastProcessedTick, useSdk } from '@qubic-labs/react'
 import { useQuery } from '@tanstack/react-query'
-import { ArrowLeftIcon, CheckIcon, CopyIcon, ExternalLinkIcon } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { ArrowLeftIcon, ClockIcon } from 'lucide-react'
+import {
+  CheckCircleFilledIcon,
+  CheckCircleIcon,
+  XCircleFilledIcon,
+} from '@/components/icons/tx-status-icons'
+import { SmartContractIcon } from '@/components/icons/smart-contract-icon'
+import type React from 'react'
+import { useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { toast } from 'sonner'
-import { buildExplorerObjectUrl, truncateString } from '@/lib/utils'
 import {
   getPendingTransaction,
   resolvePendingTransactions,
   usePendingTransactionsVersion,
 } from '@/lib/pending-transactions'
-
-const formatValue = (value: unknown): string => {
-  if (value === null || value === undefined) return '--'
-  if (typeof value === 'bigint') return value.toString()
-  if (typeof value === 'object') {
-    try {
-      return JSON.stringify(value)
-    } catch {
-      return String(value)
-    }
-  }
-  return String(value)
-}
+import { computeTransactionStatus, isTransactionFailed } from '@/lib/transaction-status'
+import { useAddressName } from '@/hooks/use-address-name'
+import { useTxTypeDescription } from '@/hooks/use-tx-type-description'
+import { useClipboardCopy } from '@/hooks/use-clipboard-copy'
+import { formatAddressLabel, formatIntegerLike, formatNumber, toTimestampMs } from '@/lib/utils'
+import { NATIVE_TOKEN_SYMBOL } from '@/lib/config/constants'
+import TxDetailsHeader from '@/components/pages/transaction-details/tx-details-header'
+import TxDetailsRow, {
+  formatValueAsString,
+} from '@/components/pages/transaction-details/tx-details-row'
 
 const TX_DETAILS_SKELETON_IDS = ['a', 'b', 'c', 'd', 'e', 'f'] as const
 
-type LatestStatsResponse = {
-  data?: {
-    currentTick?: number
-  }
-}
-
-const fetchLatestStats = async (): Promise<LatestStatsResponse> => {
-  const response = await fetch('https://rpc.qubic.org/v1/latest-stats')
-  if (!response.ok) {
-    throw new Error('Failed to load network stats.')
-  }
-  return response.json() as Promise<LatestStatsResponse>
+const formatTimestamp = (ts: unknown): string => {
+  if (ts === null || ts === undefined) return '--'
+  const num = Number(ts)
+  if (!num || Number.isNaN(num)) return '--'
+  const ms = toTimestampMs(num)
+  return new Date(ms).toLocaleString(undefined, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  })
 }
 
 const TransactionDetails = () => {
@@ -47,17 +50,15 @@ const TransactionDetails = () => {
   const { hash = '' } = useParams<{ hash: string }>()
   const sdk = useSdk()
   usePendingTransactionsVersion()
-  const [copiedKey, setCopiedKey] = useState<string | null>(null)
-  const latestStats = useQuery({
-    queryKey: ['qubic', 'latest-stats', 'tx-details'],
-    queryFn: fetchLatestStats,
-    refetchInterval: 15_000,
-    staleTime: 3_000,
-    gcTime: 120_000,
+  const { copiedKey, copyText } = useClipboardCopy({
+    successTitle: t('txDetails.copied'),
+    errorTitle: t('txDetails.copyFailed'),
   })
-  const currentTick = latestStats.data?.data?.currentTick
-  const pending = getPendingTransaction(hash, currentTick)
-  const isPending = Boolean(pending)
+  const lastProcessedTickQuery = useLastProcessedTick({ refetchInterval: 15_000 })
+  const archiverProcessedTick = lastProcessedTickQuery.data?.tickNumber
+  const pending = getPendingTransaction(hash)
+  const isPending = pending?.status === 'pending'
+  const isInvalid = pending?.status === 'invalid'
 
   const txQuery = useQuery({
     queryKey: ['qubic', 'tx-by-hash', hash],
@@ -67,87 +68,148 @@ const TransactionDetails = () => {
   })
   useEffect(() => {
     if (!hash) return
-    resolvePendingTransactions([{ hash }], currentTick)
-  }, [hash, currentTick])
+    if (txQuery.data) {
+      resolvePendingTransactions(
+        [
+          {
+            hash,
+            moneyFlew: txQuery.data.moneyFlew,
+            inputType: txQuery.data.inputType,
+            amount: txQuery.data.amount,
+            destination: txQuery.data.destination,
+          },
+        ],
+        archiverProcessedTick,
+      )
+      return
+    }
+    resolvePendingTransactions([], archiverProcessedTick)
+  }, [hash, archiverProcessedTick, txQuery.data])
 
   const details = txQuery.data as Record<string, unknown> | undefined
-  const rows: Array<{ key: string; label: string; value: unknown; copyable?: boolean }> = [
-    { key: 'hash', label: t('txDetails.hash'), value: hash, copyable: true },
-    { key: 'amount', label: t('txDetails.amount'), value: details?.amount },
+  const isFailed = isTransactionFailed({
+    moneyFlew: details?.moneyFlew as boolean | undefined,
+    inputType: details?.inputType as number | undefined,
+    amount: details?.amount as number | bigint | undefined,
+    destination: details?.destination as string | undefined,
+  })
+  const sourceAddress = (details?.source as string) || pending?.sourceIdentity || ''
+  const destAddress = (details?.destination as string) || pending?.destinationIdentity || ''
+  const sourceName = useAddressName(sourceAddress)
+  const destName = useAddressName(destAddress)
+  const txTypeDescription = useTxTypeDescription(
+    destAddress,
+    Number(details?.inputType ?? pending?.inputType ?? 0),
+  )
+
+  const amount = details?.amount ?? pending?.amount
+  const tickNumber = details?.tickNumber ?? pending?.targetTick
+
+  const confirmedStatus =
+    !isPending && !isInvalid && details
+      ? computeTransactionStatus(
+          Number(details.inputType ?? 0),
+          details.amount as number | bigint,
+          details.moneyFlew as boolean,
+          details.destination as string | undefined,
+        )
+      : undefined
+
+  const statusIcon = isPending ? (
+    <ClockIcon className="h-3.5 w-3.5 animate-pulse text-amber-700 dark:text-amber-300" />
+  ) : isInvalid ? (
+    <XCircleFilledIcon className="h-3.5 w-3.5 text-red-700 dark:text-red-300" />
+  ) : confirmedStatus === 'failure' ? (
+    <XCircleFilledIcon className="h-3.5 w-3.5 text-red-700 dark:text-red-300" />
+  ) : confirmedStatus === 'success' ? (
+    <CheckCircleFilledIcon className="h-3.5 w-3.5 text-positive" />
+  ) : confirmedStatus === 'executed' ? (
+    <CheckCircleIcon className="h-3.5 w-3.5 text-positive" />
+  ) : undefined
+
+  const rows: Array<{
+    key: string
+    label: string
+    value: unknown
+    copyable?: boolean
+    copyText?: string
+    icon?: React.ReactNode
+  }> = [
+    { key: 'hash', label: t('txDetails.txId'), value: hash, copyable: true, icon: statusIcon },
     {
-      key: 'tick',
-      label: t('txDetails.tick'),
-      value: details?.tickNumber ?? details?.tick ?? pending?.targetTick ?? '--',
+      key: 'amount',
+      label: t('txDetails.amount'),
+      value: amount != null ? `${formatIntegerLike(amount)} ${NATIVE_TOKEN_SYMBOL}` : '--',
     },
-    { key: 'inputType', label: t('txDetails.inputType'), value: details?.inputType },
-    { key: 'source', label: t('txDetails.source'), value: details?.source, copyable: true },
+    {
+      key: 'inputType',
+      label: t('txDetails.txType'),
+      value: txTypeDescription,
+    },
+    {
+      key: 'source',
+      label: t('txDetails.source'),
+      value:
+        sourceName?.type === 'smartContract' ? (
+          <span className="inline-flex items-center gap-1">
+            <SmartContractIcon className="h-3.5 w-3.5 shrink-0" />
+            {formatAddressLabel(sourceAddress, sourceName.name)}
+          </span>
+        ) : sourceName ? (
+          formatAddressLabel(sourceAddress, sourceName.name)
+        ) : (
+          sourceAddress || '--'
+        ),
+      copyable: Boolean(sourceAddress),
+      copyText: sourceAddress,
+    },
     {
       key: 'destination',
       label: t('txDetails.destination'),
-      value: details?.destination,
-      copyable: true,
+      value:
+        destName?.type === 'smartContract' ? (
+          <span className="inline-flex items-center gap-1">
+            <SmartContractIcon className="h-3.5 w-3.5 shrink-0" />
+            {formatAddressLabel(destAddress, destName.name)}
+          </span>
+        ) : destName ? (
+          formatAddressLabel(destAddress, destName.name)
+        ) : (
+          destAddress || '--'
+        ),
+      copyable: Boolean(destAddress),
+      copyText: destAddress,
+    },
+    {
+      key: 'tick',
+      label: t('txDetails.tick'),
+      value: tickNumber != null ? formatNumber(Number(tickNumber)) : '--',
+    },
+    {
+      key: 'timestamp',
+      label: t('txDetails.timestamp'),
+      value: formatTimestamp(details?.timestamp),
     },
   ]
 
-  const copyValue = async (key: string, value: unknown) => {
-    try {
-      await navigator.clipboard.writeText(formatValue(value))
-      setCopiedKey(key)
-      toast.success(t('txDetails.copied'))
-      window.setTimeout(() => {
-        setCopiedKey((current) => (current === key ? null : current))
-      }, 1200)
-    } catch {
-      toast.error(t('txDetails.copyFailed'))
-    }
+  const copyValue = async (key: string, value: unknown, rawText?: string) => {
+    await copyText(rawText ?? formatValueAsString(value), { key })
   }
 
   return (
     <section className="flex w-full justify-center pt-4">
-      <div className="flex w-full max-w-sm flex-col gap-4 px-4 pb-4">
+      <div className="flex w-full max-w-sm flex-col gap-3 px-4 pb-4">
         <button
           type="button"
           className="flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
           onClick={() => navigate(-1)}
         >
           <ArrowLeftIcon className="h-3.5 w-3.5" />
-          {t('txDetails.back')}
+          {t('common.back')}
         </button>
-        <div className="space-y-2">
-          <div className="text-xs font-semibold uppercase text-muted-foreground">
-            {t('txDetails.title')}
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="font-mono text-xs text-foreground">
-              {truncateString(hash, { emptyLabel: '--' })}
-            </div>
-            <button
-              type="button"
-              className="h-4 w-4 cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
-              onClick={() => copyValue('hash', hash)}
-              aria-label={t('txDetails.copyTxId')}
-            >
-              {copiedKey === 'hash' ? (
-                <CheckIcon className="h-3 w-3" />
-              ) : (
-                <CopyIcon className="h-3 w-3" />
-              )}
-            </button>
-          </div>
-          <div className="flex items-center gap-2">
-            <a
-              href={buildExplorerObjectUrl('tx', hash)}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex h-8 items-center gap-1 rounded-md border border-border/50 px-2 text-xs text-muted-foreground transition-colors hover:text-foreground"
-            >
-              <ExternalLinkIcon className="h-3.5 w-3.5" />
-              {t('txDetails.openExplorer')}
-            </a>
-          </div>
-        </div>
+        <TxDetailsHeader hash={hash} tick={tickNumber != null ? Number(tickNumber) : undefined} />
 
-        {txQuery.isLoading && (
+        {txQuery.isLoading && !pending && (
           <div className="space-y-2">
             <div className="text-xs text-muted-foreground">{t('txDetails.loading')}</div>
             <div className="divide-y divide-border/40">
@@ -161,42 +223,37 @@ const TransactionDetails = () => {
           </div>
         )}
 
-        {txQuery.error && !isPending && (
+        {txQuery.error && !isPending && !isFailed && !isInvalid && (
           <div className="text-xs text-destructive">
             {txQuery.error instanceof Error ? txQuery.error.message : t('txDetails.error')}
           </div>
         )}
         {isPending && !details && (
-          <div className="animate-pulse text-xs text-amber-700 dark:text-amber-300">
-            {t('txDetails.pendingHint')}
+          <div className="rounded-lg border border-amber-500/50 bg-amber-500/10 px-3 py-2.5">
+            <span className="text-xs text-amber-700 dark:text-amber-300">
+              {t('txDetails.pendingHint')}
+            </span>
+          </div>
+        )}
+        {isFailed && (
+          <div className="rounded-lg border border-red-500/50 bg-red-500/10 px-3 py-2.5">
+            <span className="text-xs text-red-700 dark:text-red-300">
+              {t('txDetails.failedHint')}
+            </span>
+          </div>
+        )}
+        {isInvalid && !details && (
+          <div className="rounded-lg border border-red-500/50 bg-red-500/10 px-3 py-2.5">
+            <span className="text-xs text-red-700 dark:text-red-300">
+              {t('txDetails.invalidHint')}
+            </span>
           </div>
         )}
 
-        {details && (
+        {(details || pending) && (
           <div className="divide-y divide-border/40">
             {rows.map((row) => (
-              <div key={row.key} className="py-2">
-                <div className="mb-1 flex items-center justify-between gap-2">
-                  <span className="text-[11px] uppercase text-muted-foreground">{row.label}</span>
-                  {row.copyable && (
-                    <button
-                      type="button"
-                      className="h-5 w-5 shrink-0 cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
-                      onClick={() => copyValue(row.key, row.value)}
-                      aria-label={`${t('txDetails.copy')} ${row.label}`}
-                    >
-                      {copiedKey === row.key ? (
-                        <CheckIcon className="h-3 w-3" />
-                      ) : (
-                        <CopyIcon className="h-3 w-3" />
-                      )}
-                    </button>
-                  )}
-                </div>
-                <div className="break-all font-mono text-xs text-foreground">
-                  {formatValue(row.value)}
-                </div>
-              </div>
+              <TxDetailsRow key={row.key} row={row} copiedKey={copiedKey} onCopy={copyValue} />
             ))}
           </div>
         )}

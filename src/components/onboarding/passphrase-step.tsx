@@ -1,13 +1,7 @@
-import { useState } from 'react'
-import { EyeIcon, EyeOffIcon } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupButton,
-  InputGroupInput,
-} from '@/components/ui/input-group'
+import { PasswordInput } from '@/components/ui/password-input'
 
 type PassphraseStepProps = {
   variant: 'onboarding' | 'add-address'
@@ -28,22 +22,21 @@ const PassphraseStep = ({
   onPassphraseChange,
   onConfirmPassphraseChange,
 }: PassphraseStepProps) => {
-  const [showPassphrase, setShowPassphrase] = useState(false)
-  const [showConfirm, setShowConfirm] = useState(false)
+  const { t } = useTranslation()
 
   return (
     <div className="space-y-4">
       <div className="space-y-1">
-        <h3 className="text-sm font-semibold">Name and protect it</h3>
+        <h3 className="text-sm font-semibold">{t('onboarding.passphraseStep.title')}</h3>
         <p className="text-xs text-muted-foreground">
           {variant === 'add-address'
-            ? 'Give this wallet a label and enter the current vault passphrase.'
-            : 'Give this wallet a label and set a vault passphrase.'}
+            ? t('onboarding.passphraseStep.subtitleAddress')
+            : t('onboarding.passphraseStep.subtitleWallet')}
         </p>
       </div>
       <div className="space-y-2">
         <Label htmlFor="wallet-name">
-          {variant === 'add-address' ? 'Address label' : 'Wallet name'}
+          {variant === 'add-address' ? t('common.addressLabel') : t('common.accountName')}
         </Label>
         <Input
           id="wallet-name"
@@ -53,49 +46,29 @@ const PassphraseStep = ({
       </div>
       <div className="space-y-2">
         <Label htmlFor="passphrase">
-          {variant === 'add-address' ? 'Current vault passphrase' : 'Vault passphrase'}
+          {variant === 'add-address'
+            ? t('common.currentVaultPassphrase')
+            : t('common.vaultPassphrase')}
         </Label>
-        <InputGroup>
-          <InputGroupInput
-            id="passphrase"
-            type={showPassphrase ? 'text' : 'password'}
-            value={passphrase}
-            onChange={(event) => onPassphraseChange(event.target.value)}
-          />
-          <InputGroupAddon align="inline-end">
-            <InputGroupButton
-              size="icon-xs"
-              aria-label={showPassphrase ? 'Hide passphrase' : 'Show passphrase'}
-              onClick={() => setShowPassphrase((prev) => !prev)}
-            >
-              {showPassphrase ? <EyeOffIcon className="size-4" /> : <EyeIcon className="size-4" />}
-            </InputGroupButton>
-          </InputGroupAddon>
-        </InputGroup>
+        <PasswordInput
+          id="passphrase"
+          value={passphrase}
+          onChange={(event) => onPassphraseChange(event.target.value)}
+        />
         {variant !== 'add-address' && (
-          <p className="text-xs text-muted-foreground">Minimum 12 characters.</p>
+          <p className="text-xs text-muted-foreground">{t('onboarding.passphraseStep.minChars')}</p>
         )}
       </div>
       {variant !== 'add-address' && (
         <div className="space-y-2">
-          <Label htmlFor="confirm-passphrase">Re-enter vault passphrase</Label>
-          <InputGroup>
-            <InputGroupInput
-              id="confirm-passphrase"
-              type={showConfirm ? 'text' : 'password'}
-              value={confirmPassphrase}
-              onChange={(event) => onConfirmPassphraseChange(event.target.value)}
-            />
-            <InputGroupAddon align="inline-end">
-              <InputGroupButton
-                size="icon-xs"
-                aria-label={showConfirm ? 'Hide passphrase' : 'Show passphrase'}
-                onClick={() => setShowConfirm((prev) => !prev)}
-              >
-                {showConfirm ? <EyeOffIcon className="size-4" /> : <EyeIcon className="size-4" />}
-              </InputGroupButton>
-            </InputGroupAddon>
-          </InputGroup>
+          <Label htmlFor="confirm-passphrase">
+            {t('onboarding.passphraseStep.reenterPassphrase')}
+          </Label>
+          <PasswordInput
+            id="confirm-passphrase"
+            value={confirmPassphrase}
+            onChange={(event) => onConfirmPassphraseChange(event.target.value)}
+          />
         </div>
       )}
     </div>

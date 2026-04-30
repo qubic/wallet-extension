@@ -1,8 +1,12 @@
 import { useQuery } from '@tanstack/react-query'
+import { QUBIC_RPC_BASE_URL, QX_CONTRACT_INDEX } from './config/constants'
+import { STALE_TIME_ASSET_ISSUANCES } from './config/refresh-intervals'
+import { formatNumber } from './utils'
 
 export type OwnedAssetsResponse = {
   ownedAssets?: Array<{
     data?: {
+      managingContractIndex?: number
       numberOfUnits?: string
       issuedAsset?: {
         name?: string
@@ -16,7 +20,7 @@ export type OwnedAssetsResponse = {
 }
 
 export const fetchOwnedAssets = async (identity: string): Promise<OwnedAssetsResponse> => {
-  const response = await fetch(`https://rpc.qubic.org/live/v1/assets/${identity}/owned`, {
+  const response = await fetch(`${QUBIC_RPC_BASE_URL}/v1/assets/${identity}/owned`, {
     headers: { accept: 'application/json' },
   })
   if (!response.ok) {
@@ -32,13 +36,18 @@ export type AggregatedAsset = {
   decimals: number
 }
 
-export const aggregateAssets = (response: OwnedAssetsResponse): AggregatedAsset[] => {
+export const aggregateAssets = (
+  response: OwnedAssetsResponse,
+  filterByQxManagement = false,
+): AggregatedAsset[] => {
   const map = new Map<string, AggregatedAsset>()
 
   for (const entry of response.ownedAssets ?? []) {
     const info = entry.data
     const issued = info?.issuedAsset
     if (!issued?.name || !info?.numberOfUnits) continue
+
+    if (filterByQxManagement && info.managingContractIndex !== QX_CONTRACT_INDEX) continue
 
     const key = `${issued.issuerIdentity ?? ''}-${issued.name}`
     const existing = map.get(key)
@@ -60,13 +69,47 @@ export const aggregateAssets = (response: OwnedAssetsResponse): AggregatedAsset[
   return [...map.values()].filter((a) => BigInt(a.numberOfUnits) > 0n)
 }
 
+export type ContractAssetEntry = {
+  name: string
+  issuerIdentity: string
+  numberOfUnits: string
+  decimals: number
+  managingContractIndex: number
+}
+
+/**
+ * Returns asset entries grouped per managing contract (not aggregated across contracts).
+ * Used for Transfer Management Rights where we need to know which contract manages each batch.
+ */
+export const getAssetsPerContract = (response: OwnedAssetsResponse): ContractAssetEntry[] => {
+  const entries: ContractAssetEntry[] = []
+
+  for (const entry of response.ownedAssets ?? []) {
+    const info = entry.data
+    const issued = info?.issuedAsset
+    if (!issued?.name || !info?.numberOfUnits) continue
+    if (info.managingContractIndex === undefined || info.managingContractIndex === null) continue
+    if (BigInt(info.numberOfUnits) <= 0n) continue
+
+    entries.push({
+      name: issued.name,
+      issuerIdentity: issued.issuerIdentity ?? '',
+      numberOfUnits: info.numberOfUnits,
+      decimals: issued.numberOfDecimalPlaces ?? 0,
+      managingContractIndex: info.managingContractIndex,
+    })
+  }
+
+  return entries
+}
+
 export const formatAssetUnits = (units: string | undefined, decimals = 0) => {
   if (!units) return '--'
-  if (decimals <= 0) return Number(units).toLocaleString()
+  if (decimals <= 0) return formatNumber(BigInt(units))
   const padded = units.padStart(decimals + 1, '0')
   const whole = padded.slice(0, -decimals)
   const fraction = padded.slice(-decimals).replace(/0+$/, '')
-  return `${Number(whole).toLocaleString()}${fraction ? `.${fraction}` : ''}`
+  return `${formatNumber(BigInt(whole))}${fraction ? `.${fraction}` : ''}`
 }
 
 export const useOwnedAssets = (identity: string) => {
@@ -75,5 +118,38 @@ export const useOwnedAssets = (identity: string) => {
     queryFn: () => fetchOwnedAssets(identity),
     enabled: Boolean(identity),
     staleTime: 60_000,
+  })
+}
+
+export type AssetIssuance = {
+  data: {
+    issuerIdentity: string
+    type: number
+    name: string
+    numberOfDecimalPlaces: number
+    unitOfMeasurement: number[]
+  }
+  tick: number
+  universeIndex: number
+}
+
+export type AssetIssuancesResponse = {
+  assets: AssetIssuance[]
+}
+const fetchAssetIssuances = async (): Promise<AssetIssuancesResponse> => {
+  const response = await fetch(`${QUBIC_RPC_BASE_URL}/v1/assets/issuances`, {
+    headers: { accept: 'application/json' },
+  })
+  if (!response.ok) {
+    throw new Error('Failed to load asset issuances.')
+  }
+  return response.json() as Promise<AssetIssuancesResponse>
+}
+
+export const useAssetIssuances = () => {
+  return useQuery({
+    queryKey: ['qubic', 'asset-issuances'],
+    queryFn: fetchAssetIssuances,
+    staleTime: STALE_TIME_ASSET_ISSUANCES,
   })
 }

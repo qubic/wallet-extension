@@ -1,18 +1,13 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { EyeIcon, EyeOffIcon, LockOpenIcon, ShieldCheckIcon } from 'lucide-react'
+import { LockOpenIcon, ShieldCheckIcon } from 'lucide-react'
 import { VaultEntryNotFoundError, VaultInvalidPassphraseError } from '@qubic-labs/sdk'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupButton,
-  InputGroupInput,
-} from '@/components/ui/input-group'
+import { PasswordInput } from '@/components/ui/password-input'
 import { setUnlocked } from '@/lib/lock'
 import { saveCachedAccounts } from '@/lib/accounts'
-import { openBrowserVault } from '@/lib/vault'
+import { openBrowserVault, repairDuplicateVaultEntries } from '@/lib/vault'
 
 const Unlock = () => {
   const { t } = useTranslation()
@@ -20,8 +15,6 @@ const Unlock = () => {
   const [passphrase, setPassphrase] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const [showPassphrase, setShowPassphrase] = useState(false)
-
   const handleSubmit = async () => {
     if (!passphrase.trim()) {
       setError(t('passphraseAuth.validation.required'))
@@ -41,7 +34,8 @@ const Unlock = () => {
       }
 
       await vault.getSeed(identityToValidate)
-      saveCachedAccounts(vault.list().map((e) => ({ name: e.name, identity: e.identity })))
+      const entries = await repairDuplicateVaultEntries(vault)
+      saveCachedAccounts(entries)
       setUnlocked()
       setPassphrase('')
       navigate('/home')
@@ -73,7 +67,7 @@ const Unlock = () => {
 
   return (
     <section className="flex min-h-full w-full justify-center">
-      <div className="flex min-h-full w-full max-w-sm flex-col px-4 pb-6 pt-4">
+      <div className="flex min-h-full w-full max-w-sm flex-col px-4 pb-6 pt-6">
         <div className="mt-8 flex flex-col items-center gap-4 text-center">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
             <ShieldCheckIcon className="h-8 w-8 text-primary" />
@@ -86,37 +80,17 @@ const Unlock = () => {
         </div>
 
         <div className="mt-6 w-full space-y-3">
-          <InputGroup className="h-12">
-            <InputGroupInput
-              id="passphrase"
-              type={showPassphrase ? 'text' : 'password'}
-              placeholder={t('passphraseAuth.form.passphrasePlaceholder')}
-              value={passphrase}
-              onChange={(e) => handlePassphraseChange(e.target.value)}
-              onKeyDown={handleKeyDown}
-              aria-invalid={Boolean(error)}
-              className="h-12 text-base"
-              autoFocus
-            />
-            <InputGroupAddon align="inline-end">
-              <InputGroupButton
-                type="button"
-                variant="ghost"
-                aria-label={
-                  showPassphrase
-                    ? t('passphraseAuth.form.hidePassphrase')
-                    : t('passphraseAuth.form.showPassphrase')
-                }
-                onClick={() => setShowPassphrase((current) => !current)}
-              >
-                {showPassphrase ? (
-                  <EyeOffIcon className="h-4 w-4" />
-                ) : (
-                  <EyeIcon className="h-4 w-4" />
-                )}
-              </InputGroupButton>
-            </InputGroupAddon>
-          </InputGroup>
+          <PasswordInput
+            id="passphrase"
+            groupClassName="h-12"
+            placeholder={t('passphraseAuth.form.passphrasePlaceholder')}
+            value={passphrase}
+            onChange={(e) => handlePassphraseChange(e.target.value)}
+            onKeyDown={handleKeyDown}
+            aria-invalid={Boolean(error)}
+            className="h-12 text-base"
+            autoFocus
+          />
           {error && <p className="text-xs text-destructive">{error}</p>}
           <p className="text-xs text-muted-foreground">{t('passphraseAuth.securityNote')}</p>
         </div>

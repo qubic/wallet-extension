@@ -1,0 +1,69 @@
+name: release
+
+on:
+  push:
+    branches:
+      - main
+      - beta
+  workflow_dispatch:
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  semantic-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.8
+      - name: cache bun
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.bun/install/cache
+          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+      - name: install deps
+        run: bun install
+      - name: resolve next version
+        id: version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          NEXT_VERSION=$(npx semantic-release --dry-run 2>&1 | grep -oP 'next release version is \K[0-9a-z.\-]+' || true)
+          if [ -n "$NEXT_VERSION" ]; then
+            echo "Resolved version: $NEXT_VERSION"
+            npm version "$NEXT_VERSION" --no-git-tag-version
+            echo "resolved=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "No new version to release"
+            echo "resolved=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: build extension
+        if: steps.version.outputs.resolved == 'true'
+        run: bun run build
+      - name: package dist artifact
+        if: steps.version.outputs.resolved == 'true'
+        run: |
+          rm -f dist.zip
+          cd dist
+          zip -r ../dist.zip .
+      - name: restore package.json
+        if: steps.version.outputs.resolved == 'true'
+        run: git checkout package.json
+      - name: release
+        if: steps.version.outputs.resolved == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bun run release
