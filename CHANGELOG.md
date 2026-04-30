@@ -1,3 +1,46 @@
+# [1.0.0-beta.8](https://github.com/qubic/wallet-extension/compare/v1.0.0-beta.7...v1.0.0-beta.8) (2026-04-30)
+
+
+### Bug Fixes
+
+* update invalid identity message ([0aa1334](https://github.com/qubic/wallet-extension/commit/0aa13341db0951234cea8e2f37a2dbf9a0dac2bf))
+* verify message visibility ([cb54c5b](https://github.com/qubic/wallet-extension/commit/cb54c5bb756eb9d7a9b24c3a79f154ff258b7ed4))
+
+
+### Features
+
+* add localization ([4888744](https://github.com/qubic/wallet-extension/commit/4888744d77f3d01584e73ca9fcc26e57615f4b21))
+* add sign/verify message ([d3e4a78](https://github.com/qubic/wallet-extension/commit/d3e4a781588b4ee1f7e8b00cff0cd4b5de9b7808))
+
+
+---
+
+**Qubic Wallet — Beta Release**
+
+Manage your Qubic accounts, send transfers, transfer asset rights, and connect to dApps via the `window.qubic` provider API.
+
+This is a pre-release build — please report any issues on [GitHub Issues](https://github.com/qubic/wallet-extension/issues).
+
+## Install (Chrome / Chromium)
+
+### First time
+
+1. Download **wallet-extension-dist.zip** from the assets below
+2. Unzip to a permanent folder (e.g. `~/qubic-wallet`)
+3. Open `chrome://extensions`
+4. Enable **Developer mode** (top right)
+5. Click **Load unpacked** and select the unzipped folder
+6. Pin the extension from the puzzle icon in the toolbar
+
+### Updating
+
+1. Download the new **wallet-extension-dist.zip**
+2. Delete the contents of your existing extension folder
+3. Unzip the new files into the **same folder**
+4. Open `chrome://extensions` and click the **reload** button (↻) on the extension
+
+> **Important:** Always reuse the same folder. Loading from a different folder changes the extension ID and you will lose your wallet data.
+
 # [1.0.0-beta.7](https://github.com/qubic/wallet-extension/compare/v1.0.0-beta.6...v1.0.0-beta.7) (2026-04-27)
 
 
