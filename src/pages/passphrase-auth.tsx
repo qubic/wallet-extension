@@ -109,7 +109,7 @@ const PassphraseAuth = ({
         }
       }}
     >
-      <DrawerContent className="border-none bg-background">
+      <DrawerContent className="max-h-[90vh] border-none bg-background">
         <DrawerHeader className="space-y-2 text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
             <ShieldCheckIcon className="h-6 w-6 shrink-0 text-primary" />
@@ -118,7 +118,7 @@ const PassphraseAuth = ({
           <DrawerDescription>{subtitle ?? t('passphraseAuth.subtitle')}</DrawerDescription>
         </DrawerHeader>
 
-        <div className="space-y-3 px-4 pb-2">
+        <div className="app-scrollbar min-h-0 flex-1 space-y-3 overflow-y-auto px-4 pb-2">
           <PasswordInput
             id="passphrase"
             groupClassName="h-12"
@@ -134,7 +134,7 @@ const PassphraseAuth = ({
           <p className="text-xs text-muted-foreground">{t('passphraseAuth.securityNote')}</p>
         </div>
 
-        <DrawerFooter>
+        <DrawerFooter className="border-t border-border/60 bg-background">
           <Button
             onClick={handleSubmit}
             size="lg"

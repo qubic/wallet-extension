@@ -2,6 +2,7 @@ import { ChevronRightIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { useBalance } from '@qubic-labs/react'
+import PageHeader from '@/components/page-header'
 import {
   type AggregatedAsset,
   aggregateAssets,
@@ -32,9 +33,9 @@ const SelectToken = () => {
 
   return (
     <section className="flex w-full justify-center pt-4">
-      <div className="flex w-full max-w-sm flex-col gap-4 px-4 pb-2">
+      <div className="flex w-full max-w-sm flex-col gap-4 px-4 pb-4">
         <div className="space-y-1">
-          <h2 className="text-lg font-semibold">{t('transfer.title')}</h2>
+          <PageHeader title={t('transfer.title')} onBack={() => navigate('/home')} />
           <p className="text-xs text-muted-foreground">{t('transfer.selectToken.subtitle')}</p>
         </div>
 

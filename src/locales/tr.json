@@ -27,7 +27,8 @@
     "actions": {
       "send": "Gönder",
       "receive": "Al",
-      "history": "Geçmiş"
+      "history": "Geçmiş",
+      "sign": "İmzala"
     },
     "balance": {
       "label": "Bakiye",
@@ -140,7 +141,9 @@
       "support": "Destek",
       "supportDesc": "Yardım alın ve sorun bildirin",
       "about": "Hakkında",
-      "aboutDesc": "Uygulama sürümü ve bilgiler"
+      "aboutDesc": "Uygulama sürümü ve bilgiler",
+      "verifyMessage": "Mesajı doğrula",
+      "verifyMessageDesc": "Bir Qubic cüzdanı tarafından üretilen bir imzayı kontrol et"
     },
     "general": {
       "title": "Tercihler",
@@ -609,6 +612,53 @@
       "copySeed": "Özel seed'i kopyala",
       "seedCopied": "Özel seed kopyalandı",
       "confirmationLabel": "Bu özel seed'i güvenli bir şekilde sakladığımı ve cüzdanı kurtarmak için gerekli olduğunu anlıyorum."
+    }
+  },
+  "signMessage": {
+    "back": "Geri",
+    "title": "Mesajı imzala",
+    "fromAccount": "\"{{name}}\" ile imzalanıyor",
+    "watchOnly": "Bu yalnızca izleme amaçlı bir hesaptır ve mesaj imzalayamaz.",
+    "messageLabel": "Mesaj",
+    "messagePlaceholder": "İmzalanacak mesajı girin",
+    "outputLabel": "İmzalı çıktı (JSON)",
+    "authTitle": "İmzalamayı yetkilendir",
+    "authSubtitle": "Bu mesajı imzalamak için şifrenizi girin.",
+    "copied": "Panoya kopyalandı",
+    "actions": {
+      "sign": "İmzala",
+      "signing": "İmzalanıyor…",
+      "copy": "Kopyala"
+    },
+    "errors": {
+      "signFailed": "Mesaj imzalanamadı",
+      "copyFailed": "Kopyalanamadı"
+    }
+  },
+  "verifyMessage": {
+    "back": "Geri",
+    "title": "Mesajı doğrula",
+    "description": "İmzalanmış bir mesajı yapıştırarak iddia edilen kimlik tarafından imzalandığını doğrulayın.",
+    "inputLabel": "İmzalı mesaj (JSON)",
+    "inputPlaceholder": "identity, message ve signature alanlarını içeren imzalı JSON'u yapıştırın",
+    "actions": {
+      "verify": "Doğrula",
+      "verifying": "Doğrulanıyor…",
+      "clear": "Temizle"
+    },
+    "result": {
+      "valid": "Geçerli imza",
+      "signedBy": "{{identity}} tarafından imzalandı",
+      "messageLabel": "Mesaj",
+      "invalid": "Geçersiz imza",
+      "invalidDescription": "İmza, verilen mesaj ve kimlikle eşleşmiyor."
+    },
+    "errors": {
+      "parse": "Giriş çözümlenemedi. identity, message ve signature alanlarını içeren JSON bekleniyor.",
+      "identity": "Geçersiz kimlik. Lütfen değeri kontrol edip tekrar deneyin.",
+      "signature": "Geçersiz imza biçimi.",
+      "checksum": "İmza sağlama toplamı eşleşmiyor.",
+      "invalid": "İmza doğrulanamadı."
     }
   }
 }

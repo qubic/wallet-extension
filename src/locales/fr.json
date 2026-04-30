@@ -27,7 +27,8 @@
     "actions": {
       "send": "Envoyer",
       "receive": "Recevoir",
-      "history": "Historique"
+      "history": "Historique",
+      "sign": "Signer"
     },
     "balance": {
       "label": "Solde",
@@ -140,7 +141,9 @@
       "support": "Support",
       "supportDesc": "Obtenir de l'aide et signaler des problèmes",
       "about": "À propos",
-      "aboutDesc": "Version et informations de l'application"
+      "aboutDesc": "Version et informations de l'application",
+      "verifyMessage": "Vérifier un message",
+      "verifyMessageDesc": "Vérifier une signature produite par un portefeuille Qubic"
     },
     "general": {
       "title": "Préférences",
@@ -609,6 +612,53 @@
       "copySeed": "Copier la seed privée",
       "seedCopied": "Seed privée copiée",
       "confirmationLabel": "J'ai sauvegardé cette seed privée en lieu sûr et je comprends qu'elle est nécessaire pour récupérer ce portefeuille."
+    }
+  },
+  "signMessage": {
+    "back": "Retour",
+    "title": "Signer un message",
+    "fromAccount": "Signature avec « {{name}} »",
+    "watchOnly": "Ce compte est en lecture seule et ne peut pas signer de messages.",
+    "messageLabel": "Message",
+    "messagePlaceholder": "Entrez le message à signer",
+    "outputLabel": "Sortie signée (JSON)",
+    "authTitle": "Autoriser la signature",
+    "authSubtitle": "Entrez votre mot de passe pour signer ce message.",
+    "copied": "Copié dans le presse-papiers",
+    "actions": {
+      "sign": "Signer",
+      "signing": "Signature…",
+      "copy": "Copier"
+    },
+    "errors": {
+      "signFailed": "Échec de la signature du message",
+      "copyFailed": "Échec de la copie"
+    }
+  },
+  "verifyMessage": {
+    "back": "Retour",
+    "title": "Vérifier un message",
+    "description": "Collez un message signé pour confirmer qu'il a été signé par l'identité indiquée.",
+    "inputLabel": "Message signé (JSON)",
+    "inputPlaceholder": "Collez le JSON signé contenant les champs identity, message et signature",
+    "actions": {
+      "verify": "Vérifier",
+      "verifying": "Vérification…",
+      "clear": "Effacer"
+    },
+    "result": {
+      "valid": "Signature valide",
+      "signedBy": "Signé par {{identity}}",
+      "messageLabel": "Message",
+      "invalid": "Signature invalide",
+      "invalidDescription": "La signature ne correspond pas au message et à l'identité fournis."
+    },
+    "errors": {
+      "parse": "Impossible d'analyser l'entrée. JSON attendu avec les champs identity, message et signature.",
+      "identity": "Identité invalide. Veuillez vérifier la valeur et réessayer.",
+      "signature": "Format de signature invalide.",
+      "checksum": "La somme de contrôle de la signature ne correspond pas.",
+      "invalid": "Impossible de vérifier la signature."
     }
   }
 }

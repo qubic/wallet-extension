@@ -27,7 +27,8 @@
     "actions": {
       "send": "Gửi",
       "receive": "Nhận",
-      "history": "Lịch sử"
+      "history": "Lịch sử",
+      "sign": "Ký"
     },
     "balance": {
       "label": "Số dư",
@@ -140,7 +141,9 @@
       "support": "Hỗ trợ",
       "supportDesc": "Nhận trợ giúp và báo cáo sự cố",
       "about": "Giới thiệu",
-      "aboutDesc": "Phiên bản ứng dụng và thông tin"
+      "aboutDesc": "Phiên bản ứng dụng và thông tin",
+      "verifyMessage": "Xác minh thông điệp",
+      "verifyMessageDesc": "Kiểm tra chữ ký được tạo bởi ví Qubic"
     },
     "general": {
       "title": "Tùy chỉnh",
@@ -609,6 +612,53 @@
       "copySeed": "Sao chép seed riêng tư",
       "seedCopied": "Đã sao chép seed riêng tư",
       "confirmationLabel": "Tôi đã lưu seed riêng tư này một cách an toàn và hiểu rằng nó cần thiết để khôi phục ví này."
+    }
+  },
+  "signMessage": {
+    "back": "Quay lại",
+    "title": "Ký thông điệp",
+    "fromAccount": "Đang ký với \"{{name}}\"",
+    "watchOnly": "Đây là tài khoản chỉ xem và không thể ký thông điệp.",
+    "messageLabel": "Thông điệp",
+    "messagePlaceholder": "Nhập thông điệp cần ký",
+    "outputLabel": "Đầu ra đã ký (JSON)",
+    "authTitle": "Xác thực ký",
+    "authSubtitle": "Nhập mật khẩu để ký thông điệp này.",
+    "copied": "Đã sao chép",
+    "actions": {
+      "sign": "Ký",
+      "signing": "Đang ký…",
+      "copy": "Sao chép"
+    },
+    "errors": {
+      "signFailed": "Không thể ký thông điệp",
+      "copyFailed": "Không thể sao chép"
+    }
+  },
+  "verifyMessage": {
+    "back": "Quay lại",
+    "title": "Xác minh thông điệp",
+    "description": "Dán một thông điệp đã ký để xác nhận nó được ký bởi danh tính được tuyên bố.",
+    "inputLabel": "Thông điệp đã ký (JSON)",
+    "inputPlaceholder": "Dán JSON đã ký với các trường identity, message và signature",
+    "actions": {
+      "verify": "Xác minh",
+      "verifying": "Đang xác minh…",
+      "clear": "Xóa"
+    },
+    "result": {
+      "valid": "Chữ ký hợp lệ",
+      "signedBy": "Được ký bởi {{identity}}",
+      "messageLabel": "Thông điệp",
+      "invalid": "Chữ ký không hợp lệ",
+      "invalidDescription": "Chữ ký không khớp với thông điệp và danh tính đã cho."
+    },
+    "errors": {
+      "parse": "Không thể phân tích đầu vào. Cần JSON có các trường identity, message và signature.",
+      "identity": "Danh tính không hợp lệ. Vui lòng kiểm tra giá trị và thử lại.",
+      "signature": "Định dạng chữ ký không hợp lệ.",
+      "checksum": "Tổng kiểm tra chữ ký không khớp.",
+      "invalid": "Không thể xác minh chữ ký."
     }
   }
 }

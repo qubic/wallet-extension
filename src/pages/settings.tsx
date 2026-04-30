@@ -8,6 +8,7 @@ import {
   ChevronRightIcon,
   DownloadIcon,
   ExternalLinkIcon,
+  FileCheck2Icon,
   InfoIcon,
   LifeBuoyIcon,
   Link2Icon,
@@ -122,6 +123,13 @@ const Settings = () => {
       action: () => navigate('/settings/security'),
     },
     {
+      key: 'verifyMessage',
+      icon: FileCheck2Icon,
+      label: t('settings.categories.verifyMessage'),
+      description: t('settings.categories.verifyMessageDesc'),
+      action: () => navigate('/settings/verify-message'),
+    },
+    {
       key: 'backup',
       icon: DownloadIcon,
       label: t('settings.categories.backup'),
@@ -194,12 +202,12 @@ const Settings = () => {
           }
         }}
       >
-        <DrawerContent>
+        <DrawerContent className="max-h-[90vh] border-none bg-background">
           <DrawerHeader>
             <DrawerTitle>{t('settings.exportVault.drawerTitle')}</DrawerTitle>
             <DrawerDescription>{t('settings.exportVault.drawerDescription')}</DrawerDescription>
           </DrawerHeader>
-          <div className="space-y-2 px-4">
+          <div className="app-scrollbar min-h-0 flex-1 space-y-2 overflow-y-auto px-4 pb-2">
             <Label htmlFor="export-passphrase">{t('settings.exportVault.passphrase')}</Label>
             <Input
               id="export-passphrase"
@@ -217,7 +225,7 @@ const Settings = () => {
             />
             {exportError && <p className="text-xs text-destructive">{exportError}</p>}
           </div>
-          <DrawerFooter>
+          <DrawerFooter className="border-t border-border/60 bg-background">
             <Button onClick={handleExportVault} disabled={exporting || !exportPassphrase.trim()}>
               <CheckIcon className="h-4 w-4" />
               {exporting ? t('settings.exportVault.exporting') : t('settings.exportVault.confirm')}
@@ -228,11 +236,11 @@ const Settings = () => {
 
       {/* Support Drawer */}
       <Drawer open={supportDrawerOpen} onOpenChange={setSupportDrawerOpen}>
-        <DrawerContent>
+        <DrawerContent className="max-h-[90vh] border-none bg-background">
           <DrawerHeader>
             <DrawerTitle>{t('settings.support.title')}</DrawerTitle>
           </DrawerHeader>
-          <div className="space-y-4 px-4 pb-4">
+          <div className="app-scrollbar min-h-0 flex-1 space-y-4 overflow-y-auto px-4 pb-4">
             <div className="rounded-lg border border-yellow-500/40 bg-yellow-500/10 p-3">
               <div className="flex items-center gap-2">
                 <AlertTriangleIcon className="h-5 w-5 shrink-0 text-yellow-500" />
@@ -270,11 +278,11 @@ const Settings = () => {
 
       {/* About Drawer */}
       <Drawer open={aboutDrawerOpen} onOpenChange={setAboutDrawerOpen}>
-        <DrawerContent>
+        <DrawerContent className="max-h-[90vh] border-none bg-background">
           <DrawerHeader>
             <DrawerTitle>{t('settings.about.title')}</DrawerTitle>
           </DrawerHeader>
-          <div className="space-y-3 px-4 pb-4">
+          <div className="app-scrollbar min-h-0 flex-1 space-y-3 overflow-y-auto px-4 pb-4">
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">{t('settings.about.extensionName')}</span>
               <span className="font-medium">{t('settings.about.extensionFullName')}</span>
