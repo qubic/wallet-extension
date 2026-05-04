@@ -1,4 +1,9 @@
 import { useMemo, useState } from 'react'
+import {
+  createMemoryVaultStore,
+  openSeedVaultBrowser,
+  VaultInvalidPassphraseError,
+} from '@qubic-labs/sdk'
 import { ArrowLeftIcon, ArrowRightIcon, FileJsonIcon, UploadCloudIcon } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -15,6 +20,16 @@ import FlowHeader from '@/components/onboarding/flow-header'
 
 const TOTAL_STEPS = 3
 const MAX_VAULT_FILE_SIZE = 102_400
+const WEB_WALLET_CONFIG_KEY = 'wallet-config'
+
+const isWebWalletVaultFile = (fileText: string) => {
+  try {
+    const data = JSON.parse(fileText)
+    return !!(data.salt && data.iv && data.cipher)
+  } catch {
+    return false
+  }
+}
 
 const ImportVault = () => {
   const navigate = useNavigate()
@@ -34,7 +49,51 @@ const ImportVault = () => {
     setFile(null)
   }
 
-  const handleNext = () => {
+  const validateSourceVault = async (
+    selectedFile: File,
+    nextPassphrase: string,
+    fileText: string,
+  ) => {
+    const importPassphrase = sourcePassphrase.trim() || nextPassphrase
+
+    if (isWebWalletVaultFile(fileText)) {
+      const previousConfig = localStorage.getItem(WEB_WALLET_CONFIG_KEY)
+      try {
+        const qubicVault = new QubicVault()
+        await qubicVault.importAndUnlock(true, importPassphrase, null, selectedFile, false)
+        return { valid: true as const }
+      } catch {
+        return { valid: false as const, reason: 'invalid' as const }
+      } finally {
+        // QubicVault persists to localStorage while unlocking, so restore the prior state.
+        if (previousConfig === null) {
+          localStorage.removeItem(WEB_WALLET_CONFIG_KEY)
+        } else {
+          localStorage.setItem(WEB_WALLET_CONFIG_KEY, previousConfig)
+        }
+      }
+    }
+
+    try {
+      const previewVault = await openSeedVaultBrowser({
+        store: createMemoryVaultStore('import-preview'),
+        passphrase: nextPassphrase,
+        create: true,
+      })
+      await previewVault.importEncrypted(fileText, {
+        mode: 'merge',
+        sourcePassphrase: importPassphrase,
+      })
+      return { valid: true as const }
+    } catch (error) {
+      if (error instanceof VaultInvalidPassphraseError) {
+        return { valid: false as const, reason: 'invalid' as const }
+      }
+      return { valid: false as const, reason: 'error' as const }
+    }
+  }
+
+  const handleNext = async () => {
     setStatus(null)
 
     if (step === 1 && !file) {
@@ -45,6 +104,31 @@ const ImportVault = () => {
     if (step === 2 && !passphrase.trim()) {
       setStatus(t('onboarding.importVault.errors.passphraseRequired'))
       return
+    }
+    if (step === 2 && passphrase.length < 12) {
+      setStatus(t('onboarding.errors.passphraseTooShort'))
+      return
+    }
+    if (step === 2 && file) {
+      setIsSaving(true)
+      try {
+        const fileText = await file.text()
+        const result = await validateSourceVault(file, passphrase.trim(), fileText)
+        if (!result.valid) {
+          setStatus(
+            result.reason === 'invalid'
+              ? t('onboarding.importVault.errors.invalidSourcePassphrase')
+              : t('onboarding.importVault.errors.generic'),
+          )
+          setIsSaving(false)
+          return
+        }
+      } catch {
+        setStatus(t('onboarding.importVault.errors.generic'))
+        setIsSaving(false)
+        return
+      }
+      setIsSaving(false)
     }
 
     setStep((current) => Math.min(current + 1, TOTAL_STEPS))
@@ -91,26 +175,26 @@ const ImportVault = () => {
       setStep(2)
       return
     }
+    if (passphrase.length < 12) {
+      setStatus(t('onboarding.errors.passphraseTooShort'))
+      setStep(2)
+      return
+    }
 
     try {
       setIsSaving(true)
 
       const fileText = await file.text()
-      let isWebWalletVault = false
-      try {
-        const data = JSON.parse(fileText)
-        isWebWalletVault = !!(data.salt && data.iv && data.cipher)
-      } catch {
-        // Not valid JSON — treat as SDK format
-      }
+      const isWebWalletVault = isWebWalletVaultFile(fileText)
 
       if (isWebWalletVault) {
         const qubicVault = new QubicVault()
         const importPassphrase = sourcePassphrase.trim() || passphrase.trim()
 
-        const success = await qubicVault.importAndUnlock(true, importPassphrase, null, file, false)
-        if (!success) {
-          setStatus(t('onboarding.importVault.errors.importFailed'))
+        try {
+          await qubicVault.importAndUnlock(true, importPassphrase, null, file, false)
+        } catch {
+          setStatus(t('onboarding.importVault.errors.invalidSourcePassphrase'))
           setIsSaving(false)
           return
         }
@@ -178,7 +262,13 @@ const ImportVault = () => {
         navigate('/home')
       }
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : t('onboarding.importVault.errors.generic'))
+      setStatus(
+        error instanceof VaultInvalidPassphraseError
+          ? t('onboarding.importVault.errors.invalidSourcePassphrase')
+          : error instanceof Error
+            ? error.message
+            : t('onboarding.importVault.errors.generic'),
+      )
       setIsSaving(false)
     }
   }
@@ -318,7 +408,7 @@ const ImportVault = () => {
             {step === 1 ? t('common.back') : t('common.previous')}
           </Button>
           {step < TOTAL_STEPS ? (
-            <Button size="lg" onClick={handleNext} className="flex-1">
+            <Button size="lg" onClick={handleNext} className="flex-1" disabled={isSaving}>
               {t('common.continue')}
               <ArrowRightIcon className="h-5 w-5" />
             </Button>

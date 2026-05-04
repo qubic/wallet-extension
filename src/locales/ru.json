@@ -592,6 +592,7 @@
         "fileTooLarge": "Выбранный файл слишком большой для допустимого файла vault.",
         "selectFile": "Выберите файл vault.",
         "passphraseRequired": "Необходимо ввести пароль.",
+        "invalidSourcePassphrase": "Неверный пароль исходного vault.",
         "importFailed": "Не удалось импортировать vault веб-кошелька.",
         "noEntries": "Vault импортирован, но записи не найдены.",
         "generic": "Не удалось импортировать vault."

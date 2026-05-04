@@ -592,6 +592,7 @@
         "fileTooLarge": "Le fichier sélectionné est trop volumineux pour être un fichier vault valide.",
         "selectFile": "Sélectionnez un fichier vault.",
         "passphraseRequired": "Le mot de passe est requis.",
+        "invalidSourcePassphrase": "Mot de passe du vault source invalide.",
         "importFailed": "Échec de l'importation du vault du portefeuille web.",
         "noEntries": "Vault importé mais aucune entrée trouvée.",
         "generic": "Échec de l'importation du vault."

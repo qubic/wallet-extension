@@ -106,6 +106,10 @@ const ImportSeed = ({
       setStatus(t('onboarding.errors.passphraseRequired'))
       return
     }
+    if (step === 2 && variant !== 'add-address' && passphrase.length < 12) {
+      setStatus(t('onboarding.errors.passphraseTooShort'))
+      return
+    }
     if (step === 2 && variant === 'add-address') {
       if (isAccountNameTaken(name)) {
         setStatus(t('accounts.manage.errors.nameDuplicate'))
@@ -146,6 +150,11 @@ const ImportSeed = ({
 
     if (!passphrase.trim()) {
       setStatus(t('onboarding.errors.passphraseRequired'))
+      setStep(2)
+      return
+    }
+    if (variant !== 'add-address' && passphrase.length < 12) {
+      setStatus(t('onboarding.errors.passphraseTooShort'))
       setStep(2)
       return
     }

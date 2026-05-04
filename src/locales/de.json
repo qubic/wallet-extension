@@ -592,6 +592,7 @@
         "fileTooLarge": "Die ausgewählte Datei ist zu groß für eine gültige Tresor-Datei.",
         "selectFile": "Wähle eine Tresor-Datei aus.",
         "passphraseRequired": "Passwort ist erforderlich.",
+        "invalidSourcePassphrase": "Ungültiges Quell-Tresor-Passwort.",
         "importFailed": "Web-Wallet-Tresor konnte nicht importiert werden.",
         "noEntries": "Tresor importiert, aber keine Einträge gefunden.",
         "generic": "Tresor konnte nicht importiert werden."
