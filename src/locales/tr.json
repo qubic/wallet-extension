@@ -573,18 +573,14 @@
       },
       "unlockSecure": {
         "title": "Kilidi aç ve güvence altına al",
-        "subtitle": "Bu cihaz için yeni bir parola belirleyin ve gerekirse kaynak parolayı girin.",
-        "newPassphrase": "Yeni vault parolası",
-        "sourcePassphrase": "Kaynak vault parolası"
+        "subtitle": "Bu cihaz için bir parola belirleyin.",
+        "newPassphrase": "Vault parolası"
       },
       "review": {
         "title": "İçe aktarmayı gözden geçir",
         "subtitle": "İçe aktarmadan önce dosya ve parola detaylarını doğrulayın.",
         "vaultFile": "Vault dosyası",
         "notSelected": "Seçilmedi",
-        "sourcePassphraseProvided": "Girildi",
-        "sourcePassphraseSame": "Yenisi ile aynı",
-        "sourcePassphraseLabel": "Kaynak parolası",
         "addMoreLater": "Daha sonra Hesapları Yönet bölümünden daha fazla hesap ekleyebilirsiniz."
       },
       "actions": {

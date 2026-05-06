@@ -22,7 +22,6 @@ const ImportVault = () => {
   const [step, setStep] = useState(1)
   const [file, setFile] = useState<File | null>(null)
   const [passphrase, setPassphrase] = useState('')
-  const [sourcePassphrase, setSourcePassphrase] = useState('')
   const [status, setStatus] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
@@ -30,7 +29,6 @@ const ImportVault = () => {
 
   const clearSensitiveState = () => {
     setPassphrase('')
-    setSourcePassphrase('')
     setFile(null)
   }
 
@@ -106,9 +104,8 @@ const ImportVault = () => {
 
       if (isWebWalletVault) {
         const qubicVault = new QubicVault()
-        const importPassphrase = sourcePassphrase.trim() || passphrase.trim()
 
-        const success = await qubicVault.importAndUnlock(true, importPassphrase, null, file, false)
+        const success = await qubicVault.importAndUnlock(true, passphrase.trim(), null, file, false)
         if (!success) {
           setStatus(t('onboarding.importVault.errors.importFailed'))
           setIsSaving(false)
@@ -160,7 +157,7 @@ const ImportVault = () => {
         const vault = await openBrowserVault(passphrase.trim(), true)
         await vault.importEncrypted(fileText, {
           mode: 'merge',
-          sourcePassphrase: sourcePassphrase.trim() || passphrase.trim(),
+          sourcePassphrase: passphrase.trim(),
         })
         await vault.save()
         saveCachedAccounts(vault.list().map((e) => ({ name: e.name, identity: e.identity })))
@@ -266,16 +263,6 @@ const ImportVault = () => {
                   onChange={(event) => setPassphrase(event.target.value)}
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="source-passphrase">
-                  {t('onboarding.importVault.unlockSecure.sourcePassphrase')}
-                </Label>
-                <PasswordInput
-                  id="source-passphrase"
-                  value={sourcePassphrase}
-                  onChange={(event) => setSourcePassphrase(event.target.value)}
-                />
-              </div>
             </div>
           )}
 
@@ -295,12 +282,6 @@ const ImportVault = () => {
                   <span className="text-foreground">
                     {file?.name ?? t('onboarding.importVault.review.notSelected')}
                   </span>
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  {t('onboarding.importVault.review.sourcePassphraseLabel')}:{' '}
-                  {sourcePassphrase.trim()
-                    ? t('onboarding.importVault.review.sourcePassphraseProvided')
-                    : t('onboarding.importVault.review.sourcePassphraseSame')}
                 </div>
               </div>
               <p className="text-xs text-muted-foreground">

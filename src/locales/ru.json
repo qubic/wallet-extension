@@ -573,18 +573,14 @@
       },
       "unlockSecure": {
         "title": "Разблокировка и защита",
-        "subtitle": "Задайте новый пароль для этого устройства и, при необходимости, пароль исходного vault.",
-        "newPassphrase": "Новый пароль vault",
-        "sourcePassphrase": "Пароль исходного vault"
+        "subtitle": "Задайте пароль для этого устройства.",
+        "newPassphrase": "Пароль vault"
       },
       "review": {
         "title": "Проверка импорта",
         "subtitle": "Подтвердите файл и пароль перед импортом.",
         "vaultFile": "Файл vault",
         "notSelected": "Не выбран",
-        "sourcePassphraseProvided": "Указан",
-        "sourcePassphraseSame": "Совпадает с новым",
-        "sourcePassphraseLabel": "Пароль источника",
         "addMoreLater": "Вы можете добавить больше аккаунтов позже в разделе Управление аккаунтами."
       },
       "actions": {

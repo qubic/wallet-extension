@@ -573,18 +573,14 @@
       },
       "unlockSecure": {
         "title": "Déverrouiller et sécuriser",
-        "subtitle": "Définissez un nouveau mot de passe pour cet appareil et, si nécessaire, le mot de passe source.",
-        "newPassphrase": "Nouveau mot de passe du vault",
-        "sourcePassphrase": "Mot de passe du vault source"
+        "subtitle": "Définissez un mot de passe pour cet appareil.",
+        "newPassphrase": "Mot de passe du vault"
       },
       "review": {
         "title": "Vérifier l'importation",
         "subtitle": "Confirmez le fichier et les détails du mot de passe avant d'importer.",
         "vaultFile": "Fichier vault",
         "notSelected": "Non sélectionné",
-        "sourcePassphraseProvided": "Fourni",
-        "sourcePassphraseSame": "Identique au nouveau",
-        "sourcePassphraseLabel": "Mot de passe source",
         "addMoreLater": "Vous pourrez ajouter d'autres comptes plus tard dans Gérer les comptes."
       },
       "actions": {

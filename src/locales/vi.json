@@ -573,18 +573,14 @@
       },
       "unlockSecure": {
         "title": "Mở khóa và bảo mật",
-        "subtitle": "Cung cấp mật khẩu mới cho thiết bị này và mật khẩu nguồn nếu cần.",
-        "newPassphrase": "Mật khẩu vault mới",
-        "sourcePassphrase": "Mật khẩu vault nguồn"
+        "subtitle": "Cung cấp mật khẩu cho thiết bị này.",
+        "newPassphrase": "Mật khẩu vault"
       },
       "review": {
         "title": "Xem lại nhập",
         "subtitle": "Xác nhận chi tiết tập tin và mật khẩu trước khi nhập.",
         "vaultFile": "Tập tin vault",
         "notSelected": "Chưa chọn",
-        "sourcePassphraseProvided": "Đã cung cấp",
-        "sourcePassphraseSame": "Giống mật khẩu mới",
-        "sourcePassphraseLabel": "Mật khẩu nguồn",
         "addMoreLater": "Bạn có thể thêm tài khoản sau trong Quản lý tài khoản."
       },
       "actions": {
