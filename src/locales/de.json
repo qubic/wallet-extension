@@ -574,13 +574,7 @@
       "unlockSecure": {
         "title": "Entsperren und sichern",
         "subtitle": "Lege ein Passwort für dieses Gerät fest.",
-        "newPassphrase": "Tresor-Passwort"
-      },
-      "review": {
-        "title": "Import überprüfen",
-        "subtitle": "Bestätige die Datei- und Passwort-Details vor dem Import.",
-        "vaultFile": "Tresor-Datei",
-        "notSelected": "Nicht ausgewählt",
+        "newPassphrase": "Tresor-Passwort",
         "addMoreLater": "Du kannst später weitere Konten unter Konten verwalten hinzufügen."
       },
       "actions": {
@@ -593,7 +587,8 @@
         "passphraseRequired": "Passwort ist erforderlich.",
         "importFailed": "Web-Wallet-Tresor konnte nicht importiert werden.",
         "noEntries": "Tresor importiert, aber keine Einträge gefunden.",
-        "generic": "Tresor konnte nicht importiert werden."
+        "generic": "Tresor konnte nicht importiert werden.",
+        "invalidPassphrase": "Ungültiges Passwort. Bitte versuche es erneut."
       }
     },
     "seedSecurity": {

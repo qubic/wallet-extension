@@ -574,13 +574,7 @@
       "unlockSecure": {
         "title": "Déverrouiller et sécuriser",
         "subtitle": "Définissez un mot de passe pour cet appareil.",
-        "newPassphrase": "Mot de passe du vault"
-      },
-      "review": {
-        "title": "Vérifier l'importation",
-        "subtitle": "Confirmez le fichier et les détails du mot de passe avant d'importer.",
-        "vaultFile": "Fichier vault",
-        "notSelected": "Non sélectionné",
+        "newPassphrase": "Mot de passe du vault",
         "addMoreLater": "Vous pourrez ajouter d'autres comptes plus tard dans Gérer les comptes."
       },
       "actions": {
@@ -593,7 +587,8 @@
         "passphraseRequired": "Le mot de passe est requis.",
         "importFailed": "Échec de l'importation du vault du portefeuille web.",
         "noEntries": "Vault importé mais aucune entrée trouvée.",
-        "generic": "Échec de l'importation du vault."
+        "generic": "Échec de l'importation du vault.",
+        "invalidPassphrase": "Mot de passe invalide. Veuillez réessayer."
       }
     },
     "seedSecurity": {

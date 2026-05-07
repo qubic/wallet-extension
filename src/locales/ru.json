@@ -574,13 +574,7 @@
       "unlockSecure": {
         "title": "Разблокировка и защита",
         "subtitle": "Задайте пароль для этого устройства.",
-        "newPassphrase": "Пароль vault"
-      },
-      "review": {
-        "title": "Проверка импорта",
-        "subtitle": "Подтвердите файл и пароль перед импортом.",
-        "vaultFile": "Файл vault",
-        "notSelected": "Не выбран",
+        "newPassphrase": "Пароль vault",
         "addMoreLater": "Вы можете добавить больше аккаунтов позже в разделе Управление аккаунтами."
       },
       "actions": {
@@ -593,7 +587,8 @@
         "passphraseRequired": "Необходимо ввести пароль.",
         "importFailed": "Не удалось импортировать vault веб-кошелька.",
         "noEntries": "Vault импортирован, но записи не найдены.",
-        "generic": "Не удалось импортировать vault."
+        "generic": "Не удалось импортировать vault.",
+        "invalidPassphrase": "Неверный пароль. Попробуйте снова."
       }
     },
     "seedSecurity": {

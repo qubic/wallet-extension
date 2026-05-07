@@ -574,13 +574,7 @@
       "unlockSecure": {
         "title": "Mở khóa và bảo mật",
         "subtitle": "Cung cấp mật khẩu cho thiết bị này.",
-        "newPassphrase": "Mật khẩu vault"
-      },
-      "review": {
-        "title": "Xem lại nhập",
-        "subtitle": "Xác nhận chi tiết tập tin và mật khẩu trước khi nhập.",
-        "vaultFile": "Tập tin vault",
-        "notSelected": "Chưa chọn",
+        "newPassphrase": "Mật khẩu vault",
         "addMoreLater": "Bạn có thể thêm tài khoản sau trong Quản lý tài khoản."
       },
       "actions": {
@@ -593,7 +587,8 @@
         "passphraseRequired": "Yêu cầu mật khẩu.",
         "importFailed": "Không thể nhập vault từ ví web.",
         "noEntries": "Đã nhập vault nhưng không tìm thấy mục nào.",
-        "generic": "Không thể nhập vault."
+        "generic": "Không thể nhập vault.",
+        "invalidPassphrase": "Mật khẩu không hợp lệ. Vui lòng thử lại."
       }
     },
     "seedSecurity": {

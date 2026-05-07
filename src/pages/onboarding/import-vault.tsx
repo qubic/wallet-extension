@@ -13,7 +13,7 @@ import { QubicVault } from '@qubic-lib/qubic-ts-vault-library/dist/vault.js'
 import { getWatchOnlyAccounts, saveCachedAccounts, saveWatchOnlyAccounts } from '@/lib/accounts'
 import FlowHeader from '@/components/onboarding/flow-header'
 
-const TOTAL_STEPS = 3
+const TOTAL_STEPS = 2
 const MAX_VAULT_FILE_SIZE = 102_400
 
 const ImportVault = () => {
@@ -37,11 +37,6 @@ const ImportVault = () => {
 
     if (step === 1 && !file) {
       setStatus(t('onboarding.importVault.errors.selectFile'))
-      return
-    }
-
-    if (step === 2 && !passphrase.trim()) {
-      setStatus(t('onboarding.importVault.errors.passphraseRequired'))
       return
     }
 
@@ -105,9 +100,21 @@ const ImportVault = () => {
       if (isWebWalletVault) {
         const qubicVault = new QubicVault()
 
-        const success = await qubicVault.importAndUnlock(true, passphrase.trim(), null, file, false)
-        if (!success) {
-          setStatus(t('onboarding.importVault.errors.importFailed'))
+        let unlockSucceeded = false
+        try {
+          unlockSucceeded = await qubicVault.importAndUnlock(
+            true,
+            passphrase.trim(),
+            null,
+            file,
+            false,
+          )
+        } catch {
+          // SDK rejects with a string on wrong password — fall through to the check below
+        }
+        if (!unlockSucceeded) {
+          setStatus(t('onboarding.importVault.errors.invalidPassphrase'))
+          setStep(2)
           setIsSaving(false)
           return
         }
@@ -155,10 +162,17 @@ const ImportVault = () => {
         navigate('/home')
       } else {
         const vault = await openBrowserVault(passphrase.trim(), true)
-        await vault.importEncrypted(fileText, {
-          mode: 'merge',
-          sourcePassphrase: passphrase.trim(),
-        })
+        try {
+          await vault.importEncrypted(fileText, {
+            mode: 'merge',
+            sourcePassphrase: passphrase.trim(),
+          })
+        } catch {
+          setStatus(t('onboarding.importVault.errors.invalidPassphrase'))
+          setStep(2)
+          setIsSaving(false)
+          return
+        }
         await vault.save()
         saveCachedAccounts(vault.list().map((e) => ({ name: e.name, identity: e.identity })))
 
@@ -263,29 +277,8 @@ const ImportVault = () => {
                   onChange={(event) => setPassphrase(event.target.value)}
                 />
               </div>
-            </div>
-          )}
-
-          {step === 3 && (
-            <div className="space-y-4">
-              <div className="space-y-1">
-                <h3 className="text-sm font-semibold">
-                  {t('onboarding.importVault.review.title')}
-                </h3>
-                <p className="text-xs text-muted-foreground">
-                  {t('onboarding.importVault.review.subtitle')}
-                </p>
-              </div>
-              <div className="space-y-2 text-sm">
-                <div className="flex items-center justify-between text-xs text-muted-foreground">
-                  <span>{t('onboarding.importVault.review.vaultFile')}</span>
-                  <span className="text-foreground">
-                    {file?.name ?? t('onboarding.importVault.review.notSelected')}
-                  </span>
-                </div>
-              </div>
               <p className="text-xs text-muted-foreground">
-                {t('onboarding.importVault.review.addMoreLater')}
+                {t('onboarding.importVault.unlockSecure.addMoreLater')}
               </p>
             </div>
           )}
