@@ -113,7 +113,7 @@ const ImportVault = () => {
           // SDK rejects with a string on wrong password — fall through to the check below
         }
         if (!unlockSucceeded) {
-          setStatus(t('onboarding.importVault.errors.invalidPassphrase'))
+          setStatus(t('onboarding.importVault.errors.invalidFileOrPassphrase'))
           setStep(2)
           setIsSaving(false)
           return
@@ -168,7 +168,7 @@ const ImportVault = () => {
             sourcePassphrase: passphrase.trim(),
           })
         } catch {
-          setStatus(t('onboarding.importVault.errors.invalidPassphrase'))
+          setStatus(t('onboarding.importVault.errors.invalidFileOrPassphrase'))
           setStep(2)
           setIsSaving(false)
           return

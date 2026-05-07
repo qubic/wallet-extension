@@ -588,7 +588,7 @@
         "importFailed": "Не удалось импортировать vault веб-кошелька.",
         "noEntries": "Vault импортирован, но записи не найдены.",
         "generic": "Не удалось импортировать vault.",
-        "invalidPassphrase": "Неверный пароль. Попробуйте снова."
+        "invalidFileOrPassphrase": "Выбранный файл не является файлом Qubic vault или пароль введён неверно."
       }
     },
     "seedSecurity": {

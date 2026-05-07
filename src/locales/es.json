@@ -588,7 +588,7 @@
         "importFailed": "No se pudo importar el vault de la billetera web.",
         "noEntries": "Vault importado pero no se encontraron entradas.",
         "generic": "No se pudo importar el vault.",
-        "invalidPassphrase": "Contraseña inválida. Intenta de nuevo."
+        "invalidFileOrPassphrase": "El archivo seleccionado no es un archivo Qubic vault o la contraseña es incorrecta."
       }
     },
     "seedSecurity": {

@@ -588,7 +588,7 @@
         "importFailed": "Không thể nhập vault từ ví web.",
         "noEntries": "Đã nhập vault nhưng không tìm thấy mục nào.",
         "generic": "Không thể nhập vault.",
-        "invalidPassphrase": "Mật khẩu không hợp lệ. Vui lòng thử lại."
+        "invalidFileOrPassphrase": "Tập tin đã chọn không phải là tập tin Qubic vault hoặc mật khẩu không chính xác."
       }
     },
     "seedSecurity": {

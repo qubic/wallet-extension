@@ -588,7 +588,7 @@
         "importFailed": "Échec de l'importation du vault du portefeuille web.",
         "noEntries": "Vault importé mais aucune entrée trouvée.",
         "generic": "Échec de l'importation du vault.",
-        "invalidPassphrase": "Mot de passe invalide. Veuillez réessayer."
+        "invalidFileOrPassphrase": "Le fichier sélectionné n'est pas un fichier Qubic vault ou le mot de passe est incorrect."
       }
     },
     "seedSecurity": {

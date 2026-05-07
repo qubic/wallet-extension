@@ -588,7 +588,7 @@
         "importFailed": "Web-Wallet-Tresor konnte nicht importiert werden.",
         "noEntries": "Tresor importiert, aber keine Einträge gefunden.",
         "generic": "Tresor konnte nicht importiert werden.",
-        "invalidPassphrase": "Ungültiges Passwort. Bitte versuche es erneut."
+        "invalidFileOrPassphrase": "Die ausgewählte Datei ist keine Qubic-Tresor-Datei oder das Passwort ist falsch."
       }
     },
     "seedSecurity": {

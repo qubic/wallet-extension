@@ -588,7 +588,7 @@
         "importFailed": "Web cüzdanı vault dosyası içe aktarılamadı.",
         "noEntries": "Vault içe aktarıldı ancak hiçbir giriş bulunamadı.",
         "generic": "Vault içe aktarılamadı.",
-        "invalidPassphrase": "Geçersiz parola. Lütfen tekrar deneyin."
+        "invalidFileOrPassphrase": "Seçilen dosya bir Qubic vault dosyası değil veya parola yanlış."
       }
     },
     "seedSecurity": {
