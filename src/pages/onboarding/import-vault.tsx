@@ -1,9 +1,5 @@
 import { useMemo, useState } from 'react'
-import {
-  createMemoryVaultStore,
-  openSeedVaultBrowser,
-  VaultInvalidPassphraseError,
-} from '@qubic-labs/sdk'
+import { VaultInvalidPassphraseError } from '@qubic-labs/sdk'
 import { ArrowLeftIcon, ArrowRightIcon, FileJsonIcon, UploadCloudIcon } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -11,7 +7,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/ui/password-input'
 import { Label } from '@/components/ui/label'
-import { validatePassphraseStrength } from '@/lib/passphrase'
 import { setUnlocked } from '@/lib/lock'
 import { openBrowserVault, setOnboarded } from '@/lib/vault'
 // @ts-expect-error - No type definitions available for this library
@@ -19,9 +14,8 @@ import { QubicVault } from '@qubic-lib/qubic-ts-vault-library/dist/vault.js'
 import { getWatchOnlyAccounts, saveCachedAccounts, saveWatchOnlyAccounts } from '@/lib/accounts'
 import FlowHeader from '@/components/onboarding/flow-header'
 
-const TOTAL_STEPS = 3
+const TOTAL_STEPS = 2
 const MAX_VAULT_FILE_SIZE = 102_400
-const WEB_WALLET_CONFIG_KEY = 'wallet-config'
 
 const isWebWalletVaultFile = (fileText: string) => {
   try {
@@ -38,7 +32,6 @@ const ImportVault = () => {
   const [step, setStep] = useState(1)
   const [file, setFile] = useState<File | null>(null)
   const [passphrase, setPassphrase] = useState('')
-  const [sourcePassphrase, setSourcePassphrase] = useState('')
   const [status, setStatus] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
@@ -46,95 +39,15 @@ const ImportVault = () => {
 
   const clearSensitiveState = () => {
     setPassphrase('')
-    setSourcePassphrase('')
     setFile(null)
   }
 
-  const validateSourceVault = async (
-    selectedFile: File,
-    nextPassphrase: string,
-    fileText: string,
-  ) => {
-    const importPassphrase = sourcePassphrase.trim() ? sourcePassphrase : nextPassphrase
-
-    if (isWebWalletVaultFile(fileText)) {
-      const previousConfig = localStorage.getItem(WEB_WALLET_CONFIG_KEY)
-      try {
-        const qubicVault = new QubicVault()
-        await qubicVault.importAndUnlock(true, importPassphrase, null, selectedFile, false)
-        return { valid: true as const }
-      } catch {
-        return { valid: false as const, reason: 'invalid' as const }
-      } finally {
-        // QubicVault persists to localStorage while unlocking, so restore the prior state.
-        if (previousConfig === null) {
-          localStorage.removeItem(WEB_WALLET_CONFIG_KEY)
-        } else {
-          localStorage.setItem(WEB_WALLET_CONFIG_KEY, previousConfig)
-        }
-      }
-    }
-
-    try {
-      const previewVault = await openSeedVaultBrowser({
-        store: createMemoryVaultStore('import-preview'),
-        passphrase: nextPassphrase,
-        create: true,
-      })
-      await previewVault.importEncrypted(fileText, {
-        mode: 'merge',
-        sourcePassphrase: importPassphrase,
-      })
-      return { valid: true as const }
-    } catch (error) {
-      if (error instanceof VaultInvalidPassphraseError) {
-        return { valid: false as const, reason: 'invalid' as const }
-      }
-      return { valid: false as const, reason: 'error' as const }
-    }
-  }
-
-  const handleNext = async () => {
+  const handleNext = () => {
     setStatus(null)
 
     if (step === 1 && !file) {
       setStatus(t('onboarding.importVault.errors.selectFile'))
       return
-    }
-
-    if (step === 2) {
-      const validation = validatePassphraseStrength(passphrase)
-      if (!validation.valid) {
-        setStatus(
-          t(
-            validation.reason === 'required'
-              ? 'onboarding.importVault.errors.passphraseRequired'
-              : 'onboarding.errors.passphraseTooShort',
-          ),
-        )
-        return
-      }
-    }
-    if (step === 2 && file) {
-      setIsSaving(true)
-      try {
-        const fileText = await file.text()
-        const result = await validateSourceVault(file, passphrase, fileText)
-        if (!result.valid) {
-          setStatus(
-            result.reason === 'invalid'
-              ? t('onboarding.importVault.errors.invalidSourcePassphrase')
-              : t('onboarding.importVault.errors.generic'),
-          )
-          setIsSaving(false)
-          return
-        }
-      } catch {
-        setStatus(t('onboarding.importVault.errors.generic'))
-        setIsSaving(false)
-        return
-      }
-      setIsSaving(false)
     }
 
     setStep((current) => Math.min(current + 1, TOTAL_STEPS))
@@ -176,15 +89,8 @@ const ImportVault = () => {
       return
     }
 
-    const validation = validatePassphraseStrength(passphrase)
-    if (!validation.valid) {
-      setStatus(
-        t(
-          validation.reason === 'required'
-            ? 'onboarding.importVault.errors.passphraseRequired'
-            : 'onboarding.errors.passphraseTooShort',
-        ),
-      )
+    if (!passphrase.trim()) {
+      setStatus(t('onboarding.importVault.errors.passphraseRequired'))
       setStep(2)
       return
     }
@@ -197,12 +103,16 @@ const ImportVault = () => {
 
       if (isWebWalletVault) {
         const qubicVault = new QubicVault()
-        const importPassphrase = sourcePassphrase.trim() ? sourcePassphrase : passphrase
 
+        let unlockSucceeded = false
         try {
-          await qubicVault.importAndUnlock(true, importPassphrase, null, file, false)
+          unlockSucceeded = await qubicVault.importAndUnlock(true, passphrase, null, file, false)
         } catch {
-          setStatus(t('onboarding.importVault.errors.invalidSourcePassphrase'))
+          // SDK rejects with a string on wrong password — fall through to the check below
+        }
+        if (!unlockSucceeded) {
+          setStatus(t('onboarding.importVault.errors.invalidFileOrPassphrase'))
+          setStep(2)
           setIsSaving(false)
           return
         }
@@ -250,10 +160,17 @@ const ImportVault = () => {
         navigate('/home')
       } else {
         const vault = await openBrowserVault(passphrase, true)
-        await vault.importEncrypted(fileText, {
-          mode: 'merge',
-          sourcePassphrase: sourcePassphrase.trim() ? sourcePassphrase : passphrase,
-        })
+        try {
+          await vault.importEncrypted(fileText, {
+            mode: 'merge',
+            sourcePassphrase: passphrase,
+          })
+        } catch {
+          setStatus(t('onboarding.importVault.errors.invalidFileOrPassphrase'))
+          setStep(2)
+          setIsSaving(false)
+          return
+        }
         await vault.save()
         saveCachedAccounts(vault.list().map((e) => ({ name: e.name, identity: e.identity })))
 
@@ -282,7 +199,7 @@ const ImportVault = () => {
   }
 
   return (
-    <section className="flex h-full w-full justify-center px-6 py-8">
+    <section className="flex min-h-full w-full justify-center px-6 py-8">
       <div className="flex w-full max-w-sm flex-col justify-between gap-6">
         <div className="space-y-3 text-center">
           <FlowHeader
@@ -364,45 +281,8 @@ const ImportVault = () => {
                   onChange={(event) => setPassphrase(event.target.value)}
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="source-passphrase">
-                  {t('onboarding.importVault.unlockSecure.sourcePassphrase')}
-                </Label>
-                <PasswordInput
-                  id="source-passphrase"
-                  value={sourcePassphrase}
-                  onChange={(event) => setSourcePassphrase(event.target.value)}
-                />
-              </div>
-            </div>
-          )}
-
-          {step === 3 && (
-            <div className="space-y-4">
-              <div className="space-y-1">
-                <h3 className="text-sm font-semibold">
-                  {t('onboarding.importVault.review.title')}
-                </h3>
-                <p className="text-xs text-muted-foreground">
-                  {t('onboarding.importVault.review.subtitle')}
-                </p>
-              </div>
-              <div className="space-y-2 text-sm">
-                <div className="flex items-center justify-between text-xs text-muted-foreground">
-                  <span>{t('onboarding.importVault.review.vaultFile')}</span>
-                  <span className="text-foreground">
-                    {file?.name ?? t('onboarding.importVault.review.notSelected')}
-                  </span>
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  {t('onboarding.importVault.review.sourcePassphraseLabel')}:{' '}
-                  {sourcePassphrase.trim()
-                    ? t('onboarding.importVault.review.sourcePassphraseProvided')
-                    : t('onboarding.importVault.review.sourcePassphraseSame')}
-                </div>
-              </div>
               <p className="text-xs text-muted-foreground">
-                {t('onboarding.importVault.review.addMoreLater')}
+                {t('onboarding.importVault.unlockSecure.addMoreLater')}
               </p>
             </div>
           )}

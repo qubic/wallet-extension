@@ -1,7 +1,7 @@
 {
   "name": "app",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -24,6 +24,7 @@
     "@qubic-labs/react": "^1.1.1",
     "@qubic-labs/sdk": "^2.0.1",
     "@qubic-lib/qubic-ts-vault-library": "^1.0.2",
+    "@qubic.ts/core": "^1.9.0",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",
     "@radix-ui/react-aspect-ratio": "^1.1.8",

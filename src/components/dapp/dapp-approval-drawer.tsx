@@ -26,7 +26,11 @@ import {
 import { getChromeApi } from '@/lib/dapp/chrome-api'
 import { PasswordInput } from '@/components/ui/password-input'
 import { formatIntegerLike, formatNumber, truncateString } from '@/lib/utils'
-import { NATIVE_TOKEN_SYMBOL } from '@/lib/config/constants'
+import {
+  DAPP_APPROVAL_QUERY_PARAM,
+  DAPP_APPROVAL_QUERY_VALUE,
+  NATIVE_TOKEN_SYMBOL,
+} from '@/lib/config/constants'
 import AddressLabel from '@/components/address-label'
 import { useTxTypeDescription } from '@/hooks/use-tx-type-description'
 import { isWalletLocked } from '@/lib/lock'
@@ -45,7 +49,8 @@ const DappApprovalDrawer = () => {
   const [locked, setLocked] = useState(() => isWalletLocked())
   const isDappApprovalPopup =
     window.location.pathname.endsWith('popup.html') &&
-    new URLSearchParams(window.location.search).get('dapp') === '1'
+    new URLSearchParams(window.location.search).get(DAPP_APPROVAL_QUERY_PARAM) ===
+      DAPP_APPROVAL_QUERY_VALUE
 
   const loadPendingRequests = useCallback(async () => {
     const next = await getDappPendingRequests()
@@ -247,11 +252,11 @@ const DappApprovalDrawer = () => {
       <DrawerContent
         className={
           isDappApprovalPopup
-            ? 'inset-0 h-full max-h-none rounded-none border-none bg-background data-[vaul-drawer-direction=bottom]:mt-0 data-[vaul-drawer-direction=bottom]:max-h-none data-[vaul-drawer-direction=bottom]:rounded-none data-[vaul-drawer-direction=bottom]:border-none'
-            : 'border-none bg-background'
+            ? 'inset-0 h-full max-h-none overflow-hidden rounded-none border-none bg-background data-[vaul-drawer-direction=bottom]:mt-0 data-[vaul-drawer-direction=bottom]:max-h-none data-[vaul-drawer-direction=bottom]:rounded-none data-[vaul-drawer-direction=bottom]:border-none'
+            : 'max-h-[90vh] overflow-hidden border-none bg-background'
         }
       >
-        <DrawerHeader className="space-y-2 text-center">
+        <DrawerHeader className="shrink-0 space-y-2 text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
             {faviconUrl && faviconError !== faviconUrl ? (
               <img
@@ -269,7 +274,7 @@ const DappApprovalDrawer = () => {
         </DrawerHeader>
 
         {current && (
-          <div className="space-y-3 px-4 pb-2">
+          <div className="app-scrollbar min-h-0 flex-1 space-y-3 overflow-y-auto px-4 pb-2">
             <div className="rounded-xl border border-border/60 bg-background/40 p-3">
               <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
                 {t('dapp.approval.origin')}
@@ -401,7 +406,7 @@ const DappApprovalDrawer = () => {
           </div>
         )}
 
-        <DrawerFooter className="grid grid-cols-2 gap-2">
+        <DrawerFooter className="shrink-0 border-t border-border/60 bg-background grid grid-cols-2 gap-2">
           <Button
             variant="outline"
             onClick={() => void submitDecision(false)}

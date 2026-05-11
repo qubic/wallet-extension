@@ -1,5 +1,12 @@
 import { useBalance, useTransactions } from '@qubic-labs/react'
-import { CopyIcon, EyeIcon, Loader2Icon, PackageIcon, RefreshCwIcon } from 'lucide-react'
+import {
+  CopyIcon,
+  EyeIcon,
+  Loader2Icon,
+  PackageIcon,
+  RefreshCwIcon,
+  SignatureIcon,
+} from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import QRCode from 'qrcode'
 import { useNavigate } from 'react-router-dom'
@@ -200,7 +207,7 @@ const Home = () => {
           </motion.div>
 
           {!isWatchOnly && (
-            <motion.div className="grid grid-cols-2 gap-3" variants={sectionMotion}>
+            <motion.div className="grid grid-cols-3 gap-3" variants={sectionMotion}>
               <Button
                 size="sm"
                 className="h-12 w-full gap-2 rounded-md bg-primary/10 text-primary hover:bg-primary/20"
@@ -216,6 +223,14 @@ const Home = () => {
               >
                 <ReceiveIcon className="h-4 w-4" />
                 {t('home.actions.receive')}
+              </Button>
+              <Button
+                size="sm"
+                className="h-12 w-full gap-2 rounded-md bg-primary/10 text-primary hover:bg-primary/20"
+                onClick={() => navigate('/sign-message')}
+              >
+                <SignatureIcon className="h-4 w-4" />
+                {t('home.actions.sign')}
               </Button>
             </motion.div>
           )}

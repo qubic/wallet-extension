@@ -243,7 +243,7 @@ const CreateWallet = ({
   }
 
   return (
-    <section className="flex h-full w-full justify-center px-6 py-8">
+    <section className="flex min-h-full w-full justify-center px-6 py-8">
       <div className="flex w-full max-w-sm flex-col justify-between gap-6">
         <div className="space-y-3 text-center">
           <FlowHeader

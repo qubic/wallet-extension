@@ -7,6 +7,14 @@ import { startActionIconThemeSync } from './lib/extension-icons'
 import { startDappSidepanelPresenceHeartbeat } from './lib/dapp/sidepanel-presence'
 import { startDappSessionSync } from './lib/dapp/session-sync'
 import { syncVaultStorageMirror } from './lib/vault'
+import {
+  DAPP_APPROVAL_POPUP_HEIGHT_PX,
+  DAPP_APPROVAL_POPUP_WIDTH_PX,
+  DAPP_APPROVAL_QUERY_PARAM,
+  DAPP_APPROVAL_QUERY_VALUE,
+  TOOLBAR_POPUP_HEIGHT_PX,
+  TOOLBAR_POPUP_WIDTH_PX,
+} from './lib/config/constants'
 
 const applyViewportSizing = () => {
   const html = document.documentElement
@@ -15,30 +23,39 @@ const applyViewportSizing = () => {
   const pathname = window.location.pathname
   const isPopup = pathname.endsWith('popup.html')
   const isSidepanel = pathname.endsWith('sidepanel.html')
+  const isDappApproval =
+    isPopup &&
+    new URLSearchParams(window.location.search).get(DAPP_APPROVAL_QUERY_PARAM) ===
+      DAPP_APPROVAL_QUERY_VALUE
 
   body.dataset.view = isPopup ? 'popup' : isSidepanel ? 'sidepanel' : 'other'
 
   if (isPopup) {
-    html.style.width = '360px'
-    html.style.height = '600px'
-    html.style.maxHeight = '600px'
-    html.style.minWidth = '360px'
-    html.style.minHeight = '600px'
+    const width = isDappApproval ? DAPP_APPROVAL_POPUP_WIDTH_PX : TOOLBAR_POPUP_WIDTH_PX
+    const height = isDappApproval ? DAPP_APPROVAL_POPUP_HEIGHT_PX : TOOLBAR_POPUP_HEIGHT_PX
+    const widthPx = `${width}px`
+    const heightPx = `${height}px`
+
+    html.style.width = widthPx
+    html.style.height = heightPx
+    html.style.maxHeight = heightPx
+    html.style.minWidth = widthPx
+    html.style.minHeight = heightPx
     html.style.overflow = 'hidden'
 
-    body.style.width = '360px'
-    body.style.height = '600px'
-    body.style.maxHeight = '600px'
-    body.style.minWidth = '360px'
-    body.style.minHeight = '600px'
+    body.style.width = widthPx
+    body.style.height = heightPx
+    body.style.maxHeight = heightPx
+    body.style.minWidth = widthPx
+    body.style.minHeight = heightPx
     body.style.margin = '0'
     body.style.overflow = 'hidden'
 
     if (root) {
-      root.style.width = '360px'
-      root.style.height = '600px'
-      root.style.maxHeight = '600px'
-      root.style.minHeight = '600px'
+      root.style.width = widthPx
+      root.style.height = heightPx
+      root.style.maxHeight = heightPx
+      root.style.minHeight = heightPx
       root.style.overflow = 'hidden'
     }
     return

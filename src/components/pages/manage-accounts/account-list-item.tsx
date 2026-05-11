@@ -4,10 +4,10 @@ import {
   GripVerticalIcon,
   MoreHorizontalIcon,
   PencilIcon,
-  ShieldCheckIcon,
   TrashIcon,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { KeyVerticalIcon } from '@/components/icons/key-vertical-icon'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -130,7 +130,7 @@ const AccountListItem = ({
             </DropdownMenuItem>
             {!account.watchOnly && (
               <DropdownMenuItem onClick={() => onReveal(account)}>
-                <ShieldCheckIcon className="h-4 w-4" />
+                <KeyVerticalIcon className="h-4 w-4" />
                 {t('accounts.manage.reveal')}
               </DropdownMenuItem>
             )}

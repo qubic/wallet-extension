@@ -15,6 +15,8 @@ import Settings from '../pages/settings'
 import ConnectedSites from '../pages/settings/connected-sites'
 import General from '../pages/settings/general'
 import Security from '../pages/settings/security'
+import VerifyMessage from '../pages/settings/verify-message'
+import SignMessage from '../pages/sign-message'
 import TransactionDetails from '../pages/transaction-details'
 import Unlock from '../pages/unlock'
 import Welcome from '../pages/welcome'
@@ -239,6 +241,14 @@ const AppRouter = () => {
             }
           />
           <Route
+            path="/sign-message"
+            element={
+              <AnimatedRoute>
+                <SignMessage />
+              </AnimatedRoute>
+            }
+          />
+          <Route
             path="/history"
             element={
               <AnimatedRoute>
@@ -323,6 +333,14 @@ const AppRouter = () => {
             element={
               <AnimatedRoute>
                 <Security />
+              </AnimatedRoute>
+            }
+          />
+          <Route
+            path="/settings/verify-message"
+            element={
+              <AnimatedRoute>
+                <VerifyMessage />
               </AnimatedRoute>
             }
           />

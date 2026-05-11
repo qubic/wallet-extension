@@ -199,12 +199,12 @@ const Security = () => {
           }
         }}
       >
-        <DrawerContent>
+        <DrawerContent className="max-h-[90vh] border-none bg-background">
           <DrawerHeader>
             <DrawerTitle>{t('settings.security.changePasswordDrawerTitle')}</DrawerTitle>
             <DrawerDescription>{t('settings.security.changePasswordDrawerDesc')}</DrawerDescription>
           </DrawerHeader>
-          <div className="space-y-3 px-4">
+          <div className="app-scrollbar min-h-0 flex-1 space-y-3 overflow-y-auto px-4 pb-2">
             <div className="space-y-2">
               <Label htmlFor="current-passphrase">{t('settings.security.currentPassphrase')}</Label>
               <Input
@@ -251,7 +251,7 @@ const Security = () => {
               <p className="text-xs text-destructive">{changePasswordError}</p>
             )}
           </div>
-          <DrawerFooter>
+          <DrawerFooter className="border-t border-border/60 bg-background">
             <Button
               onClick={handleChangePassword}
               disabled={
