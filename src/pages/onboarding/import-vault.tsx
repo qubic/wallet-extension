@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/ui/password-input'
 import { Label } from '@/components/ui/label'
+import { MIN_PASSPHRASE_LENGTH } from '@/lib/config/constants'
 import { setUnlocked } from '@/lib/lock'
 import { openBrowserVault, setOnboarded } from '@/lib/vault'
 // @ts-expect-error - No type definitions available for this library
@@ -105,7 +106,7 @@ const ImportVault = () => {
       setStatus(t('onboarding.importVault.errors.passphraseRequired'))
       return
     }
-    if (step === 2 && passphrase.length < 12) {
+    if (step === 2 && passphrase.length < MIN_PASSPHRASE_LENGTH) {
       setStatus(t('onboarding.errors.passphraseTooShort'))
       return
     }
@@ -175,7 +176,7 @@ const ImportVault = () => {
       setStep(2)
       return
     }
-    if (passphrase.length < 12) {
+    if (passphrase.length < MIN_PASSPHRASE_LENGTH) {
       setStatus(t('onboarding.errors.passphraseTooShort'))
       setStep(2)
       return

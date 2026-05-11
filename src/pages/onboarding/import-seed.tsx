@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { PasswordInput } from '@/components/ui/password-input'
 import { isSeedLike } from '@/lib/seed'
+import { MIN_PASSPHRASE_LENGTH } from '@/lib/config/constants'
 import {
   getCachedAccounts,
   getSuggestedNextAccountName,
@@ -106,7 +107,7 @@ const ImportSeed = ({
       setStatus(t('onboarding.errors.passphraseRequired'))
       return
     }
-    if (step === 2 && variant !== 'add-address' && passphrase.length < 12) {
+    if (step === 2 && variant !== 'add-address' && passphrase.length < MIN_PASSPHRASE_LENGTH) {
       setStatus(t('onboarding.errors.passphraseTooShort'))
       return
     }
@@ -153,7 +154,7 @@ const ImportSeed = ({
       setStep(2)
       return
     }
-    if (variant !== 'add-address' && passphrase.length < 12) {
+    if (variant !== 'add-address' && passphrase.length < MIN_PASSPHRASE_LENGTH) {
       setStatus(t('onboarding.errors.passphraseTooShort'))
       setStep(2)
       return
