@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/ui/password-input'
 import { Label } from '@/components/ui/label'
-import { MIN_PASSPHRASE_LENGTH } from '@/lib/config/constants'
+import { validatePassphraseStrength } from '@/lib/passphrase'
 import { setUnlocked } from '@/lib/lock'
 import { openBrowserVault, setOnboarded } from '@/lib/vault'
 // @ts-expect-error - No type definitions available for this library
@@ -55,7 +55,7 @@ const ImportVault = () => {
     nextPassphrase: string,
     fileText: string,
   ) => {
-    const importPassphrase = sourcePassphrase.trim() || nextPassphrase
+    const importPassphrase = sourcePassphrase.trim() ? sourcePassphrase : nextPassphrase
 
     if (isWebWalletVaultFile(fileText)) {
       const previousConfig = localStorage.getItem(WEB_WALLET_CONFIG_KEY)
@@ -102,19 +102,24 @@ const ImportVault = () => {
       return
     }
 
-    if (step === 2 && !passphrase.trim()) {
-      setStatus(t('onboarding.importVault.errors.passphraseRequired'))
-      return
-    }
-    if (step === 2 && passphrase.length < MIN_PASSPHRASE_LENGTH) {
-      setStatus(t('onboarding.errors.passphraseTooShort'))
-      return
+    if (step === 2) {
+      const validation = validatePassphraseStrength(passphrase)
+      if (!validation.valid) {
+        setStatus(
+          t(
+            validation.reason === 'required'
+              ? 'onboarding.importVault.errors.passphraseRequired'
+              : 'onboarding.errors.passphraseTooShort',
+          ),
+        )
+        return
+      }
     }
     if (step === 2 && file) {
       setIsSaving(true)
       try {
         const fileText = await file.text()
-        const result = await validateSourceVault(file, passphrase.trim(), fileText)
+        const result = await validateSourceVault(file, passphrase, fileText)
         if (!result.valid) {
           setStatus(
             result.reason === 'invalid'
@@ -171,13 +176,15 @@ const ImportVault = () => {
       return
     }
 
-    if (!passphrase.trim()) {
-      setStatus(t('onboarding.importVault.errors.passphraseRequired'))
-      setStep(2)
-      return
-    }
-    if (passphrase.length < MIN_PASSPHRASE_LENGTH) {
-      setStatus(t('onboarding.errors.passphraseTooShort'))
+    const validation = validatePassphraseStrength(passphrase)
+    if (!validation.valid) {
+      setStatus(
+        t(
+          validation.reason === 'required'
+            ? 'onboarding.importVault.errors.passphraseRequired'
+            : 'onboarding.errors.passphraseTooShort',
+        ),
+      )
       setStep(2)
       return
     }
@@ -190,7 +197,7 @@ const ImportVault = () => {
 
       if (isWebWalletVault) {
         const qubicVault = new QubicVault()
-        const importPassphrase = sourcePassphrase.trim() || passphrase.trim()
+        const importPassphrase = sourcePassphrase.trim() ? sourcePassphrase : passphrase
 
         try {
           await qubicVault.importAndUnlock(true, importPassphrase, null, file, false)
@@ -245,7 +252,7 @@ const ImportVault = () => {
         const vault = await openBrowserVault(passphrase, true)
         await vault.importEncrypted(fileText, {
           mode: 'merge',
-          sourcePassphrase: sourcePassphrase || passphrase,
+          sourcePassphrase: sourcePassphrase.trim() ? sourcePassphrase : passphrase,
         })
         await vault.save()
         saveCachedAccounts(vault.list().map((e) => ({ name: e.name, identity: e.identity })))

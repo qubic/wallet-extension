@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { PasswordInput } from '@/components/ui/password-input'
 import { isSeedLike } from '@/lib/seed'
-import { MIN_PASSPHRASE_LENGTH } from '@/lib/config/constants'
+import { validatePassphraseStrength } from '@/lib/passphrase'
 import {
   getCachedAccounts,
   getSuggestedNextAccountName,
@@ -103,20 +103,27 @@ const ImportSeed = ({
       }
     }
 
-    if (step === 2 && !passphrase.trim()) {
-      setStatus(t('onboarding.errors.passphraseRequired'))
-      return
-    }
-    if (step === 2 && variant !== 'add-address' && passphrase.length < MIN_PASSPHRASE_LENGTH) {
-      setStatus(t('onboarding.errors.passphraseTooShort'))
-      return
+    if (step === 2) {
+      const validation = validatePassphraseStrength(passphrase, {
+        requireMinLength: variant !== 'add-address',
+      })
+      if (!validation.valid) {
+        setStatus(
+          t(
+            validation.reason === 'required'
+              ? 'onboarding.errors.passphraseRequired'
+              : 'onboarding.errors.passphraseTooShort',
+          ),
+        )
+        return
+      }
     }
     if (step === 2 && variant === 'add-address') {
       if (isAccountNameTaken(name)) {
         setStatus(t('accounts.manage.errors.nameDuplicate'))
         return
       }
-      const result = await validateVaultPassphrase(passphrase.trim())
+      const result = await validateVaultPassphrase(passphrase)
       if (!result.valid) {
         setStatus(
           result.reason === 'invalid'
@@ -149,13 +156,17 @@ const ImportSeed = ({
       return
     }
 
-    if (!passphrase.trim()) {
-      setStatus(t('onboarding.errors.passphraseRequired'))
-      setStep(2)
-      return
-    }
-    if (variant !== 'add-address' && passphrase.length < MIN_PASSPHRASE_LENGTH) {
-      setStatus(t('onboarding.errors.passphraseTooShort'))
+    const validation = validatePassphraseStrength(passphrase, {
+      requireMinLength: variant !== 'add-address',
+    })
+    if (!validation.valid) {
+      setStatus(
+        t(
+          validation.reason === 'required'
+            ? 'onboarding.errors.passphraseRequired'
+            : 'onboarding.errors.passphraseTooShort',
+        ),
+      )
       setStep(2)
       return
     }

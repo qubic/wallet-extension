@@ -163,13 +163,12 @@ const DappApprovalDrawer = () => {
       return
     }
 
-    const normalizedPassphrase = passphrase.trim()
     if (approved && requiresPassphrase) {
-      if (!normalizedPassphrase) {
+      if (!passphrase.trim()) {
         setError(t('passphraseAuth.validation.required'))
         return
       }
-      const validation = await validateVaultPassphrase(normalizedPassphrase)
+      const validation = await validateVaultPassphrase(passphrase)
       if (!validation.valid) {
         setError(
           validation.reason === 'invalid'
@@ -194,7 +193,7 @@ const DappApprovalDrawer = () => {
             payload: {
               id: current.id,
               approved,
-              passphrase: approved && requiresPassphrase ? normalizedPassphrase : undefined,
+              passphrase: approved && requiresPassphrase ? passphrase : undefined,
             },
           },
           (response?: { ok?: boolean; executed?: boolean; targetTick?: number }) => {

@@ -4,9 +4,7 @@ export const changeVaultPassphrase = async (
   currentPassphrase: string,
   newPassphrase: string,
 ): Promise<void> => {
-  const trimmedCurrent = currentPassphrase.trim()
-  const trimmedNew = newPassphrase.trim()
-  const vault = await openBrowserVault(trimmedCurrent, false)
-  await vault.rotatePassphrase(trimmedNew)
+  const vault = await openBrowserVault(currentPassphrase, false)
+  await vault.rotatePassphrase(newPassphrase)
   await vault.save()
 }
