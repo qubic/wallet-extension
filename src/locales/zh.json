@@ -573,18 +573,8 @@
       },
       "unlockSecure": {
         "title": "解锁并设置安全",
-        "subtitle": "为此设备设置新密码，如需要，请提供来源 vault 密码。",
-        "newPassphrase": "新 vault 密码",
-        "sourcePassphrase": "来源 vault 密码"
-      },
-      "review": {
-        "title": "审核导入",
-        "subtitle": "导入前请确认文件和密码信息。",
-        "vaultFile": "vault 文件",
-        "notSelected": "未选择",
-        "sourcePassphraseProvided": "已提供",
-        "sourcePassphraseSame": "与新密码相同",
-        "sourcePassphraseLabel": "来源密码",
+        "subtitle": "为此设备设置密码。",
+        "newPassphrase": "Vault 密码",
         "addMoreLater": "您可以稍后在「管理账户」中添加更多账户。"
       },
       "actions": {
@@ -597,7 +587,8 @@
         "passphraseRequired": "请输入密码。",
         "importFailed": "导入网页钱包 vault 失败。",
         "noEntries": "vault 已导入但未找到任何条目。",
-        "generic": "导入 vault 失败。"
+        "generic": "导入 vault 失败。",
+        "invalidFileOrPassphrase": "选择的文件不是 Qubic vault 文件，或者密码不正确。"
       }
     },
     "seedSecurity": {

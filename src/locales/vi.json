@@ -573,18 +573,8 @@
       },
       "unlockSecure": {
         "title": "Mở khóa và bảo mật",
-        "subtitle": "Cung cấp mật khẩu mới cho thiết bị này và mật khẩu nguồn nếu cần.",
-        "newPassphrase": "Mật khẩu vault mới",
-        "sourcePassphrase": "Mật khẩu vault nguồn"
-      },
-      "review": {
-        "title": "Xem lại nhập",
-        "subtitle": "Xác nhận chi tiết tập tin và mật khẩu trước khi nhập.",
-        "vaultFile": "Tập tin vault",
-        "notSelected": "Chưa chọn",
-        "sourcePassphraseProvided": "Đã cung cấp",
-        "sourcePassphraseSame": "Giống mật khẩu mới",
-        "sourcePassphraseLabel": "Mật khẩu nguồn",
+        "subtitle": "Cung cấp mật khẩu cho thiết bị này.",
+        "newPassphrase": "Mật khẩu vault",
         "addMoreLater": "Bạn có thể thêm tài khoản sau trong Quản lý tài khoản."
       },
       "actions": {
@@ -597,7 +587,8 @@
         "passphraseRequired": "Yêu cầu mật khẩu.",
         "importFailed": "Không thể nhập vault từ ví web.",
         "noEntries": "Đã nhập vault nhưng không tìm thấy mục nào.",
-        "generic": "Không thể nhập vault."
+        "generic": "Không thể nhập vault.",
+        "invalidFileOrPassphrase": "Tập tin đã chọn không phải là tập tin Qubic vault hoặc mật khẩu không chính xác."
       }
     },
     "seedSecurity": {

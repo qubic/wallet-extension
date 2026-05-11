@@ -573,18 +573,8 @@
       },
       "unlockSecure": {
         "title": "Unlock and secure",
-        "subtitle": "Provide a new password for this device and, if needed, the source password.",
-        "newPassphrase": "New vault password",
-        "sourcePassphrase": "Source vault password"
-      },
-      "review": {
-        "title": "Review import",
-        "subtitle": "Confirm the file and password details before importing.",
-        "vaultFile": "Vault file",
-        "notSelected": "Not selected",
-        "sourcePassphraseProvided": "Provided",
-        "sourcePassphraseSame": "Same as new",
-        "sourcePassphraseLabel": "Source password",
+        "subtitle": "Enter the password for this vault file. You'll use the same password to unlock the wallet on this device.",
+        "newPassphrase": "Vault password",
         "addMoreLater": "You can add more accounts later in Manage Accounts."
       },
       "actions": {
@@ -597,7 +587,8 @@
         "passphraseRequired": "Password is required.",
         "importFailed": "Failed to import web wallet vault.",
         "noEntries": "Vault imported but no entries were found.",
-        "generic": "Failed to import vault."
+        "generic": "Failed to import vault.",
+        "invalidFileOrPassphrase": "Selected file is not a Qubic vault file or password is incorrect."
       }
     },
     "seedSecurity": {

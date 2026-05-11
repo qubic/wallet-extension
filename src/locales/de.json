@@ -573,18 +573,8 @@
       },
       "unlockSecure": {
         "title": "Entsperren und sichern",
-        "subtitle": "Lege ein neues Passwort für dieses Gerät fest und gib bei Bedarf das Quell-Passwort ein.",
-        "newPassphrase": "Neues Tresor-Passwort",
-        "sourcePassphrase": "Quell-Tresor-Passwort"
-      },
-      "review": {
-        "title": "Import überprüfen",
-        "subtitle": "Bestätige die Datei- und Passwort-Details vor dem Import.",
-        "vaultFile": "Tresor-Datei",
-        "notSelected": "Nicht ausgewählt",
-        "sourcePassphraseProvided": "Angegeben",
-        "sourcePassphraseSame": "Gleich wie neue",
-        "sourcePassphraseLabel": "Quell-Passwort",
+        "subtitle": "Lege ein Passwort für dieses Gerät fest.",
+        "newPassphrase": "Tresor-Passwort",
         "addMoreLater": "Du kannst später weitere Konten unter Konten verwalten hinzufügen."
       },
       "actions": {
@@ -597,7 +587,8 @@
         "passphraseRequired": "Passwort ist erforderlich.",
         "importFailed": "Web-Wallet-Tresor konnte nicht importiert werden.",
         "noEntries": "Tresor importiert, aber keine Einträge gefunden.",
-        "generic": "Tresor konnte nicht importiert werden."
+        "generic": "Tresor konnte nicht importiert werden.",
+        "invalidFileOrPassphrase": "Die ausgewählte Datei ist keine Qubic-Tresor-Datei oder das Passwort ist falsch."
       }
     },
     "seedSecurity": {
