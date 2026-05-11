@@ -26,7 +26,11 @@ import {
 import { getChromeApi } from '@/lib/dapp/chrome-api'
 import { PasswordInput } from '@/components/ui/password-input'
 import { formatIntegerLike, formatNumber, truncateString } from '@/lib/utils'
-import { NATIVE_TOKEN_SYMBOL } from '@/lib/config/constants'
+import {
+  DAPP_APPROVAL_QUERY_PARAM,
+  DAPP_APPROVAL_QUERY_VALUE,
+  NATIVE_TOKEN_SYMBOL,
+} from '@/lib/config/constants'
 import AddressLabel from '@/components/address-label'
 import { useTxTypeDescription } from '@/hooks/use-tx-type-description'
 import { isWalletLocked } from '@/lib/lock'
@@ -45,7 +49,8 @@ const DappApprovalDrawer = () => {
   const [locked, setLocked] = useState(() => isWalletLocked())
   const isDappApprovalPopup =
     window.location.pathname.endsWith('popup.html') &&
-    new URLSearchParams(window.location.search).get('dapp') === '1'
+    new URLSearchParams(window.location.search).get(DAPP_APPROVAL_QUERY_PARAM) ===
+      DAPP_APPROVAL_QUERY_VALUE
 
   const loadPendingRequests = useCallback(async () => {
     const next = await getDappPendingRequests()
