@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { VaultInvalidPassphraseError } from '@qubic-labs/sdk'
 import { ArrowLeftIcon, ArrowRightIcon, FileJsonIcon, UploadCloudIcon } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -15,6 +16,15 @@ import FlowHeader from '@/components/onboarding/flow-header'
 
 const TOTAL_STEPS = 2
 const MAX_VAULT_FILE_SIZE = 102_400
+
+const isWebWalletVaultFile = (fileText: string) => {
+  try {
+    const data = JSON.parse(fileText)
+    return !!(data.salt && data.iv && data.cipher)
+  } catch {
+    return false
+  }
+}
 
 const ImportVault = () => {
   const navigate = useNavigate()
@@ -89,26 +99,14 @@ const ImportVault = () => {
       setIsSaving(true)
 
       const fileText = await file.text()
-      let isWebWalletVault = false
-      try {
-        const data = JSON.parse(fileText)
-        isWebWalletVault = !!(data.salt && data.iv && data.cipher)
-      } catch {
-        // Not valid JSON — treat as SDK format
-      }
+      const isWebWalletVault = isWebWalletVaultFile(fileText)
 
       if (isWebWalletVault) {
         const qubicVault = new QubicVault()
 
         let unlockSucceeded = false
         try {
-          unlockSucceeded = await qubicVault.importAndUnlock(
-            true,
-            passphrase.trim(),
-            null,
-            file,
-            false,
-          )
+          unlockSucceeded = await qubicVault.importAndUnlock(true, passphrase, null, file, false)
         } catch {
           // SDK rejects with a string on wrong password — fall through to the check below
         }
@@ -132,7 +130,7 @@ const ImportVault = () => {
           return
         }
 
-        const vault = await openBrowserVault(passphrase.trim(), true)
+        const vault = await openBrowserVault(passphrase, true)
         const watchOnlyAccounts = getWatchOnlyAccounts()
 
         for (const seed of seeds) {
@@ -161,11 +159,11 @@ const ImportVault = () => {
         clearSensitiveState()
         navigate('/home')
       } else {
-        const vault = await openBrowserVault(passphrase.trim(), true)
+        const vault = await openBrowserVault(passphrase, true)
         try {
           await vault.importEncrypted(fileText, {
             mode: 'merge',
-            sourcePassphrase: passphrase.trim(),
+            sourcePassphrase: passphrase,
           })
         } catch {
           setStatus(t('onboarding.importVault.errors.invalidFileOrPassphrase'))
@@ -189,7 +187,13 @@ const ImportVault = () => {
         navigate('/home')
       }
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : t('onboarding.importVault.errors.generic'))
+      setStatus(
+        error instanceof VaultInvalidPassphraseError
+          ? t('onboarding.importVault.errors.invalidSourcePassphrase')
+          : error instanceof Error
+            ? error.message
+            : t('onboarding.importVault.errors.generic'),
+      )
       setIsSaving(false)
     }
   }
@@ -292,7 +296,7 @@ const ImportVault = () => {
             {step === 1 ? t('common.back') : t('common.previous')}
           </Button>
           {step < TOTAL_STEPS ? (
-            <Button size="lg" onClick={handleNext} className="flex-1">
+            <Button size="lg" onClick={handleNext} className="flex-1" disabled={isSaving}>
               {t('common.continue')}
               <ArrowRightIcon className="h-5 w-5" />
             </Button>

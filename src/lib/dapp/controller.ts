@@ -430,8 +430,8 @@ const executeApprovedRequest = async (
       if (!decision.approved) {
         return asDappFailure(request.id, 'USER_REJECTED', 'Request was rejected by user')
       }
-      const passphrase = decision.passphrase?.trim()
-      if (!passphrase) {
+      const passphrase = decision.passphrase
+      if (!passphrase || !passphrase.trim()) {
         return asDappFailure(request.id, 'INVALID_PASSPHRASE', 'Passphrase is required')
       }
       const permissions = await getDappPermissions()

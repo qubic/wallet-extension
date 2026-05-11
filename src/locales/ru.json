@@ -585,7 +585,7 @@
         "fileTooLarge": "Выбранный файл слишком большой для допустимого файла vault.",
         "selectFile": "Выберите файл vault.",
         "passphraseRequired": "Необходимо ввести пароль.",
-        "importFailed": "Не удалось импортировать vault веб-кошелька.",
+        "invalidSourcePassphrase": "Неверный пароль исходного vault.",
         "noEntries": "Vault импортирован, но записи не найдены.",
         "generic": "Не удалось импортировать vault.",
         "invalidFileOrPassphrase": "Выбранный файл не является файлом Qubic vault или пароль введён неверно."

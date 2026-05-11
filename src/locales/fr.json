@@ -585,7 +585,7 @@
         "fileTooLarge": "Le fichier sélectionné est trop volumineux pour être un fichier vault valide.",
         "selectFile": "Sélectionnez un fichier vault.",
         "passphraseRequired": "Le mot de passe est requis.",
-        "importFailed": "Échec de l'importation du vault du portefeuille web.",
+        "invalidSourcePassphrase": "Mot de passe du vault source invalide.",
         "noEntries": "Vault importé mais aucune entrée trouvée.",
         "generic": "Échec de l'importation du vault.",
         "invalidFileOrPassphrase": "Le fichier sélectionné n'est pas un fichier Qubic vault ou le mot de passe est incorrect."

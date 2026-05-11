@@ -8,6 +8,7 @@ const MIN_LOCK_TIMEOUT_MINUTES = 0
 const MAX_LOCK_TIMEOUT_MINUTES = 120
 const ACTIVITY_TOUCH_THROTTLE_MS = 1_000
 let lastActivityTouchAt = 0
+let sessionUnlockedMemory = false
 
 type ChromeStorageSession = {
   get: (keys: string[], callback: (items: Record<string, unknown>) => void) => void
@@ -28,6 +29,7 @@ const getChromeSessionStorage = (): ChromeStorageSession | null => {
 }
 
 const setSessionUnlockedFlag = (value: boolean) => {
+  sessionUnlockedMemory = value
   const sessionStorage = getChromeSessionStorage()
   if (!sessionStorage) return
 
@@ -155,6 +157,8 @@ const normalizeLockTimeoutOption = (minutes: number) => {
 }
 
 const readSessionUnlockedFlag = async () => {
+  if (sessionUnlockedMemory) return true
+
   const sessionStorage = getChromeSessionStorage()
   if (!sessionStorage) return true
 

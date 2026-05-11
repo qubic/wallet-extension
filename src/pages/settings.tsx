@@ -63,8 +63,8 @@ const Settings = () => {
     setExportError('')
 
     try {
-      const vault = await openBrowserVault(exportPassphrase.trim(), false)
-      const encryptedVault = await exportVaultToWebWalletFormat(vault, exportPassphrase.trim())
+      const vault = await openBrowserVault(exportPassphrase, false)
+      const encryptedVault = await exportVaultToWebWalletFormat(vault, exportPassphrase)
 
       const json = JSON.stringify(encryptedVault, null, 2)
       const blob = new Blob([new TextEncoder().encode(json)], {

@@ -585,7 +585,7 @@
         "fileTooLarge": "Tập tin đã chọn quá lớn để là tập tin vault hợp lệ.",
         "selectFile": "Chọn một tập tin vault.",
         "passphraseRequired": "Yêu cầu mật khẩu.",
-        "importFailed": "Không thể nhập vault từ ví web.",
+        "invalidSourcePassphrase": "Mật khẩu vault nguồn không hợp lệ.",
         "noEntries": "Đã nhập vault nhưng không tìm thấy mục nào.",
         "generic": "Không thể nhập vault.",
         "invalidFileOrPassphrase": "Tập tin đã chọn không phải là tập tin Qubic vault hoặc mật khẩu không chính xác."

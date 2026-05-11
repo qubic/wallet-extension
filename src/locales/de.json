@@ -585,7 +585,7 @@
         "fileTooLarge": "Die ausgewählte Datei ist zu groß für eine gültige Tresor-Datei.",
         "selectFile": "Wähle eine Tresor-Datei aus.",
         "passphraseRequired": "Passwort ist erforderlich.",
-        "importFailed": "Web-Wallet-Tresor konnte nicht importiert werden.",
+        "invalidSourcePassphrase": "Ungültiges Quell-Tresor-Passwort.",
         "noEntries": "Tresor importiert, aber keine Einträge gefunden.",
         "generic": "Tresor konnte nicht importiert werden.",
         "invalidFileOrPassphrase": "Die ausgewählte Datei ist keine Qubic-Tresor-Datei oder das Passwort ist falsch."

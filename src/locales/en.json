@@ -585,7 +585,7 @@
         "fileTooLarge": "The selected file is too large to be a valid vault file.",
         "selectFile": "Select a vault file.",
         "passphraseRequired": "Password is required.",
-        "importFailed": "Failed to import web wallet vault.",
+        "invalidSourcePassphrase": "Invalid source vault password.",
         "noEntries": "Vault imported but no entries were found.",
         "generic": "Failed to import vault.",
         "invalidFileOrPassphrase": "Selected file is not a Qubic vault file or password is incorrect."
