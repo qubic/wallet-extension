@@ -593,7 +593,6 @@
         "selectFile": "Select a vault file.",
         "passphraseRequired": "Password is required.",
         "invalidSourcePassphrase": "Invalid source vault password.",
-        "importFailed": "Failed to import web wallet vault.",
         "noEntries": "Vault imported but no entries were found.",
         "generic": "Failed to import vault."
       }

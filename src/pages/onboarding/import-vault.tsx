@@ -213,7 +213,7 @@ const ImportVault = () => {
           return
         }
 
-        const vault = await openBrowserVault(passphrase.trim(), true)
+        const vault = await openBrowserVault(passphrase, true)
         const watchOnlyAccounts = getWatchOnlyAccounts()
 
         for (const seed of seeds) {
@@ -242,10 +242,10 @@ const ImportVault = () => {
         clearSensitiveState()
         navigate('/home')
       } else {
-        const vault = await openBrowserVault(passphrase.trim(), true)
+        const vault = await openBrowserVault(passphrase, true)
         await vault.importEncrypted(fileText, {
           mode: 'merge',
-          sourcePassphrase: sourcePassphrase.trim() || passphrase.trim(),
+          sourcePassphrase: sourcePassphrase || passphrase,
         })
         await vault.save()
         saveCachedAccounts(vault.list().map((e) => ({ name: e.name, identity: e.identity })))

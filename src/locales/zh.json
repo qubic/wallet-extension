@@ -593,7 +593,6 @@
         "selectFile": "请选择 vault 文件。",
         "passphraseRequired": "请输入密码。",
         "invalidSourcePassphrase": "来源 vault 密码无效。",
-        "importFailed": "导入网页钱包 vault 失败。",
         "noEntries": "vault 已导入但未找到任何条目。",
         "generic": "导入 vault 失败。"
       }
