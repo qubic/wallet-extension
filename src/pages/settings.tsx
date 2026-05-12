@@ -26,7 +26,7 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from '@/components/ui/drawer'
-import { Input } from '@/components/ui/input'
+import { PasswordInput } from '@/components/ui/password-input'
 import { Label } from '@/components/ui/label'
 import { lockWallet } from '@/lib/lock'
 import { openBrowserVault } from '@/lib/vault'
@@ -209,9 +209,8 @@ const Settings = () => {
           </DrawerHeader>
           <div className="app-scrollbar min-h-0 flex-1 space-y-2 overflow-y-auto px-4 pb-2">
             <Label htmlFor="export-passphrase">{t('settings.exportVault.passphrase')}</Label>
-            <Input
+            <PasswordInput
               id="export-passphrase"
-              type="password"
               value={exportPassphrase}
               onChange={(event) => {
                 setExportPassphrase(event.target.value)
