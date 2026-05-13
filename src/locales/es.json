@@ -28,7 +28,8 @@
       "send": "Enviar",
       "receive": "Recibir",
       "history": "Historial",
-      "sign": "Firmar"
+      "sign": "Firmar",
+      "menu": "Acciones"
     },
     "balance": {
       "label": "Saldo",

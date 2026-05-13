@@ -28,7 +28,8 @@
       "send": "Gönder",
       "receive": "Al",
       "history": "Geçmiş",
-      "sign": "İmzala"
+      "sign": "İmzala",
+      "menu": "İşlemler"
     },
     "balance": {
       "label": "Bakiye",

@@ -62,6 +62,7 @@ const ManageAccounts = () => {
   const [passphrasePromptOpen, setPassphrasePromptOpen] = useState(false)
   const [passphraseInput, setPassphraseInput] = useState('')
   const [passphraseError, setPassphraseError] = useState('')
+  const [submittingPassphrase, setSubmittingPassphrase] = useState(false)
   const [pendingAction, setPendingAction] = useState<
     | { type: 'load' }
     | { type: 'remove'; account: AccountEntry }
@@ -332,10 +333,12 @@ const ManageAccounts = () => {
   }
 
   const handlePassphraseSubmit = async () => {
+    if (submittingPassphrase) return
     if (!passphraseInput.trim()) {
       setPassphraseError(t('accounts.manage.errors.passphraseRequired'))
       return
     }
+    setSubmittingPassphrase(true)
     try {
       const vault = await openBrowserVault(passphraseInput, false)
       const expectedIdentity = vault.list()[0]?.identity
@@ -372,6 +375,8 @@ const ManageAccounts = () => {
         return
       }
       setPassphraseError(t('accounts.manage.errors.invalidPassphrase'))
+    } finally {
+      setSubmittingPassphrase(false)
     }
   }
 
@@ -534,6 +539,7 @@ const ManageAccounts = () => {
         open={passphrasePromptOpen}
         passphrase={passphraseInput}
         error={passphraseError}
+        loading={submittingPassphrase}
         onOpenChange={(open) => {
           setPassphrasePromptOpen(open)
           if (!open) {

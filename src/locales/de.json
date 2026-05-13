@@ -28,7 +28,8 @@
       "send": "Senden",
       "receive": "Empfangen",
       "history": "Verlauf",
-      "sign": "Signieren"
+      "sign": "Signieren",
+      "menu": "Aktionen"
     },
     "balance": {
       "label": "Kontostand",

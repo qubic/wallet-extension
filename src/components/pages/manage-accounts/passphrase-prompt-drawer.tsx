@@ -16,6 +16,7 @@ type PassphrasePromptDrawerProps = {
   open: boolean
   passphrase: string
   error: string
+  loading?: boolean
   onOpenChange: (open: boolean) => void
   onPassphraseChange: (value: string) => void
   onSubmit: () => void
@@ -25,6 +26,7 @@ const PassphrasePromptDrawer = ({
   open,
   passphrase,
   error,
+  loading = false,
   onOpenChange,
   onPassphraseChange,
   onSubmit,
@@ -45,11 +47,17 @@ const PassphrasePromptDrawer = ({
             id="vault-passphrase"
             value={passphrase}
             onChange={(event) => onPassphraseChange(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' && !loading && passphrase.trim()) {
+                event.preventDefault()
+                onSubmit()
+              }
+            }}
           />
           {error && <p className="text-xs text-destructive">{error}</p>}
         </div>
         <DrawerFooter>
-          <Button onClick={onSubmit}>
+          <Button onClick={onSubmit} disabled={loading || !passphrase.trim()}>
             <CheckIcon className="h-4 w-4" />
             {t('accounts.manage.confirm')}
           </Button>

@@ -3,6 +3,7 @@ import {
   CopyIcon,
   EyeIcon,
   Loader2Icon,
+  MoreHorizontalIcon,
   PackageIcon,
   RefreshCwIcon,
   SignatureIcon,
@@ -14,12 +15,20 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import TransferRightsButton from '@/components/transfer-rights-button'
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { ReceiveIcon } from '@/components/icons/receive-icon'
 import { SendIcon } from '@/components/icons/send-icon'
+import { KeyVerticalIcon } from '@/components/icons/key-vertical-icon'
 import { useTranslation } from 'react-i18next'
 import { truncateString } from '@/lib/utils'
-import { isWatchOnlyIdentity } from '@/lib/accounts'
+import { getCachedAccounts, isWatchOnlyIdentity } from '@/lib/accounts'
 import { useCurrentIdentity } from '@/hooks/use-current-identity'
+import { useRevealSeedFlow } from '@/hooks/use-reveal-seed-flow'
 import { HIDDEN_BALANCE, useBalanceVisibility } from '@/lib/balance-visibility'
 import { aggregateAssets, formatAssetUnits, useOwnedAssets } from '@/lib/assets'
 import { useLatestStats } from '@/lib/network-stats'
@@ -90,6 +99,7 @@ const Home = () => {
   )
   const [isReceiveOpen, setIsReceiveOpen] = useState(false)
   const [qrCode, setQrCode] = useState<string | null>(null)
+  const { openReveal, drawers: revealDrawers } = useRevealSeedFlow(identity)
   const pendingForIdentity = getPendingTransactionsForIdentity(identity)
   const pricePerQu = latestStats.data?.data?.price
   const pricePerBFormatted = pricePerQu
@@ -111,6 +121,11 @@ const Home = () => {
     transactions.isFetching ||
     ownedAssets.isFetching ||
     latestStats.isFetching
+
+  const handleRevealClick = () => {
+    const name = getCachedAccounts().find((entry) => entry.identity === identity)?.name ?? ''
+    openReveal({ identity, name })
+  }
 
   const handleCopyIdentity = async () => {
     await copyText(identity, {
@@ -207,7 +222,7 @@ const Home = () => {
           </motion.div>
 
           {!isWatchOnly && (
-            <motion.div className="grid grid-cols-3 gap-3" variants={sectionMotion}>
+            <motion.div className="grid grid-cols-[1fr_1fr_auto] gap-3" variants={sectionMotion}>
               <Button
                 size="sm"
                 className="h-12 w-full gap-2 rounded-md bg-primary/10 text-primary hover:bg-primary/20"
@@ -224,14 +239,27 @@ const Home = () => {
                 <ReceiveIcon className="h-4 w-4" />
                 {t('home.actions.receive')}
               </Button>
-              <Button
-                size="sm"
-                className="h-12 w-full gap-2 rounded-md bg-primary/10 text-primary hover:bg-primary/20"
-                onClick={() => navigate('/sign-message')}
-              >
-                <SignatureIcon className="h-4 w-4" />
-                {t('home.actions.sign')}
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    size="sm"
+                    aria-label={t('home.actions.menu')}
+                    className="h-12 w-12 rounded-md bg-primary/10 text-primary hover:bg-primary/20"
+                  >
+                    <MoreHorizontalIcon className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={handleRevealClick}>
+                    <KeyVerticalIcon className="h-4 w-4" />
+                    {t('accounts.manage.reveal')}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate('/sign-message')}>
+                    <SignatureIcon className="h-4 w-4" />
+                    {t('home.actions.sign')}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </motion.div>
           )}
 
@@ -380,6 +408,8 @@ const Home = () => {
           </div>
         </DrawerContent>
       </Drawer>
+
+      {revealDrawers}
     </section>
   )
 }

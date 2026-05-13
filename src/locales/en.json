@@ -28,7 +28,8 @@
       "send": "Send",
       "receive": "Receive",
       "history": "History",
-      "sign": "Sign"
+      "sign": "Sign",
+      "menu": "Actions"
     },
     "balance": {
       "label": "Balance",

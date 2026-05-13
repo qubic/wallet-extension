@@ -28,7 +28,8 @@
       "send": "发送",
       "receive": "接收",
       "history": "记录",
-      "sign": "签名"
+      "sign": "签名",
+      "menu": "操作"
     },
     "balance": {
       "label": "余额",

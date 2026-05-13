@@ -28,7 +28,8 @@
       "send": "Gửi",
       "receive": "Nhận",
       "history": "Lịch sử",
-      "sign": "Ký"
+      "sign": "Ký",
+      "menu": "Hành động"
     },
     "balance": {
       "label": "Số dư",
