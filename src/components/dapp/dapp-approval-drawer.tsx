@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useDrawerAutoFocus } from '@/hooks/use-drawer-auto-focus'
 import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router-dom'
 import { ChevronDownIcon, ChevronUpIcon, GlobeIcon, Link2OffIcon, LinkIcon } from 'lucide-react'
@@ -113,6 +114,10 @@ const DappApprovalDrawer = () => {
         current.method === 'sendTransaction') &&
       accountSummary?.accountWatchOnly,
   )
+  const { ref: passphraseInputRef, onOpenAutoFocus: onPassphraseOpenAutoFocus } =
+    useDrawerAutoFocus<HTMLInputElement>({
+      enabled: requiresPassphrase && !isWatchOnlySigningRequest,
+    })
 
   const title = useMemo(() => {
     if (!current) return ''
@@ -250,6 +255,7 @@ const DappApprovalDrawer = () => {
       }}
     >
       <DrawerContent
+        onOpenAutoFocus={onPassphraseOpenAutoFocus}
         className={
           isDappApprovalPopup
             ? 'inset-0 h-full max-h-none overflow-hidden rounded-none border-none bg-background data-[vaul-drawer-direction=bottom]:mt-0 data-[vaul-drawer-direction=bottom]:max-h-none data-[vaul-drawer-direction=bottom]:rounded-none data-[vaul-drawer-direction=bottom]:border-none'
@@ -391,6 +397,7 @@ const DappApprovalDrawer = () => {
             )}
             {requiresPassphrase && !isWatchOnlySigningRequest && (
               <PasswordInput
+                ref={passphraseInputRef}
                 id="dapp-passphrase"
                 groupClassName="h-12"
                 placeholder={t('passphraseAuth.form.passphrasePlaceholder')}

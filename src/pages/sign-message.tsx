@@ -111,6 +111,7 @@ const SignMessage = () => {
               placeholder={t('signMessage.messagePlaceholder')}
               className="resize-none"
               disabled={isWatchOnly || signing}
+              autoFocus
             />
           </div>
 

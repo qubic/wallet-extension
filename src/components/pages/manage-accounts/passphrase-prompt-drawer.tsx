@@ -1,6 +1,7 @@
 import { CheckIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
+import { useDrawerAutoFocus } from '@/hooks/use-drawer-auto-focus'
 import {
   Drawer,
   DrawerContent,
@@ -29,16 +30,18 @@ const PassphrasePromptDrawer = ({
   onSubmit,
 }: PassphrasePromptDrawerProps) => {
   const { t } = useTranslation()
+  const { ref: inputRef, onOpenAutoFocus } = useDrawerAutoFocus<HTMLInputElement>()
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent>
+      <DrawerContent onOpenAutoFocus={onOpenAutoFocus}>
         <DrawerHeader>
           <DrawerTitle>{t('accounts.manage.passphraseTitle')}</DrawerTitle>
         </DrawerHeader>
         <div className="space-y-2 px-4">
           <Label htmlFor="vault-passphrase">{t('accounts.manage.passphrase')}</Label>
           <PasswordInput
+            ref={inputRef}
             id="vault-passphrase"
             value={passphrase}
             onChange={(event) => onPassphraseChange(event.target.value)}
