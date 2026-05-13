@@ -9,7 +9,7 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from '@/components/ui/drawer'
-import { Input } from '@/components/ui/input'
+import { PasswordInput } from '@/components/ui/password-input'
 import { Label } from '@/components/ui/label'
 
 type PassphrasePromptDrawerProps = {
@@ -40,10 +40,9 @@ const PassphrasePromptDrawer = ({
         </DrawerHeader>
         <div className="space-y-2 px-4">
           <Label htmlFor="vault-passphrase">{t('accounts.manage.passphrase')}</Label>
-          <Input
+          <PasswordInput
             ref={inputRef}
             id="vault-passphrase"
-            type="password"
             value={passphrase}
             onChange={(event) => onPassphraseChange(event.target.value)}
           />
