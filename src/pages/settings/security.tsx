@@ -117,8 +117,12 @@ const Security = () => {
     }
   }
 
-  const handleResetApp = () => {
-    clearWalletStorage()
+  const handleResetApp = async () => {
+    try {
+      await clearWalletStorage()
+    } catch {
+      // Wipe is best-effort; reload regardless so the router re-evaluates onboarded state.
+    }
     window.location.reload()
   }
 
