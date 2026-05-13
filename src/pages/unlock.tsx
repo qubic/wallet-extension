@@ -3,21 +3,11 @@ import { useTranslation } from 'react-i18next'
 import { LockOpenIcon, ShieldCheckIcon } from 'lucide-react'
 import { VaultEntryNotFoundError, VaultInvalidPassphraseError } from '@qubic-labs/sdk'
 import { useNavigate } from 'react-router-dom'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
+import DeleteWalletDialog from '@/components/delete-wallet-dialog'
 import { Button } from '@/components/ui/button'
 import { PasswordInput } from '@/components/ui/password-input'
 import { setUnlocked } from '@/lib/lock'
 import { saveCachedAccounts } from '@/lib/accounts'
-import { clearWalletStorage } from '@/lib/storage'
 import { openBrowserVault, repairDuplicateVaultEntries } from '@/lib/vault'
 
 const Unlock = () => {
@@ -27,19 +17,6 @@ const Unlock = () => {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [deleteWalletOpen, setDeleteWalletOpen] = useState(false)
-  const [isDeleting, setIsDeleting] = useState(false)
-
-  const handleDeleteWallet = async () => {
-    if (isDeleting) return
-    setIsDeleting(true)
-    try {
-      await clearWalletStorage()
-    } catch {
-      // Wipe is best-effort; reload regardless so the router re-evaluates onboarded state.
-    }
-    window.location.hash = '/'
-    window.location.reload()
-  }
 
   const handleSubmit = async () => {
     if (!passphrase.trim()) {
@@ -145,26 +122,7 @@ const Unlock = () => {
         </div>
       </section>
 
-      <AlertDialog open={deleteWalletOpen} onOpenChange={setDeleteWalletOpen}>
-        <AlertDialogContent size="sm">
-          <AlertDialogHeader>
-            <AlertDialogTitle>{t('settings.security.resetAppTitle')}</AlertDialogTitle>
-            <AlertDialogDescription>{t('settings.security.resetAppDesc')}</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>
-              {t('settings.security.cancel')}
-            </AlertDialogCancel>
-            <AlertDialogAction
-              variant="destructive"
-              onClick={handleDeleteWallet}
-              disabled={isDeleting}
-            >
-              {t('settings.security.resetAppConfirm')}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <DeleteWalletDialog open={deleteWalletOpen} onOpenChange={setDeleteWalletOpen} />
     </>
   )
 }

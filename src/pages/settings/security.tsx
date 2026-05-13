@@ -3,16 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { VaultInvalidPassphraseError } from '@qubic-labs/sdk'
 import { ArrowLeftIcon, CheckIcon, ChevronRightIcon, KeyRoundIcon, TrashIcon } from 'lucide-react'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
+import DeleteWalletDialog from '@/components/delete-wallet-dialog'
 import { Button } from '@/components/ui/button'
 import {
   Drawer,
@@ -38,7 +29,6 @@ import {
   lockWallet,
   setLockTimeoutMinutes,
 } from '@/lib/lock'
-import { clearWalletStorage } from '@/lib/storage'
 import { changeVaultPassphrase } from '@/lib/vault-password'
 
 const Security = () => {
@@ -115,15 +105,6 @@ const Security = () => {
     } finally {
       setChangingPassword(false)
     }
-  }
-
-  const handleResetApp = async () => {
-    try {
-      await clearWalletStorage()
-    } catch {
-      // Wipe is best-effort; reload regardless so the router re-evaluates onboarded state.
-    }
-    window.location.reload()
   }
 
   return (
@@ -269,20 +250,7 @@ const Security = () => {
         </DrawerContent>
       </Drawer>
 
-      <AlertDialog open={resetAppOpen} onOpenChange={setResetAppOpen}>
-        <AlertDialogContent size="sm">
-          <AlertDialogHeader>
-            <AlertDialogTitle>{t('settings.security.resetAppTitle')}</AlertDialogTitle>
-            <AlertDialogDescription>{t('settings.security.resetAppDesc')}</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>{t('settings.security.cancel')}</AlertDialogCancel>
-            <AlertDialogAction variant="destructive" onClick={handleResetApp}>
-              {t('settings.security.resetAppConfirm')}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <DeleteWalletDialog open={resetAppOpen} onOpenChange={setResetAppOpen} />
     </>
   )
 }
