@@ -1,3 +1,29 @@
+# [1.1.0](https://github.com/qubic/wallet-extension/compare/v1.0.0...v1.1.0) (2026-05-13)
+
+
+### Bug Fixes
+
+* **dapp:** enlarge approval popup so password input fits ([d1ff019](https://github.com/qubic/wallet-extension/commit/d1ff019bc0a056f257b19bef31411857b14f7c22))
+* **lock:** keep wallets unlocked after onboarding ([b1564a1](https://github.com/qubic/wallet-extension/commit/b1564a14dde1b0012d48d36d4d74c0bd4885c2d6))
+* **onboarding:** remove unused locale key and passphrase trim in vault import ([71c6233](https://github.com/qubic/wallet-extension/commit/71c6233a3a3edc104e3391357976da037d9118a2))
+* **onboarding:** replace magic number with MIN_PASSPHRASE_LENGTH constant ([18be40d](https://github.com/qubic/wallet-extension/commit/18be40d41a46754ad799e951243a0cfb1f2c827a))
+* **onboarding:** show seed validation error only after user types ([8cc2682](https://github.com/qubic/wallet-extension/commit/8cc26829bb27eb582dcaaa80bf328b65b8220586))
+* **onboarding:** validate import passphrases earlier ([2efec4e](https://github.com/qubic/wallet-extension/commit/2efec4ee893e71f73a47492def9fe3049580c4cd))
+* **passphrase:** extract validation helper and stop trimming before vault APIs ([da9e125](https://github.com/qubic/wallet-extension/commit/da9e1253ab7387c6f032eaaca26347c43982cc7e))
+* remove the new password from import vault flow ([7580ae9](https://github.com/qubic/wallet-extension/commit/7580ae9ddbd578989d9ad444b657549af3f27865))
+* **router:** avoid stale unlock redirect after onboarding ([1c2aee0](https://github.com/qubic/wallet-extension/commit/1c2aee0c3300648b24e19928749ee03de7fddc3a))
+* **ui:** align account names and input spacing ([7d22a4d](https://github.com/qubic/wallet-extension/commit/7d22a4da0c3f6fdef5aa77969365bb1dae2ac157))
+* **ui:** improve input field visibility in dark mode ([aa0edb0](https://github.com/qubic/wallet-extension/commit/aa0edb09a9fa73ea8bebff9c142709670426663b))
+* **ui:** use PasswordInput for all password fields ([3997ab6](https://github.com/qubic/wallet-extension/commit/3997ab6c0bd968f1487c968d034bf7e73be6c818)), closes [#160](https://github.com/qubic/wallet-extension/issues/160)
+* update localization from invalid password to invalid file or password ([c3906b6](https://github.com/qubic/wallet-extension/commit/c3906b65a8b62c66b8e88ad17e1f6a5f1c6ec82b))
+* update reveal seed icon to match the web wallet ([ac34d6d](https://github.com/qubic/wallet-extension/commit/ac34d6d02d1de005eef8b7f62fa83639fa35ed47))
+
+
+### Features
+
+* removed unnecessary third step from import flow ([89090b0](https://github.com/qubic/wallet-extension/commit/89090b0f52cb22c6cce9fcac1b34c07f73a9d1dd))
+* **ui:** auto-focus single-field forms ([e423f68](https://github.com/qubic/wallet-extension/commit/e423f685d0351313b20b18bdd2c69c58ddf8ffeb))
+
 # 1.0.0 (2026-04-30)
 
 
