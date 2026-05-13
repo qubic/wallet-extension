@@ -48,6 +48,7 @@ const AppRouter = () => {
   const location = useLocation()
   const isOnboarded = hasAccounts()
   const [isLocked, setIsLocked] = useState(() => isWalletLocked())
+  const currentlyLocked = isOnboarded ? isWalletLocked() : isLocked
   const lockTimeoutRef = useRef<number | null>(null)
   const hideChrome = location.pathname === '/unlock'
   const routeKey = `${location.pathname}${location.search}`
@@ -214,7 +215,7 @@ const AppRouter = () => {
     )
   }
 
-  if (isLocked && location.pathname !== '/unlock') {
+  if (currentlyLocked && location.pathname !== '/unlock') {
     return <Navigate to="/unlock" replace />
   }
 

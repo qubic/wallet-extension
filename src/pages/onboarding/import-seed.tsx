@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { PasswordInput } from '@/components/ui/password-input'
 import { isSeedLike } from '@/lib/seed'
+import { validatePassphraseStrength } from '@/lib/passphrase'
 import {
   getCachedAccounts,
   getSuggestedNextAccountName,
@@ -102,16 +103,27 @@ const ImportSeed = ({
       }
     }
 
-    if (step === 2 && !passphrase.trim()) {
-      setStatus(t('onboarding.errors.passphraseRequired'))
-      return
+    if (step === 2) {
+      const validation = validatePassphraseStrength(passphrase, {
+        requireMinLength: variant !== 'add-address',
+      })
+      if (!validation.valid) {
+        setStatus(
+          t(
+            validation.reason === 'required'
+              ? 'onboarding.errors.passphraseRequired'
+              : 'onboarding.errors.passphraseTooShort',
+          ),
+        )
+        return
+      }
     }
     if (step === 2 && variant === 'add-address') {
       if (isAccountNameTaken(name)) {
         setStatus(t('accounts.manage.errors.nameDuplicate'))
         return
       }
-      const result = await validateVaultPassphrase(passphrase.trim())
+      const result = await validateVaultPassphrase(passphrase)
       if (!result.valid) {
         setStatus(
           result.reason === 'invalid'
@@ -144,8 +156,17 @@ const ImportSeed = ({
       return
     }
 
-    if (!passphrase.trim()) {
-      setStatus(t('onboarding.errors.passphraseRequired'))
+    const validation = validatePassphraseStrength(passphrase, {
+      requireMinLength: variant !== 'add-address',
+    })
+    if (!validation.valid) {
+      setStatus(
+        t(
+          validation.reason === 'required'
+            ? 'onboarding.errors.passphraseRequired'
+            : 'onboarding.errors.passphraseTooShort',
+        ),
+      )
       setStep(2)
       return
     }
@@ -229,7 +250,7 @@ const ImportSeed = ({
                   rows={3}
                   value={seed}
                   onChange={(event) => handleSeedChange(event.target.value)}
-                  aria-invalid={!isSeedValid}
+                  aria-invalid={seed.length > 0 && !isSeedValid}
                 />
                 <p className={`text-xs ${isSeedValid ? 'text-success' : 'text-muted-foreground'}`}>
                   {seedValidationMessage}

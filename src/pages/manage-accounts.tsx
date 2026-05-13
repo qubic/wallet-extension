@@ -336,9 +336,8 @@ const ManageAccounts = () => {
       setPassphraseError(t('accounts.manage.errors.passphraseRequired'))
       return
     }
-    const passphrase = passphraseInput.trim()
     try {
-      const vault = await openBrowserVault(passphrase, false)
+      const vault = await openBrowserVault(passphraseInput, false)
       const expectedIdentity = vault.list()[0]?.identity
       if (expectedIdentity) {
         await vault.getSeed(expectedIdentity)
@@ -350,19 +349,19 @@ const ManageAccounts = () => {
       const action = pendingAction
       setPendingAction(null)
       if (action.type === 'load') {
-        await loadAccounts(passphrase)
+        await loadAccounts(passphraseInput)
         return
       }
       if (action.type === 'remove') {
-        await handleRemove(action.account, passphrase)
+        await handleRemove(action.account, passphraseInput)
         return
       }
       if (action.type === 'reveal') {
-        await handleRevealSeed(action.account, passphrase)
+        await handleRevealSeed(action.account, passphraseInput)
         return
       }
       if (action.type === 'rename') {
-        await handleRename(action.account, action.name, passphrase)
+        await handleRename(action.account, action.name, passphraseInput)
       }
     } catch (error) {
       if (

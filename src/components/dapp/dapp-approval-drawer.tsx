@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useDrawerAutoFocus } from '@/hooks/use-drawer-auto-focus'
 import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router-dom'
 import { ChevronDownIcon, ChevronUpIcon, GlobeIcon, Link2OffIcon, LinkIcon } from 'lucide-react'
@@ -26,7 +27,11 @@ import {
 import { getChromeApi } from '@/lib/dapp/chrome-api'
 import { PasswordInput } from '@/components/ui/password-input'
 import { formatIntegerLike, formatNumber, truncateString } from '@/lib/utils'
-import { NATIVE_TOKEN_SYMBOL } from '@/lib/config/constants'
+import {
+  DAPP_APPROVAL_QUERY_PARAM,
+  DAPP_APPROVAL_QUERY_VALUE,
+  NATIVE_TOKEN_SYMBOL,
+} from '@/lib/config/constants'
 import AddressLabel from '@/components/address-label'
 import { useTxTypeDescription } from '@/hooks/use-tx-type-description'
 import { isWalletLocked } from '@/lib/lock'
@@ -45,7 +50,8 @@ const DappApprovalDrawer = () => {
   const [locked, setLocked] = useState(() => isWalletLocked())
   const isDappApprovalPopup =
     window.location.pathname.endsWith('popup.html') &&
-    new URLSearchParams(window.location.search).get('dapp') === '1'
+    new URLSearchParams(window.location.search).get(DAPP_APPROVAL_QUERY_PARAM) ===
+      DAPP_APPROVAL_QUERY_VALUE
 
   const loadPendingRequests = useCallback(async () => {
     const next = await getDappPendingRequests()
@@ -108,6 +114,10 @@ const DappApprovalDrawer = () => {
         current.method === 'sendTransaction') &&
       accountSummary?.accountWatchOnly,
   )
+  const { ref: passphraseInputRef, onOpenAutoFocus: onPassphraseOpenAutoFocus } =
+    useDrawerAutoFocus<HTMLInputElement>({
+      enabled: requiresPassphrase && !isWatchOnlySigningRequest,
+    })
 
   const title = useMemo(() => {
     if (!current) return ''
@@ -163,13 +173,12 @@ const DappApprovalDrawer = () => {
       return
     }
 
-    const normalizedPassphrase = passphrase.trim()
     if (approved && requiresPassphrase) {
-      if (!normalizedPassphrase) {
+      if (!passphrase.trim()) {
         setError(t('passphraseAuth.validation.required'))
         return
       }
-      const validation = await validateVaultPassphrase(normalizedPassphrase)
+      const validation = await validateVaultPassphrase(passphrase)
       if (!validation.valid) {
         setError(
           validation.reason === 'invalid'
@@ -194,7 +203,7 @@ const DappApprovalDrawer = () => {
             payload: {
               id: current.id,
               approved,
-              passphrase: approved && requiresPassphrase ? normalizedPassphrase : undefined,
+              passphrase: approved && requiresPassphrase ? passphrase : undefined,
             },
           },
           (response?: { ok?: boolean; executed?: boolean; targetTick?: number }) => {
@@ -246,6 +255,7 @@ const DappApprovalDrawer = () => {
       }}
     >
       <DrawerContent
+        onOpenAutoFocus={onPassphraseOpenAutoFocus}
         className={
           isDappApprovalPopup
             ? 'inset-0 h-full max-h-none overflow-hidden rounded-none border-none bg-background data-[vaul-drawer-direction=bottom]:mt-0 data-[vaul-drawer-direction=bottom]:max-h-none data-[vaul-drawer-direction=bottom]:rounded-none data-[vaul-drawer-direction=bottom]:border-none'
@@ -387,6 +397,7 @@ const DappApprovalDrawer = () => {
             )}
             {requiresPassphrase && !isWatchOnlySigningRequest && (
               <PasswordInput
+                ref={passphraseInputRef}
                 id="dapp-passphrase"
                 groupClassName="h-12"
                 placeholder={t('passphraseAuth.form.passphrasePlaceholder')}

@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { generateSeed, isSeedLike } from '@/lib/seed'
+import { validatePassphraseStrength } from '@/lib/passphrase'
 import { setUnlocked } from '@/lib/lock'
 import {
   openBrowserVault,
@@ -112,9 +113,20 @@ const CreateWallet = ({
       }
     }
 
-    if (step === 2 && !passphrase.trim()) {
-      setStatus(t('onboarding.errors.passphraseRequired'))
-      return
+    if (step === 2) {
+      const validation = validatePassphraseStrength(passphrase, {
+        requireMinLength: variant !== 'add-address',
+      })
+      if (!validation.valid) {
+        setStatus(
+          t(
+            validation.reason === 'required'
+              ? 'onboarding.errors.passphraseRequired'
+              : 'onboarding.errors.passphraseTooShort',
+          ),
+        )
+        return
+      }
     }
     if (step === 2 && variant !== 'add-address') {
       if (!confirmPassphrase.trim()) {
@@ -125,17 +137,13 @@ const CreateWallet = ({
         setStatus(t('onboarding.errors.passphraseMismatch'))
         return
       }
-      if (passphrase.length < 12) {
-        setStatus(t('onboarding.errors.passphraseTooShort'))
-        return
-      }
     }
     if (step === 2 && variant === 'add-address') {
       if (isAccountNameTaken(name)) {
         setStatus(t('accounts.manage.errors.nameDuplicate'))
         return
       }
-      const result = await validateVaultPassphrase(passphrase.trim())
+      const result = await validateVaultPassphrase(passphrase)
       if (!result.valid) {
         setStatus(
           result.reason === 'invalid'
@@ -168,8 +176,17 @@ const CreateWallet = ({
       return
     }
 
-    if (!passphrase.trim()) {
-      setStatus(t('onboarding.errors.passphraseRequired'))
+    const validation = validatePassphraseStrength(passphrase, {
+      requireMinLength: variant !== 'add-address',
+    })
+    if (!validation.valid) {
+      setStatus(
+        t(
+          validation.reason === 'required'
+            ? 'onboarding.errors.passphraseRequired'
+            : 'onboarding.errors.passphraseTooShort',
+        ),
+      )
       setStep(2)
       return
     }
@@ -181,11 +198,6 @@ const CreateWallet = ({
       }
       if (passphrase !== confirmPassphrase) {
         setStatus(t('onboarding.errors.passphraseMismatch'))
-        setStep(2)
-        return
-      }
-      if (passphrase.length < 12) {
-        setStatus(t('onboarding.errors.passphraseTooShort'))
         setStep(2)
         return
       }

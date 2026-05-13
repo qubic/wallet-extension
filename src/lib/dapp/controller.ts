@@ -48,14 +48,18 @@ import {
   signMessageFromSeed,
   signTransactionFromSeed,
 } from '@/lib/dapp/signing'
-import { QUBIC_RPC_BASE_URL } from '@/lib/config/constants'
+import {
+  DAPP_APPROVAL_POPUP_HEIGHT_PX,
+  DAPP_APPROVAL_POPUP_WIDTH_PX,
+  DAPP_APPROVAL_QUERY_PARAM,
+  DAPP_APPROVAL_QUERY_VALUE,
+  QUBIC_RPC_BASE_URL,
+} from '@/lib/config/constants'
 import { upsertPendingTransactionInChromeStorage } from '@/lib/pending-transactions-storage'
 import { normalizeBalance } from '@/lib/utils'
 import { openBrowserVault, verifyVaultAccess } from '@/lib/vault'
 
 const sdk = createSdk({ baseUrl: QUBIC_RPC_BASE_URL })
-const DAPP_APPROVAL_WINDOW_WIDTH = 380
-const DAPP_APPROVAL_WINDOW_HEIGHT = 600
 const processingApprovalDecisionIds = new Set<string>()
 
 type DappSendTransactionParams = {
@@ -120,14 +124,16 @@ const hasOpenSidePanel = async () => {
 const ensureApprovalWindow = async () => {
   if (await hasOpenSidePanel()) return
 
-  const popupUrl = chrome.runtime.getURL('popup.html?dapp=1')
+  const popupUrl = chrome.runtime.getURL(
+    `popup.html?${DAPP_APPROVAL_QUERY_PARAM}=${DAPP_APPROVAL_QUERY_VALUE}`,
+  )
   try {
     await chrome.windows.create({
       url: popupUrl,
       type: 'popup',
       focused: true,
-      width: DAPP_APPROVAL_WINDOW_WIDTH,
-      height: DAPP_APPROVAL_WINDOW_HEIGHT,
+      width: DAPP_APPROVAL_POPUP_WIDTH_PX,
+      height: DAPP_APPROVAL_POPUP_HEIGHT_PX,
     })
   } catch {
     throw new DappProviderError(
@@ -424,8 +430,8 @@ const executeApprovedRequest = async (
       if (!decision.approved) {
         return asDappFailure(request.id, 'USER_REJECTED', 'Request was rejected by user')
       }
-      const passphrase = decision.passphrase?.trim()
-      if (!passphrase) {
+      const passphrase = decision.passphrase
+      if (!passphrase || !passphrase.trim()) {
         return asDappFailure(request.id, 'INVALID_PASSPHRASE', 'Passphrase is required')
       }
       const permissions = await getDappPermissions()

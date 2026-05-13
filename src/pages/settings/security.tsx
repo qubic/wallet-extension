@@ -22,7 +22,7 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from '@/components/ui/drawer'
-import { Input } from '@/components/ui/input'
+import { PasswordInput } from '@/components/ui/password-input'
 import { Label } from '@/components/ui/label'
 import {
   Select,
@@ -207,9 +207,8 @@ const Security = () => {
           <div className="app-scrollbar min-h-0 flex-1 space-y-3 overflow-y-auto px-4 pb-2">
             <div className="space-y-2">
               <Label htmlFor="current-passphrase">{t('settings.security.currentPassphrase')}</Label>
-              <Input
+              <PasswordInput
                 id="current-passphrase"
-                type="password"
                 value={currentPassphrase}
                 onChange={(event) => {
                   setCurrentPassphrase(event.target.value)
@@ -219,9 +218,8 @@ const Security = () => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="new-passphrase">{t('settings.security.newPassphrase')}</Label>
-              <Input
+              <PasswordInput
                 id="new-passphrase"
-                type="password"
                 value={newPassphrase}
                 onChange={(event) => {
                   setNewPassphrase(event.target.value)
@@ -232,9 +230,8 @@ const Security = () => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="confirm-passphrase">{t('settings.security.confirmPassphrase')}</Label>
-              <Input
+              <PasswordInput
                 id="confirm-passphrase"
-                type="password"
                 value={confirmPassphrase}
                 onChange={(event) => {
                   setConfirmPassphrase(event.target.value)

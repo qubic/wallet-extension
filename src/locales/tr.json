@@ -573,18 +573,8 @@
       },
       "unlockSecure": {
         "title": "Kilidi aç ve güvence altına al",
-        "subtitle": "Bu cihaz için yeni bir parola belirleyin ve gerekirse kaynak parolayı girin.",
-        "newPassphrase": "Yeni vault parolası",
-        "sourcePassphrase": "Kaynak vault parolası"
-      },
-      "review": {
-        "title": "İçe aktarmayı gözden geçir",
-        "subtitle": "İçe aktarmadan önce dosya ve parola detaylarını doğrulayın.",
-        "vaultFile": "Vault dosyası",
-        "notSelected": "Seçilmedi",
-        "sourcePassphraseProvided": "Girildi",
-        "sourcePassphraseSame": "Yenisi ile aynı",
-        "sourcePassphraseLabel": "Kaynak parolası",
+        "subtitle": "Bu cihaz için bir parola belirleyin.",
+        "newPassphrase": "Vault parolası",
         "addMoreLater": "Daha sonra Hesapları Yönet bölümünden daha fazla hesap ekleyebilirsiniz."
       },
       "actions": {
@@ -595,9 +585,10 @@
         "fileTooLarge": "Seçilen dosya geçerli bir vault dosyası için çok büyük.",
         "selectFile": "Bir vault dosyası seçin.",
         "passphraseRequired": "Parola gereklidir.",
-        "importFailed": "Web cüzdanı vault dosyası içe aktarılamadı.",
+        "invalidSourcePassphrase": "Kaynak vault parolası geçersiz.",
         "noEntries": "Vault içe aktarıldı ancak hiçbir giriş bulunamadı.",
-        "generic": "Vault içe aktarılamadı."
+        "generic": "Vault içe aktarılamadı.",
+        "invalidFileOrPassphrase": "Seçilen dosya bir Qubic vault dosyası değil veya parola yanlış."
       }
     },
     "seedSecurity": {

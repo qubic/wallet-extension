@@ -573,18 +573,8 @@
       },
       "unlockSecure": {
         "title": "Desbloquear y asegurar",
-        "subtitle": "Proporciona una nueva contraseña para este dispositivo y, si es necesario, la contraseña de origen.",
-        "newPassphrase": "Nueva contraseña del vault",
-        "sourcePassphrase": "Contraseña del vault de origen"
-      },
-      "review": {
-        "title": "Revisar importación",
-        "subtitle": "Confirma los detalles del archivo y la contraseña antes de importar.",
-        "vaultFile": "Archivo vault",
-        "notSelected": "No seleccionado",
-        "sourcePassphraseProvided": "Proporcionada",
-        "sourcePassphraseSame": "Igual que la nueva",
-        "sourcePassphraseLabel": "Contraseña de origen",
+        "subtitle": "Ingresa la contraseña de este archivo de vault. Usarás la misma contraseña para desbloquear la billetera en este dispositivo.",
+        "newPassphrase": "Contraseña del vault",
         "addMoreLater": "Puedes agregar más cuentas luego en Administrar Cuentas."
       },
       "actions": {
@@ -595,9 +585,10 @@
         "fileTooLarge": "El archivo seleccionado es demasiado grande para ser un vault válido.",
         "selectFile": "Selecciona un archivo vault.",
         "passphraseRequired": "Se requiere contraseña.",
-        "importFailed": "No se pudo importar el vault de la billetera web.",
+        "invalidSourcePassphrase": "Contraseña del vault de origen inválida.",
         "noEntries": "Vault importado pero no se encontraron entradas.",
-        "generic": "No se pudo importar el vault."
+        "generic": "No se pudo importar el vault.",
+        "invalidFileOrPassphrase": "El archivo seleccionado no es un archivo Qubic vault o la contraseña es incorrecta."
       }
     },
     "seedSecurity": {
