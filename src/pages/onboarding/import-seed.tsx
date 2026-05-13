@@ -250,7 +250,7 @@ const ImportSeed = ({
                   rows={3}
                   value={seed}
                   onChange={(event) => handleSeedChange(event.target.value)}
-                  aria-invalid={!isSeedValid}
+                  aria-invalid={seed.length > 0 && !isSeedValid}
                 />
                 <p className={`text-xs ${isSeedValid ? 'text-success' : 'text-muted-foreground'}`}>
                   {seedValidationMessage}

@@ -93,6 +93,7 @@ const VerifyMessage = () => {
             rows={8}
             className="resize-none font-mono text-xs"
             disabled={verifying}
+            autoFocus
           />
           {hasInput && (
             <div className="flex justify-end">

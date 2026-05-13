@@ -31,6 +31,7 @@ import { Label } from '@/components/ui/label'
 import { lockWallet } from '@/lib/lock'
 import { openBrowserVault } from '@/lib/vault'
 import { exportVaultToWebWalletFormat } from '@/lib/vault-export'
+import { useDrawerAutoFocus } from '@/hooks/use-drawer-auto-focus'
 
 declare const __APP_VERSION__: string
 
@@ -42,6 +43,8 @@ const Settings = () => {
 
   const [exportDrawerOpen, setExportDrawerOpen] = useState(false)
   const [exportPassphrase, setExportPassphrase] = useState('')
+  const { ref: exportPassphraseInputRef, onOpenAutoFocus: onExportOpenAutoFocus } =
+    useDrawerAutoFocus<HTMLInputElement>()
   const [exportError, setExportError] = useState('')
   const [exporting, setExporting] = useState(false)
 
@@ -202,7 +205,10 @@ const Settings = () => {
           }
         }}
       >
-        <DrawerContent className="max-h-[90vh] border-none bg-background">
+        <DrawerContent
+          className="max-h-[90vh] border-none bg-background"
+          onOpenAutoFocus={onExportOpenAutoFocus}
+        >
           <DrawerHeader>
             <DrawerTitle>{t('settings.exportVault.drawerTitle')}</DrawerTitle>
             <DrawerDescription>{t('settings.exportVault.drawerDescription')}</DrawerDescription>
@@ -210,6 +216,7 @@ const Settings = () => {
           <div className="app-scrollbar min-h-0 flex-1 space-y-2 overflow-y-auto px-4 pb-2">
             <Label htmlFor="export-passphrase">{t('settings.exportVault.passphrase')}</Label>
             <Input
+              ref={exportPassphraseInputRef}
               id="export-passphrase"
               type="password"
               value={exportPassphrase}
