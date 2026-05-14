@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/drawer'
 import { Textarea } from '@/components/ui/textarea'
 import { useClipboardCopy } from '@/hooks/use-clipboard-copy'
+import { SEED_CLIPBOARD_CLEAR_MS } from '@/lib/clipboard'
 
 type RevealSeedDrawerProps = {
   open: boolean
@@ -47,6 +48,7 @@ const RevealSeedDrawer = ({ open, seed, accountName, onOpenChange }: RevealSeedD
   const handleCopy = () => {
     copyText(seed, {
       messages: { successTitle: t('accounts.manage.seedCopied') },
+      clearAfterMs: SEED_CLIPBOARD_CLEAR_MS,
     })
   }
 
