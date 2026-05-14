@@ -5,6 +5,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { useClipboardCopy } from '@/hooks/use-clipboard-copy'
+import { SEED_CLIPBOARD_CLEAR_MS } from '@/lib/clipboard'
 
 type SeedSecurityStepProps = {
   variant: 'onboarding' | 'add-address'
@@ -29,6 +30,7 @@ const SeedSecurityStep = ({
   const handleCopy = () => {
     copyText(seed, {
       messages: { successTitle: t('onboarding.seedSecurity.seedCopied') },
+      clearAfterMs: SEED_CLIPBOARD_CLEAR_MS,
     })
   }
 
