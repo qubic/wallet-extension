@@ -406,6 +406,11 @@ const DappApprovalDrawer = () => {
                   setPassphrase(event.target.value)
                   if (error) setError('')
                 }}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' && !loading) {
+                    void submitDecision(true)
+                  }
+                }}
                 className="h-12 text-base"
               />
             )}
