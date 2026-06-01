@@ -5,8 +5,9 @@ export const SEED_CLIPBOARD_CLEAR_MS = 60_000
 const CLEARED_CLIPBOARD_VALUE = ' '
 
 // execCommand is deprecated but it's the only clipboard write that doesn't
-// require document focus in Chrome extension pages — important when this
-// runs from a setTimeout after the user has switched apps.
+// require document focus in Chrome extension pages — important for the
+// scheduled clear, which fires from a setTimeout after the user has likely
+// switched focus to another app (where navigator.clipboard rejects).
 const writeViaExecCommand = (text: string): boolean => {
   const mark = document.createElement('span')
   mark.textContent = text
@@ -41,13 +42,14 @@ const writeViaExecCommand = (text: string): boolean => {
   return success
 }
 
+// For user-gesture copies (button clicks): the document is focused, so prefer
+// the modern async API and only fall back to execCommand if it rejects.
 export const writeToClipboard = async (text: string): Promise<boolean> => {
-  if (writeViaExecCommand(text)) return true
   try {
     await navigator.clipboard.writeText(text)
     return true
   } catch {
-    return false
+    return writeViaExecCommand(text)
   }
 }
 
@@ -60,10 +62,14 @@ export const cancelPendingClipboardClear = (): void => {
   }
 }
 
+// NOTE: timer lives in the page document — if torn down (popup closed,
+// extension reloaded) before delayMs, the clear won't run (follow-up:
+// chrome.alarms + offscreen). Uses execCommand since the doc is usually
+// unfocused when this fires, where the async clipboard API rejects.
 export const scheduleClipboardClear = (delayMs: number): void => {
   cancelPendingClipboardClear()
   pendingClearTimer = window.setTimeout(() => {
     pendingClearTimer = null
-    void writeToClipboard(CLEARED_CLIPBOARD_VALUE)
+    writeViaExecCommand(CLEARED_CLIPBOARD_VALUE)
   }, delayMs)
 }

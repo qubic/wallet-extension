@@ -39,8 +39,6 @@ export const useClipboardCopy = (defaults?: CopyMessages) => {
     async (value: string, options?: CopyOptions) => {
       const messages = { ...defaults, ...options?.messages }
 
-      cancelPendingClipboardClear()
-
       const success = await writeToClipboard(value)
       if (!success) {
         if (messages.errorTitle) {
@@ -68,6 +66,7 @@ export const useClipboardCopy = (defaults?: CopyMessages) => {
         }, COPIED_KEY_INDICATOR_MS)
       }
 
+      cancelPendingClipboardClear()
       if (options?.clearAfterMs) {
         scheduleClipboardClear(options.clearAfterMs)
       }
