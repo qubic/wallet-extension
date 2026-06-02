@@ -149,6 +149,15 @@ export const formatAddressLabel = (
   return `${name} (${truncated})`
 }
 
+export const hasIdnHostname = (origin: string): boolean => {
+  try {
+    const { hostname } = new URL(origin)
+    return hostname.includes('xn--') || /[^\x00-\x7F]/.test(hostname)
+  } catch {
+    return false
+  }
+}
+
 export type ExplorerObject = 'tx'
 
 export const compareBigIntDesc = (a: string, b: string): number => {

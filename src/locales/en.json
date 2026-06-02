@@ -471,6 +471,7 @@
     "importVault": "Import vault backup"
   },
   "dapp": {
+    "idnWarning": "Internationalized domain",
     "approval": {
       "title": "Connection request",
       "connectTitle": "Connection request",
