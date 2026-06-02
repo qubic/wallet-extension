@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { generateSeed, isSeedLike } from '@/lib/seed'
 import { validatePassphraseStrength } from '@/lib/passphrase'
-import { setUnlocked } from '@/lib/lock'
+import { isWalletLocked, setUnlocked } from '@/lib/lock'
 import {
   openBrowserVault,
   setOnboarded,
@@ -62,6 +62,18 @@ const CreateWallet = ({
     setConfirmPassphrase('')
     setHasConfirmedSeedBackup(false)
   }
+
+  useEffect(() => {
+    const onLock = () => {
+      if (!isWalletLocked()) return
+      setSeed('')
+      setPassphrase('')
+      setConfirmPassphrase('')
+      setHasConfirmedSeedBackup(false)
+    }
+    window.addEventListener('wallet-lock-updated', onLock)
+    return () => window.removeEventListener('wallet-lock-updated', onLock)
+  }, [])
 
   useEffect(() => {
     let isActive = true

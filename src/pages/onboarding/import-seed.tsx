@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { identityFromSeed } from '@qubic-labs/core'
 import { ArrowLeftIcon, ArrowRightIcon, KeyRoundIcon } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
@@ -16,7 +16,7 @@ import {
   isAccountNameTaken,
   saveCachedAccounts,
 } from '@/lib/accounts'
-import { setUnlocked } from '@/lib/lock'
+import { isWalletLocked, setUnlocked } from '@/lib/lock'
 import {
   openBrowserVault,
   setOnboarded,
@@ -72,6 +72,17 @@ const ImportSeed = ({
     setPassphrase('')
     setDerivedIdentity(null)
   }
+
+  useEffect(() => {
+    const onLock = () => {
+      if (!isWalletLocked()) return
+      setSeed('')
+      setPassphrase('')
+      setDerivedIdentity(null)
+    }
+    window.addEventListener('wallet-lock-updated', onLock)
+    return () => window.removeEventListener('wallet-lock-updated', onLock)
+  }, [])
 
   const handleSeedChange = (value: string) => {
     setSeed(normalizeSeedInput(value))
