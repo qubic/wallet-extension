@@ -152,7 +152,7 @@ export const formatAddressLabel = (
 export const hasIdnHostname = (origin: string): boolean => {
   try {
     const { hostname } = new URL(origin)
-    return hostname.includes('xn--') || /[^\x00-\x7F]/.test(hostname)
+    return hostname.includes('xn--') || /[^a-z0-9.-]/i.test(hostname)
   } catch {
     return false
   }
