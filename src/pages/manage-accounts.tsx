@@ -22,6 +22,7 @@ import {
   repairDuplicateVaultEntries,
   setOnboarded,
 } from '@/lib/vault'
+import { isWalletLocked } from '@/lib/lock'
 import AccountListItem from '@/components/pages/manage-accounts/account-list-item'
 import AddAccountDrawer from '@/components/pages/manage-accounts/add-account-drawer'
 import RenameAccountDrawer from '@/components/pages/manage-accounts/rename-account-drawer'
@@ -125,6 +126,19 @@ const ManageAccounts = () => {
       window.removeEventListener('wallet-account-updated', handleStorage)
     }
   }, [refreshFromCache])
+
+  useEffect(() => {
+    const onLock = () => {
+      if (!isWalletLocked()) return
+      setRevealedSeed('')
+      setSeedTarget(null)
+      setPassphraseInput('')
+      setPassphrasePromptOpen(false)
+      setPendingAction(null)
+    }
+    window.addEventListener('wallet-lock-updated', onLock)
+    return () => window.removeEventListener('wallet-lock-updated', onLock)
+  }, [])
 
   const balanceQueries = useQueries({
     queries: orderedAccounts.map((account) => ({
