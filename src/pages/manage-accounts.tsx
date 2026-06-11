@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useQueries } from '@tanstack/react-query'
-import { useSdk } from '@qubic-labs/react'
 import { VaultInvalidPassphraseError, VaultEntryNotFoundError } from '@qubic-labs/sdk'
 import { ArrowLeftIcon, PlusIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -22,6 +21,7 @@ import {
   repairDuplicateVaultEntries,
   setOnboarded,
 } from '@/lib/vault'
+import { fetchQutilBalance } from '@/hooks/use-qutil-balance'
 import AccountListItem from '@/components/pages/manage-accounts/account-list-item'
 import AddAccountDrawer from '@/components/pages/manage-accounts/add-account-drawer'
 import RenameAccountDrawer from '@/components/pages/manage-accounts/rename-account-drawer'
@@ -32,7 +32,6 @@ import type { AccountEntry } from '@/components/pages/manage-accounts/types'
 
 const ManageAccounts = () => {
   const { t } = useTranslation()
-  const sdk = useSdk()
   const navigate = useNavigate()
   const location = useLocation()
   const [accounts, setAccounts] = useState<AccountEntry[]>(() => {
@@ -129,7 +128,7 @@ const ManageAccounts = () => {
   const balanceQueries = useQueries({
     queries: orderedAccounts.map((account) => ({
       queryKey: ['qubic', 'balance', account.identity],
-      queryFn: () => sdk.rpc.live.balance(account.identity),
+      queryFn: () => fetchQutilBalance(account.identity),
       enabled: Boolean(account.identity),
       refetchInterval: 20_000,
     })),

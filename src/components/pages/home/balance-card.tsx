@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import type { useBalance } from '@qubic-labs/react'
+import type { useQutilBalance } from '@/hooks/use-qutil-balance'
 import { useTranslation } from 'react-i18next'
 import { formatBalanceCompact, formatUsd, normalizeBalance } from '@/lib/utils'
 import { HIDDEN_BALANCE, useBalanceVisibility } from '@/lib/balance-visibility'
@@ -30,7 +30,7 @@ const setCachedBalance = (identity: string, value: bigint) => {
 }
 
 type BalanceCardProps = {
-  balance: ReturnType<typeof useBalance>
+  balance: ReturnType<typeof useQutilBalance>
   identity: string
   price?: number
 }

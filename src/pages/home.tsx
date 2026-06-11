@@ -1,4 +1,5 @@
-import { useBalance, useTransactions } from '@qubic-labs/react'
+import { useTransactions } from '@qubic-labs/react'
+import { useQutilBalance } from '@/hooks/use-qutil-balance'
 import {
   CopyIcon,
   EyeIcon,
@@ -76,7 +77,7 @@ const Home = () => {
 
   const navigate = useNavigate()
   const { copyText } = useClipboardCopy()
-  const balance = useBalance(identity, { refetchInterval: REFRESH_INTERVAL_ACTIVE_BALANCE })
+  const balance = useQutilBalance(identity, { refetchInterval: REFRESH_INTERVAL_ACTIVE_BALANCE })
   const latestStats = useLatestStats('home')
   const ownedAssets = useOwnedAssets(identity)
   const aggregatedAssets = ownedAssets.data ? aggregateAssets(ownedAssets.data) : []

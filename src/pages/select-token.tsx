@@ -1,7 +1,7 @@
 import { ChevronRightIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { useBalance } from '@qubic-labs/react'
+import { useQutilBalance } from '@/hooks/use-qutil-balance'
 import PageHeader from '@/components/page-header'
 import {
   type AggregatedAsset,
@@ -17,7 +17,7 @@ const SelectToken = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const currentIdentity = useCurrentIdentity()
-  const balance = useBalance(currentIdentity)
+  const balance = useQutilBalance(currentIdentity)
   const ownedAssets = useOwnedAssets(currentIdentity)
   const parsedAssets = aggregateAssets(ownedAssets.data ?? {}, true)
   const onChainQuBalance = normalizeBalance(balance.data?.balance)

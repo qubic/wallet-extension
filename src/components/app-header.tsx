@@ -15,7 +15,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useClipboardCopy } from '@/hooks/use-clipboard-copy'
 import { useQueries } from '@tanstack/react-query'
-import { useSdk } from '@qubic-labs/react'
+import { fetchQutilBalance } from '@/hooks/use-qutil-balance'
 import { HIDDEN_BALANCE, useBalanceVisibility } from '@/lib/balance-visibility'
 import {
   getAccountOrder,
@@ -42,7 +42,6 @@ const AppHeader = ({
 }: AppHeaderProps) => {
   const { t } = useTranslation()
   const { isVisible } = useBalanceVisibility()
-  const sdk = useSdk()
   const navigate = useNavigate()
   const { copyText } = useClipboardCopy({
     successTitle: t('home.toast.copySuccess'),
@@ -95,7 +94,7 @@ const AppHeader = ({
   const balanceQueries = useQueries({
     queries: accounts.map((account) => ({
       queryKey: ['qubic', 'balance', account.identity],
-      queryFn: () => sdk.rpc.live.balance(account.identity),
+      queryFn: () => fetchQutilBalance(account.identity),
       enabled: accounts.length > 0,
       refetchInterval: REFRESH_INTERVAL_BACKGROUND_BALANCE,
     })),
