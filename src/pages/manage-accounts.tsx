@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { useQueries } from '@tanstack/react-query'
 import { VaultInvalidPassphraseError, VaultEntryNotFoundError } from '@qubic-labs/sdk'
 import { ArrowLeftIcon, PlusIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -21,7 +20,7 @@ import {
   repairDuplicateVaultEntries,
   setOnboarded,
 } from '@/lib/vault'
-import { fetchQutilBalance, qutilBalanceQueryKey } from '@/lib/qutil-balances'
+import { useQutilBalances } from '@/hooks/use-qutil-balance'
 import AccountListItem from '@/components/pages/manage-accounts/account-list-item'
 import AddAccountDrawer from '@/components/pages/manage-accounts/add-account-drawer'
 import RenameAccountDrawer from '@/components/pages/manage-accounts/rename-account-drawer'
@@ -125,25 +124,11 @@ const ManageAccounts = () => {
     }
   }, [refreshFromCache])
 
-  const balanceQueries = useQueries({
-    queries: orderedAccounts.map((account) => ({
-      queryKey: qutilBalanceQueryKey(account.identity),
-      queryFn: () => fetchQutilBalance(account.identity),
-      enabled: Boolean(account.identity),
-      refetchInterval: 20_000,
-    })),
-  })
-
-  const balanceByIdentity = useMemo(() => {
-    const map = new Map<string, bigint>()
-    orderedAccounts.forEach((account, index) => {
-      const data = balanceQueries[index]?.data
-      if (data?.balance !== undefined) {
-        map.set(account.identity, data.balance)
-      }
-    })
-    return map
-  }, [balanceQueries, orderedAccounts])
+  const balances = useQutilBalances(
+    orderedAccounts.map((account) => account.identity),
+    { refetchInterval: 20_000 },
+  )
+  const balanceByIdentity = balances.data ?? new Map<string, bigint>()
 
   const canRemoveAnyAccount = orderedAccounts.length > 1
 
