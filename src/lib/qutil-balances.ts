@@ -3,20 +3,24 @@ import { identityToPublicKey } from '@qubic.org/crypto'
 import { createLiveClient } from '@qubic.org/rpc'
 import { QUBIC_RPC_BASE_URL } from '@/lib/config/constants'
 
-// @qubic.org/rpc's createLiveClient POSTs to `/querySmartContract` relative to its
-// baseUrl, and does NOT append `/live/v1` itself (unlike @qubic-labs/sdk). So we pass
-// the full live base here. The result equals the package default and the Angular
-// wallet's mainnet base — guaranteeing identical values.
+// The @qubic.org/rpc live client appends only `/querySmartContract` to its baseUrl, so the
+// base must already include `/live/v1`. We derive it from QUBIC_RPC_BASE_URL so the endpoint
+// follows the configured network (this equals the package default for mainnet).
 const live = createLiveClient({ baseUrl: `${QUBIC_RPC_BASE_URL}/live/v1` })
 
-// @qubic.org/crypto types identity as a branded string; cast to a plain-string
-// signature (the same cast the Angular wallet uses).
+// @qubic.org/crypto types identity as a branded string; cast to a plain-string signature
+// (the same cast the Angular wallet uses).
 const idToPk = identityToPublicKey as (id: string) => Uint8Array
 
 /**
- * On-chain QU balance for one identity via the QUTIL GetBalances16 procedure, using
- * the generated qUtilGetBalances16 helper (single-key call). Mirrors the Angular
- * wallet's QubicRpcService.getBalances.
+ * Shared query key for an identity's QU balance. All readers must use this so they share a
+ * single react-query cache entry per identity.
+ */
+export const qutilBalanceQueryKey = (identity: string) => ['qubic', 'balance', identity]
+
+/**
+ * On-chain QU balance (raw value) for one identity via the QUTIL GetBalances16 procedure
+ * (single-key call). Mirrors the Angular wallet's QubicRpcService.getBalances.
  */
 export const fetchQutilBalanceValue = async (identity: string): Promise<bigint> => {
   const result = await qUtilGetBalances16(
@@ -27,3 +31,8 @@ export const fetchQutilBalanceValue = async (identity: string): Promise<bigint> 
   if (!result.ok) throw result.error
   return result.value.balances[0] ?? 0n
 }
+
+/** react-query fetcher; `balance` is the only field any reader consumes. */
+export const fetchQutilBalance = async (identity: string): Promise<{ balance: bigint }> => ({
+  balance: await fetchQutilBalanceValue(identity),
+})

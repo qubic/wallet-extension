@@ -21,7 +21,7 @@ import {
   repairDuplicateVaultEntries,
   setOnboarded,
 } from '@/lib/vault'
-import { fetchQutilBalance } from '@/hooks/use-qutil-balance'
+import { fetchQutilBalance, qutilBalanceQueryKey } from '@/lib/qutil-balances'
 import AccountListItem from '@/components/pages/manage-accounts/account-list-item'
 import AddAccountDrawer from '@/components/pages/manage-accounts/add-account-drawer'
 import RenameAccountDrawer from '@/components/pages/manage-accounts/rename-account-drawer'
@@ -127,7 +127,7 @@ const ManageAccounts = () => {
 
   const balanceQueries = useQueries({
     queries: orderedAccounts.map((account) => ({
-      queryKey: ['qubic', 'balance', account.identity],
+      queryKey: qutilBalanceQueryKey(account.identity),
       queryFn: () => fetchQutilBalance(account.identity),
       enabled: Boolean(account.identity),
       refetchInterval: 20_000,

@@ -15,7 +15,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useClipboardCopy } from '@/hooks/use-clipboard-copy'
 import { useQueries } from '@tanstack/react-query'
-import { fetchQutilBalance } from '@/hooks/use-qutil-balance'
+import { fetchQutilBalance, qutilBalanceQueryKey } from '@/lib/qutil-balances'
 import { HIDDEN_BALANCE, useBalanceVisibility } from '@/lib/balance-visibility'
 import {
   getAccountOrder,
@@ -93,7 +93,7 @@ const AppHeader = ({
 
   const balanceQueries = useQueries({
     queries: accounts.map((account) => ({
-      queryKey: ['qubic', 'balance', account.identity],
+      queryKey: qutilBalanceQueryKey(account.identity),
       queryFn: () => fetchQutilBalance(account.identity),
       enabled: accounts.length > 0,
       refetchInterval: REFRESH_INTERVAL_BACKGROUND_BALANCE,
