@@ -13,10 +13,8 @@ const ACCOUNT_AVATAR_COLORS = [
 ]
 
 const SIZE_STYLES = {
-  xs: { className: 'h-6 w-6', pixelSize: 24 },
   sm: { className: 'h-8 w-8', pixelSize: 32 },
   md: { className: 'h-10 w-10', pixelSize: 40 },
-  lg: { className: 'h-12 w-12', pixelSize: 48 },
 } as const
 
 type AccountAvatarProps = {
@@ -42,7 +40,7 @@ const AccountAvatar = ({
       <BoringAvatar
         size={pixelSize}
         name={avatarName}
-        variant="marble"
+        variant="bauhaus"
         colors={ACCOUNT_AVATAR_COLORS}
         className="h-full w-full rounded-full border border-border/60 bg-card"
       />

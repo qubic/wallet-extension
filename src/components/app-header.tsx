@@ -1,4 +1,4 @@
-import { CopyIcon, EyeIcon, PanelRightOpenIcon, PlusIcon, UsersIcon, XIcon } from 'lucide-react'
+import { CopyIcon, PanelRightOpenIcon, PlusIcon, UsersIcon, XIcon } from 'lucide-react'
 import AccountAvatar from '@/components/account-avatar'
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
@@ -159,7 +159,7 @@ const AppHeader = ({
                 identity={identity}
                 name={accountName}
                 watchOnly={activeAccount?.watchOnly}
-                size="md"
+                size="sm"
               />
               <div className="flex min-w-0 flex-col">
                 <span
@@ -222,16 +222,12 @@ const AppHeader = ({
                         name={account.name}
                         watchOnly={account.watchOnly}
                         size="sm"
-                        className="mr-3"
                       />
                       <div className="min-w-0 flex-1">
                         <div className="flex min-w-0 items-center gap-2">
                           <span className="min-w-0 flex-1 truncate font-medium text-foreground">
                             {account.name}
                           </span>
-                          {account.watchOnly && (
-                            <EyeIcon className="size-3 shrink-0 text-muted-foreground" />
-                          )}
                           {account.identity === identity && (
                             <span className="shrink-0 text-[11px] text-primary">
                               {t('accounts.manage.active')}
