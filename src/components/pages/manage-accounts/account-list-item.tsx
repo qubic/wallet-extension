@@ -8,6 +8,7 @@ import {
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { KeyVerticalIcon } from '@/components/icons/key-vertical-icon'
+import AccountAvatar from '@/components/account-avatar'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -75,38 +76,46 @@ const AccountListItem = ({
         isOver ? 'ring-2 ring-primary/40' : ''
       } ${isDragging ? 'opacity-60' : ''}`}
     >
-      <div className="min-w-0 flex-1">
-        <div className="flex min-w-0 items-start justify-between gap-2">
-          <div className="min-w-0">
-            <span className="block truncate text-sm font-semibold text-foreground">
-              {account.name}
+      <div className="flex min-w-0 flex-1 items-center gap-2">
+        <AccountAvatar
+          identity={account.identity}
+          name={account.name}
+          watchOnly={account.watchOnly}
+          size="sm"
+        />
+        <div className="min-w-0 flex-1">
+          <div className="flex min-w-0 items-start justify-between gap-2">
+            <div className="min-w-0">
+              <span className="block truncate text-sm font-semibold text-foreground">
+                {account.name}
+              </span>
+            </div>
+            <div className="flex shrink-0 items-center gap-2">
+              {account.watchOnly && (
+                <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-1.5 py-0.5 text-[10px] text-amber-700 dark:text-amber-200">
+                  <EyeIcon className="h-2.5 w-2.5" />
+                  {t('accounts.manage.watchOnly')}
+                </span>
+              )}
+              {isActive && (
+                <span className="shrink-0 text-[11px] text-primary">
+                  {t('accounts.manage.active')}
+                </span>
+              )}
+            </div>
+          </div>
+          <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
+            <span className="truncate">
+              {truncateString(account.identity, { leading: 5, trailing: 5 })}
+            </span>
+            <span className="text-[11px] font-semibold text-foreground">
+              {isVisible
+                ? balance !== undefined
+                  ? formatBalanceCompact(balance)
+                  : '--'
+                : HIDDEN_BALANCE}
             </span>
           </div>
-          <div className="flex shrink-0 items-center gap-2">
-            {account.watchOnly && (
-              <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-1.5 py-0.5 text-[10px] text-amber-700 dark:text-amber-200">
-                <EyeIcon className="h-2.5 w-2.5" />
-                {t('accounts.manage.watchOnly')}
-              </span>
-            )}
-            {isActive && (
-              <span className="shrink-0 text-[11px] text-primary">
-                {t('accounts.manage.active')}
-              </span>
-            )}
-          </div>
-        </div>
-        <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
-          <span className="truncate">
-            {truncateString(account.identity, { leading: 5, trailing: 5 })}
-          </span>
-          <span className="text-[11px] font-semibold text-foreground">
-            {isVisible
-              ? balance !== undefined
-                ? formatBalanceCompact(balance)
-                : '--'
-              : HIDDEN_BALANCE}
-          </span>
         </div>
       </div>
       <div className="flex items-center gap-1">

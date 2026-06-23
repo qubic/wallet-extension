@@ -1,12 +1,5 @@
-import {
-  CopyIcon,
-  EyeIcon,
-  PanelRightOpenIcon,
-  PlusIcon,
-  UsersIcon,
-  WalletIcon,
-  XIcon,
-} from 'lucide-react'
+import { CopyIcon, PanelRightOpenIcon, PlusIcon, UsersIcon, XIcon } from 'lucide-react'
+import AccountAvatar from '@/components/account-avatar'
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { formatBalanceCompact, truncateString } from '@/lib/utils'
@@ -58,6 +51,10 @@ const AppHeader = ({
     Array<{ name: string; identity: string; watchOnly?: boolean }>
   >([])
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const activeAccount = useMemo(
+    () => accounts.find((account) => account.identity === identity),
+    [accounts, identity],
+  )
 
   const refreshAccounts = useCallback(() => {
     const nextAccountName =
@@ -158,9 +155,12 @@ const AppHeader = ({
               className="flex min-w-0 items-center gap-3 text-left"
               aria-label={t('home.accounts.selectLabel')}
             >
-              <div className="flex h-10 w-10 items-center justify-center rounded-md border border-border/60 bg-card">
-                <WalletIcon className="h-5 w-5 text-primary" />
-              </div>
+              <AccountAvatar
+                identity={identity}
+                name={accountName}
+                watchOnly={activeAccount?.watchOnly}
+                size="sm"
+              />
               <div className="flex min-w-0 flex-col">
                 <span
                   className="truncate text-sm font-semibold text-foreground"
@@ -213,18 +213,21 @@ const AppHeader = ({
                       key={account.identity}
                       type="button"
                       onClick={() => handleSelectAccount(account)}
-                      className={`flex w-full items-center rounded-md px-2 py-2 text-left text-sm transition hover:bg-muted/30 ${
+                      className={`flex w-full items-center gap-3 rounded-md px-2 py-2 text-left text-sm transition hover:bg-muted/30 ${
                         account.identity === identity ? 'bg-muted/20' : ''
                       }`}
                     >
+                      <AccountAvatar
+                        identity={account.identity}
+                        name={account.name}
+                        watchOnly={account.watchOnly}
+                        size="sm"
+                      />
                       <div className="min-w-0 flex-1">
                         <div className="flex min-w-0 items-center gap-2">
                           <span className="min-w-0 flex-1 truncate font-medium text-foreground">
                             {account.name}
                           </span>
-                          {account.watchOnly && (
-                            <EyeIcon className="size-3 shrink-0 text-muted-foreground" />
-                          )}
                           {account.identity === identity && (
                             <span className="shrink-0 text-[11px] text-primary">
                               {t('accounts.manage.active')}
