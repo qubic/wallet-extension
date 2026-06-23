@@ -36,6 +36,7 @@ import {
 import AddressLabel from '@/components/address-label'
 import { useTxTypeDescription } from '@/hooks/use-tx-type-description'
 import { isWalletLocked } from '@/lib/lock'
+import IdnWarningBadge from '@/components/idn-warning-badge'
 import { validateVaultPassphrase } from '@/lib/vault'
 import { toast } from 'sonner'
 
@@ -73,7 +74,9 @@ const DappApprovalDrawer = () => {
 
   useEffect(() => {
     const syncLockState = () => {
-      setLocked(isWalletLocked())
+      const nowLocked = isWalletLocked()
+      if (nowLocked) setPassphrase('')
+      setLocked(nowLocked)
     }
 
     syncLockState()
@@ -287,6 +290,7 @@ const DappApprovalDrawer = () => {
                 {t('dapp.approval.origin')}
               </p>
               <p className="truncate text-sm font-medium text-foreground">{current.origin}</p>
+              <IdnWarningBadge origin={current.origin} />
             </div>
             {current.method === 'connect' && connectSummary && (
               <div className="rounded-xl border border-border/60 bg-background/40 p-3">

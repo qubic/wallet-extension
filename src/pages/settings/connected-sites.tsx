@@ -18,6 +18,7 @@ import {
 } from '@/lib/dapp/storage'
 import { useAccountNames } from '@/hooks/use-account-names'
 import { truncateString } from '@/lib/utils'
+import IdnWarningBadge from '@/components/idn-warning-badge'
 
 const ConnectedSites = () => {
   const { t } = useTranslation()
@@ -87,6 +88,7 @@ const ConnectedSites = () => {
                 <div className="flex items-start gap-3">
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium text-foreground">{site.origin}</p>
+                    <IdnWarningBadge origin={site.origin} />
                     <p className="mt-1 text-xs text-muted-foreground">
                       {t('settings.connectedSites.connectedAt', {
                         date: new Date(site.connectedAt).toLocaleString(),
