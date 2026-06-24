@@ -15,13 +15,8 @@ export const useQutilBalance = (identity: string, options: UseQutilBalanceOption
   })
 }
 
-type UseQutilBalancesOptions = {
-  enabled?: boolean
-  refetchInterval?: number
-}
-
 /** Batched balances for many identities; seeds each per-identity cache entry. */
-export const useQutilBalances = (ids: string[], options: UseQutilBalancesOptions = {}) => {
+export const useQutilBalances = (ids: string[], options: UseQutilBalanceOptions = {}) => {
   const queryClient = useQueryClient()
   const sortedIds = [...ids].sort()
   return useQuery({

@@ -21,6 +21,7 @@ import {
   setOnboarded,
 } from '@/lib/vault'
 import { useQutilBalances } from '@/hooks/use-qutil-balance'
+import { REFRESH_INTERVAL_ACCOUNT_LIST_BALANCE } from '@/lib/config/refresh-intervals'
 import AccountListItem from '@/components/pages/manage-accounts/account-list-item'
 import AddAccountDrawer from '@/components/pages/manage-accounts/add-account-drawer'
 import RenameAccountDrawer from '@/components/pages/manage-accounts/rename-account-drawer'
@@ -126,7 +127,7 @@ const ManageAccounts = () => {
 
   const balances = useQutilBalances(
     orderedAccounts.map((account) => account.identity),
-    { refetchInterval: 20_000 },
+    { refetchInterval: REFRESH_INTERVAL_ACCOUNT_LIST_BALANCE },
   )
   const balanceByIdentity = balances.data ?? new Map<string, bigint>()
 
