@@ -2,7 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import { useBalance, useSdk } from '@qubic-labs/react'
+import { useSdk } from '@qubic-labs/react'
+import { useQutilBalance } from '@/hooks/use-qutil-balance'
 import { AlertTriangleIcon, ChevronRightIcon, RouteIcon, SendIcon, XIcon } from 'lucide-react'
 import PageHeader from '@/components/page-header'
 import { Button } from '@/components/ui/button'
@@ -94,7 +95,7 @@ const TransferRights = () => {
   const currentIdentity = useCurrentIdentity(handleIdentityRefresh)
 
   const sdk = useSdk()
-  const balance = useBalance(currentIdentity)
+  const balance = useQutilBalance(currentIdentity)
   const ownedAssets = useOwnedAssets(currentIdentity)
   const smartContracts = useSmartContracts()
   const tickInfo = useTickInfo('transfer-rights')

@@ -57,6 +57,7 @@ import {
 } from '@/lib/config/constants'
 import { upsertPendingTransactionInChromeStorage } from '@/lib/pending-transactions-storage'
 import { normalizeBalance } from '@/lib/utils'
+import { fetchQutilBalanceValue } from '@/lib/qutil-balances'
 import { openBrowserVault, verifyVaultAccess } from '@/lib/vault'
 
 const sdk = createSdk({ baseUrl: QUBIC_RPC_BASE_URL })
@@ -359,12 +360,7 @@ const queueSendTransactionApproval = async (
   if (parsedParams.inputType === undefined || parsedParams.inputType === 0) {
     let currentBalance = 0n
     try {
-      const balanceResponse = await sdk.rpc.live.balance(account.identity)
-      const rawBalance =
-        balanceResponse && typeof balanceResponse === 'object'
-          ? (balanceResponse as { balance?: bigint | number | string }).balance
-          : undefined
-      currentBalance = normalizeBalance(rawBalance)
+      currentBalance = normalizeBalance(await fetchQutilBalanceValue(account.identity))
     } catch {
       throw new DappProviderError('INTERNAL_ERROR', 'Unable to validate account balance')
     }

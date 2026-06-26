@@ -2,7 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import { useBalance, useSdk, useSend } from '@qubic-labs/react'
+import { useSdk, useSend } from '@qubic-labs/react'
+import { useQutilBalance } from '@/hooks/use-qutil-balance'
 import { useCurrentIdentity } from '@/hooks/use-current-identity'
 import { NATIVE_TOKEN_SYMBOL } from '@/lib/config/constants'
 import {
@@ -53,7 +54,7 @@ const Transfer = () => {
   const currentIdentity = useCurrentIdentity(handleIdentityRefresh)
 
   const sdk = useSdk()
-  const balance = useBalance(currentIdentity)
+  const balance = useQutilBalance(currentIdentity)
   const ownedAssets = useOwnedAssets(currentIdentity)
   const sendMutation = useSend()
   const latestStats = useLatestStats('transfer')

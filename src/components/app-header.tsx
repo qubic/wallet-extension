@@ -4,11 +4,10 @@ import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { formatBalanceCompact, truncateString } from '@/lib/utils'
 import { setOnboarded } from '@/lib/vault'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useClipboardCopy } from '@/hooks/use-clipboard-copy'
-import { useQueries } from '@tanstack/react-query'
-import { useSdk } from '@qubic-labs/react'
+import { useQutilBalances } from '@/hooks/use-qutil-balance'
 import { HIDDEN_BALANCE, useBalanceVisibility } from '@/lib/balance-visibility'
 import {
   getAccountOrder,
@@ -18,7 +17,6 @@ import {
 } from '@/lib/accounts'
 import { useNavigate } from 'react-router-dom'
 import { useCallback } from 'react'
-import { REFRESH_INTERVAL_BACKGROUND_BALANCE } from '@/lib/config/refresh-intervals'
 
 type AppHeaderProps = {
   onToggleSidePanel: () => void
@@ -35,7 +33,6 @@ const AppHeader = ({
 }: AppHeaderProps) => {
   const { t } = useTranslation()
   const { isVisible } = useBalanceVisibility()
-  const sdk = useSdk()
   const navigate = useNavigate()
   const { copyText } = useClipboardCopy({
     successTitle: t('home.toast.copySuccess'),
@@ -89,25 +86,11 @@ const AppHeader = ({
     setAccounts([...ordered, ...remaining])
   }, [t])
 
-  const balanceQueries = useQueries({
-    queries: accounts.map((account) => ({
-      queryKey: ['qubic', 'balance', account.identity],
-      queryFn: () => sdk.rpc.live.balance(account.identity),
-      enabled: accounts.length > 0,
-      refetchInterval: REFRESH_INTERVAL_BACKGROUND_BALANCE,
-    })),
-  })
-
-  const balanceByIdentity = useMemo(() => {
-    const map = new Map<string, bigint>()
-    accounts.forEach((account, index) => {
-      const data = balanceQueries[index]?.data
-      if (data?.balance !== undefined) {
-        map.set(account.identity, data.balance)
-      }
-    })
-    return map
-  }, [accounts, balanceQueries])
+  const balances = useQutilBalances(
+    accounts.map((account) => account.identity),
+    { enabled: isMenuOpen },
+  )
+  const balanceByIdentity = balances.data ?? new Map<string, bigint>()
   const handleCopyIdentity = async () => {
     await copyText(identity)
   }
@@ -117,13 +100,6 @@ const AppHeader = ({
     setAccountName(selected.name)
     setIdentity(selected.identity)
     setIsMenuOpen(false)
-
-    // Trigger immediate refresh for the selected account
-    const accountIndex = accounts.findIndex((acc) => acc.identity === selected.identity)
-    if (accountIndex !== -1) {
-      void balanceQueries[accountIndex]?.refetch()
-    }
-
     navigate('/home')
   }
 
