@@ -24,7 +24,11 @@ import {
 import { addPendingTransaction, PENDING_SETTLED_EVENT } from '@/lib/pending-transactions'
 import { isWalletLocked } from '@/lib/lock'
 import { useLatestStats, useTickInfo, fetchTickInfo } from '@/lib/network-stats'
-import { resolveTransactionSubmissionErrorMessage } from '@/lib/transaction-submission-errors'
+import {
+  createTargetTickExpiredError,
+  resolveTransactionSubmissionErrorMessage,
+  TransactionValidationError,
+} from '@/lib/transaction-submission-errors'
 import ConfirmationDrawer from '@/components/pages/transfer/confirmation-drawer'
 import TransferForm from '@/components/pages/transfer/transfer-form'
 import type { FormErrors } from '@/components/pages/transfer/types'
@@ -211,7 +215,7 @@ const Transfer = () => {
     try {
       const parsedAmount = parseAmount(amount)
       if (!parsedAmount) {
-        throw new Error(t('transfer.validation.amountInvalid'))
+        throw new TransactionValidationError(t('transfer.validation.amountInvalid'))
       }
 
       let result: { txId: string; targetTick: bigint }
@@ -222,10 +226,10 @@ const Transfer = () => {
       if (isManualTargetTickEnabled) {
         const parsedManualTick = Number(parseAmount(manualTargetTick) ?? Number.NaN)
         if (!Number.isFinite(parsedManualTick) || parsedManualTick < 1) {
-          throw new Error(t('transfer.validation.targetTickManualInvalid'))
+          throw new TransactionValidationError(t('transfer.validation.targetTickManualInvalid'))
         }
         if (typeof sendCurrentTick === 'number' && parsedManualTick <= sendCurrentTick) {
-          throw new Error(t('transfer.validation.targetTickManualPast'))
+          throw createTargetTickExpiredError(t('transfer.validation.targetTickManualPast'))
         }
         requestedTargetTick = parsedManualTick
       } else {
@@ -245,7 +249,7 @@ const Transfer = () => {
       }
 
       if (requestedTargetTick === undefined) {
-        throw new Error(t('transfer.errors.networkError'))
+        throw new TransactionValidationError(t('transfer.errors.networkError'))
       }
 
       reachedSubmitStage = true

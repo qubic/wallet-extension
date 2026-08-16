@@ -19,7 +19,9 @@ const isRequestedTargetTickExpired = (
   const targetTick =
     typeof requestedTargetTick === 'bigint' ? requestedTargetTick : BigInt(requestedTargetTick)
 
-  return targetTick < BigInt(currentTick)
+  // A transaction aimed at the tick already being processed can no longer be
+  // included, so treat it as expired — matching the pre-submit validation.
+  return targetTick <= BigInt(currentTick)
 }
 
 export const isRequestedTargetTickExpiredNow = async (

@@ -42,7 +42,11 @@ import {
 import { addPendingTransaction, PENDING_SETTLED_EVENT } from '@/lib/pending-transactions'
 import { isWalletLocked } from '@/lib/lock'
 import { useTickInfo, fetchTickInfo } from '@/lib/network-stats'
-import { resolveTransactionSubmissionErrorMessage } from '@/lib/transaction-submission-errors'
+import {
+  createTargetTickExpiredError,
+  resolveTransactionSubmissionErrorMessage,
+  TransactionValidationError,
+} from '@/lib/transaction-submission-errors'
 import {
   compareBigIntDesc,
   formatBalance,
@@ -331,7 +335,7 @@ const TransferRights = () => {
     try {
       const parsedShares = parseAmount(shares)
       if (!parsedShares) {
-        throw new Error(t('transferRights.validation.sharesInvalid'))
+        throw new TransactionValidationError(t('transferRights.validation.sharesInvalid'))
       }
 
       const freshTickInfo = await fetchTickInfo()
@@ -340,10 +344,10 @@ const TransferRights = () => {
       if (isManualTargetTickEnabled) {
         const parsedManualTick = Number(parseAmount(manualTargetTick) ?? Number.NaN)
         if (!Number.isFinite(parsedManualTick) || parsedManualTick < 1) {
-          throw new Error(t('transfer.validation.targetTickManualInvalid'))
+          throw new TransactionValidationError(t('transfer.validation.targetTickManualInvalid'))
         }
         if (typeof sendCurrentTick === 'number' && parsedManualTick <= sendCurrentTick) {
-          throw new Error(t('transfer.validation.targetTickManualPast'))
+          throw createTargetTickExpiredError(t('transfer.validation.targetTickManualPast'))
         }
         requestedTargetTick = parsedManualTick
       } else {
@@ -363,7 +367,7 @@ const TransferRights = () => {
       }
 
       if (requestedTargetTick === undefined) {
-        throw new Error(t('transferRights.errors.networkError'))
+        throw new TransactionValidationError(t('transferRights.errors.networkError'))
       }
 
       let payload: Uint8Array
