@@ -25,6 +25,10 @@ import {
 import { addPendingTransaction, PENDING_SETTLED_EVENT } from '@/lib/pending-transactions'
 import { isWalletLocked } from '@/lib/lock'
 import { useLatestStats, useTickInfo, fetchTickInfo } from '@/lib/network-stats'
+import {
+  createTargetTickExpiredError,
+  resolveTransactionSubmissionErrorMessage,
+} from '@/lib/transaction-submission-errors'
 import ConfirmationDrawer from '@/components/pages/transfer/confirmation-drawer'
 import TransferForm from '@/components/pages/transfer/transfer-form'
 import type { FormErrors } from '@/components/pages/transfer/types'
@@ -205,6 +209,8 @@ const Transfer = () => {
 
     setSending(true)
     setErrorMessage('')
+    let requestedTargetTick: bigint | number | undefined
+    let reachedSubmitStage = false
 
     try {
       const parsedAmount = parseAmount(amount)
@@ -213,9 +219,7 @@ const Transfer = () => {
       }
 
       let result: { txId: string; targetTick: bigint }
-      let requestedTargetTick: bigint | number | undefined
 
-      // Fetch fresh tick info at send time
       const freshTickInfo = await fetchTickInfo()
       const sendCurrentTick = freshTickInfo.tickInfo?.tick
 
@@ -225,7 +229,7 @@ const Transfer = () => {
           throw new Error(t('transfer.validation.targetTickManualInvalid'))
         }
         if (typeof sendCurrentTick === 'number' && parsedManualTick <= sendCurrentTick) {
-          throw new Error(t('transfer.validation.targetTickManualPast'))
+          throw createTargetTickExpiredError()
         }
         requestedTargetTick = parsedManualTick
       } else {
@@ -247,6 +251,8 @@ const Transfer = () => {
       if (requestedTargetTick === undefined) {
         throw new Error(t('transfer.errors.networkError'))
       }
+
+      reachedSubmitStage = true
 
       if (selectedAsset) {
         const payload = buildAssetTransferPayload(
@@ -299,17 +305,17 @@ const Transfer = () => {
 
       navigate('/')
     } catch (error) {
-      let message = t('transfer.errors.generic')
-
-      if (error instanceof Error) {
-        if (error.message.includes('network') || error.message.includes('fetch')) {
-          message = t('transfer.errors.networkError')
-        } else if (error.message.includes('broadcast')) {
-          message = t('transfer.errors.broadcastFailed')
-        } else {
-          message = error.message
-        }
-      }
+      const message = await resolveTransactionSubmissionErrorMessage(
+        error,
+        requestedTargetTick,
+        {
+          generic: t('transfer.errors.generic'),
+          targetTickExpired: t('transfer.errors.targetTickExpired'),
+          networkError: t('transfer.errors.networkError'),
+          broadcastFailed: t('transfer.errors.broadcastFailed'),
+        },
+        { allowTickExpiryHeuristic: reachedSubmitStage },
+      )
 
       seedRef.current = null
       setErrorMessage(message)

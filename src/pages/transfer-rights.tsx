@@ -44,6 +44,10 @@ import { addPendingTransaction, PENDING_SETTLED_EVENT } from '@/lib/pending-tran
 import { isWalletLocked } from '@/lib/lock'
 import { useTickInfo, fetchTickInfo } from '@/lib/network-stats'
 import {
+  createTargetTickExpiredError,
+  resolveTransactionSubmissionErrorMessage,
+} from '@/lib/transaction-submission-errors'
+import {
   compareBigIntDesc,
   formatBalance,
   formatNumber,
@@ -325,14 +329,14 @@ const TransferRights = () => {
 
     setSending(true)
     setErrorMessage('')
+    let requestedTargetTick: bigint | number | undefined
+    let reachedSubmitStage = false
 
     try {
       const parsedShares = parseAmount(shares)
       if (!parsedShares) {
         throw new Error(t('transferRights.validation.sharesInvalid'))
       }
-
-      let requestedTargetTick: bigint | number | undefined
 
       const freshTickInfo = await fetchTickInfo()
       const sendCurrentTick = freshTickInfo.tickInfo?.tick
@@ -343,7 +347,7 @@ const TransferRights = () => {
           throw new Error(t('transfer.validation.targetTickManualInvalid'))
         }
         if (typeof sendCurrentTick === 'number' && parsedManualTick <= sendCurrentTick) {
-          throw new Error(t('transfer.validation.targetTickManualPast'))
+          throw createTargetTickExpiredError()
         }
         requestedTargetTick = parsedManualTick
       } else {
@@ -382,6 +386,8 @@ const TransferRights = () => {
         )
       }
 
+      reachedSubmitStage = true
+
       const result = await sdk.transactions.send({
         fromSeed: seed,
         toIdentity: sourceContract.contractAddress,
@@ -416,17 +422,17 @@ const TransferRights = () => {
 
       navigate('/')
     } catch (error) {
-      let message = t('transferRights.errors.generic')
-
-      if (error instanceof Error) {
-        if (error.message.includes('network') || error.message.includes('fetch')) {
-          message = t('transferRights.errors.networkError')
-        } else if (error.message.includes('broadcast')) {
-          message = t('transferRights.errors.broadcastFailed')
-        } else {
-          message = error.message
-        }
-      }
+      const message = await resolveTransactionSubmissionErrorMessage(
+        error,
+        requestedTargetTick,
+        {
+          generic: t('transferRights.errors.generic'),
+          targetTickExpired: t('transferRights.errors.targetTickExpired'),
+          networkError: t('transferRights.errors.networkError'),
+          broadcastFailed: t('transferRights.errors.broadcastFailed'),
+        },
+        { allowTickExpiryHeuristic: reachedSubmitStage },
+      )
 
       seedRef.current = null
       setErrorMessage(message)

@@ -369,6 +369,7 @@
     },
     "errors": {
       "networkError": "Network error. Please retry.",
+      "targetTickExpired": "Target tick has already passed. Please use a higher target tick.",
       "broadcastFailed": "Failed to broadcast transaction.",
       "watchOnly": "Watch-only accounts cannot send transfers.",
       "generic": "Transfer failed. Please retry."
@@ -418,6 +419,7 @@
     },
     "errors": {
       "networkError": "Network error. Please retry.",
+      "targetTickExpired": "Target tick has already passed. Please use a higher target tick.",
       "broadcastFailed": "Failed to broadcast transaction.",
       "watchOnly": "Watch-only accounts cannot transfer rights.",
       "generic": "Transfer rights failed. Please retry."
