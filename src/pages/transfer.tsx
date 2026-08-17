@@ -27,7 +27,6 @@ import { useLatestStats, useTickInfo, fetchTickInfo } from '@/lib/network-stats'
 import {
   createTargetTickExpiredError,
   resolveTransactionSubmissionErrorMessage,
-  TransactionValidationError,
 } from '@/lib/transaction-submission-errors'
 import ConfirmationDrawer from '@/components/pages/transfer/confirmation-drawer'
 import TransferForm from '@/components/pages/transfer/transfer-form'
@@ -215,7 +214,7 @@ const Transfer = () => {
     try {
       const parsedAmount = parseAmount(amount)
       if (!parsedAmount) {
-        throw new TransactionValidationError(t('transfer.validation.amountInvalid'))
+        throw new Error(t('transfer.validation.amountInvalid'))
       }
 
       let result: { txId: string; targetTick: bigint }
@@ -226,10 +225,10 @@ const Transfer = () => {
       if (isManualTargetTickEnabled) {
         const parsedManualTick = Number(parseAmount(manualTargetTick) ?? Number.NaN)
         if (!Number.isFinite(parsedManualTick) || parsedManualTick < 1) {
-          throw new TransactionValidationError(t('transfer.validation.targetTickManualInvalid'))
+          throw new Error(t('transfer.validation.targetTickManualInvalid'))
         }
         if (typeof sendCurrentTick === 'number' && parsedManualTick <= sendCurrentTick) {
-          throw createTargetTickExpiredError(t('transfer.validation.targetTickManualPast'))
+          throw createTargetTickExpiredError()
         }
         requestedTargetTick = parsedManualTick
       } else {
@@ -249,7 +248,7 @@ const Transfer = () => {
       }
 
       if (requestedTargetTick === undefined) {
-        throw new TransactionValidationError(t('transfer.errors.networkError'))
+        throw new Error(t('transfer.errors.networkError'))
       }
 
       reachedSubmitStage = true

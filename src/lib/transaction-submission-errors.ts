@@ -1,32 +1,14 @@
 import { isRequestedTargetTickExpiredNow } from '@/lib/target-tick'
 
 type RequestedTargetTick = bigint | number | undefined
-
 const TARGET_TICK_EXPIRED_ERROR_CODE = 'tx_target_tick_expired'
-const VALIDATION_ERROR_CODE = 'tx_validation'
-// Error codes raised by @qubic-labs/sdk: the request never completed vs. the
-// node answering with a non-2xx status.
-const RPC_FETCH_ERROR_CODE = 'rpc_fetch_error'
-const RPC_REQUEST_FAILED_CODE = 'rpc_request_failed'
 
-/**
- * Raised by the wallet itself before a transaction is submitted. The message is
- * already localized, so it must be surfaced as-is — running it through the
- * message matching below would misread wording such as "current network tick"
- * as a network failure.
- */
-export class TransactionValidationError extends Error {
-  readonly code: string
-
-  constructor(message: string, code: string = VALIDATION_ERROR_CODE) {
-    super(message)
-    this.name = 'TransactionValidationError'
-    this.code = code
-  }
-}
-
-export const createTargetTickExpiredError = (message: string) =>
-  new TransactionValidationError(message, TARGET_TICK_EXPIRED_ERROR_CODE)
+// Not a plain Error: those are classified by message text below, and the
+// past-tick copy ends in "current network tick" — read as a network failure.
+export const createTargetTickExpiredError = () =>
+  Object.assign(new Error('Target tick has already passed'), {
+    code: TARGET_TICK_EXPIRED_ERROR_CODE,
+  })
 
 type TransactionSubmissionErrorMessages = {
   generic: string
@@ -47,29 +29,9 @@ export const resolveTransactionSubmissionErrorMessage = async (
   messages: TransactionSubmissionErrorMessages,
   options?: { allowTickExpiryHeuristic?: boolean },
 ): Promise<string> => {
-  const errorCode = getErrorCode(error)
-
-  if (errorCode === TARGET_TICK_EXPIRED_ERROR_CODE) {
+  if (getErrorCode(error) === TARGET_TICK_EXPIRED_ERROR_CODE) {
     return messages.targetTickExpired
   }
-
-  if (errorCode === VALIDATION_ERROR_CODE && error instanceof Error) {
-    return error.message
-  }
-
-  // An expired target tick can also surface from the SDK as a plain transport
-  // or rejection error, so confirm it against the live tick before the coarser
-  // checks below claim it. If the network is genuinely unreachable this lookup
-  // fails and we fall through to the network error instead.
-  if (
-    options?.allowTickExpiryHeuristic &&
-    (await isRequestedTargetTickExpiredNow(requestedTargetTick))
-  ) {
-    return messages.targetTickExpired
-  }
-
-  if (errorCode === RPC_FETCH_ERROR_CODE) return messages.networkError
-  if (errorCode === RPC_REQUEST_FAILED_CODE) return messages.broadcastFailed
 
   if (!(error instanceof Error)) return messages.generic
 
@@ -81,6 +43,13 @@ export const resolveTransactionSubmissionErrorMessage = async (
 
   if (errorMessage.includes('broadcast')) {
     return messages.broadcastFailed
+  }
+
+  if (
+    options?.allowTickExpiryHeuristic &&
+    (await isRequestedTargetTickExpiredNow(requestedTargetTick))
+  ) {
+    return messages.targetTickExpired
   }
 
   return error.message

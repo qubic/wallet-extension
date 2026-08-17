@@ -45,7 +45,6 @@ import { useTickInfo, fetchTickInfo } from '@/lib/network-stats'
 import {
   createTargetTickExpiredError,
   resolveTransactionSubmissionErrorMessage,
-  TransactionValidationError,
 } from '@/lib/transaction-submission-errors'
 import {
   compareBigIntDesc,
@@ -335,7 +334,7 @@ const TransferRights = () => {
     try {
       const parsedShares = parseAmount(shares)
       if (!parsedShares) {
-        throw new TransactionValidationError(t('transferRights.validation.sharesInvalid'))
+        throw new Error(t('transferRights.validation.sharesInvalid'))
       }
 
       const freshTickInfo = await fetchTickInfo()
@@ -344,10 +343,10 @@ const TransferRights = () => {
       if (isManualTargetTickEnabled) {
         const parsedManualTick = Number(parseAmount(manualTargetTick) ?? Number.NaN)
         if (!Number.isFinite(parsedManualTick) || parsedManualTick < 1) {
-          throw new TransactionValidationError(t('transfer.validation.targetTickManualInvalid'))
+          throw new Error(t('transfer.validation.targetTickManualInvalid'))
         }
         if (typeof sendCurrentTick === 'number' && parsedManualTick <= sendCurrentTick) {
-          throw createTargetTickExpiredError(t('transfer.validation.targetTickManualPast'))
+          throw createTargetTickExpiredError()
         }
         requestedTargetTick = parsedManualTick
       } else {
@@ -367,7 +366,7 @@ const TransferRights = () => {
       }
 
       if (requestedTargetTick === undefined) {
-        throw new TransactionValidationError(t('transferRights.errors.networkError'))
+        throw new Error(t('transferRights.errors.networkError'))
       }
 
       let payload: Uint8Array
