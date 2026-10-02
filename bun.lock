@@ -12,10 +12,10 @@
         "@hookform/resolvers": "^5.2.2",
         "@qubic-labs/react": "^1.1.1",
         "@qubic-labs/sdk": "^2.0.1",
-        "@qubic-lib/qubic-ts-vault-library": "^1.0.2",
         "@qubic.org/contracts": "0.2.6",
         "@qubic.org/crypto": "0.2.6",
         "@qubic.org/rpc": "0.2.6",
+        "@qubic.org/vault": "1.2.1",
         "@qubic.ts/core": "^1.9.0",
         "@radix-ui/react-accordion": "^1.2.12",
         "@radix-ui/react-alert-dialog": "^1.1.15",
@@ -355,8 +355,6 @@
 
     "@qubic-labs/sdk": ["@qubic-labs/sdk@2.0.1", "", { "dependencies": { "@qubic-labs/core": "^1.0.3" }, "peerDependencies": { "typescript": "^5" }, "bin": { "qubic-vault": "dist/src/vault-cli.js" } }, "sha512-ija289W31WzAEDMqLz23iLO0J4fmWCBu0nkbgmNLD9MPmsWLZr0Rwgkgz41HyhJGtxY0eqHaq/vWXOxb2QHY+A=="],
 
-    "@qubic-lib/qubic-ts-vault-library": ["@qubic-lib/qubic-ts-vault-library@1.0.2", "", {}, "sha512-sgaMOVUcakLT7sCTTMIn5k2mrToZhVHmlqGKgamDA7McRvg0i1e5L5SHjNQ4jOc9koyJ48f1qZRHAfeCG6LyzQ=="],
-
     "@qubic.org/contracts": ["@qubic.org/contracts@0.2.6", "", { "dependencies": { "@qubic.org/crypto": "^0.2.1", "@qubic.org/registry": "^0.2.1", "@qubic.org/rpc": "^0.2.1", "@qubic.org/types": "^0.2.1" } }, "sha512-UL16EEXKqaBG+OTq6wQPWZVKHTTGf8dolvSuUsMnmG9a75DLkx8uigkyln4bP5nX8RoSa4r11EGVknztXNxUYg=="],
 
     "@qubic.org/crypto": ["@qubic.org/crypto@0.2.6", "", { "dependencies": { "@noble/hashes": "^2.2.0", "@qubic.org/types": "^0.2.1" } }, "sha512-Csw0+DwDI5I5BsR7yi+gIaopmw94mtx1TtYjAS4GxbRp8RO+tQI8y3r2WVYf21AMrmb8xg8GMyWGsUIgxpDD/w=="],
@@ -366,6 +364,8 @@
     "@qubic.org/rpc": ["@qubic.org/rpc@0.2.6", "", { "dependencies": { "@qubic.org/types": "^0.2.1", "openapi-fetch": "^0.17.0" } }, "sha512-KEJZ+566EIf6pqgHUL5ld60/smyvsLTJHNUW6kXy9EIeGEnnCqnQR8zvJNfn0NpeT6u11+89obn1O0WVUCSadA=="],
 
     "@qubic.org/types": ["@qubic.org/types@0.2.7", "", {}, "sha512-rziCgcD6DD1zC6uIEPtwnKPkn/hVdKyAwrcITJB9+Vyl/SLI6pLbCFv2hzEqvCt5gVI7sYzN7VpurU0fB+dveQ=="],
+
+    "@qubic.org/vault": ["@qubic.org/vault@1.2.1", "", { "dependencies": { "@noble/ciphers": "^1.0.0", "@noble/hashes": "^2.2.0", "hash-wasm": "^4.12.0" } }, "sha512-fwgdvoIx1XKhq5rtwnSCU4zqk9aqdksC1GEPdYf+KURfW1dH5irG/s+rmxXYbUt/KLaUC/r734ROROz0M4zUhA=="],
 
     "@qubic.ts/core": ["@qubic.ts/core@1.9.0", "", { "dependencies": { "@noble/hashes": "^1.8.0" } }, "sha512-ckuaU4TEB/atXXCRkadDP2Z0ttqMm7iWuSlJ+yCUMtRdKx00LwfkekgyzhPMBynLqnKtgp1P3Q65BnxKLd3aZw=="],
 
@@ -1006,6 +1006,8 @@
     "handlebars": ["handlebars@4.7.8", "", { "dependencies": { "minimist": "^1.2.5", "neo-async": "^2.6.2", "source-map": "^0.6.1", "wordwrap": "^1.0.0" }, "optionalDependencies": { "uglify-js": "^3.1.4" }, "bin": { "handlebars": "bin/handlebars" } }, "sha512-vafaFqs8MZkRrSX7sFVUdo3ap/eNiLnb4IakshzvP56X5Nr1iGKAIqdX6tMlm6HcNRIkr6AxO5jFEoJzzpT8aQ=="],
 
     "has-flag": ["has-flag@4.0.0", "", {}, "sha512-EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ=="],
+
+    "hash-wasm": ["hash-wasm@4.12.0", "", {}, "sha512-+/2B2rYLb48I/evdOIhP+K/DD2ca2fgBjp6O+GBEnCDk2e4rpeXIK8GvIyRPjTezgmWn9gmKwkQjjx6BtqDHVQ=="],
 
     "highlight.js": ["highlight.js@10.7.3", "", {}, "sha512-tzcUFauisWKNHaRkN4Wjl/ZA07gENAjFl3J/c480dprkGTg5EQstgaNFqBfUqCq54kZRIEcreTsAgF/m2quD7A=="],
 

@@ -9,22 +9,12 @@ import { PasswordInput } from '@/components/ui/password-input'
 import { Label } from '@/components/ui/label'
 import { setUnlocked } from '@/lib/lock'
 import { openBrowserVault, setOnboarded } from '@/lib/vault'
-// @ts-expect-error - No type definitions available for this library
-import { QubicVault } from '@qubic-lib/qubic-ts-vault-library/dist/vault.js'
+import { readVaultFile, VaultFileError, type VaultFileAccount } from '@/lib/vault-file'
 import { getWatchOnlyAccounts, saveCachedAccounts, saveWatchOnlyAccounts } from '@/lib/accounts'
 import FlowHeader from '@/components/onboarding/flow-header'
 
 const TOTAL_STEPS = 2
 const MAX_VAULT_FILE_SIZE = 102_400
-
-const isWebWalletVaultFile = (fileText: string) => {
-  try {
-    const data = JSON.parse(fileText)
-    return !!(data.salt && data.iv && data.cipher)
-  } catch {
-    return false
-  }
-}
 
 const ImportVault = () => {
   const navigate = useNavigate()
@@ -98,94 +88,49 @@ const ImportVault = () => {
     try {
       setIsSaving(true)
 
-      const fileText = await file.text()
-      const isWebWalletVault = isWebWalletVaultFile(fileText)
-
-      if (isWebWalletVault) {
-        const qubicVault = new QubicVault()
-
-        let unlockSucceeded = false
-        try {
-          unlockSucceeded = await qubicVault.importAndUnlock(true, passphrase, null, file, false)
-        } catch {
-          // SDK rejects with a string on wrong password — fall through to the check below
-        }
-        if (!unlockSucceeded) {
-          setStatus(t('onboarding.importVault.errors.invalidFileOrPassphrase'))
-          setStep(2)
-          setIsSaving(false)
-          return
-        }
-
-        type QubicSeed = {
-          encryptedSeed: string
-          alias: string
-          publicId: string
-          isOnlyWatch: boolean
-        }
-        const seeds = qubicVault.getSeeds() as QubicSeed[]
-        if (seeds.length === 0) {
-          setStatus(t('onboarding.importVault.errors.noEntries'))
-          setIsSaving(false)
-          return
-        }
-
-        const vault = await openBrowserVault(passphrase, true)
-        const watchOnlyAccounts = getWatchOnlyAccounts()
-
-        for (const seed of seeds) {
-          if (seed.isOnlyWatch) {
-            const existingAccount = watchOnlyAccounts.find((acc) => acc.identity === seed.publicId)
-            if (!existingAccount) {
-              watchOnlyAccounts.push({ identity: seed.publicId, name: seed.alias, watchOnly: true })
-            }
-          } else {
-            const decryptedSeed = await qubicVault.revealSeed(seed.publicId)
-            await vault.addSeed({ name: seed.alias, seed: decryptedSeed, overwrite: true })
-          }
-        }
-
-        saveWatchOnlyAccounts(watchOnlyAccounts)
-        await vault.save()
-        saveCachedAccounts(vault.list().map((e) => ({ name: e.name, identity: e.identity })))
-
-        const firstEntry = vault.list()[0]
-        const firstWatchOnly = seeds.find((s) => s.isOnlyWatch)
-        setUnlocked()
-        setOnboarded(
-          firstEntry?.identity ?? firstWatchOnly?.publicId,
-          firstEntry?.name ?? firstWatchOnly?.alias,
-        )
-        clearSensitiveState()
-        navigate('/home')
-      } else {
-        const vault = await openBrowserVault(passphrase, true)
-        try {
-          await vault.importEncrypted(fileText, {
-            mode: 'merge',
-            sourcePassphrase: passphrase,
-          })
-        } catch {
-          setStatus(t('onboarding.importVault.errors.invalidFileOrPassphrase'))
-          setStep(2)
-          setIsSaving(false)
-          return
-        }
-        await vault.save()
-        saveCachedAccounts(vault.list().map((e) => ({ name: e.name, identity: e.identity })))
-
-        const entries = vault.list()
-        if (entries.length === 0) {
-          setStatus(t('onboarding.importVault.errors.noEntries'))
-          setIsSaving(false)
-          return
-        }
-
-        setUnlocked()
-        setOnboarded(entries[0].identity, entries[0].name)
-        clearSensitiveState()
-        navigate('/home')
+      let accounts: VaultFileAccount[]
+      try {
+        accounts = await readVaultFile(new Uint8Array(await file.arrayBuffer()), passphrase)
+      } catch (error) {
+        if (!(error instanceof VaultFileError)) throw error
+        setStatus(t('onboarding.importVault.errors.invalidFileOrPassphrase'))
+        // A file that is not a vault sends the user back to pick another one.
+        setStep(error.code === 'invalid-file' ? 1 : 2)
+        setIsSaving(false)
+        return
       }
+
+      const vault = await openBrowserVault(passphrase, true)
+      const watchOnlyAccounts = getWatchOnlyAccounts()
+
+      for (const account of accounts) {
+        if (account.isOnlyWatch) {
+          const existingAccount = watchOnlyAccounts.find((acc) => acc.identity === account.publicId)
+          if (!existingAccount) {
+            watchOnlyAccounts.push({
+              identity: account.publicId,
+              name: account.alias,
+              watchOnly: true,
+            })
+          }
+        } else {
+          await vault.addSeed({ name: account.alias, seed: account.seed, overwrite: true })
+        }
+      }
+
+      saveWatchOnlyAccounts(watchOnlyAccounts)
+      await vault.save()
+      saveCachedAccounts(vault.list().map((e) => ({ name: e.name, identity: e.identity })))
+
+      const firstEntry = vault.list()[0]
+      const firstWatchOnly = accounts.find((account) => account.isOnlyWatch)
+      setUnlocked()
+      setOnboarded(
+        firstEntry?.identity ?? firstWatchOnly?.publicId,
+        firstEntry?.name ?? firstWatchOnly?.alias,
+      )
+      clearSensitiveState()
+      navigate('/home')
     } catch (error) {
       setStatus(
         error instanceof VaultInvalidPassphraseError
