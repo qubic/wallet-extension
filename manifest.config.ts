@@ -59,7 +59,7 @@ export const buildManifest = (mode: ManifestMode) => {
     ],
     content_security_policy: {
       extension_pages:
-        "script-src 'self'; object-src 'self'; font-src 'self' data:; style-src 'self' 'unsafe-inline'; connect-src 'self' https://rpc.qubic.org https://static.qubic.org",
+        "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'; font-src 'self' data:; style-src 'self' 'unsafe-inline'; connect-src 'self' https://rpc.qubic.org https://static.qubic.org",
     },
     side_panel: {
       default_path: 'sidepanel.html',

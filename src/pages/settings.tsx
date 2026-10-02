@@ -30,7 +30,7 @@ import { PasswordInput } from '@/components/ui/password-input'
 import { Label } from '@/components/ui/label'
 import { lockWallet } from '@/lib/lock'
 import { openBrowserVault } from '@/lib/vault'
-import { exportVaultToWebWalletFormat } from '@/lib/vault-export'
+import { exportVaultToFile } from '@/lib/vault-export'
 import { useDrawerAutoFocus } from '@/hooks/use-drawer-auto-focus'
 
 declare const __APP_VERSION__: string
@@ -67,10 +67,9 @@ const Settings = () => {
 
     try {
       const vault = await openBrowserVault(exportPassphrase, false)
-      const encryptedVault = await exportVaultToWebWalletFormat(vault, exportPassphrase)
+      const vaultFile = await exportVaultToFile(vault, exportPassphrase, appVersion)
 
-      const json = JSON.stringify(encryptedVault, null, 2)
-      const blob = new Blob([new TextEncoder().encode(json)], {
+      const blob = new Blob([vaultFile as Uint8Array<ArrayBuffer>], {
         type: 'application/octet-stream',
       })
       const url = URL.createObjectURL(blob)
